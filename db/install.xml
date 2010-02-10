@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20100125" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20100303" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="amos_strings" COMMENT="All current Moodle strings">
+    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
-        <FIELD NAME="branch" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="the name of the branch this string is valid for, like MOODLE_20_STABLE" PREVIOUS="id" NEXT="pack"/>
-        <FIELD NAME="pack" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="pack" NEXT="stringid"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
         <FIELD NAME="stringid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="text"/>
         <FIELD NAME="text" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The localized string text" PREVIOUS="stringid" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="text" NEXT="commithash"/>
-        <FIELD NAME="commithash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="The git commit hash that introduced this string" PREVIOUS="timemodified" NEXT="source"/>
-        <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The source of this string - git, email etc." PREVIOUS="commithash"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="text" NEXT="commitmsg"/>
+        <FIELD NAME="commitmsg" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Commit message" PREVIOUS="timemodified" NEXT="commithash"/>
+        <FIELD NAME="commithash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="The git commit hash that introduced this string" PREVIOUS="commitmsg" NEXT="source"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The source of this string - git, email etc." PREVIOUS="commithash" NEXT="deleted"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs" PREVIOUS="source" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="If the author is known in the local user table, store their id here" PREVIOUS="deleted" NEXT="userinfo"/>
+        <FIELD NAME="userinfo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Helps to identify the author of the change, for example a name from CVS commit" PREVIOUS="userid"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_snapshot" UNIQUE="false" FIELDS="component, lang, branch" COMMENT="Optimised for getting a snapshot of all current strings in one component"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

@@ -26,4 +26,4 @@
 defined('MOODLE_INTERNAL') || die();
 
 $ADMIN->add('root', new admin_category('amos', 'AMOS'));
-$ADMIN->add('amos', new admin_externalpage('amosinfo', 'Devel', $CFG->wwwroot.'/local/amos/devel.php'));
+$ADMIN->add('amos', new admin_externalpage('amosinfo', 'View', $CFG->wwwroot.'/local/amos/view.php'));
