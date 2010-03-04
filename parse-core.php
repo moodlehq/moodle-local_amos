@@ -5,8 +5,29 @@ header("Content-Type: text/plain");
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/mlanglib.php');
 
+// prepare the list of valid locations of string files
 $wtree = '/home/mudrd8mz/devel/amos/moodle';
-$locations = 'lang/en_utf8/ mod/workshop/lang/en_utf8/ mod/workshop/form/*/lang/en_utf8/';
+$locations = array('lang/en_utf8/*.php');
+$plugins = string_manager::instance()->get_registered_plugin_types();
+foreach ($plugins as $prefixtype => $pluginlocations) {
+    if (empty($prefixtype)) {
+        $plugintype = '';
+    } else {
+        $plugintype = substr($prefixtype, 0, strlen($prefixtype)-1);
+    }
+    foreach ($pluginlocations as $pluginlocation) {
+        $pluginlist = get_plugin_list($plugintype);
+        foreach ($pluginlist as $plugintype => $pluginpath) {
+            $langfile = substr($pluginpath . '/lang/en_utf8/' . $prefixtype . $plugintype  . '.php', strlen($CFG->dirroot) + 1);
+            if (file_exists($wtree . '/' . $langfile)) {
+                $locations[] = $langfile;
+            }
+        }
+    }
+}
+$locations = implode(' ', $locations);
+echo "SEARCH $locations\n";
+
 $tmp = make_upload_directory('temp/amos', false);
 $var = make_upload_directory('var/amos', false);
 $mem = memory_get_usage();
