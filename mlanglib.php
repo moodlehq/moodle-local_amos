@@ -235,9 +235,6 @@ class mlang_component {
      * @param string $id string identifier
      */
     public function unlink_string($id) {
-        if (!is_string($id)) {
-            throw new coding_exception('Illegal param type');
-        }
         if (isset($this->strings[$id])) {
             $this->strings[$id]->component = null;
             unset($this->strings[$id]);
