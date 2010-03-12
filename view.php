@@ -26,12 +26,6 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
-// filter settings
-$fver = optional_param('fver', array(), PARAM_ALPHANUMEXT);             // array of selected filter versions
-$flng = optional_param('flng', array('cs', 'sk'), PARAM_ALPHANUMEXT);   // languages to show or empty for current language
-$fcmp = optional_param('fcmp', array('moodle'));                        // components to show or, all if empty
-$ftxt = optional_param('ftxt', '', PARAM_CLEANHTML);                    // must contain this text
-
 require_login(SITEID, false);
 require_capability('moodle/site:config', $PAGE->context);
 
@@ -48,15 +42,10 @@ echo $output->header();
 
 // create a renderable object that represents the filter
 $filter = new local_amos_filter($PAGE->url);
-$filter->set_versions($fver);
-$fver = $filter->get_versions();
+$fdata = $filter->get_data();
 
 // create a renderable object that represent the translation table
-$translator = new local_amos_translator(new moodle_url('/local/amos/savebulk.php'));
-$filtersettings = compact('fver', 'flng', 'fcmp', 'ftxt');
-$translator->load_strings($filtersettings);
-
 echo $output->render($filter);
-echo $output->render($translator);
 
+print_object($fdata); // DONOTCOMMIT
 echo $output->footer();

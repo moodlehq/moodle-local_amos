@@ -28,177 +28,113 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__).'/mlanglib.php');
 
 /**
- * TODO: short description.
- *
- * TODO: long description.
- */
-class local_amos {
-
-    /**
-     * TODO: short description.
-     *
-     * @return TODO
-     */
-    public static function versions() {
-
-        $versions = array();
-
-        $version                    = new stdclass();
-        $version->code              = 20;
-        $version->label             = '2.0 dev';
-        $version->branch            = 'MOODLE_20_STABLE';
-        $version->translatable      = true;
-        $version->current           = true;
-        $version->checked           = null;
-        $versions[$version->code]   = $version;
-
-        $version                    = new stdclass();
-        $version->code              = 19;
-        $version->label             = '1.9';
-        $version->branch            = 'MOODLE_19_STABLE';
-        $version->translatable      = true;
-        $version->current           = true;
-        $version->checked           = null;
-        $versions[$version->code]   = $version;
-
-        $version                    = new stdclass();
-        $version->code              = 18;
-        $version->label             = '1.8';
-        $version->branch            = 'MOODLE_18_STABLE';
-        $version->translatable      = true;
-        $version->current           = false;
-        $version->checked           = null;
-        $versions[$version->code]   = $version;
-
-        $version                    = new stdclass();
-        $version->code              = 17;
-        $version->label             = '1.7';
-        $version->branch            = 'MOODLE_17_STABLE';
-        $version->translatable      = true;
-        $version->current           = false;
-        $version->checked           = null;
-        $versions[$version->code]   = $version;
-
-        $version                    = new stdclass();
-        $version->code              = 16;
-        $version->label             = '1.6';
-        $version->branch            = 'MOODLE_16_STABLE';
-        $version->translatable      = true;
-        $version->current           = false;
-        $version->checked           = null;
-        $versions[$version->code]   = $version;
-
-        return $versions;
-    }
-}
-
-/**
- * TODO: short description.
- *
- * TODO: long description.
+ * Represent the AMOS translator filter and its settings
  */
 class local_amos_filter implements renderable {
 
     /** @var moodle_url */
-    protected $handler;
+    public $handler;
 
-    /** @var array of versions meta info */
-    protected $versions;
+    /** @var list of Moodle versions to show strings from */
+    public $version = array();
+
+    /** @var list of languages to show next to the English master strings */
+    public $lang = array();
 
     /**
-     * TODO: short description.
+     * Creates the filter and sets the default filter values
      *
-     * @param string $actionhandler URL
-     *
+     * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
         $this->handler  = $handler;
-        $this->versions = array();
     }
 
     /**
-     * TODO: short description.
+     * Returns the filter data
      *
-     * @param array $checked the list of version codes
-     * @return TODO
+     * @return object
      */
-    public function set_versions($checked = array()) {
+    public function get_data() {
+        $data = new stdclass();
 
-        $this->versions = local_amos::versions();
+        $default    = $this->get_data_default();
+        $submitted  = $this->get_data_submitted();
 
-        if (empty($checked)) {
-            // by default, only current versions are chosen
-            foreach ($this->versions as $version) {
-                $version->checked = $version->current;
+        $fields = array('version', 'language', 'component', 'missing', 'substring');
+        foreach ($fields as $field) {
+            if (isset($submitted->{$field})) {
+                $data->{$field} = $submitted->{$field};
+            } else {
+                $data->{$field} = $default->{$field};
             }
-        } else {
-            // apply what user has checked
-            foreach ($checked as $versioncode) {
-                if (isset($this->versions[$versioncode])) {
-                    $this->versions[$versioncode]->checked = true;
-                } else {
-                    $this->versions[$versioncode]->checked = false;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns the default values of the filter fields
+     *
+     * @return object
+     */
+    protected function get_data_default() {
+        $data = new stdclass();
+
+        $data->version = array();
+        foreach (mlang_version::list_translatable() as $version) {
+            if ($version->current) {
+                $data->version[] = $version->code;
+            }
+        }
+        $data->language = array('cs');
+        $data->component = array();
+        $data->missing = false;
+        $data->substring = '';
+
+        return $data;
+    }
+
+    /**
+     * Returns the form data as submitted by the user
+     *
+     * @return object
+     */
+    protected function get_data_submitted() {
+        $data = new stdclass();
+
+        $fver = optional_param('fver', null, PARAM_INT);
+        if (!is_null($fver)) {
+            $data->version = array();
+            foreach (mlang_version::list_translatable() as $version) {
+                if (in_array($version->code, $fver)) {
+                    $data->version[] = $version->code;
                 }
             }
         }
-    }
 
-    /**
-     * Returns the array of all version that were checked by the user
-     *
-     * This function creates several anonymous functions but the list of versions if reasonable short
-     *
-     * @see self::set_versions()
-     * @return array of stdclass
-     */
-    public function get_versions() {
-        return array_filter($this->versions, create_function('$v', 'return !empty($v->checked);'));
-    }
-}
-
-/**
- * TODO: short description.
- *
- * TODO: long description.
- */
-class local_amos_translator implements renderable {
-
-    /**
-     * TODO: short description.
-     *
-     * @param mixed $filter 
-     * @return TODO
-     */
-    public function load_strings($filter, $orderby='') {
-        global $DB;
-
-        $sql = "SELECT *
-                  FROM {local_amos_strings}
-                 WHERE pack = :pack
-                       AND component = :component";
-        $params = array('pack' => 'cs', 'component' => 'langconfig');
-
-        // filter by branches
-        $branches = array();
-        foreach ($filter['fver'] as $version) {
-            $branches[] = $version->branch;
-        }
-        if (!empty($branches)) {
-            list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED);
-            $sql .= " AND branch {$sqlbranches}";
-            $params = array_merge($params, $paramsbranches);
+        $flng = optional_param('flng', null, PARAM_SAFEDIR);
+        if (!is_null($flng)) {
+            $data->language = array();
+            foreach ($flng as $language) {
+                // todo if valid language code
+                $data->language[] = $language;
+            }
         }
 
-        if (is_array($orderby)) {
-            $orderby = implode(',', $orderby);
+        $fcmp = optional_param('fcmp', null, PARAM_SAFEDIR);
+        if (!is_null($fcmp)) {
+            $data->component = array();
+            foreach ($fcmp as $component) {
+                // todo if valid component
+                $data->component[] = $component;
+            }
         }
-        if (empty($orderby)) {
-            $orderby = 'component,stringid,branch,pack';
-        }
-        $sql .= " ORDER BY {$orderby}";
 
+        $data->missing = optional_param('fmis', false, PARAM_BOOL);
 
-            print_object($sql); die(); // DONOTCOMMIT
+        $data->substring = optional_param('ftxt', '', PARAM_RAW);
 
+        return $data;
     }
 }

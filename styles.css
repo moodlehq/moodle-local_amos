@@ -1,0 +1,31 @@
+.local-amos .lazyform {
+    border: 1px solid #eee;
+    width: 90%;
+    margin: auto;
+    padding: 3px;
+}
+
+.local-amos .lazyform .item {
+    margin-bottom: 5px;
+}
+
+.local-amos .lazyform .item .label {
+    text-align: right;
+}
+
+.local-amos .lazyform .item .label .description {
+    color: #999;
+    font-size: small;
+}
+
+.local-amos .lazyform .item .element {
+}
+
+.local-amos .labelled_checkbox label {
+    margin: 0em 1.5em 0em 0.5em;
+}
+
+.local-amos #amosfilter_fver .labelled_checkbox {
+    display: inline;
+}
+

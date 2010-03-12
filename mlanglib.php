@@ -488,6 +488,21 @@ class mlang_version {
     }
 
     /**
+     * Get a list of all known versions and information about them
+     *
+     * @return array of mlang_version
+     */
+    public static function list_translatable() {
+        $list = array();
+        foreach (self::versions_info() as $ver) {
+            if ($ver['translatable']) {
+                $list[$ver['code']] = new mlang_version($ver);
+            }
+        }
+        return $list;
+    }
+
+    /**
      * Used by factory methods to create instances of this class
      */
     protected function __construct(array $info) {
