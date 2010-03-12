@@ -1,9 +1,56 @@
 <?php
 
-header("Content-Type: text/plain");
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * AMOS script to parse English strings in the core
+ *
+ * @package   local_amos
+ * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+set_time_limit(0);
+$starttime = microtime();
+
+// this cron script might be considered to be a CLI script even when accessed over HTTP,
+// we do not want HTML in output and there is no real session ;-)
+define('CLI_SCRIPT', true);
+
+// Do not set moodle cookie because we do not need it here, it is better to emulate session
+define('NO_MOODLE_COOKIES', true);
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/mlanglib.php');
+
+// send mime type and encoding
+if (check_browser_version('MSIE')) {
+    //ugly IE hack to work around downloading instead of viewing
+    @header('Content-Type: text/html; charset=utf-8');
+    echo "<xmp>"; //<pre> is not good enough for us here
+} else {
+    //send proper plaintext header
+    @header('Content-Type: text/plain; charset=utf-8');
+}
+
+// no more headers and buffers
+while(@ob_end_flush());
+
+// increase memory limit (PHP 5.2 does different calculation, we need more memory now)
+@raise_memory_limit('128M');
 
 // prepare the list of valid locations of string files
 $wtree = '/home/mudrd8mz/devel/amos/moodle';
