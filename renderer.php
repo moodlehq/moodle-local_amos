@@ -40,6 +40,18 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_filter(local_amos_filter $filter) {
         $output = '';
 
+        // translate into languages
+        $output .= html_writer::start_tag('div', array('class' => 'item select yui-gd'));
+        $output .= html_writer::start_tag('div', array('class' => 'label yui-u first'));
+        $output .= html_writer::tag('label', 'Language', array('for' => 'amosfilter_ftgt'));
+        $output .= html_writer::tag('div', 'Translate into this language', array('class' => 'description'));
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'element yui-u'));
+        $options = array('cs' => 'Čeština (cs)', 'fr' => 'Français (fr)', 'fr_ca' => 'Français - Canada (fr_ca)');
+        $output .= html_writer::select($options, 'ftgt', $filter->get_data()->target, '', array('id' => 'amosfilter_ftgt'));
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+
         // version checkboxes
         $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup yui-gd'));
         $output .= html_writer::start_tag('div', array('class' => 'label yui-u first'));
@@ -57,14 +69,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
-        // language selector
+        // other languages selector
         $output .= html_writer::start_tag('div', array('class' => 'item select yui-gd'));
         $output .= html_writer::start_tag('div', array('class' => 'label yui-u first'));
-        $output .= html_writer::tag('label', 'Language', array('for' => 'amosfilter_flng'));
-        $output .= html_writer::tag('div', 'Display translations into these languages', array('class' => 'description'));
+        $output .= html_writer::tag('label', 'Compare with', array('for' => 'amosfilter_flng'));
+        $output .= html_writer::tag('div', 'Beside English, display also translations into these languages', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui-u'));
-        $options = array('cs' => 'Čeština (cs)', 'fr_ca' => 'French - Canadian (fr_cs)');
+        $options = array('en' => 'English (en)', 'cs' => 'Čeština (cs)', 'fr' => 'Français (fr)', 'fr_ca' => 'Français - Canada (fr_ca)');
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
                     array('id' => 'amosfilter_flng', 'multiple' => true, 'size' => 3));
         $output .= html_writer::end_tag('div');
@@ -111,9 +123,9 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
-
         // hidden fields
-        //$output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '__lazyform_' . $filter->lazyformname, 'value' => 1));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
 
         // submit
         $output .= html_writer::start_tag('div', array('class' => 'item submit yui-gd'));
@@ -121,7 +133,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui-u'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Show strings'));
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save filter settings'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
@@ -132,21 +144,62 @@ class local_amos_renderer extends plugin_renderer_base {
         $attributes = array('method' => 'get',
                             'action' => $filter->handler->out(),
                             'id'     => html_writer::random_id(),
-                            'class'  => 'lazyform yui-t7',
+                            'class'  => 'lazyform ' . $filter->lazyformname . ' yui-t7',
                         );
         $output = html_writer::tag('form', $output, $attributes);
+        $output = html_writer::tag('div', $output, array('class' => 'filterwrapper'));
 
         return $output;
     }
 
     /**
-     * TODO: short description.
+     * Renders the translation tool
      *
-     * @param local_amos_translator $translator 
-     * @return TODO
+     * @param local_amos_translator $translator
+     * @return string
      */
     protected function render_local_amos_translator(local_amos_translator $translator) {
 
+        $table = new html_table();
+        $table->head = array('Component', 'String', 'Ver', 'Original', 'Translation');
+        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'translation');
+        $table->set_classes('translator');
+        foreach ($translator->strings as $string) {
+            $cells = array();
+            // component name
+            $cells[0] = new html_table_cell($string->component);
+            // string identification code and some meta information
+            $t  = html_writer::tag('div', s($string->stringid), array('class' => 'stringid'));
+            $t .= html_writer::tag('div', '@param $a the name of user', array('class' => 'param'));
+            $cells[1] = new html_table_cell($t);
+            // moodle version to put this translation onto
+            $cells[2] = new html_table_cell($string->branch);
+            // English original of the string
+            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            // Translation
+            $t = s($string->translation);
+            $sid = local_amos_translator::encode_identifier($string->originalid, $string->translationid);
+            $t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
+            $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sid[]', 'value' => $sid));
+            $cells[4] = new html_table_cell($t . $i);
+            $row = new html_table_row($cells);
+            $table->data[] = $row;
+        }
+
+        $output  = $this->output->table($table);
+        $submit  = html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save translations'));
+        $output .= html_writer::tag('div', $submit, array('class' => 'buttons'));
+
+        // wrapping form
+        $attributes = array('method' => 'post',
+                            'action' => $translator->handler->out(),
+                            'id'     => html_writer::random_id(),
+                            'class'  => 'translatorform',
+                        );
+        $output = html_writer::tag('form', $output, $attributes);
+        $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
+
+        return $output;
     }
 }
 

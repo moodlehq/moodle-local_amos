@@ -5,6 +5,10 @@
     padding: 3px;
 }
 
+.local-amos .lazyform.amosfilter {
+    width: 70%;
+}
+
 .local-amos .lazyform .item {
     margin-bottom: 5px;
 }
@@ -29,3 +33,49 @@
     display: inline;
 }
 
+.local-amos .preformatted {     /* a workaround the lack of pre-wrap support */
+    white-space: pre-wrap;      /* css-3 should we be so lucky... */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap;     /* Opera 4-6 ?? */
+    white-space: -o-pre-wrap;   /* Opera 7 ?? */
+    word-wrap: break-word;      /* Internet Explorer 5.5+ */
+    _white-space: pre;          /* IE only hack to re-specify in addition to word-wrap  */
+}
+
+.local-amos table.translator {
+    width: 90%;
+    margin: 1em auto;
+}
+
+.local-amos table.translator tr {
+    border: 1px solid #ddd;
+}
+
+.local-amos table.translator .r0 {
+    background-color: white;
+}
+
+.local-amos table.translator .r1 {
+    background-color: #f9f9f9;
+}
+
+/* minimal width for these two columns */
+.local-amos table.translator .component,
+.local-amos table.translator .version {
+    width: 1px;
+}
+
+.local-amos table.translator .original,
+.local-amos table.translator .translation {
+    min-width: 35%;
+}
+
+.local-amos .translator .stringinfo .param {
+    color: #999;
+    font-size: small;
+}
+
+.local-amos table.translator textarea.translation {
+    width: 100%;
+    min-height: 4em;
+}

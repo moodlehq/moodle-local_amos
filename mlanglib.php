@@ -437,6 +437,22 @@ class mlang_stage {
 }
 
 /**
+ * Starageable staging area
+ */
+class mlang_persistent_stage extends mlang_stage {
+
+    /**
+     * TODO: short description.
+     *
+     * @param stdclass $user 
+     * @return TODO
+     */
+    public static function instance_for_user(stdclass $user) {
+        return new mlang_persistent_stage();
+    }
+}
+
+/**
  * Provides information about Moodle versions and corresponding branches
  *
  * Do not modify the returned instances, they are not cloned during coponent copying.

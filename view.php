@@ -16,7 +16,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO
+ * Main AMOS translation page
+ *
+ * Displays strings filter and the translation table. Data submitted from the
+ * whole translation table are handled by savebulk.php which should redirect
+ * back here.
  *
  * @package   local-amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -37,15 +41,19 @@ $PAGE->set_heading('AMOS');
 
 $output = $PAGE->get_renderer('local_amos');
 
-/// Output starts here
-echo $output->header();
-
-// create a renderable object that represents the filter
+// create a renderable object that represents the filter form
 $filter = new local_amos_filter($PAGE->url);
+// save the filter settings into the sesssion
 $fdata = $filter->get_data();
+foreach ($fdata as $setting => $value) {
+    set_user_preference('amos_' . $setting, serialize($value));
+}
 
 // create a renderable object that represent the translation table
-echo $output->render($filter);
+$translator = new local_amos_translator($filter, $USER, new moodle_url('/local/amos/savebulk.php'));
 
-print_object($fdata); // DONOTCOMMIT
+/// Output starts here
+echo $output->header();
+echo $output->render($filter);
+echo $output->render($translator);
 echo $output->footer();
