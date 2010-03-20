@@ -181,11 +181,101 @@ class local_amos_filter implements renderable {
  */
 class local_amos_translator implements renderable {
 
+    /** @var string target language of the translation */
+    public $target = null;
+
     /** @var array of stdclass strings to display */
     public $strings = array();
 
     /* @var mlang_persistent_stage */
     protected $stage = null;
+
+    /**
+     * @param local_amos_filter $filter
+     * @param stdclass $user working with the translator
+     * @param moodle_url $handler processing the submitted translation
+     */
+    public function __construct(local_amos_filter $filter, stdclass $user, moodle_url $handler) {
+        global $DB;
+
+        $this->handler = $handler;
+        $this->target = $filter->get_data()->target;
+        $this->stage = mlang_persistent_stage::instance_for_user($user);
+
+        // get the list of strings to display according the current filter values
+        $languages = array_merge(array('en',$this->target), $filter->get_data()->language);
+        list($sqlbranches,   $paramsbranches)  = $DB->get_in_or_equal($filter->get_data()->version,   SQL_PARAMS_NAMED, 'branch0000');
+        list($sqllanguages,  $paramslanguages) = $DB->get_in_or_equal($languages,  SQL_PARAMS_NAMED, 'lang0000');
+        list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($filter->get_data()->component, SQL_PARAMS_NAMED, 'comp0000');
+        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted
+                  FROM {amos_repository} r
+                  JOIN (SELECT branch, lang, component, stringid,MAX(timemodified) AS timemodified
+                          FROM {amos_repository}
+                         GROUP BY branch,lang,component,stringid) j
+                    ON (r.branch = j.branch
+                       AND r.lang = j.lang
+                       AND r.component = j.component
+                       AND r.stringid = j.stringid
+                       AND r.timemodified = j.timemodified)
+                 WHERE r.branch {$sqlbranches}
+                       AND r.lang {$sqllanguages}
+                       AND r.component {$sqlcomponents}\n";
+        $sql .= "ORDER BY r.component, r.stringid, r.lang, r.branch";
+
+        $params = array_merge($paramsbranches, $paramslanguages, $paramcomponents);
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $s = array();
+        foreach($rs as $r) {
+            if (!isset($s[$r->lang])) {
+                $s[$r->lang] = array();
+            }
+            if (!isset($s[$r->lang][$r->component])) {
+                $s[$r->lang][$r->component] = array();
+            }
+            if (!isset($s[$r->lang][$r->component][$r->stringid])) {
+                $s[$r->lang][$r->component][$r->stringid] = array();
+            }
+            if (!isset($s[$r->lang][$r->component][$r->stringid][$r->branch])) {
+                $string = new stdclass();
+                $string->amosid = $r->id;
+                $string->text = $r->text;
+                $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
+            }
+        }
+        $rs->close();
+
+        $langs = array_keys($s);
+        $langs = array_flip($langs);
+        unset($langs['en']);
+        $langs = array_keys($langs);
+        foreach ($s['en'] as $component => $t) {
+            foreach ($t as $stringid => $u) {
+                foreach ($u as $branchcode => $english) {
+                    reset($langs);
+                    foreach ($langs as $lang) {
+                        $string = new stdclass();
+                        $string->branch = mlang_version::by_code($branchcode)->label;
+                        $string->language = $lang;
+                        $string->component = $component;
+                        $string->stringid = $stringid;
+                        $string->metainfo = ''; // todo read metainfo from database
+                        $string->original = $english->text;
+                        $string->originalid = $english->amosid;
+                        if (isset($s[$lang][$component][$stringid][$branchcode])) {
+                            $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
+                            $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
+                        } else {
+                            $string->translation = null;
+                            $string->translationid = null;
+                        }
+                        unset($s[$lang][$component][$stringid][$branchcode]);
+                        $this->strings[] = $string;
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Given AMOS string id, returns the suitable name of HTTP parameter to hold the translation
@@ -203,44 +293,24 @@ class local_amos_translator implements renderable {
     }
 
     /**
-     * @param local_amos_filter $filter
-     * @param stdclass $user working with the translator
-     * @param moodle_url $handler processing the submitted translation
+     * Decodes the identifier encoded by {@see self::encode_identifier()}
+     *
+     * @param string $encoded
+     * @return array of (int)amosid_original, (int)amosid_translation
      */
-    public function __construct(local_amos_filter $filter, stdclass $user, moodle_url $handler) {
-        $this->handler = $handler;
-        $this->stage = mlang_persistent_stage::instance_for_user($user);
-
-        // get the list of strings to display according the current filter values
-        $string = new stdclass();
-        $string->branch = '2.0';
-        $string->language = 'cs';
-        $string->component = 'moodle';
-        $string->stringid = 'editthis';
-        $string->params = array('$a activity type');
-        $string->original = 'Edit this {$a}';
-        $string->originalid = 23;
-        $string->translation = 'Upravit tuto činnost: {$a}';
-        $string->translationid = 786;
-        $this->strings[] = $string;
-
-        $string = new stdclass();
-        $string->branch = '2.0';
-        $string->language = 'cs';
-        $string->component = 'moodle';
-        $string->stringid = 'view';
-        $string->params = array();
-        $string->original = <<<EOF
-<h1>View</h1>
-
-this
-is
-quite a long string. this is quite a long string. this is quite a long string. this is quite a long string. this is quite a long string. this is quite a long string. this is quite a long string
-EOF;
-        $string->originalid = 24;
-        $string->translation = null;
-        $string->translationid = null;
-        $this->strings[] = $string;
-
+    public static function decode_identifier($encoded) {
+        $parts = split('_', $encoded, 3);
+        if (($parts[0] !== 's') || (count($parts) < 2)) {
+            throw new coding_exception('Invalid encoded identifier supplied');
+        }
+        $result = array();
+        $result[0] = $parts[1]; // amosid_original
+        if (isset($parts[2])) {
+            $result[1] = $parts[2];
+        } else {
+            $result[1] = null;
+        }
+        return $result;
     }
+
 }

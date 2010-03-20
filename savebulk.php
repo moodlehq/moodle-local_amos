@@ -31,5 +31,10 @@ require_once(dirname(__FILE__).'/locallib.php');
 
 require_login(SITEID, false);
 require_capability('moodle/site:config', $PAGE->context);
+require_sesskey();
 
+$fields = required_param('fields', PARAM_ALPHANUMEXT);
+foreach($fields as $field) {
+    list($originalid, $translationid) = local_amos_translator::decode_identifier($field);
+}
 redirect(new moodle_url('/local/amos/view.php'));

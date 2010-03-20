@@ -169,14 +169,38 @@ class mlang_component {
         if (empty($deleted)) {
             $sql .= "  AND deleted = 0";
         }
+        $sql .= " ORDER BY r.stringid, r.id";
         $rs = $DB->get_recordset_sql($sql, $params);
         $component = new mlang_component($name, $lang, $version);
         foreach ($rs as $r) {
-            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted));
+            // we force here so in case of two string with the same timemodified, the higher id wins
+            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted), true);
         }
         $rs->close();
 
         return $component;
+    }
+
+    /**
+     * @param string $name the name of the component, eg. 'role', 'glossary', 'datafield_text' etc.
+     * @param string $lang
+     * @param mlang_version $version
+     */
+
+    public static function calculate_identifer($name, $lang, mlang_version $version) {
+        return md5($name . '#' . $lang . '@' . $version->code);
+    }
+
+    /**
+     * Returns the current identifier of the component
+     *
+     * Every component is identified by its branch, lang and name. This method returns md5 hash of
+     * a concatenation of these three values.
+     *
+     * @return string
+     */
+    public function get_identifier() {
+        return self::calculate_identifer($this->name, $this->lang, $this->version);
     }
 
     /**
@@ -293,6 +317,13 @@ class mlang_string {
      * @return bool
      */
     public static function differ(mlang_string $a, mlang_string $b) {
+        if (is_null($a->text) or is_null($b->text)) {
+            if (is_null($a->text) and is_null($b->text)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
         if (trim($a->text) === trim($b->text)) {
             return false;
         }
@@ -305,7 +336,7 @@ class mlang_string {
  *
  * After obtaining a new instance and adding some components into it, you should either call commit()
  * or clear(). Otherwise, the copies of staged strings remain in PHP memory and they are not
- * garbage collected before of the bi-directional reference component-string.
+ * garbage collected because of the circular reference component-string.
  */
 class mlang_stage {
 
@@ -313,18 +344,19 @@ class mlang_stage {
     protected $components = array();
 
     /**
-     * Adds a component into the staging area
+     * Adds a copy of the given component into the staging area
      *
      * @param mlang_component $component
      * @param bool $force replace the previously staged string if there is such if there is already
      * @return void
      */
     public function add(mlang_component $component, $force=false) {
-        if (!isset($this->components[$component->name])) {
-            $this->components[$component->name] = new mlang_component($component->name, $component->lang, $component->version);
+        $cid = $component->get_identifier();
+        if (!isset($this->components[$cid])) {
+            $this->components[$cid] = new mlang_component($component->name, $component->lang, $component->version);
         }
         foreach ($component->get_iterator() as $string) {
-            $this->components[$component->name]->add_string(clone($string), $force);
+            $this->components[$cid]->add_string(clone($string), $force);
         }
     }
 
@@ -376,8 +408,8 @@ class mlang_stage {
                     $component->unlink_string($stagedstring->id);
                     continue;
                 }
-                if ($stagedstring->timemodified <= $capstring->timemodified) {
-                    // the staged string is older than the cap, do not commit keep it
+                if ($stagedstring->timemodified < $capstring->timemodified) {
+                    // the staged string is older than the cap, do not keep it
                     $component->unlink_string($stagedstring->id);
                     continue;
                 }
@@ -434,6 +466,48 @@ class mlang_stage {
         global $DB;
         return $DB->insert_record('amos_repository', $record);
     }
+
+    /**
+     * Returns the iterator over components
+     */
+    public function get_iterator() {
+        return new mlang_iterator($this->components);
+    }
+
+    /**
+     * Returns the staged component or null if not known
+     *
+     * @param string $name the name of the component, eg. 'role', 'glossary', 'datafield_text' etc.
+     * @param string $lang
+     * @param mlang_version $version
+     * @return mlang_component|null
+     */
+    public function get_component($name, $lang, mlang_version $version) {
+        $cid = mlang_component::calculate_identifer($name, $lang, $version);
+        if (!isset($this->components[$cid])) {
+            return null;
+        }
+        return $this->components[$cid];
+    }
+
+    /**
+     * Checks if the stage contains some component or a given component
+     *
+     * @param string $name the name of the component, eg. 'role', 'glossary', 'datafield_text' etc.
+     * @param string $lang
+     * @param mlang_version $version
+     * @return bool
+     */
+    public function has_component($name=null, $lang=null, mlang_version $version=null) {
+        if (is_null($name) and is_null($lang) and is_null($version)) {
+            return (!empty($this->components));
+        } else {
+            $cid = mlang_component::calculate_identifer($name, $lang, $version);
+            return (isset($this->components[$cid]));
+        }
+    }
+
+
 }
 
 /**
@@ -540,35 +614,35 @@ class mlang_version {
                 'current'       => false,
             ),
             array(
-                'code'          => 20,
+                'code'          => 2000,
                 'label'         => '2.0',
                 'branch'        => 'MOODLE_20_STABLE',
                 'translatable'  => true,
                 'current'       => true,
             ),
             array(
-                'code'          => 19,
+                'code'          => 1900,
                 'label'         => '1.9',
                 'branch'        => 'MOODLE_19_STABLE',
                 'translatable'  => true,
                 'current'       => true,
             ),
             array(
-                'code'          => 18,
+                'code'          => 1800,
                 'label'         => '1.8',
                 'branch'        => 'MOODLE_18_STABLE',
                 'translatable'  => true,
                 'current'       => false,
             ),
             array(
-                'code'          => 17,
+                'code'          => 1700,
                 'label'         => '1.7',
                 'branch'        => 'MOODLE_17_STABLE',
                 'translatable'  => true,
                 'current'       => false,
             ),
             array(
-                'code'          => 16,
+                'code'          => 1600,
                 'label'         => '1.6',
                 'branch'        => 'MOODLE_16_STABLE',
                 'translatable'  => true,

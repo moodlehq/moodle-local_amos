@@ -125,7 +125,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat}";
+$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} {$wtree}";
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 
@@ -175,6 +175,12 @@ foreach ($gitout as $line) {
     $parts = explode('/', $file);
     $langcode = $parts[0];  // eg. 'en_us_utf8'
     $langcode = substr($langcode, 0, -5);   // without _utf8 suffix
+
+    if ($langcode == 'en') {
+        // for historical reasons, English strings are in this repo history as well
+        // we can not process them here as they would break the data
+        continue;
+    }
 
     // get some additional information of the commit
     $format = implode('%n', array('%an', '%ae', '%at', '%s')); // name, email, timestamp, subject

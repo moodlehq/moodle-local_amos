@@ -163,14 +163,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $table = new html_table();
         $table->head = array('Component', 'String', 'Ver', 'Original', 'Translation');
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'translation');
-        $table->set_classes('translator');
+        $table->attributes['class'] = 'translator';
         foreach ($translator->strings as $string) {
             $cells = array();
             // component name
             $cells[0] = new html_table_cell($string->component);
             // string identification code and some meta information
             $t  = html_writer::tag('div', s($string->stringid), array('class' => 'stringid'));
-            $t .= html_writer::tag('div', '@param $a the name of user', array('class' => 'param'));
+            $t .= html_writer::tag('div', s($string->metainfo), array('class' => 'metainfo'));
             $cells[1] = new html_table_cell($t);
             // moodle version to put this translation onto
             $cells[2] = new html_table_cell($string->branch);
@@ -180,13 +180,15 @@ class local_amos_renderer extends plugin_renderer_base {
             $t = s($string->translation);
             $sid = local_amos_translator::encode_identifier($string->originalid, $string->translationid);
             $t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
-            $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sid[]', 'value' => $sid));
+            $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
             $cells[4] = new html_table_cell($t . $i);
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }
 
-        $output  = $this->output->table($table);
+        $output  = html_writer::table($table);
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'language', 'value' => $translator->target));
+        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         $submit  = html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save translations'));
         $output .= html_writer::tag('div', $submit, array('class' => 'buttons'));
 
