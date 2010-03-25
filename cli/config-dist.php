@@ -28,10 +28,10 @@ defined('MOODLE_INTERNAL') or die();
 /**
  * Full path to the git clone of Moodle. Used by parse-core.php
  */
-define('AMOS_REPO_MOODLE', '/home/mudrd8mz/devel/amos/moodle');
+define('AMOS_REPO_MOODLE', $CFG->dataroot . '/amos/repos/moodle');
 
 /**
  * Full path to the git clone of legacy language translation files.
  * User by parse-lang.php to get the history of strings into database.
  */
-define('AMOS_REPO_LANGS', '/home/mudrd8mz/devel/amos/moodle-lang');
+define('AMOS_REPO_LANGS', $CFG->dataroot . '/amos/repos/moodle-lang');

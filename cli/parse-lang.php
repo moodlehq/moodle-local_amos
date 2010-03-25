@@ -55,8 +55,8 @@ while(@ob_end_flush());
 // increase memory limit (PHP 5.2 does different calculation, we need more memory now)
 @raise_memory_limit('128M');
 
-$tmp = make_upload_directory('temp/amos', false);
-$var = make_upload_directory('var/amos', false);
+$tmp = make_upload_directory('amos/temp', false);
+$var = make_upload_directory('amos/var', false);
 $mem = memory_get_usage();
 
 $version = mlang_version::by_branch('MOODLE_20_STABLE');

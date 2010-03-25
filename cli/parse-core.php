@@ -78,8 +78,8 @@ foreach ($plugins as $prefixtype => $pluginlocations) {
 $locations = implode(' ', $locations);
 echo "SEARCH $locations\n";
 
-$tmp = make_upload_directory('temp/amos', false);
-$var = make_upload_directory('var/amos', false);
+$tmp = make_upload_directory('amos/temp', false);
+$var = make_upload_directory('amos/var', false);
 $mem = memory_get_usage();
 
 // the following commits contains a syntax typo and they can't be included for processing. They are skipped
