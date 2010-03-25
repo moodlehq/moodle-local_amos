@@ -17,6 +17,9 @@
 
 /**
  * AMOS script to parse English strings in the core
+ * 
+ * This is supposed to be run regularly in a cronjob to register all changes
+ * done in Moodle source code.
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -33,8 +36,9 @@ define('CLI_SCRIPT', true);
 // Do not set moodle cookie because we do not need it here, it is better to emulate session
 define('NO_MOODLE_COOKIES', true);
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/mlanglib.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->dirroot . '/local/amos/cli/config.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 // send mime type and encoding
 if (check_browser_version('MSIE')) {
@@ -53,7 +57,6 @@ while(@ob_end_flush());
 @raise_memory_limit('128M');
 
 // prepare the list of valid locations of string files
-$wtree = '/home/mudrd8mz/devel/amos/moodle';
 $locations = array('lang/en_utf8/*.php');
 $plugins = string_manager::instance()->get_registered_plugin_types();
 foreach ($plugins as $prefixtype => $pluginlocations) {
@@ -66,7 +69,7 @@ foreach ($plugins as $prefixtype => $pluginlocations) {
         $pluginlist = get_plugin_list($plugintype);
         foreach ($pluginlist as $plugintype => $pluginpath) {
             $langfile = substr($pluginpath . '/lang/en_utf8/' . $prefixtype . $plugintype  . '.php', strlen($CFG->dirroot) + 1);
-            if (file_exists($wtree . '/' . $langfile)) {
+            if (file_exists(AMOS_REPO_MOODLE . '/' . $langfile)) {
                 $locations[] = $langfile;
             }
         }
@@ -124,7 +127,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
     }
 
-    chdir($wtree);
+    chdir(AMOS_REPO_MOODLE);
     $gitout = array();
     $gitstatus = 0;
     $gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H {$gitbranch} {$startat} {$locations}";

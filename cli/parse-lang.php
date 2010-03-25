@@ -16,7 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * AMOS script to parse English strings in the core
+ * AMOS script to parse the history of all standard translation packages
+ *
+ * This is supposed to run manually to import the history in a one-shot
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -33,8 +35,9 @@ define('CLI_SCRIPT', true);
 // Do not set moodle cookie because we do not need it here, it is better to emulate session
 define('NO_MOODLE_COOKIES', true);
 
-require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once(dirname(__FILE__) . '/mlanglib.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->dirroot . '/local/amos/cli/config.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 // send mime type and encoding
 if (check_browser_version('MSIE')) {
@@ -52,7 +55,6 @@ while(@ob_end_flush());
 // increase memory limit (PHP 5.2 does different calculation, we need more memory now)
 @raise_memory_limit('128M');
 
-$wtree = '/home/mudrd8mz/devel/amos/moodle-lang';
 $tmp = make_upload_directory('temp/amos', false);
 $var = make_upload_directory('var/amos', false);
 $mem = memory_get_usage();
@@ -100,7 +102,7 @@ $MLANG_BROKEN_CHECKOUTS = array(
     'cfec4b2b359a67abd50eca74fd37f12a54d8ea42_nl_utf8_grades.php',
 );
 
-chdir($wtree);
+chdir(AMOS_REPO_LANGS);
 
 // find the root commit
 $gitout = array();
@@ -125,7 +127,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} {$wtree}";
+$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 
