@@ -187,7 +187,7 @@ class mlang_component {
      * @param mlang_version $version
      */
 
-    public static function calculate_identifer($name, $lang, mlang_version $version) {
+    public static function calculate_identifier($name, $lang, mlang_version $version) {
         return md5($name . '#' . $lang . '@' . $version->code);
     }
 
@@ -200,7 +200,7 @@ class mlang_component {
      * @return string
      */
     public function get_identifier() {
-        return self::calculate_identifer($this->name, $this->lang, $this->version);
+        return self::calculate_identifier($this->name, $this->lang, $this->version);
     }
 
     /**
@@ -483,7 +483,7 @@ class mlang_stage {
      * @return mlang_component|null
      */
     public function get_component($name, $lang, mlang_version $version) {
-        $cid = mlang_component::calculate_identifer($name, $lang, $version);
+        $cid = mlang_component::calculate_identifier($name, $lang, $version);
         if (!isset($this->components[$cid])) {
             return null;
         }
@@ -502,7 +502,7 @@ class mlang_stage {
         if (is_null($name) and is_null($lang) and is_null($version)) {
             return (!empty($this->components));
         } else {
-            $cid = mlang_component::calculate_identifer($name, $lang, $version);
+            $cid = mlang_component::calculate_identifier($name, $lang, $version);
             return (isset($this->components[$cid]));
         }
     }
