@@ -163,13 +163,15 @@ class mlang_test extends UnitTestCase {
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
     }
 
-    public function test_component_from_phpfile() {
+    public function test_component_from_phpfile_legacy_format() {
         $filecontents = <<<EOF
 <?php
 \$string['about'] = 'Multiline
 string';
 \$string['pluginname'] = 'AMOS';
 \$string['author'] = 'David Mudrak';
+\$string['syntax'] = 'What \$a\\'Pe%%\\"be';
+
 EOF;
         $tmp = make_upload_directory('temp/amos', false);
         $filepath = $tmp . '/mlangunittest.php';
@@ -178,7 +180,20 @@ EOF;
         $this->assertTrue($component->has_string('about'));
         $this->assertTrue($component->has_string('pluginname'));
         $this->assertTrue($component->has_string('author'));
+        $this->assertTrue($component->has_string('syntax'));
         $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
+        $this->assertEqual('What {$a}\'Pe%"be', $component->get_string('syntax')->text);
+        $component->clear();
+
+        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertTrue($component->has_string('about'));
+        $this->assertTrue($component->has_string('pluginname'));
+        $this->assertTrue($component->has_string('author'));
+        $this->assertTrue($component->has_string('syntax'));
+        $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
+        $this->assertEqual('What $a\'Pe%%\\"be', $component->get_string('syntax')->text);
+        $component->clear();
+
         unlink($filepath);
     }
 
@@ -336,5 +351,114 @@ EOF;
         $this->assertTrue($rebased->has_string('foo'));
         $this->assertFalse($rebased->has_string('bar'));
         $this->assertTrue($rebased->has_string('job'));
+    }
+
+    /**
+     * Sanity 1.x string
+     * - all variables but $a placeholders must be escaped because the string is eval'ed
+     * - all ' and " must be escaped
+     * - all single % must be converted into %% for backwards compatibility
+     */
+    public function test_fix_syntax_sanity_v1_strings() {
+        $this->assertEqual(mlang_string::fix_syntax('No change', 1), 'No change');
+        $this->assertEqual(mlang_string::fix_syntax('Completed 100% of work', 1), 'Completed 100%% of work');
+        $this->assertEqual(mlang_string::fix_syntax('Completed 100%% of work', 1), 'Completed 100%% of work');
+        $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks", 1), "Windows\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks", 1), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 1), "Empty\n\nlines");
+        $this->assertEqual(mlang_string::fix_syntax('Escape $variable names', 1), 'Escape \$variable names');
+        $this->assertEqual(mlang_string::fix_syntax('Escape $alike names', 1), 'Escape \$alike names');
+        $this->assertEqual(mlang_string::fix_syntax('String $a placeholder', 1), 'String $a placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Escaped \$a', 1), 'Escaped \$a');
+        $this->assertEqual(mlang_string::fix_syntax('Wrapped {$a}', 1), 'Wrapped {$a}');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a', 1), 'Trailing $a');
+        $this->assertEqual(mlang_string::fix_syntax('$a leading', 1), '$a leading');
+        $this->assertEqual(mlang_string::fix_syntax('Hit $a-times', 1), 'Hit $a-times'); // this is placeholder',
+        $this->assertEqual(mlang_string::fix_syntax('This is $a_book', 1), 'This is \$a_book'); // this is not
+        $this->assertEqual(mlang_string::fix_syntax('Bye $a, ttyl', 1), 'Bye $a, ttyl');
+        $this->assertEqual(mlang_string::fix_syntax('Object $a->foo placeholder', 1), 'Object $a->foo placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a->bar', 1), 'Trailing $a->bar');
+        $this->assertEqual(mlang_string::fix_syntax('<strong>AMOS</strong>', 1), '<strong>AMOS</strong>');
+        $this->assertEqual(mlang_string::fix_syntax('<a href="http://localhost">AMOS</a>', 1), '<a href=\"http://localhost\">AMOS</a>');
+        $this->assertEqual(mlang_string::fix_syntax('<a href=\"http://localhost\">AMOS</a>', 1), '<a href=\"http://localhost\">AMOS</a>');
+        $this->assertEqual(mlang_string::fix_syntax("'Murder!', she wrote", 1), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEqual(mlang_string::fix_syntax("\t  Trim Hunter  \t\t", 1), 'Trim Hunter');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?', 1), 'Delete role \"$a->role\"?');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?', 1), 'Delete role \"$a->role\"?');
+    }
+
+    /**
+     * Sanity 2.x string
+     * - the string is not eval'ed any more - no need to escape $variables
+     * - placeholders can be only {$a} or {$a->something} or {$a->some_thing}, nothing else
+     * - quoting marks are not escaped
+     * - percent signs are not duplicated any more, reverting them into single (is it good idea?)
+     */
+    public function test_fix_syntax_sanity_v2_strings() {
+        $this->assertEqual(mlang_string::fix_syntax('No change'), 'No change');
+        $this->assertEqual(mlang_string::fix_syntax('Completed 100% of work'), 'Completed 100% of work');
+        $this->assertEqual(mlang_string::fix_syntax('%%%% HEADER %%%%'), '%%%% HEADER %%%%'); // was not possible before
+        $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks"), "Windows\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks"), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines"), "Empty\n\n\nlines"); // now allows up to two empty lines
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape $variable names'), 'Do not escape $variable names');
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape $alike names'), 'Do not escape $alike names');
+        $this->assertEqual(mlang_string::fix_syntax('Not $a placeholder'), 'Not $a placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('String {$a} placeholder'), 'String {$a} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing {$a}'), 'Trailing {$a}');
+        $this->assertEqual(mlang_string::fix_syntax('{$a} leading'), '{$a} leading');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a'), 'Trailing $a');
+        $this->assertEqual(mlang_string::fix_syntax('$a leading'), '$a leading');
+        $this->assertEqual(mlang_string::fix_syntax('Not $a->foo placeholder'), 'Not $a->foo placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Object {$a->foo} placeholder'), 'Object {$a->foo} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a->bar'), 'Trailing $a->bar');
+        $this->assertEqual(mlang_string::fix_syntax('Invalid $a-> placeholder'), 'Invalid $a-> placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('<strong>AMOS</strong>'), '<strong>AMOS</strong>');
+        $this->assertEqual(mlang_string::fix_syntax("'Murder!', she wrote"), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEqual(mlang_string::fix_syntax("\t  Trim Hunter  \t\t"), 'Trim Hunter');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?'), 'Delete role "$a->role"?');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?'), 'Delete role "$a->role"?');
+    }
+
+    /**
+     * Converting 1.x strings into 2.x strings
+     * - unescape all variables
+     * - wrap all placeholders in curly brackets
+     * - unescape quoting marks
+     * - collapse percent signs
+     */
+    public function test_fix_syntax_converting_from_v1_to_v2() {
+        $this->assertEqual(mlang_string::fix_syntax('No change', 2, 1), 'No change');
+        $this->assertEqual(mlang_string::fix_syntax('Completed 100% of work', 2, 1), 'Completed 100% of work');
+        $this->assertEqual(mlang_string::fix_syntax('Completed 100%% of work', 2, 1), 'Completed 100% of work');
+        $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks", 2, 1), "Windows\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks", 2, 1), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 2, 1), "Empty\n\n\nlines");
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape $variable names', 2, 1), 'Do not escape $variable names');
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape \$variable names', 2, 1), 'Do not escape $variable names');
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape $alike names', 2, 1), 'Do not escape $alike names');
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape \$alike names', 2, 1), 'Do not escape $alike names');
+        $this->assertEqual(mlang_string::fix_syntax('Do not escape \$a names', 2, 1), 'Do not escape $a names');
+        $this->assertEqual(mlang_string::fix_syntax('String $a placeholder', 2, 1), 'String {$a} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('String {$a} placeholder', 2, 1), 'String {$a} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a', 2, 1), 'Trailing {$a}');
+        $this->assertEqual(mlang_string::fix_syntax('$a leading', 2, 1), '{$a} leading');
+        $this->assertEqual(mlang_string::fix_syntax('$a', 2, 1), '{$a}');
+        $this->assertEqual(mlang_string::fix_syntax('$a->single', 2, 1), '{$a->single}');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a->foobar', 2, 1), 'Trailing {$a->foobar}');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing {$a}', 2, 1), 'Trailing {$a}');
+        $this->assertEqual(mlang_string::fix_syntax('Hit $a-times', 2, 1), 'Hit {$a}-times');
+        $this->assertEqual(mlang_string::fix_syntax('This is $a_book', 2, 1), 'This is $a_book');
+        $this->assertEqual(mlang_string::fix_syntax('Object $a->foo placeholder', 2, 1), 'Object {$a->foo} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Object {$a->foo} placeholder', 2, 1), 'Object {$a->foo} placeholder');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing $a->bar', 2, 1), 'Trailing {$a->bar}');
+        $this->assertEqual(mlang_string::fix_syntax('Trailing {$a->bar}', 2, 1), 'Trailing {$a->bar}');
+        $this->assertEqual(mlang_string::fix_syntax('Invalid $a-> placeholder', 2, 1), 'Invalid {$a}-> placeholder'); // weird but BC
+        $this->assertEqual(mlang_string::fix_syntax('<strong>AMOS</strong>', 2, 1), '<strong>AMOS</strong>');
+        $this->assertEqual(mlang_string::fix_syntax("'Murder!', she wrote", 2, 1), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEqual(mlang_string::fix_syntax("\'Murder!\', she wrote", 2, 1), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEqual(mlang_string::fix_syntax("\t  Trim Hunter  \t\t", 2, 1), 'Trim Hunter');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?', 2, 1), 'Delete role "{$a->role}"?');
+        $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?', 2, 1), 'Delete role "{$a->role}"?');
     }
 }

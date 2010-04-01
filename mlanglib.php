@@ -105,7 +105,7 @@ class mlang_component {
      *
      * @param string $filepath full path to the file to load
      * @param string $lang lang pack we are part of
-     * @param mlang_version $version
+     * @param mlang_version $version the branch to put this string on
      * @param string $name use this as a component name instead of guessing from the file name
      * @param int $timemodified use this as a timestamp of string modification instead of the filemtime()
      * @throw Exception
@@ -127,6 +127,12 @@ class mlang_component {
         }
         if (!empty($string) && is_array($string)) {
             foreach ($string as $id => $value) {
+                if ($version->code <= mlang_version::MOODLE_19) {
+                    $value = mlang_string::fix_syntax($value, 1);
+                } else {
+                    // TODO XXX change this once we start tracking new format
+                    $value = mlang_string::fix_syntax($value, 2, 1);
+                }
                 $component->add_string(new mlang_string($id, $value, $timemodified), true);
             }
         } else {
@@ -328,6 +334,70 @@ class mlang_string {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Given a string text, returns it being formatted properly for storing in AMOS repository
+     *
+     * We need to know for what branch the string should be prepared due to internal changes in
+     * format required by get_string()
+     * - for get_string() in Moodle 1.6 - 1.9 use $format == 1
+     * - for get_string() in Moodle 2.0 and higher use $format == 2
+     *
+     * Typical usages of this methods:
+     *  $t = mlang_string::fix_syntax($t);          // sanity new translations of 2.x strings
+     *  $t = mlang_string::fix_syntax($t, 1);       // sanity legacy 1.x strings
+     *  $t = mlang_string::fix_syntax($t, 2, 1);    // convert format of 1.x strings into 2.x
+     *
+     * Backward converting 2.x format into 1.x is not supported
+     *
+     * @param string $text string text to be fixed
+     * @param int $format target get_string() format version
+     * @param int $from which format version does the text come from, defaults to the same as $format
+     * @return string
+     */
+    public static function fix_syntax($text, $format=2, $from=null) {
+        if (is_null($from)) {
+            $from = $format;
+        }
+
+        if (($format === 2) && ($from === 2)) {
+            // sanity translations of 2.x strings
+            $clean = trim($text);
+            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
+            $clean = str_replace("\\", '', $clean); // delete all slashes
+            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
+
+        } elseif (($format === 2) && ($from === 1)) {
+            // convert 1.x string into 2.x format
+            $clean = trim($text);
+            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
+            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
+            $clean = preg_replace('/%+/', '%', $clean); // collapse % characters
+            $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean); // remember for later
+            $clean = str_replace("\\", '', $clean); // delete all slashes
+            $clean = preg_replace('/(^|[^{])\$a\b(\->[a-zA-Z0-9_]+)?/', '\\1{$a\\2}', $clean); // wrap placeholders
+            $clean = str_replace('@@@___XXX_ESCAPED_DOLLAR__@@@', '$', $clean);
+
+        } elseif (($format === 1) && ($from === 1)) {
+            // sanity legacy 1.x strings
+            $clean = trim($text);
+            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
+            $clean = preg_replace("/\n{3,}/", "\n\n", $clean); // collapse runs of blank lines
+            $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean);
+            $clean = str_replace("\\", '', $clean); // delete all slashes
+            $clean = str_replace('$', '\$', $clean); // escape all embedded variables
+            // unescape placeholders: only $a and $a->something are allowed. All other $variables are left escaped
+            $clean = preg_replace('/\\\\\$a\b(\->[a-zA-Z0-9_]+)?/', '$a\\1', $clean); // unescape placeholders
+            $clean = str_replace('@@@___XXX_ESCAPED_DOLLAR__@@@', '\$', $clean);
+            $clean = str_replace('"', "\\\"", $clean); // add slashes for "
+            $clean = preg_replace('/%+/', '%', $clean); // collapse % characters
+            $clean = str_replace('%', '%%', $clean); // duplicate %
+
+        } else {
+            throw new coding_exception('Unknown get_string() format version');
+        }
+        return $clean;
     }
 }
 
@@ -536,6 +606,16 @@ class mlang_persistent_stage extends mlang_stage {
  * Do not modify the returned instances, they are not cloned during coponent copying.
  */
 class mlang_version {
+    /** internal version codes stored in database */
+    const MOODLE_16 = 1600;
+    const MOODLE_17 = 1700;
+    const MOODLE_18 = 1800;
+    const MOODLE_19 = 1900;
+    const MOODLE_20 = 2000;
+    const MOODLE_21 = 2100;
+    const MOODLE_22 = 2200;
+    const MOODLE_23 = 2300;
+
     /** @var int internal code of the version */
     public $code;
 
@@ -611,42 +691,42 @@ class mlang_version {
     protected static function versions_info() {
         return array(
             array(
-                'code'          => 21,
+                'code'          => self::MOODLE_21,
                 'label'         => '2.1',
                 'branch'        => 'MOODLE_21_STABLE',
                 'translatable'  => false,
                 'current'       => false,
             ),
             array(
-                'code'          => 2000,
+                'code'          => self::MOODLE_20,
                 'label'         => '2.0',
                 'branch'        => 'MOODLE_20_STABLE',
                 'translatable'  => true,
                 'current'       => true,
             ),
             array(
-                'code'          => 1900,
+                'code'          => self::MOODLE_19,
                 'label'         => '1.9',
                 'branch'        => 'MOODLE_19_STABLE',
                 'translatable'  => true,
                 'current'       => true,
             ),
             array(
-                'code'          => 1800,
+                'code'          => self::MOODLE_18,
                 'label'         => '1.8',
                 'branch'        => 'MOODLE_18_STABLE',
                 'translatable'  => true,
                 'current'       => false,
             ),
             array(
-                'code'          => 1700,
+                'code'          => self::MOODLE_17,
                 'label'         => '1.7',
                 'branch'        => 'MOODLE_17_STABLE',
                 'translatable'  => true,
                 'current'       => false,
             ),
             array(
-                'code'          => 1600,
+                'code'          => self::MOODLE_16,
                 'label'         => '1.6',
                 'branch'        => 'MOODLE_16_STABLE',
                 'translatable'  => true,
