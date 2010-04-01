@@ -216,7 +216,7 @@ foreach ($gitout as $line) {
     $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
     $stage = new mlang_stage();
     $stage->add($component);
-    $stage->rebase(true, $timemodified);
+    $stage->rebase($timemodifed, true, $timemodified);
     try {
         $stage->commit($commitmsg, array(
                 'source' => 'git',

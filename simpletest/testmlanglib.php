@@ -224,7 +224,7 @@ EOF;
         // string 'two' is missing and we want it to be removed from repository
         $component->add_string(new mlang_string('three', 'Three')); // changed
         $stage->add($component);
-        $stage->rebase(true);
+        $stage->rebase(null, true);
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $this->assertTrue($rebased instanceof mlang_component);
         $this->assertFalse($rebased->has_string('one'));
@@ -283,4 +283,58 @@ EOF;
         $this->assertEqual('OneThreeTwo', $concat);
     }
 
+    /**
+     * Rebasing should respect commits in whatever order so it is safe to re-run the import scripts
+     */
+    public function test_non_chronological_commits() {
+        global $DB;
+
+        // firstly commit the most recent version
+        $today = time();
+        $stage = new mlang_stage();
+        $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('foo', 'Today Foo', $today));   // changed today
+        $component->add_string(new mlang_string('bar', 'New Bar', $today));     // new today
+        $component->add_string(new mlang_string('job', 'Boring', $today));      // not changed
+        $stage->add($component);
+        $stage->commit('Initial commit', array('source' => 'unittest'));
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        // we are re-importing the history - let us commit the version that was actually created yesterday
+        $yesterday = time() - DAYSECS;
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));         // as it was yesterday
+        $component->add_string(new mlang_string('job', 'Boring', $yesterday));      // still the same
+        $stage->add($component);
+        $stage->rebase($yesterday, true, $yesterday);
+        $rebased = $stage->get_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertIsA($rebased, 'mlang_component');
+        $component->clear();
+        unset($component);
+        unset($stage);
+        $this->assertTrue($rebased->has_string('foo'));
+        $this->assertFalse($rebased->has_string('bar'));
+        $this->assertTrue($rebased->has_string('job'));
+
+        // and the same case using rebase() without deleting
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));         // as it was yesterday
+        $component->add_string(new mlang_string('job', 'Boring', $yesterday));      // still the same
+        $stage->add($component);
+        $stage->rebase($yesterday);
+        $rebased = $stage->get_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertIsA($rebased, 'mlang_component');
+        $component->clear();
+        unset($component);
+        unset($stage);
+        $this->assertTrue($rebased->has_string('foo'));
+        $this->assertFalse($rebased->has_string('bar'));
+        $this->assertTrue($rebased->has_string('job'));
+    }
 }

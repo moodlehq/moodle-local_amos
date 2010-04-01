@@ -373,12 +373,16 @@ class mlang_stage {
     /**
      * Check the staged strings against the repository cap and keep modified strings only
      *
+     * @param int|null the timestamp to rebase against, null for the most recent
      * @param bool $deletemissing if true, then all strings that are in repository but not in stage will be marked as to be deleted
      * @param int $deletetimestamp if $deletemissing is tru, what timestamp to use when removing strings (defaults to current)
      */
-    public function rebase($deletemissing=false, $deletetimestamp=null) {
+    public function rebase($basetimestamp=null, $deletemissing=false, $deletetimestamp=null) {
+        if(!is_bool($deletemissing)) {
+            throw new coding_exception('Incorrect type of the parameter $deletemissing');
+        }
         foreach ($this->components as $cx => $component) {
-            $cap = mlang_component::from_snapshot($component->name, $component->lang, $component->version);
+            $cap = mlang_component::from_snapshot($component->name, $component->lang, $component->version, $basetimestamp);
             if ($deletemissing) {
                 if (empty($deletetimestamp)) {
                     $deletetimestamp = time();

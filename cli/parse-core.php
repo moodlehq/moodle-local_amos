@@ -17,7 +17,7 @@
 
 /**
  * AMOS script to parse English strings in the core
- * 
+ *
  * This is supposed to be run regularly in a cronjob to register all changes
  * done in Moodle source code.
  *
@@ -204,7 +204,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified, mlang_component::name_from_filename($file));
         $stage = new mlang_stage();
         $stage->add($component);
-        $stage->rebase(true, $timemodified);
+        $stage->rebase($timemodified, true, $timemodified);
         $stage->commit($commitmsg, array(
                 'source' => 'git',
                 'userinfo' => $committer . ' <' . $committeremail . '>',
