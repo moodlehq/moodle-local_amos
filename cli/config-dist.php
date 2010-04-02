@@ -35,3 +35,8 @@ define('AMOS_REPO_MOODLE', $CFG->dataroot . '/amos/repos/moodle');
  * User by parse-lang.php to get the history of strings into database.
  */
 define('AMOS_REPO_LANGS', $CFG->dataroot . '/amos/repos/moodle-lang');
+
+/**
+ * Full path to the directory where AMOS will generate language packs
+ */
+define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');

@@ -279,6 +279,81 @@ class mlang_component {
             $this->unlink_string($string->id);
         }
     }
+
+    /**
+     * Exports the string into a file in Moodle PHP format ($string array)
+     *
+     * @param string $filepath full path of the file to write into
+     * @return false if unable to open a file
+     */
+    public function export_phpfile($filepath) {
+        if (! $f = fopen($filepath, 'w')) {
+            return false;
+        }
+        $branch = $this->version->branch;
+        $lang   = $this->lang;
+        $name   = $this->name;
+        fwrite($f, <<<EOF
+<?php
+
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Strings for component '$name', language '$lang', branch '$branch'
+ *
+ * @package   $this->name
+ * @copyright 1999 onwards Martin Dougiamas  http://dougiamas.com
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+
+EOF
+);
+        foreach ($this->get_iterator() as $string) {
+            fwrite($f, '$string[\'' . $string->id . '\'] = ');
+            fwrite($f, var_export($string->text, true));
+            fwrite($f, ";\n");
+        }
+        fclose($f);
+    }
+
+    /**
+     * Returns the relative path to the file where the component should be exported to
+     *
+     * This respects the component language and version. For Moodle 1.6 - 1.9, string files
+     * are put into common lang/xx_utf8 directory. Since Moodle 2.0, every plugin type
+     * holds its own strings itself.
+     *
+     * For example, for Workshop module this returns 'lang/xx_utf8/workshop.php' in 1.x and
+     * 'mod/workshop/lang/xx/workshop.php' in 2.x
+     *
+     * @return string relative path to the file
+     */
+    public function get_phpfile_location() {
+        if ($this->version->code <= mlang_version::MOODLE_19) {
+            // Moodle 1.x
+            return 'lang/' . $this->lang . '_utf8/' . $this->name . '.php';
+
+        } else {
+            // Moodle 2.x
+            $root = get_component_directory($this->name, false);
+            $root = empty($root) ? 'lang' : $root . '/lang';
+            return $root. '/' . $this->lang . '/' . $this->name . '.php';
+        }
+    }
 }
 
 /**
@@ -694,6 +769,7 @@ class mlang_version {
                 'code'          => self::MOODLE_21,
                 'label'         => '2.1',
                 'branch'        => 'MOODLE_21_STABLE',
+                'dir'           => 'lang21',
                 'translatable'  => false,
                 'current'       => false,
             ),
@@ -701,6 +777,7 @@ class mlang_version {
                 'code'          => self::MOODLE_20,
                 'label'         => '2.0',
                 'branch'        => 'MOODLE_20_STABLE',
+                'dir'           => 'lang20',
                 'translatable'  => true,
                 'current'       => true,
             ),
@@ -708,6 +785,7 @@ class mlang_version {
                 'code'          => self::MOODLE_19,
                 'label'         => '1.9',
                 'branch'        => 'MOODLE_19_STABLE',
+                'dir'           => 'lang19',
                 'translatable'  => true,
                 'current'       => true,
             ),
@@ -715,6 +793,7 @@ class mlang_version {
                 'code'          => self::MOODLE_18,
                 'label'         => '1.8',
                 'branch'        => 'MOODLE_18_STABLE',
+                'dir'           => 'lang18',
                 'translatable'  => true,
                 'current'       => false,
             ),
@@ -722,6 +801,7 @@ class mlang_version {
                 'code'          => self::MOODLE_17,
                 'label'         => '1.7',
                 'branch'        => 'MOODLE_17_STABLE',
+                'dir'           => 'lang17',
                 'translatable'  => true,
                 'current'       => false,
             ),
@@ -729,10 +809,10 @@ class mlang_version {
                 'code'          => self::MOODLE_16,
                 'label'         => '1.6',
                 'branch'        => 'MOODLE_16_STABLE',
+                'dir'           => 'lang16',
                 'translatable'  => true,
                 'current'       => false,
             ),
         );
     }
-
 }
