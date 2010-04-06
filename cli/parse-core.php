@@ -184,6 +184,10 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             // this is not a language file
             continue;
         }
+        if (substr($file, 0, 13) == 'install/lang/') {
+            // ignore these auto generated files
+            continue;
+        }
         if (substr($file, -4) !== '.php') {
             // this is not a valid string file
             continue;
