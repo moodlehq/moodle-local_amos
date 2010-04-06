@@ -462,4 +462,27 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?', 2, 1), 'Delete role "{$a->role}"?');
         $this->assertEqual(mlang_string::fix_syntax('See &#36;CFG->foo', 2, 1), 'See $CFG->foo');
     }
+
+    public function test_get_phpfile_location() {
+        $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertEqual('lang/en_utf8/moodle.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('lang/en/moodle.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertEqual('lang/en_utf8/workshop.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('mod/workshop/lang/en/workshop.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('workshopform_accumulative', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('mod/workshop/form/accumulative/lang/en/workshopform_accumulative.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertEqual('lang/en_utf8/gradeexport_xml.php', $component->get_phpfile_location());
+
+        $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('grade/export/xml/lang/en/gradeexport_xml.php', $component->get_phpfile_location());
+    }
 }

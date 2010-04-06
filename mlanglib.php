@@ -349,9 +349,12 @@ EOF
 
         } else {
             // Moodle 2.x
-            $root = get_component_directory($this->name, false);
-            $root = empty($root) ? 'lang' : $root . '/lang';
-            return $root. '/' . $this->lang . '/' . $this->name . '.php';
+            list($type, $plugin) = normalize_component($this->name);
+            if ($type === 'core') {
+                return 'lang/' . $this->lang . '/' . $this->name . '.php';
+            } else {
+                return get_plugin_directory($type, $plugin, false) . '/lang/' . $this->lang . '/' . $this->name . '.php';
+            }
         }
     }
 }
