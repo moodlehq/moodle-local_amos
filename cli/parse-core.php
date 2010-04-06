@@ -128,6 +128,8 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_16_STABLE',
 );
 
+$plugintypes = get_plugin_types(false);
+
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
     echo "*****************************************\n";
     echo "BRANCH {$branch}\n";
@@ -180,17 +182,37 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $parts = explode("\t", $line);
         $changetype = substr($parts[0], -1);    // A (added new file), M (modified), D (deleted)
         $file = $parts[1];
+        // series of checks that the file is proper language pack
         if (!strstr($file, 'lang/en_utf8/')) {
             // this is not a language file
-            continue;
-        }
-        if (substr($file, 0, 13) == 'install/lang/') {
-            // ignore these auto generated files
             continue;
         }
         if (substr($file, -4) !== '.php') {
             // this is not a valid string file
             continue;
+        }
+        if (substr($file, 0, 13) == 'install/lang/') {
+            // ignore these auto generated files
+            echo "SKIP installer bootstrap strings\n";
+            continue;
+        }
+        if (substr($file, 0, 13) !== 'lang/en_utf8/') {
+            // this is to avoid things like lang files inside simpletest, wrong langpack filenames etc.
+            list($plugintype, $pluginname) = normalize_component(mlang_component::name_from_filename($file));
+            if (!isset($plugintypes[$plugintype])) {
+                // unknown plugin type - skip the lang file
+                echo "SKIP invalid plugintype\n";
+                continue;
+            }
+            if ($plugintype == 'mod') {
+                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . '/lang/en_utf8/' . $pluginname . '.php';
+            } else {
+                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . '/lang/en_utf8/' . $plugintype . '_' . $pluginname . '.php';
+            }
+            if ($file !== $validpath) {
+                echo "SKIP unsupported string file location\n";
+                continue;
+            }
         }
         $memprev = $mem;
         $mem = memory_get_usage();
