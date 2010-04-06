@@ -453,6 +453,7 @@ class mlang_string {
             $clean = str_replace("\\", '', $clean); // delete all slashes
             $clean = preg_replace('/(^|[^{])\$a\b(\->[a-zA-Z0-9_]+)?/', '\\1{$a\\2}', $clean); // wrap placeholders
             $clean = str_replace('@@@___XXX_ESCAPED_DOLLAR__@@@', '$', $clean);
+            $clean = str_replace('&#36;', '$', $clean);
 
         } elseif (($format === 1) && ($from === 1)) {
             // sanity legacy 1.x strings
