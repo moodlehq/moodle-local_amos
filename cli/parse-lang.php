@@ -59,8 +59,6 @@ $tmp = make_upload_directory('amos/temp', false);
 $var = make_upload_directory('amos/var', false);
 $mem = memory_get_usage();
 
-$version = mlang_version::by_branch('MOODLE_20_STABLE');
-
 // the following commits contains a syntax typo and they can't be included for processing. They are skipped
 $MLANG_BROKEN_CHECKOUTS = array(
     '6ec9481c57031d35ebb5ed19807791264f522d9c_cs_utf8_langconfig.php',
@@ -127,7 +125,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
+$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS . '/cs_utf8'; // XXX
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 
@@ -212,22 +210,35 @@ foreach ($gitout as $line) {
     $checkout = $tmp . '/' . $checkout;
     exec("git show {$commithash}:{$file} > {$checkout}");
 
-    // convert the php file into strings in the staging area
-    $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
-    $stage = new mlang_stage();
-    $stage->add($component);
-    $stage->rebase($timemodifed, true, $timemodified);
-    try {
-        $stage->commit($commitmsg, array(
-                'source' => 'git',
-                'userinfo' => $committer . ' <' . $committeremail . '>',
-                'commithash' => $commithash
-            ), true);
-        unlink($checkout);
-    } catch (dml_write_exception $e) {
-        echo "FAILED COMMIT $checkout\n";
+    // push the string on all branches where the English original is currently (or has ever been) defined
+    // note that all English strings history must already be registered in AMOS repository
+    foreach (array('MOODLE_20_STABLE', 'MOODLE_19_STABLE', 'MOODLE_18_STABLE', 'MOODLE_17_STABLE', 'MOODLE_16_STABLE') as $branch) {
+        $version = mlang_version::by_branch($branch);
+        // get the translated strings from PHP file
+        $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
+        // get the most recent snapshot of English strings including those deleted
+        // TODO those deleted from English are are not marked as deleted in the translation yet
+        $english = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
+        // keep just those defined in English on that branch - this is where we are replaying branching of lang packs
+        $component->intersect($english);
+        $english->clear();
+        unset($english);
+        // and let us commit added/modified strings
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->rebase($timemodified, true, $timemodified);
+        try {
+            $stage->commit($commitmsg, array(
+                    'source' => 'git',
+                    'userinfo' => $committer . ' <' . $committeremail . '>',
+                    'commithash' => $commithash
+                ), true);
+        } catch (dml_write_exception $e) {
+            echo "FAILED COMMIT $checkout\n";
+        }
+        $component->clear();
+        unset($component);
     }
-    $component->clear();
-    unset($component);
+    unlink($checkout);
 }
 echo "DONE\n";

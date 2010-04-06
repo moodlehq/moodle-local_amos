@@ -244,6 +244,15 @@ class mlang_component {
     }
 
     /**
+     * Returns array of all string identifiers in the component
+     *
+     * @return array of string identifiers
+     */
+    public function get_string_keys() {
+        return array_keys($this->strings);
+    }
+
+    /**
      * Adds new string into the collection
      *
      * @param mlang_string $string to add
@@ -356,6 +365,30 @@ EOF
                 return get_plugin_directory($type, $plugin, false) . '/lang/' . $this->lang . '/' . $this->name . '.php';
             }
         }
+    }
+
+    /**
+     * Prunes the strings, keeping just those defined in given $mask as well
+     *
+     * This may be used to get rid of strings that are not defined in another component.
+     * Typically can be used to clean the translation from strings that are not defined in
+     * the master English pack.
+     * Beware - if the string is defined in $mask as deleted, it will be kept in this regardless
+     * its state.
+     *
+     * @param mlang_component $mask master component to compare strings with
+     * @return int number of removed strings
+     */
+    public function intersect(mlang_component $mask) {
+        $removed = 0;
+        $masked = array_flip($mask->get_string_keys());
+        foreach (array_keys($this->strings) as $key) {
+            if (! isset($masked[$key])) {
+                $this->unlink_string($key);
+                $removed++;
+            }
+        }
+        return $removed;
     }
 }
 

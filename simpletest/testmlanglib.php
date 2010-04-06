@@ -485,4 +485,37 @@ EOF;
         $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->assertEqual('grade/export/xml/lang/en/gradeexport_xml.php', $component->get_phpfile_location());
     }
+
+    public function test_get_string_keys() {
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $keys = $component->get_string_keys();
+        $this->assertEqual(count($keys), 0);
+        $this->assertTrue(empty($keys));
+
+        $component->add_string(new mlang_string('hello', 'Hello'));
+        $component->add_string(new mlang_string('world', 'World'));
+        $keys = $component->get_string_keys();
+        $keys = array_flip($keys);
+        $this->assertEqual(count($keys), 2);
+        $this->assertTrue(isset($keys['hello']));
+        $this->assertTrue(isset($keys['world']));
+    }
+
+    public function test_intersect() {
+        $master = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_18_STABLE'));
+        $master->add_string(new mlang_string('one', 'One'));
+        $master->add_string(new mlang_string('two', 'Two'));
+        $master->add_string(new mlang_string('three', 'Three'));
+
+        $slave = new mlang_component('moodle', 'cs', mlang_version::by_branch('MOODLE_18_STABLE'));
+        $slave->add_string(new mlang_string('one', 'Jedna'));
+        $slave->add_string(new mlang_string('two', 'Dva'));
+        $slave->add_string(new mlang_string('seven', 'Sedm'));
+        $slave->add_string(new mlang_string('eight', 'Osm'));
+
+        $slave->intersect($master);
+        $this->assertEqual(2, count($slave->get_string_keys()));
+        $this->assertTrue($slave->has_string('one'));
+        $this->assertTrue($slave->has_string('two'));
+    }
 }
