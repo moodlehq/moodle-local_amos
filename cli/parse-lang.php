@@ -58,6 +58,7 @@ while(@ob_end_flush());
 $tmp = make_upload_directory('amos/temp', false);
 $var = make_upload_directory('amos/var', false);
 $mem = memory_get_usage();
+$eng = array();
 
 // the following commits contains a syntax typo and they can't be included for processing. They are skipped
 $MLANG_BROKEN_CHECKOUTS = array(
@@ -217,12 +218,16 @@ foreach ($gitout as $line) {
         // get the translated strings from PHP file
         $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
         // get the most recent snapshot of English strings including those deleted
+        // beware - we are caching the English snapshots so do not modify English strings while migrating langs
         // TODO those deleted from English are are not marked as deleted in the translation yet
-        $english = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
+        if (!isset($eng[$branch])) {
+            $eng[$branch] = array();
+        }
+        if (!isset($eng[$branch][$component->name])) {
+            $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
+        }
         // keep just those defined in English on that branch - this is where we are replaying branching of lang packs
-        $component->intersect($english);
-        $english->clear();
-        unset($english);
+        $component->intersect($eng[$branch][$component->name]);
         // and let us commit added/modified strings
         $stage = new mlang_stage();
         $stage->add($component);
