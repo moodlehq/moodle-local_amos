@@ -55,6 +55,5 @@ $translator = new local_amos_translator($filter, $USER, new moodle_url('/local/a
 /// Output starts here
 echo $output->header();
 echo $output->render($filter);
-print_object($translator); die(); // DONOTCOMMIT
 echo $output->render($translator);
 echo $output->footer();

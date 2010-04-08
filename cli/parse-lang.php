@@ -126,7 +126,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS . '/cs_utf8'; // XXX
+$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 
@@ -219,7 +219,6 @@ foreach ($gitout as $line) {
         $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
         // get the most recent snapshot of English strings including those deleted
         // beware - we are caching the English snapshots so do not modify English strings while migrating langs
-        // TODO those deleted from English are are not marked as deleted in the translation yet
         if (!isset($eng[$branch])) {
             $eng[$branch] = array();
         }
@@ -227,6 +226,8 @@ foreach ($gitout as $line) {
             $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
         }
         // keep just those defined in English on that branch - this is where we are replaying branching of lang packs
+        // strings deleted from English are are not marked as deleted in the translation yet - run rev-clean.php to 
+        // propagate removal of English strings
         $component->intersect($eng[$branch][$component->name]);
         // and let us commit added/modified strings
         $stage = new mlang_stage();

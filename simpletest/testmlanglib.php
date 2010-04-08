@@ -255,6 +255,24 @@ EOF;
         unset($stage);
     }
 
+    public function test_rebasing_deletion_already_deleted() {
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('trash', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('delme', 'Del me', time() - 1000, true));    // deleted string
+        $stage->add($component);
+        $stage->commit('The string was already born deleted... sad');
+        $this->assertFalse($stage->has_component());
+        unset($stage);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('trash', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('delme', 'Del me', null, true));    // already deleted string
+        $stage->add($component);
+        $stage->rebase();
+        $this->assertFalse($stage->has_component());
+    }
+
     public function test_implicit_rebasing_during_commit() {
         global $DB;
 

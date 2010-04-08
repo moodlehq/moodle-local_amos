@@ -21,7 +21,7 @@
  * Provides classes and functions to handle various low-level operations on Moodle
  * strings in various formats.
  *
- * @package   moodlecore
+ * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -149,14 +149,19 @@ class mlang_component {
      * @param mlang_version $version
      * @param int $timestamp time of the snapshot, empty for the most recent
      * @param bool $deleted shall deleted strings be included?
-     * @return mdl_component component with the strings from the snapshot
+     * @param bool $fullinfo shall full information about the string (commit messages, source etc) be returned?
+     * @return mlang_component component with the strings from the snapshot
      */
-    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false) {
+    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false, $fullinfo=false) {
         global $DB;
 
         $params = array('branch' => $version->code, 'lang' => $lang, 'component' => $name);
-        $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted
-                  FROM {amos_repository} r
+        if ($fullinfo) {
+            $sql = "SELECT r.*\n";
+        } else {
+            $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted\n";
+        }
+        $sql .= " FROM {amos_repository} r
                   JOIN (SELECT branch, lang, component, stringid,MAX(timemodified) AS timemodified
                           FROM {amos_repository} ";
         if (!empty($timestamp)) {
@@ -179,8 +184,18 @@ class mlang_component {
         $rs = $DB->get_recordset_sql($sql, $params);
         $component = new mlang_component($name, $lang, $version);
         foreach ($rs as $r) {
+            if ($fullinfo) {
+                $extra = new stdclass();
+                foreach ($r as $property => $value) {
+                    if (!in_array($property, array('stringid', 'text', 'timemodified', 'deleted'))) {
+                        $extra->{$property} = $value;
+                    }
+                }
+            } else {
+                $extra = null;
+            }
             // we force here so in case of two string with the same timemodified, the higher id wins
-            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted), true);
+            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted, $extra), true);
         }
         $rs->close();
 
@@ -409,14 +424,20 @@ class mlang_string {
     /** @var bool is deleted */
     public $deleted = false;
 
+    /** @var extra information about the string */
+    public $extra = null;
+
     /** @var mlang_component we are part of */
     public $component;
 
     /**
      * @param string $id string identifier
      * @param string $text string text
+     * @param int $timemodified
+     * @param bool $deleted
+     * @param stdclass $extra
      */
-    public function __construct($id, $text='', $timemodified=null, $deleted=0) {
+    public function __construct($id, $text='', $timemodified=null, $deleted=0, stdclass $extra=null) {
         if (is_null($timemodified)) {
             $timemodified = time();
         }
@@ -424,16 +445,22 @@ class mlang_string {
         $this->text         = $text;
         $this->timemodified = $timemodified;
         $this->deleted      = $deleted;
+        $this->extra        = $extra;
     }
 
     /**
      * Returns true if the two given strings should be considered as different, false otherwise.
+     *
+     * Deleted strings are considered equal, regardless the actual text
      *
      * @param mlang_string $a
      * @param mlang_string $b
      * @return bool
      */
     public static function differ(mlang_string $a, mlang_string $b) {
+        if ($a->deleted and $b->deleted) {
+            return false;
+        }
         if (is_null($a->text) or is_null($b->text)) {
             if (is_null($a->text) and is_null($b->text)) {
                 return false;
@@ -555,7 +582,7 @@ class mlang_stage {
     /**
      * Check the staged strings against the repository cap and keep modified strings only
      *
-     * @param int|null the timestamp to rebase against, null for the most recent
+     * @param int|null $basetimestamp the timestamp to rebase against, null for the most recent
      * @param bool $deletemissing if true, then all strings that are in repository but not in stage will be marked as to be deleted
      * @param int $deletetimestamp if $deletemissing is tru, what timestamp to use when removing strings (defaults to current)
      */
@@ -564,7 +591,7 @@ class mlang_stage {
             throw new coding_exception('Incorrect type of the parameter $deletemissing');
         }
         foreach ($this->components as $cx => $component) {
-            $cap = mlang_component::from_snapshot($component->name, $component->lang, $component->version, $basetimestamp);
+            $cap = mlang_component::from_snapshot($component->name, $component->lang, $component->version, $basetimestamp, true);
             if ($deletemissing) {
                 if (empty($deletetimestamp)) {
                     $deletetimestamp = time();
@@ -585,7 +612,7 @@ class mlang_stage {
                     // the staged string does not exist in the repository yet - will be committed
                     continue;
                 }
-                if (!empty($stagedstring->deleted)) {
+                if ($stagedstring->deleted && empty($capstring->deleted)) {
                     // the staged string object is the removal record - will be committed
                     continue;
                 }
@@ -634,7 +661,7 @@ class mlang_stage {
                 $record->text       = $string->text;
                 $record->timemodified = $string->timemodified;
                 $record->deleted    = $string->deleted;
-                $record->commitmsg  = $message;
+                $record->commitmsg  = trim($message);
 
                 $this->commit_low_add($record);
             }
@@ -851,5 +878,56 @@ class mlang_version {
                 'current'       => false,
             ),
         );
+    }
+}
+
+/**
+ * Class providing various AMOS-related tools
+ */
+class mlang_tools {
+
+    /**
+     * Returns the tree of all known components
+     *
+     * @param array $conditions can specify branch, lang and component to filter
+     * @return array [branch][language][component] => null
+     */
+    public static function components_tree(array $conditions=null) {
+        global $DB;
+
+        $where = array();
+        if (!empty($conditions['branch'])) {
+            $where[] = 'branch = :branch';
+        }
+        if (!empty($conditions['lang'])) {
+            $where[] = 'lang = :lang';
+        }
+        if (!empty($conditions['component'])) {
+            $where[] = 'component = :component';
+        }
+        if (!empty($where)) {
+            $where = "WHERE " . implode(" AND ", $where) . "\n";
+        }
+        $sql = "SELECT branch,lang,component
+                  FROM {amos_repository}\n";
+        if (!empty($where)) {
+            $sql .= $where;
+        }
+        $sql .= "GROUP BY branch,lang,component
+                 ORDER BY branch,lang,component";
+        $rs = $DB->get_recordset_sql($sql, $conditions);
+        $tree = array();
+        foreach ($rs as $record) {
+            if (!isset($tree[$record->branch])) {
+                $tree[$record->branch] = array();
+            }
+            if (!isset($tree[$record->branch][$record->lang])) {
+                $tree[$record->branch][$record->lang] = array();
+            }
+            $tree[$record->branch][$record->lang][$record->component] = null;
+        }
+        $rs->close();
+
+        return $tree;
     }
 }
