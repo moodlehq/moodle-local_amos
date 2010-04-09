@@ -187,6 +187,10 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             // this is not a language file
             continue;
         }
+        if (strstr($file, 'lang/en_utf8/docs/') or strstr($file, 'lang/en_utf8/help/')) {
+            // ignore
+            continue;
+        }
         if (substr($file, -4) !== '.php') {
             // this is not a valid string file
             continue;
