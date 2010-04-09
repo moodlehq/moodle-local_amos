@@ -95,17 +95,21 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
-        // missing and outdated strings only
+        // other filter settings
         $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup yui-gd'));
         $output .= html_writer::start_tag('div', array('class' => 'label yui-u first'));
-        $output .= html_writer::tag('label', 'Status', array('for' => 'amosfilter_fmis'));
+        $output .= html_writer::tag('label', 'Miscellaneous', array('for' => 'amosfilter_fmis'));
         $output .= html_writer::tag('div', 'Additional conditions on strings to display', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui-u'));
 
-        $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, 'only missing and outdated strings');
+        $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, 'missing and outdated strings only');
         $fmis    = html_writer::tag('div', $fmis, array('class' => 'labelled_checkbox'));
-        $output .= html_writer::tag('div', $fmis, array('id' => 'amosfilter_fver', 'class' => 'checkboxgroup singlecheckbox'));
+
+        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, 'help tooltips only');
+        $fhlp    = html_writer::tag('div', $fhlp, array('class' => 'labelled_checkbox'));
+
+        $output .= html_writer::tag('div', $fmis . $fhlp, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');

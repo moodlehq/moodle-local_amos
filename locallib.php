@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('target','version', 'language', 'component', 'missing', 'substring');
+        $this->fields = array('target','version', 'language', 'component', 'missing', 'helps', 'substring');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -115,6 +115,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->missing)) {
            $data->missing = false;
         }
+        if (is_null($data->helps)) {
+           $data->helps = false;
+        }
         if (is_null($data->substring)) {
             $data->substring = '';
         }
@@ -168,9 +171,9 @@ class local_amos_filter implements renderable {
             }
         }
 
-        $data->missing = optional_param('fmis', false, PARAM_BOOL);
-
-        $data->substring = optional_param('ftxt', '', PARAM_RAW);
+        $data->missing      = optional_param('fmis', false, PARAM_BOOL);
+        $data->helps        = optional_param('fhlp', false, PARAM_BOOL);
+        $data->substring    = optional_param('ftxt', '', PARAM_RAW);
 
         return $data;
     }
