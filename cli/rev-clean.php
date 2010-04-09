@@ -33,14 +33,17 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
+$mem = memory_get_usage();
 $tree = mlang_tools::components_tree();
+echo "COMPONENTS TREE LOADED\n";
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
-    foreach ($languages as $langcode => $components) {
-        if ($langcode != 'en') {
-            continue;
-        }
+    foreach ($tree[$vercode]['en'] as $components) {
         foreach ($components as $componentname => $unused) {
+            $memprev = $mem;
+            $mem = memory_get_usage();
+            $memdiff = $memprev < $mem ? '+' : '-';
+            echo "{$version->label} {$componentname} [{$mem} {$memdiff}]\n";
             $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
             foreach ($english->get_iterator() as $string) {
                 if ($string->deleted) {

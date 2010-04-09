@@ -99,6 +99,7 @@ $MLANG_BROKEN_CHECKOUTS = array(
     '598095a80d24d982efa2eb5446ba2046ff5a4f80_dv_utf8_moodlelib.php',
     'dcb292801654b0fd0bfb76ff0bf597f49f133cc9_da_utf8_moodle.php',
     'cfec4b2b359a67abd50eca74fd37f12a54d8ea42_nl_utf8_grades.php',
+    '61b81feac5f42fe346cbf000a1bb40fda00a22a0_el_utf8_fonts_lang_decode.php',
 );
 
 chdir(AMOS_REPO_LANGS);
