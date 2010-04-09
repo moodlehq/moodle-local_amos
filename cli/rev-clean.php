@@ -34,33 +34,32 @@ require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 $mem = memory_get_usage();
+echo "LOADING COMPONENTS TREE... ";
 $tree = mlang_tools::components_tree();
-echo "COMPONENTS TREE LOADED\n";
+echo "DONE\n";
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
-    foreach ($tree[$vercode]['en'] as $components) {
-        foreach ($components as $componentname => $unused) {
-            $memprev = $mem;
-            $mem = memory_get_usage();
-            $memdiff = $memprev < $mem ? '+' : '-';
-            echo "{$version->label} {$componentname} [{$mem} {$memdiff}]\n";
-            $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
-            foreach ($english->get_iterator() as $string) {
-                if ($string->deleted) {
-                    //echo "DELETED {$english->lang} {$english->name} {$string->id} {$string->extra->commithash}\n";
-
-                    $stage = new mlang_stage();
-                    foreach (array_keys($tree[$vercode]) as $otherlang) {
-                        if ($otherlang == 'en') {
-                            continue;
-                        }
-                        $other = new mlang_component($english->name, $otherlang, $english->version);
-                        $other->add_string(new mlang_string($string->id, '[deleted]', null, 1));
-                        $stage->add($other);
+    foreach ($languages['en'] as $componentname => $unused) {
+        $memprev = $mem;
+        $mem = memory_get_usage();
+        $memdiff = $memprev < $mem ? '+' : '-';
+        $memdiff = $memdiff . abs($mem - $memprev);
+        echo "{$version->label} {$componentname} [{$mem} {$memdiff}]\n";
+        $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
+        foreach ($english->get_iterator() as $string) {
+            if ($string->deleted) {
+                $stage = new mlang_stage();
+                foreach (array_keys($tree[$vercode]) as $otherlang) {
+                    if ($otherlang == 'en') {
+                        continue;
                     }
-                    $stage->rebase();
-                    if ($stage->has_component()) {
-                        $msg = <<<EOF
+                    $other = new mlang_component($english->name, $otherlang, $english->version);
+                    $other->add_string(new mlang_string($string->id, '[deleted]', null, 1));
+                    $stage->add($other);
+                }
+                $stage->rebase();
+                if ($stage->has_component()) {
+                    $msg = <<<EOF
 Propagating removal of the string
 
 The string {$string->id} was removed from the English language pack by
@@ -68,10 +67,11 @@ The string {$string->id} was removed from the English language pack by
 {$string->extra->commitmsg}
 {$string->extra->commithash}
 EOF;
-                        echo "COMMIT removal of '{$string->id}' from '{$english->name}'\n";
-                        $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'David Mudrak <david@moodle.com>'), true);
-                    }
+                    echo "COMMIT removal of '{$string->id}' from '{$english->name}'\n";
+                    $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'David Mudrak <david@moodle.com>'), true);
                 }
+                $stage->clear();
+                unset($stage);
             }
         }
     }
