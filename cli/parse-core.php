@@ -157,7 +157,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     chdir(AMOS_REPO_MOODLE);
     $gitout = array();
     $gitstatus = 0;
-    $gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H {$gitbranch} {$startat}";
+    $gitcmd = "git whatchanged --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
     echo "RUN {$gitcmd}\n";
     exec($gitcmd, $gitout, $gitstatus);
 
@@ -167,6 +167,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     }
 
     $commithash = '';
+    $committime = '';
     foreach ($gitout as $line) {
         $line = trim($line);
         if (empty($line)) {
@@ -177,7 +178,8 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             if (!empty($commithash)) {
                 file_put_contents($startatlock, $commithash);
             }
-            $commithash = substr($line, 7);
+            $commithash = substr($line, 7, 40);
+            $committime = substr($line, 58);
             continue;
         }
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
@@ -188,11 +190,18 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $changetype = substr($parts[0], -1);    // A (added new file), M (modified), D (deleted)
         $file = $parts[1];
         // series of checks that the file is proper language pack
-        if (!strstr($file, 'lang/en_utf8/')) {
+        if (($version->code >= mlang_version::MOODLE_20) and ($committime >= 1270884296)) {
+            // since Petr's commit 3a915b066765efc3cc166ae8186405f67c04ec2c
+            // on 10th April 2010, strings are in 'en' folder again
+            $enfolder = 'en';
+        } else {
+            $enfolder = 'en_utf8';
+        }
+        if (!strstr($file, "lang/$enfolder/")) {
             // this is not a language file
             continue;
         }
-        if (strstr($file, 'lang/en_utf8/docs/') or strstr($file, 'lang/en_utf8/help/')) {
+        if (strstr($file, "lang/$enfolder/docs/") or strstr($file, "lang/$enfolder/help/")) {
             // ignore
             continue;
         }
@@ -205,21 +214,21 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             echo "SKIP installer bootstrap strings\n";
             continue;
         }
-        if (substr($file, 0, 13) !== 'lang/en_utf8/') {
+        if (substr($file, 0, strlen("lang/$enfolder/")) !== "lang/$enfolder/") {
             // this is to avoid things like lang files inside simpletest, wrong langpack filenames etc.
             list($plugintype, $pluginname) = normalize_component(mlang_component::name_from_filename($file));
             if (!isset($plugintypes[$plugintype])) {
                 // unknown plugin type - skip the lang file
-                echo "SKIP invalid plugintype\n";
+                echo "SKIP invalid plugintype: $file\n";
                 continue;
             }
             if ($plugintype == 'mod') {
-                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . '/lang/en_utf8/' . $pluginname . '.php';
+                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . "/lang/$enfolder/" . $pluginname . '.php';
             } else {
-                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . '/lang/en_utf8/' . $plugintype . '_' . $pluginname . '.php';
+                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . "/lang/$enfolder/" . $plugintype . '_' . $pluginname . '.php';
             }
             if ($file !== $validpath) {
-                echo "SKIP unsupported string file location\n";
+                echo "SKIP unsupported string file location: $file\n";
                 continue;
             }
         }
