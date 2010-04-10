@@ -118,6 +118,11 @@ $MLANG_IGNORE_COMMITS = array(
     'b13af519fc48ee9d8b1e801c6056519454bf8400',
     'd1f62223b59d6acb1475d3979cdafda726cc1290',
     '2064cbaa0f6ea36fc5803fcebb5954ef8c642ac4',
+    //
+    // the following commit renames en_utf8 back to en
+    // we are ignoring that
+    //
+    '3a915b066765efc3cc166ae8186405f67c04ec2c',
 );
 
 $MLANG_PARSE_BRANCHES = array(
