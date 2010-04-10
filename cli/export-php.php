@@ -67,6 +67,7 @@ foreach ($tree as $vercode => $languages) {
                 echo "$file\n";
                 $component->export_phpfile($file);
             }
+            $component->clear();
         }
     }
 }
