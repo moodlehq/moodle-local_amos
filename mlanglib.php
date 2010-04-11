@@ -367,6 +367,8 @@ EOF
      * @return string relative path to the file
      */
     public function get_phpfile_location() {
+        global $CFG;
+
         if ($this->version->code <= mlang_version::MOODLE_19) {
             // Moodle 1.x
             return 'lang/' . $this->lang . '_utf8/' . $this->name . '.php';
@@ -377,7 +379,12 @@ EOF
             if ($type === 'core') {
                 return 'lang/' . $this->lang . '/' . $this->name . '.php';
             } else {
-                return get_plugin_directory($type, $plugin, false) . '/lang/' . $this->lang . '/' . $this->name . '.php';
+                $abspath = get_plugin_directory($type, $plugin);
+                if (substr($abspath, 0, strlen($CFG->dirroot)) !== $CFG->dirroot) {
+                    throw new coding_exception('Plugin directory outside dirroot');
+                }
+                $relpath = substr($abspath, strlen($CFG->dirroot) + 1);
+                return $relpath . '/lang/' . $this->lang . '/' . $this->name . '.php';
             }
         }
     }
