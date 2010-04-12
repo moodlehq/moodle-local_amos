@@ -152,20 +152,35 @@ class mlang_component {
      * @param bool $fullinfo shall full information about the string (commit messages, source etc) be returned?
      * @return mlang_component component with the strings from the snapshot
      */
-    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false, $fullinfo=false) {
+    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false,
+                                         $fullinfo=false, array $stringids=null) {
         global $DB;
 
-        $params = array('branch' => $version->code, 'lang' => $lang, 'component' => $name);
+        $params = array(
+            'inner_branch' => $version->code, 'inner_lang' => $lang, 'inner_component' => $name,
+            'outer_branch' => $version->code, 'outer_lang' => $lang, 'outer_component' => $name,
+            );
+        if (!empty($stringids)) {
+            list($inner_strsql, $inner_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'innerstringid000000');
+            list($outer_strsql, $outer_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'outerstringid000000');
+            $params = array_merge($params, $inner_strparams, $outer_strparams);
+        }
         if ($fullinfo) {
-            $sql = "SELECT r.*\n";
+            $sql = "SELECT r.*";
         } else {
-            $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted\n";
+            $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted";
         }
         $sql .= " FROM {amos_repository} r
-                  JOIN (SELECT branch, lang, component, stringid,MAX(timemodified) AS timemodified
-                          FROM {amos_repository} ";
+                  JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
+                          FROM {amos_repository}
+                         WHERE branch=:inner_branch
+                           AND lang=:inner_lang
+                           AND component=:inner_component";
+        if (!empty($stringids)) {
+            $sql .= "      AND stringid $inner_strsql";
+        }
         if (!empty($timestamp)) {
-            $sql .= "    WHERE timemodified <= :timemodified";
+            $sql .= "      AND timemodified <= :timemodified";
             $params = array_merge($params, array('timemodified' => $timestamp));
         }
         $sql .="         GROUP BY branch,lang,component,stringid) j
@@ -174,11 +189,14 @@ class mlang_component {
                        AND r.component = j.component
                        AND r.stringid = j.stringid
                        AND r.timemodified = j.timemodified)
-                 WHERE r.branch=:branch
-                       AND r.lang=:lang
-                       AND r.component=:component";
+                 WHERE r.branch=:outer_branch
+                       AND r.lang=:outer_lang
+                       AND r.component=:outer_component";
         if (empty($deleted)) {
-            $sql .= "  AND deleted = 0";
+            $sql .= "  AND r.deleted = 0";
+        }
+        if (!empty($stringids)) {
+            $sql .= "  AND r.stringid $outer_strsql";
         }
         $sql .= " ORDER BY r.stringid, r.id";
         $rs = $DB->get_recordset_sql($sql, $params);
