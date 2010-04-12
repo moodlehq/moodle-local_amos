@@ -71,4 +71,4 @@ foreach ($tree as $vercode => $languages) {
         }
     }
 }
-echo "\nDONE";
+echo "DONE\n";

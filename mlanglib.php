@@ -326,15 +326,13 @@ class mlang_component {
      * Exports the string into a file in Moodle PHP format ($string array)
      *
      * @param string $filepath full path of the file to write into
+     * @param string $phpdoc optional custom PHPdoc block for the file
      * @return false if unable to open a file
      */
-    public function export_phpfile($filepath) {
+    public function export_phpfile($filepath, $phpdoc = null) {
         if (! $f = fopen($filepath, 'w')) {
             return false;
         }
-        $branch = $this->version->branch;
-        $lang   = $this->lang;
-        $name   = $this->name;
         fwrite($f, <<<EOF
 <?php
 
@@ -353,6 +351,14 @@ class mlang_component {
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+
+EOF
+        );
+        if (empty($phpdoc)) {
+            $branch = $this->version->branch;
+            $lang   = $this->lang;
+            $name   = $this->name;
+            fwrite($f, <<<EOF
 /**
  * Strings for component '$name', language '$lang', branch '$branch'
  *
@@ -363,7 +369,10 @@ class mlang_component {
 
 
 EOF
-);
+            );
+        } else {
+            fwrite($f, $phpdoc);
+        }
         foreach ($this->get_iterator() as $string) {
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));
