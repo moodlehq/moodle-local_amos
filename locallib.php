@@ -206,26 +206,37 @@ class local_amos_translator implements renderable {
         $this->stage = mlang_persistent_stage::instance_for_user($user);
 
         // get the list of strings to display according the current filter values
+        $branches = $filter->get_data()->version;
         $languages = array_merge(array('en',$this->target), $filter->get_data()->language);
-        list($sqlbranches,   $paramsbranches)  = $DB->get_in_or_equal($filter->get_data()->version,   SQL_PARAMS_NAMED, 'branch0000');
-        list($sqllanguages,  $paramslanguages) = $DB->get_in_or_equal($languages,  SQL_PARAMS_NAMED, 'lang0000');
-        list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($filter->get_data()->component, SQL_PARAMS_NAMED, 'comp0000');
+        $components = $filter->get_data()->component;
+        list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
+        list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
+        list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
+        list($outer_sqlbranches, $outer_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'outerbranch00000');
+        list($outer_sqllanguages, $outer_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'outerlang00000');
+        list($outer_sqlcomponents, $outer_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'outercomp00000');
         $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted
                   FROM {amos_repository} r
-                  JOIN (SELECT branch, lang, component, stringid,MAX(timemodified) AS timemodified
+                  JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
                           FROM {amos_repository}
+                         WHERE branch $inner_sqlbranches
+                           AND lang $inner_sqllanguages
+                           AND component $inner_sqlcomponents
                          GROUP BY branch,lang,component,stringid) j
                     ON (r.branch = j.branch
                        AND r.lang = j.lang
                        AND r.component = j.component
                        AND r.stringid = j.stringid
                        AND r.timemodified = j.timemodified)
-                 WHERE r.branch {$sqlbranches}
-                       AND r.lang {$sqllanguages}
-                       AND r.component {$sqlcomponents}\n";
-        $sql .= "ORDER BY r.component, r.stringid, r.lang, r.branch";
+                 WHERE r.branch {$outer_sqlbranches}
+                       AND r.lang {$outer_sqllanguages}
+                       AND r.component {$outer_sqlcomponents}
+                  ORDER BY r.component, r.stringid, r.lang, r.branch";
 
-        $params = array_merge($paramsbranches, $paramslanguages, $paramcomponents);
+        $params = array_merge(
+            $inner_paramsbranches, $inner_paramslanguages, $inner_paramcomponents,
+            $outer_paramsbranches, $outer_paramslanguages, $outer_paramcomponents
+        );
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $s = array();

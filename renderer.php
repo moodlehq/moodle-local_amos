@@ -165,9 +165,10 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_translator(local_amos_translator $translator) {
 
         $table = new html_table();
-        $table->head = array('Component', 'String', 'Ver', 'Original', 'Translation');
-        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'translation');
+        $table->head = array('Component', 'Identifier', 'Ver', 'Lang', 'Original', 'Translation');
+        $table->colclasses = array('component', 'stringinfo', 'version', 'lang', 'original', 'translation');
         $table->attributes['class'] = 'translator';
+
         foreach ($translator->strings as $string) {
             $cells = array();
             // component name
@@ -178,14 +179,17 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells[1] = new html_table_cell($t);
             // moodle version to put this translation onto
             $cells[2] = new html_table_cell($string->branch);
-            // English original of the string
-            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            // the language in which the original is displayed
+            $cells[3] = new html_table_cell($string->language);
+            // original of the string
+            $cells[4] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
             // Translation
             $t = s($string->translation);
             $sid = local_amos_translator::encode_identifier($string->originalid, $string->translationid);
-            $t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
+            //$t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
+            $t = html_writer::tag('div', $t, array('name' => $sid, 'class' => 'translation'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
-            $cells[4] = new html_table_cell($t . $i);
+            $cells[5] = new html_table_cell($t . $i);
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }
