@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('target','version', 'language', 'component', 'missing', 'helps', 'substring');
+        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -96,9 +96,6 @@ class local_amos_filter implements renderable {
             $data->{$field} = unserialize(get_user_preferences('amos_' . $field));
         }
 
-        if (is_null($data->target)) {
-            $data->target = current_language();
-        }
         if (empty($data->version)) {
             foreach (mlang_version::list_translatable() as $version) {
                 if ($version->current) {
@@ -107,7 +104,7 @@ class local_amos_filter implements renderable {
             }
         }
         if (is_null($data->language)) {
-            $data->language = array('en');
+            $data->language = array(current_language());
         }
         if (is_null($data->component)) {
            $data->component = array();
@@ -138,9 +135,6 @@ class local_amos_filter implements renderable {
         require_sesskey();
         $data = new stdclass();
 
-        // todo if valid language code
-        $data->target = optional_param('ftgt', null, PARAM_SAFEDIR);
-
         $data->version = array();
         $fver = optional_param('fver', null, PARAM_INT);
         if (!is_null($fver)) {
@@ -156,9 +150,7 @@ class local_amos_filter implements renderable {
         if (!is_null($flng)) {
             foreach ($flng as $language) {
                 // todo if valid language code
-                if ($language != $data->target) {
-                    $data->language[] = $language;
-                }
+                $data->language[] = $language;
             }
         }
 
@@ -184,9 +176,6 @@ class local_amos_filter implements renderable {
  */
 class local_amos_translator implements renderable {
 
-    /** @var string target language of the translation */
-    public $target = null;
-
     /** @var array of stdclass strings to display */
     public $strings = array();
 
@@ -202,12 +191,11 @@ class local_amos_translator implements renderable {
         global $DB;
 
         $this->handler = $handler;
-        $this->target = $filter->get_data()->target;
         $this->stage = mlang_persistent_stage::instance_for_user($user);
 
         // get the list of strings to display according the current filter values
         $branches = $filter->get_data()->version;
-        $languages = array_merge(array('en',$this->target), $filter->get_data()->language);
+        $languages = array_merge(array('en'), $filter->get_data()->language);
         $components = $filter->get_data()->component;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
@@ -215,7 +203,7 @@ class local_amos_translator implements renderable {
         list($outer_sqlbranches, $outer_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'outerbranch00000');
         list($outer_sqllanguages, $outer_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'outerlang00000');
         list($outer_sqlcomponents, $outer_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'outercomp00000');
-        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted
+        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified
                   FROM {amos_repository} r
                   JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
                           FROM {amos_repository}
@@ -231,6 +219,7 @@ class local_amos_translator implements renderable {
                  WHERE r.branch {$outer_sqlbranches}
                        AND r.lang {$outer_sqllanguages}
                        AND r.component {$outer_sqlcomponents}
+                       AND r.deleted = 0
                   ORDER BY r.component, r.stringid, r.lang, r.branch";
 
         $params = array_merge(
