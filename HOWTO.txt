@@ -1,0 +1,22 @@
+HOW TO DEPLOY AMOS AND RELOAD THE HISTORY OF STRINGS
+====================================================
+
+1.  Install /local/amos as normal subplugin
+2.  Copy /local/amos/cli/config-dist.php to config.php and modify if needed
+3.  Prepare git repositories of Moodle core and Moodle lang packs in locations
+    defined in config.php
+4.  Run cli/parse-core.php to get English strings into database
+5.  Run cli/parse-lang.php to get translations into database
+6.  Modify cli/parse-core.php and uncomment XXX'ed code to hard code the
+    startat commit hash
+7.  Re-run cli/parse-core.php to execute AMOS scripts from recent commits
+8.  Run cli/rev-cleanup.php to delete orphaned strings
+
+
+HOW TO KEEP AMOS DATA UP-TO-UPDATE
+==================================
+
+1.  git pull both repositories
+2.  Run cli/parse-core.php
+3.  Run cli/parse-lang.php
+4.  Run cli/rev-cleanup.php
