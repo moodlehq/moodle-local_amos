@@ -40,6 +40,9 @@ echo "DONE\n";
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     foreach ($languages['en'] as $componentname => $unused) {
+        if ($componentname == 'langconfig') {
+            continue;
+        }
         $memprev = $mem;
         $mem = memory_get_usage();
         $memdiff = $memprev < $mem ? '+' : '-';
