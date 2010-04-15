@@ -227,9 +227,12 @@ foreach ($gitout as $line) {
             $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
         }
         // keep just those defined in English on that branch - this is where we are replaying branching of lang packs
-        // strings deleted from English are are not marked as deleted in the translation yet - run rev-clean.php to 
+        // strings deleted from English are are not marked as deleted in the translation yet - run rev-clean.php to
         // propagate removal of English strings
-        $component->intersect($eng[$branch][$component->name]);
+        // langconfig.php is not compared with English because it may contain extra string like parentlanguage
+        if ($component->name !== 'langconfig') {
+            $component->intersect($eng[$branch][$component->name]);
+        }
         // and let us commit added/modified strings
         $stage = new mlang_stage();
         $stage->add($component);
