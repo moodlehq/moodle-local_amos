@@ -154,6 +154,11 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
     }
 
+    // XXX temporarily freezing the start point at MOODLE_20_STABLE because of AMOS script testing
+    if ($branch == 'MOODLE_20_STABLE') {
+        $startat = '^61bb07c2573ec711a0e5d1ccafa313cf47b9fc22^';
+    }
+
     chdir(AMOS_REPO_MOODLE);
     $gitout = array();
     $gitstatus = 0;
@@ -239,7 +244,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         echo "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n";
 
         // get some additional information of the commit
-        $format = implode('%n', array('%an', '%ae', '%at', '%s')); // name, email, timestamp, subject
+        $format = implode('%n', array('%an', '%ae', '%at', '%s', '%b')); // name, email, timestamp, subject, body
         $commitinfo = array();
         $gitcmd = "git log --format={$format} {$commithash} ^{$commithash}~";
         exec($gitcmd, $commitinfo);
@@ -247,6 +252,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $committeremail = $commitinfo[1];
         $timemodified   = $commitinfo[2];
         $commitmsg      = iconv('UTF-8', 'UTF-8//IGNORE', $commitinfo[3]);
+        $fullcommitmsg  = implode("\n", array_slice($commitinfo, 3));  // AMOS script is looked up here later
 
         if ($changetype == 'D') {
             // whole file removal
@@ -289,6 +295,29 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $component->clear();
         unset($component);
         unlink($checkout);
+
+        // execute AMOS script if the commit message contains some
+        if ($version->code == mlang_version::MOODLE_20) {
+            $instructions = mlang_tools::extract_script_from_text($fullcommitmsg);
+            if (empty($instructions)) {
+                continue;
+            }
+            foreach ($instructions as $instruction) {
+                echo "EXEC $instruction\n";
+                $changes = mlang_tools::execute($instruction, $version, $timemodified);
+                if ($changes instanceof mlang_stage) {
+                    $changes->rebase($timemodified);
+                    $changes->commit($commitmsg, array(
+                        'source' => 'commitscript',
+                        'userinfo' => $committer . ' <' . $committeremail . '>',
+                        'commithash' => $commithash
+                    ), true);
+                } elseif ($changes < 0) {
+                    echo "EXIT STATUS $changes\n";
+                }
+                unset($changes);
+            }
+        }
     }
 }
 echo "DONE\n";

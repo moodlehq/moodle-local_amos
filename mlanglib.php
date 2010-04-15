@@ -920,6 +920,29 @@ class mlang_version {
  */
 class mlang_tools {
 
+    /** return stati of {@see self::execute()} */
+    const STATUS_OK                 = 0;
+    const STATUS_SYNTAX_ERROR       = -1;
+
+    /**
+     * Returns a list of all languages known in the strings repository
+     *
+     * @return array (string)langcode => undefined (language name to be returned later)
+     */
+    public static function list_languages() {
+        global $DB;
+        static $cache = null;
+
+        if (is_null($cache)) {
+            $records = $DB->get_records_select('amos_repository', null, null, 'lang', 'DISTINCT lang');
+            foreach ($records as $record) {
+                $cache[$record->lang] = null;
+            }
+        }
+
+        return $cache;
+    }
+
     /**
      * Returns the tree of all known components
      *
@@ -963,5 +986,202 @@ class mlang_tools {
         $rs->close();
 
         return $tree;
+    }
+
+    /**
+     * Given a text, extracts AMOS script lines from it as array of commands
+     *
+     * See {@link http://docs.moodle.org/en/Development:Languages/AMOS} for the specification
+     * of the script. Basically it is a block of lines starting with "AMOS BEGIN" line and
+     * ending with "AMOS END" line. "AMOS START" is an alias for "AMOS BEGIN". Each instruction
+     * in the script must be on a separate line.
+     *
+     * @param string $text
+     * @return array of the script lines
+     */
+    public static function extract_script_from_text($text) {
+        $lines = array();
+        if (preg_match('/^\s*AMOS\s+(BEGIN|START)\s+(.+)\s+AMOS\s+END\s*$/sm', $text, $matches)) {
+            $lines = array_filter(array_map('trim', explode("\n", $matches[2])));
+        }
+        return $lines;
+    }
+
+    /**
+     * Executes the given instruction
+     *
+     * TODO AMOS script uses the new proposed component naming style, also known as frankenstyle. AMOS repository,
+     * however, still uses the legacy names of components. Therefore we are translating new notation into the legacy
+     * one here. This may change in the future.
+     *
+     * @param string $instruction in form of 'CMD arguments'
+     * @param mlang_version $version strings branch to execute instruction on
+     * @param int $timestamp effective time of the execution
+     * @return int|mlang_stage mlang_stage to commit, 0 if success and there is nothing to commit, error code otherwise
+     */
+    public static function execute($instruction, mlang_version $version, $timestamp=null) {
+        $spcpos = strpos($instruction, ' ');
+        if ($spcpos === false) {
+            $cmd = trim($instruction);
+            $arg = null;
+        } else {
+            $cmd = trim(substr($instruction, 0, $spcpos));
+            $arg = trim(substr($instruction, $spcpos + 1));
+        }
+        switch ($cmd) {
+        case 'CPY':
+            // CPY [sourcestring,sourcecomponent],[targetstring,targetcomponent]
+            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                array_map('trim', $matches);
+                $fromcomponent = self::legacy_component_name($matches[2]);
+                $tocomponent =   self::legacy_component_name($matches[4]);
+                return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+            } else {
+                return self::STATUS_SYNTAX_ERROR;
+            }
+            break;
+        case 'MOV':
+            // MOV [sourcestring,sourcecomponent],[targetstring,targetcomponent]
+            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                array_map('trim', $matches);
+                $fromcomponent = self::legacy_component_name($matches[2]);
+                $tocomponent =   self::legacy_component_name($matches[4]);
+                return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+            } else {
+                return self::STATUS_SYNTAX_ERROR;
+            }
+            break;
+        case 'HLP':
+            // HLP feedback/preview.html,[preview_hlp,mod_feedback]
+            if (preg_match('/(.+),\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                array_map('trim', $matches);
+                $helpfile = clean_param($matches[1], PARAM_PATH);
+                $tocomponent = self::legacy_component_name($matches[3]);
+                return self::migrate_helpfile($version, $helpfile, $matches[2], $tocomponent, $timestamp);
+            } else {
+                return self::STATUS_SYNTAX_ERROR;
+            }
+            break;
+        case 'REM':
+            return self::STATUS_OK;
+            break;
+        }
+    }
+
+    /**
+     * Copy one string to another at the given version branch for all languages in the repository
+     *
+     * Deleted strings are not copied. If the target string already exists (and is not deleted), it is
+     * not overwritten.
+     *
+     * @param mlang_version $version to execute copying on
+     * @param string $fromstring source string identifier
+     * @param string $fromcomponent source component name
+     * @param string $tostring target string identifier
+     * @param string $tocomponet target component name
+     * @param int $timestamp effective timestamp of the copy, null for now
+     * @return mlang_stage to be committed
+     */
+    protected static function copy_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+        $stage = new mlang_stage();
+        foreach (array_keys(self::list_languages()) as $lang) {
+            $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
+            $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
+            if ($from->has_string($fromstring) and !$to->has_string($tostring)) {
+                $to->add_string(new mlang_string($tostring, $from->get_string($fromstring)->text, $timestamp));
+                $stage->add($to);
+            }
+            $from->clear();
+            $to->clear();
+        }
+        return $stage;
+    }
+
+    /**
+     * Move the string to another at the given version branch for all languages in the repository
+     *
+     * Deleted strings are not moved. If the target string already exists (and is not deleted), it is
+     * not overwritten.
+     *
+     * @param mlang_version $version to execute moving on
+     * @param string $fromstring source string identifier
+     * @param string $fromcomponent source component name
+     * @param string $tostring target string identifier
+     * @param string $tocomponet target component name
+     * @param int $timestamp effective timestamp of the move, null for now
+     * @return mlang_stage to be committed
+     */
+    protected static function move_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+        $stage = new mlang_stage();
+        foreach (array_keys(self::list_languages()) as $lang) {
+            $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
+            $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
+            if ($src = $from->get_string($fromstring)) {
+                $from->add_string(new mlang_string($fromstring, $from->get_string($fromstring)->text, $timestamp, true), true);
+                $stage->add($from);
+                if (!$to->has_string($tostring)) {
+                    $to->add_string(new mlang_string($tostring, $src->text, $timestamp));
+                    $stage->add($to);
+                }
+            }
+            $from->clear();
+            $to->clear();
+        }
+        return $stage;
+    }
+
+    /**
+     * Migrate help file into a help string if such one does not exist yet
+     *
+     * This is a temporary method and will be dropped once we have all English helps migrated. It does not do anything
+     * yet. It is intended to be run once upon a checkout of 1.9 language files prepared just for this purpose.
+     *
+     * @param mixed         $helpfile
+     * @param mixed         $tostring
+     * @param mixed         $tocomponent
+     * @param mixed         $timestamp
+     * @return mlang_stage
+     */
+    protected static function migrate_helpfile($helpfile, $tostring, $tocomponent, $timestamp=null) {
+
+        return self::STATUS_OK;
+
+        $stage = new mlang_stage();
+        foreach (array_keys(self::list_languages()) as $lang) {
+            $fullpath = 'TODO MUST BE PREPARED' . '/' . $lang . '_utf8/help/' . $helpfile;
+            if (! is_readable($fullpath)) {
+                continue;
+            }
+            $helpstring = trim(file_get_contents($fullpath));
+            if (empty($helpstring)) {
+                continue;
+            }
+            $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
+            if (!$to->has_string($tostring)) {
+                $to->add_string(new mlang_string($tostring, $helpstring, $timestamp));
+                $stage->add($to);
+            }
+            $to->clear();
+        }
+        return $stage;
+    }
+
+    /**
+     * Given a newstyle component name (aka frankenstyle), returns the legacy style name
+     *
+     * @param string $newstyle name like core, core_admin, mod_workshop or auth_ldap
+     * @return string legacy style like moodle, admin, workshop or auth_ldap
+     */
+    protected static function legacy_component_name($newstyle) {
+        if ($newstyle == 'core') {
+            return 'moodle';
+        }
+        if (substr($newstyle, 0, 5) == 'core_') {
+            return substr($newstyle, 5);
+        }
+        if (substr($newstyle, 0, 4) == 'mod_') {
+            return substr($newstyle, 4);
+        }
+        return $newstyle;
     }
 }

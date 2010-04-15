@@ -536,4 +536,106 @@ EOF;
         $this->assertTrue($slave->has_string('one'));
         $this->assertTrue($slave->has_string('two'));
     }
+
+    public function test_extract_script_from_text() {
+        $noscript = 'This is text with no AMOS script';
+        $emptyarray = mlang_tools::extract_script_from_text($noscript);
+        $this->assertTrue(empty($emptyarray));
+
+        $oneliner = 'AMOS BEGIN command AMOS END';
+        $script = mlang_tools::extract_script_from_text($oneliner);
+        $this->assertIsA($script, 'array');
+        $this->assertEqual(1, count($script));
+        $this->assertEqual('command', $script[0]);
+
+        $multiline = 'This is a typical usage of AMOS script in a commit message
+                    AMOS BEGIN
+                     MOV a,b  
+                     CPY  c,d
+                    AMOS END
+                   Here it can continue';
+        $script = mlang_tools::extract_script_from_text($multiline);
+        $this->assertIsA($script, 'array');
+        $this->assertEqual(2, count($script));
+        $this->assertEqual('MOV a,b', $script[0]);
+        $this->assertEqual('CPY  c,d', $script[1]);
+    }
+
+    public function test_list_languages() {
+        $stage = new mlang_stage();
+        $component = new mlang_component('assignment', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('submission', 'Submission'));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('workshop', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('workshop', 'Workshop'));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('assignment', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('submission', 'Odevzdany ukol'));
+        $stage->add($component);
+        $component->clear();
+
+        $stage->commit('Adding some testing strings', array('source' => 'unittest'));
+
+        $langs = mlang_tools::list_languages();
+        $this->assertIsA($langs, 'array');
+        $this->assertEqual(count($langs), 2);
+        $this->assertTrue(array_key_exists('cs', $langs));
+        $this->assertTrue(array_key_exists('en', $langs));
+    }
+
+    public function test_execution_strings() {
+        $stage = new mlang_stage();
+        $version = mlang_version::by_branch('MOODLE_20_STABLE');
+        // this is to prevent situation where a string is added and immediately removed in the same second. Such
+        // situations are not supported yet very well in AMOS as it would require to rewrite well tuned getting
+        // component from snapshot
+        $past = time() - 1;
+        $component = new mlang_component('auth', 'en', $version);
+        $component->add_string(new mlang_string('authenticate', 'Authenticate', $past));
+        $component->add_string(new mlang_string('ldap', 'Use LDAP', $past));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('auth_ldap', 'en', $version);
+        $component->add_string(new mlang_string('pluginname', 'LDAP', $past));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('auth', 'cs', $version);
+        $component->add_string(new mlang_string('authenticate', 'Autentizovat', $past));
+        $component->add_string(new mlang_string('ldap', 'Pouzit LDAP', $past));
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+
+        $stage->commit('Adding some testing strings', array('source' => 'unittest'));
+        unset($stage);
+
+        $stage = mlang_tools::execute('MOV [ldap,auth],[pluginname,auth_ldap]', $version);
+        $stage->commit('Moving string ldap into auth_ldap', array('source' => 'unittest'));
+        unset($stage);
+
+        $component = mlang_component::from_snapshot('auth_ldap', 'cs', $version);
+        $this->assertTrue($component->has_string('pluginname'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('auth', 'cs', $version);
+        $this->assertFalse($component->has_string('ldap'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('auth', 'en', $version);
+        $this->assertFalse($component->has_string('ldap'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('auth_ldap', 'en', $version);
+        $string = $component->get_string('pluginname');
+        $this->assertEqual($string->text, 'LDAP');
+        unset($string);
+        $component->clear();
+    }
+
 }
