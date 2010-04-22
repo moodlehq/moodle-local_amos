@@ -171,7 +171,7 @@ class local_amos_filter implements renderable {
 
         $data->missing      = optional_param('fmis', false, PARAM_BOOL);
         $data->helps        = optional_param('fhlp', false, PARAM_BOOL);
-        $data->substring    = optional_param('ftxt', '', PARAM_RAW);
+        $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
 
         return $data;
     }
@@ -289,6 +289,12 @@ class local_amos_translator implements renderable {
                                 $string->translationid = null;
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
+                            if (!empty($substring)) {
+                                // if defined, then either English or the translation must contain the substring
+                                if (!strstr($string->original, $substring) and !strstr($string->translation, $substring)) {
+                                    continue;
+                                }
+                            }
                             $this->strings[] = $string;
                         }
                     }
