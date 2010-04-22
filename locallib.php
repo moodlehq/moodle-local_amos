@@ -203,6 +203,9 @@ class local_amos_translator implements renderable {
         $branches = $filter->get_data()->version;
         $languages = array_merge(array('en'), $filter->get_data()->language);
         $components = $filter->get_data()->component;
+        if (empty($branches) or empty($components) or empty($languages)) {
+            return;
+        }
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
@@ -256,30 +259,32 @@ class local_amos_translator implements renderable {
 
         $langs = array_keys($s);
         $langs = array_flip($langs);
-        unset($langs['en']);
+        unset($langs['en']); // English is not translatable via AMOS
         $langs = array_keys($langs);
-        foreach ($s['en'] as $component => $t) {
-            foreach ($t as $stringid => $u) {
-                foreach ($u as $branchcode => $english) {
-                    reset($langs);
-                    foreach ($langs as $lang) {
-                        $string = new stdclass();
-                        $string->branch = mlang_version::by_code($branchcode)->label;
-                        $string->language = $lang;
-                        $string->component = $component;
-                        $string->stringid = $stringid;
-                        $string->metainfo = ''; // todo read metainfo from database
-                        $string->original = $english->text;
-                        $string->originalid = $english->amosid;
-                        if (isset($s[$lang][$component][$stringid][$branchcode])) {
-                            $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
-                            $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
-                        } else {
-                            $string->translation = null;
-                            $string->translationid = null;
+        if (isset($s['en'])) {
+            foreach ($s['en'] as $component => $t) {
+                foreach ($t as $stringid => $u) {
+                    foreach ($u as $branchcode => $english) {
+                        reset($langs);
+                        foreach ($langs as $lang) {
+                            $string = new stdclass();
+                            $string->branch = mlang_version::by_code($branchcode)->label;
+                            $string->language = $lang;
+                            $string->component = $component;
+                            $string->stringid = $stringid;
+                            $string->metainfo = ''; // todo read metainfo from database
+                            $string->original = $english->text;
+                            $string->originalid = $english->amosid;
+                            if (isset($s[$lang][$component][$stringid][$branchcode])) {
+                                $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
+                                $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
+                            } else {
+                                $string->translation = null;
+                                $string->translationid = null;
+                            }
+                            unset($s[$lang][$component][$stringid][$branchcode]);
+                            $this->strings[] = $string;
                         }
-                        unset($s[$lang][$component][$stringid][$branchcode]);
-                        $this->strings[] = $string;
                     }
                 }
             }

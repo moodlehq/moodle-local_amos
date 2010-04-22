@@ -68,6 +68,7 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach ($options as $langcode => $langname) {
             $options[$langcode] = $langname . ' (' . $langcode . ')';
         }
+        unset($options['en']); // English is not translatable via AMOS
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
                     array('id' => 'amosfilter_flng', 'multiple' => true, 'size' => 3));
         $output .= html_writer::end_tag('div');
@@ -80,8 +81,11 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', 'Show strings of these components', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
-        $components = array('moodle' => 'moodle', 'auth_ldap' => 'auth_ldap', 'workshop' => 'workshop');
-        $output .= html_writer::select($components, 'fcmp[]', $filter->get_data()->component, '',
+        $options = array();
+        foreach (mlang_tools::list_components() as $componentname => $undefined) {
+            $options[$componentname] = $componentname;
+        }
+        $output .= html_writer::select($options, 'fcmp[]', $filter->get_data()->component, '',
                     array('id' => 'amosfilter_fcmp', 'multiple' => true, 'size' => 3));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
@@ -159,6 +163,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
         $table->colclasses = array('component', 'stringinfo', 'version', 'lang', 'original', 'translation');
         $table->attributes['class'] = 'translator';
+
+        if (empty($translator->strings)) {
+            return $this->heading('No strings found');
+        }
 
         foreach ($translator->strings as $string) {
             $cells = array();

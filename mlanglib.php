@@ -930,21 +930,22 @@ class mlang_tools {
      * The language must have defined its name in langconfig. This method takes the value from the most
      * recent branch and time stamp.
      *
+     * @param bool $usecache can the internal cache be used?
      * @return array (string)langcode => (string)langname
      */
-    public static function list_languages() {
+    public static function list_languages($usecache=true) {
         global $DB;
         static $cache = null;
 
-        if (is_null($cache)) {
+        if (empty($usecache) or is_null($cache)) {
             $cache = array();
             $sql = "SELECT lang AS code, text AS name
                       FROM {amos_repository}
-                     WHERE component = 'langconfig'
-                       AND stringid  = 'thislanguage'
+                     WHERE component = ?
+                       AND stringid  = ?
                        AND deleted   = 0
                   ORDER BY lang, branch DESC, timemodified DESC";
-            $rs = $DB->get_recordset_sql($sql);
+            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguage'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
                     // use the first returned value, all others are historical records
@@ -955,6 +956,31 @@ class mlang_tools {
         }
 
         return $cache;
+    }
+
+    /**
+     * Returns the list of all known components
+     *
+     * The component must exist in English on at least one branch to be returned.
+     *
+     * @param bool $usecache can the internal cache be used?
+     * @return array (string)componentname => undefined, the values of the array may change later if needed, do not rely on them
+     */
+    public static function list_components($usecache=true) {
+        global $DB;
+        static $cache = null;
+
+        if (empty($usecache) or is_null($cache)) {
+            $cache = array();
+            $sql = "SELECT component
+                      FROM {amos_repository}
+                     WHERE lang = ?
+                  GROUP BY component ORDER BY component";
+            $cache = array_flip(array_keys($DB->get_records_sql($sql, array('en'))));
+        }
+
+        return $cache;
+
     }
 
     /**

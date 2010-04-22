@@ -587,6 +587,34 @@ EOF;
         $this->assertTrue(array_key_exists('en', $langs));
         $this->assertEqual($langs['en'], 'English');
         $this->assertEqual($langs['cs'], 'Cestina');
+        // todo test caching
+    }
+
+    public function test_list_components() {
+        $stage = new mlang_stage();
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('modulename', 'Workshop'));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('foo', 'Bar'));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('thislanguage', 'CS'));
+        $stage->add($component);
+        $component->clear();
+
+        $stage->commit('Registering two English components', array('source' => 'unittest'));
+
+        $comps = mlang_tools::list_components();
+        $this->assertIsA($comps, 'array');
+        $this->assertEqual(count($comps), 2);
+        $this->assertTrue(array_key_exists('workshop', $comps));
+        $this->assertTrue(array_key_exists('auth', $comps));
+        // todo test caching
     }
 
     public function test_execution_strings() {
