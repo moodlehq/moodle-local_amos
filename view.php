@@ -46,7 +46,7 @@ $filter = new local_amos_filter($PAGE->url);
 // save the filter settings into the sesssion
 $fdata = $filter->get_data();
 foreach ($fdata as $setting => $value) {
-    set_user_preference('amos_' . $setting, serialize($value));
+    $USER->{'local_amos_' . $setting} = serialize($value);
 }
 
 // create a renderable object that represent the translation table

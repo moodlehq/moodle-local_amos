@@ -89,11 +89,17 @@ class local_amos_filter implements renderable {
      * @return object
      */
     protected function get_data_default() {
+        global $USER;
+
         $data = new stdclass();
 
         // if we have a previously saved filter settings in the session, use it
         foreach ($this->fields as $field) {
-            $data->{$field} = unserialize(get_user_preferences('amos_' . $field));
+            if (isset($USER->{'local_amos_' . $field})) {
+                $data->{$field} = unserialize($USER->{'local_amos_' . $field});
+            } else {
+                $data->{$field} = null;
+            }
         }
 
         if (empty($data->version)) {
