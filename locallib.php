@@ -206,6 +206,9 @@ class local_amos_translator implements renderable {
         if (empty($branches) or empty($components) or empty($languages)) {
             return;
         }
+        $missing = $filter->get_data()->missing;
+        $helps = $filter->get_data()->helps;
+        $substring = $filter->get_data()->substring;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
@@ -218,8 +221,8 @@ class local_amos_translator implements renderable {
                           FROM {amos_repository}
                          WHERE branch $inner_sqlbranches
                            AND lang $inner_sqllanguages
-                           AND component $inner_sqlcomponents
-                         GROUP BY branch,lang,component,stringid) j
+                           AND component $inner_sqlcomponents";
+        $sql .= "     GROUP BY branch,lang,component,stringid) j
                     ON (r.branch = j.branch
                        AND r.lang = j.lang
                        AND r.component = j.component
@@ -228,8 +231,11 @@ class local_amos_translator implements renderable {
                  WHERE r.branch {$outer_sqlbranches}
                        AND r.lang {$outer_sqllanguages}
                        AND r.component {$outer_sqlcomponents}
-                       AND r.deleted = 0
-                  ORDER BY r.component, r.stringid, r.lang, r.branch";
+                       AND r.deleted = 0";
+        if ($helps) {
+            $sql .= "      AND r.stringid LIKE '%\\\\_help'";
+        }
+        $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch";
 
         $params = array_merge(
             $inner_paramsbranches, $inner_paramslanguages, $inner_paramcomponents,
