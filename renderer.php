@@ -64,7 +64,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', 'Display translations in these languages', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
-        $options = array('cs' => 'Čeština (cs)', 'fr' => 'Français (fr)', 'fr_ca' => 'Français - Canada (fr_ca)');
+        $options = mlang_tools::list_languages();
+        foreach ($options as $langcode => $langname) {
+            $options[$langcode] = $langname . ' (' . $langcode . ')';
+        }
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
                     array('id' => 'amosfilter_flng', 'multiple' => true, 'size' => 3));
         $output .= html_writer::end_tag('div');

@@ -563,28 +563,30 @@ EOF;
 
     public function test_list_languages() {
         $stage = new mlang_stage();
-        $component = new mlang_component('assignment', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('submission', 'Submission'));
+        $component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('thislanguage', 'English'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('workshop', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('workshop', 'Workshop'));
+        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('thislanguage', 'Cestina'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('assignment', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('submission', 'Odevzdany ukol'));
+        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('thislanguage', 'CS'));
         $stage->add($component);
         $component->clear();
 
-        $stage->commit('Adding some testing strings', array('source' => 'unittest'));
+        $stage->commit('Registering two languages', array('source' => 'unittest'));
 
         $langs = mlang_tools::list_languages();
         $this->assertIsA($langs, 'array');
         $this->assertEqual(count($langs), 2);
         $this->assertTrue(array_key_exists('cs', $langs));
         $this->assertTrue(array_key_exists('en', $langs));
+        $this->assertEqual($langs['en'], 'English');
+        $this->assertEqual($langs['cs'], 'Cestina');
     }
 
     public function test_execution_strings() {

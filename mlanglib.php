@@ -927,17 +927,31 @@ class mlang_tools {
     /**
      * Returns a list of all languages known in the strings repository
      *
-     * @return array (string)langcode => undefined (language name to be returned later)
+     * The language must have defined its name in langconfig. This method takes the value from the most
+     * recent branch and time stamp.
+     *
+     * @return array (string)langcode => (string)langname
      */
     public static function list_languages() {
         global $DB;
         static $cache = null;
 
         if (is_null($cache)) {
-            $records = $DB->get_records_select('amos_repository', null, null, 'lang', 'DISTINCT lang');
-            foreach ($records as $record) {
-                $cache[$record->lang] = null;
+            $cache = array();
+            $sql = "SELECT lang AS code, text AS name
+                      FROM {amos_repository}
+                     WHERE component = 'langconfig'
+                       AND stringid  = 'thislanguage'
+                       AND deleted   = 0
+                  ORDER BY lang, branch DESC, timemodified DESC";
+            $rs = $DB->get_recordset_sql($sql);
+            foreach ($rs as $lang) {
+                if (!isset($cache[$lang->code])) {
+                    // use the first returned value, all others are historical records
+                    $cache[$lang->code] = $lang->name;
+                }
             }
+            $rs->close();
         }
 
         return $cache;
@@ -947,7 +961,7 @@ class mlang_tools {
      * Returns the tree of all known components
      *
      * @param array $conditions can specify branch, lang and component to filter
-     * @return array [branch][language][component] => null
+     * @return array [branch][language][component] => true
      */
     public static function components_tree(array $conditions=null) {
         global $DB;
@@ -981,7 +995,7 @@ class mlang_tools {
             if (!isset($tree[$record->branch][$record->lang])) {
                 $tree[$record->branch][$record->lang] = array();
             }
-            $tree[$record->branch][$record->lang][$record->component] = null;
+            $tree[$record->branch][$record->lang][$record->component] = true;
         }
         $rs->close();
 
