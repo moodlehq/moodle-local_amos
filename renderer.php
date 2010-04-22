@@ -161,7 +161,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
-        $table->colclasses = array('component', 'stringinfo', 'version', 'lang', 'original', 'translation');
+        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
         $table->attributes['class'] = 'translator';
 
         if (empty($translator->strings)) {
