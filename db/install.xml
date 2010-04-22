@@ -26,6 +26,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="ix_snapshot" UNIQUE="false" FIELDS="component, lang, branch" COMMENT="Optimised for getting a snapshot of all current strings in one component"/>
+        <INDEX NAME="ix_lang" UNIQUE="false" FIELDS="lang" COMMENT="For getting a list of all known components, we need to filter English records only"/>
       </INDEXES>
     </TABLE>
   </TABLES>
