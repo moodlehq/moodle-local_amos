@@ -37,7 +37,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS');
 $PAGE->set_heading('AMOS');
-//$PAGE->requires->js_init_call('M.local_amos.init_translator', array('container' => 'translator-wrapper', 'datafeed' => 'waitress.php'), true);
+$PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);
 
 $output = $PAGE->get_renderer('local_amos');
 

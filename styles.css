@@ -17,6 +17,10 @@
     text-align: right;
 }
 
+.path-local-amos .lazyform .item.select .actions {
+    margin-left: 0.5em;
+}
+
 .path-local-amos .lazyform .item .label .description {
     color: #999;
     font-size: small;

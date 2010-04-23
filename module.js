@@ -22,116 +22,36 @@
  */
 
 /**
- * @namespace
+ * @namespace Local amos namespace
  */
-M.local_amos = {};
-
-/**
- * Called by PHP
- *
- * @param {Object} Y YUI instance
- * @param {String} container id if the DOM element to render translation table into
- * @param {String} datafeed url of the source of strings data
- */
-M.local_amos.init_translator = function(Y, container, datafeed) {
+M.local_amos = {
 
     /**
-     * @object translator
+     * Initialize JS support for the main translation page, called from view.php
+     *
+     * @param {Object} Y YUI instance
      */
-    var translator = {
+    init_translator:function(Y) {
+        filter = Y.one('#amosfilter');
 
-        /**
-         * column definitions
-         */
-        aColumnDefs : [],
+        // add select All / None links to the components field
+        filter.one('#amosfilter_fcmp_actions').set('innerHTML',
+            '<a href="#" id="amosfilter_fcmp_actions_all">All</a> / <a href="#" id="amosfilter_fcmp_actions_none">None</a>');
+        filter.one('#amosfilter_fcmp_actions_all').on('click', function(e) {
+            filter.one('select#amosfilter_fcmp').get('options').set('selected', true);
+        });
+        filter.one('#amosfilter_fcmp_actions_none').on('click', function(e) {
+            filter.one('select#amosfilter_fcmp').get('options').set('selected', false);
+        });
 
-        /**
-         * where the data for the table are fetched from
-         */
-        oDataSource : null,
-        oTblCfg     : {},
-        tbl         : null,
-
-        oVersionMenuButton: null,
-
-        /**
-         * Defines columns and data source and initializes the table
-         */
-        init: function(Y, container, datafeed) {
-            Y.use("yui2-oDataSource", "yui2-datatable", "yui2-menu", "yui2-button", function(Y) {
-
-                // columns definition
-                this.aColumnDefs = [
-                    { key: "branch", label: "Branch", sortable: true },
-                    { key: "component", label: "Component", sortable: true },
-                    { key: "stringid", label: "String ID", sortable: true },
-                    { key: "origin", label: "Origin" },
-                    { key: "translation", label: "Translation" },
-                ];
-
-                // define source of table data
-                this.oDataSource = new YAHOO.util.DataSource(datafeed);
-                this.oDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-                this.oDataSource.connXhrMode = "queueRequests";
-                this.oDataSource.responseSchema = {
-                    resultsList: "items",
-                    fields: [
-                        { key: "branch" },
-                        { key: "component" },
-                        { key: "stringid" },
-                        { key: "origin" },
-                        { key: "translation" },
-                    ]
-                };
-                this.oDataSource.doBeforeParseData = function(oRequest, oFullResponse, oCallback) {
-                    if (oFullResponse.code) {
-                        if (oFullResponse.code > 299) {
-                            alert(oFullResponse.text);
-                            return {};
-                        }
-                    } else {
-                        alert(oFullResponse);
-                    }
-                    return oFullResponse;
-                };
-
-                // table configuration
-                this.oTblCfg = {
-                    generateRequest : this.buildRequest,
-                    handleDataReturnPayload : this.handlePayload,
-                    initialLoad     : false,
-                }
-
-                // translation table
-                this.tbl = new YAHOO.widget.DataTable(container, this.aColumnDefs, this.oDataSource, this.oTblCfg);
-            });
-        },
-
-        buildRequest: function(oState, oSelf) {
-            // Get states or use defaults
-            oState          = oState || { pagination: null, sortedBy: null };
-            var sort        = (oState.sortedBy) ? oState.sortedBy.key : oSelf.getColumnSet().keys[0].getKey();
-            var dir         = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
-            var startIndex  = (oState.pagination) ? oState.pagination.recordOffset : 0;
-            var results     = (oState.pagination) ? oState.pagination.rowsPerPage : 100;
-
-            // Build custom request
-            return  "?sort="        + sort +
-                    "&dir="         + dir +
-                    "&format=json"  +
-                    "&version="     + CF.settings.state1;
-        },
-
-        handlePayload: function(oRequest, oResponse, oPayload) {
-            // The payload object usually represents DataTable's state values, including:
-            // oPayload.totalRecords = [number of total records]
-            // oPayload.pagination.rowsPerPage = [number of rows per page]
-            // oPayload.pagination.recordOffset = [index of first record of current page]
-            // oPayload.sortedBy.key =  [key of currently sorted column]
-            // oPayload.sortedBy.dir = [direction of currently sorted column]
-            return oPayload;
-        },
-
+        // add select All / None links to the languages field
+        filter.one('#amosfilter_flng_actions').set('innerHTML',
+            '<a href="#" id="amosfilter_flng_actions_all">All</a> / <a href="#" id="amosfilter_flng_actions_none">None</a>');
+        filter.one('#amosfilter_flng_actions_all').on('click', function(e) {
+            filter.one('select#amosfilter_flng').get('options').set('selected', true);
+        });
+        filter.one('#amosfilter_flng_actions_none').on('click', function(e) {
+            filter.one('select#amosfilter_flng').get('options').set('selected', false);
+        });
     }
-    translator.init(Y, container, datafeed);
 }

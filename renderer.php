@@ -57,7 +57,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
-        // other languages selector
+        // language selector
         $output .= html_writer::start_tag('div', array('class' => 'item select yui3-gd'));
         $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
         $output .= html_writer::tag('label', 'Languages', array('for' => 'amosfilter_flng'));
@@ -71,6 +71,7 @@ class local_amos_renderer extends plugin_renderer_base {
         unset($options['en']); // English is not translatable via AMOS
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
                     array('id' => 'amosfilter_flng', 'multiple' => true, 'size' => 3));
+        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_flng_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
@@ -87,6 +88,7 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         $output .= html_writer::select($options, 'fcmp[]', $filter->get_data()->component, '',
                     array('id' => 'amosfilter_fcmp', 'multiple' => true, 'size' => 3));
+        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
@@ -137,7 +139,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // block wrapper for xhtml strictness
-        $output = html_writer::tag('div', $output, array());
+        $output = html_writer::tag('div', $output, array('id' => 'amosfilter'));
 
         // form
         $attributes = array('method' => 'get',
@@ -179,14 +181,14 @@ class local_amos_renderer extends plugin_renderer_base {
             // moodle version to put this translation onto
             $cells[2] = new html_table_cell($string->branch);
             // original of the string
-            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original) . ' ' . $string->originalmodified, array('class' => 'preformatted')));
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation
             $t = s($string->translation);
             $sid = local_amos_translator::encode_identifier($string->originalid, $string->translationid);
             //$t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
-            $t = html_writer::tag('div', $t, array('name' => $sid, 'class' => 'translation'));
+            $t = html_writer::tag('div', $t, array('id' => 'sid_' . $sid, 'class' => 'translation'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
             $cells[5] = new html_table_cell($t . $i);
             $row = new html_table_row($cells);
@@ -208,6 +210,23 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
 
         return $output;
+    }
+
+    /**
+     * Returns formatted commit date and time
+     *
+     * In our git repos, timestamps are stored in UTC always and that is what standard got log
+     * displays.
+     *
+     * @param int $timestamp
+     * @return string formatted date and time
+     */
+    public static function commit_datetime($timestamp) {
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        $t = date('Y-m-d H:i', $timestamp);
+        date_default_timezone_set($tz);
+        return $t;
     }
 }
 
