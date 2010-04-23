@@ -168,6 +168,8 @@ class local_amos_renderer extends plugin_renderer_base {
 
         if (empty($translator->strings)) {
             return $this->heading('No strings found');
+        } else {
+            $output = $this->heading('Found ' . count($translator->strings) . ' strings');
         }
 
         foreach ($translator->strings as $string) {
@@ -181,7 +183,7 @@ class local_amos_renderer extends plugin_renderer_base {
             // moodle version to put this translation onto
             $cells[2] = new html_table_cell($string->branch);
             // original of the string
-            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original) . ' ' . $string->originalmodified, array('class' => 'preformatted')));
+            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation
@@ -195,18 +197,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $table->data[] = $row;
         }
 
-        $output  = html_writer::table($table);
-        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-        $submit  = html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save translations'));
-        $output .= html_writer::tag('div', $submit, array('class' => 'buttons'));
-
-        // wrapping form
-        $attributes = array('method' => 'post',
-                            'action' => $translator->handler->out(),
-                            'id'     => html_writer::random_id(),
-                            'class'  => 'translatorform',
-                        );
-        $output = html_writer::tag('form', $output, $attributes);
+        $output .= html_writer::table($table);
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
 
         return $output;

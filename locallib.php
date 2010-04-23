@@ -258,6 +258,7 @@ class local_amos_translator implements renderable {
                 $string = new stdclass();
                 $string->amosid = $r->id;
                 $string->text = $r->text;
+                $string->timemodified = $r->timemodified;
                 $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
             }
         }
@@ -281,18 +282,35 @@ class local_amos_translator implements renderable {
                             $string->metainfo = ''; // todo read metainfo from database
                             $string->original = $english->text;
                             $string->originalid = $english->amosid;
+                            $string->originalmodified = $english->timemodified;
                             if (isset($s[$lang][$component][$stringid][$branchcode])) {
                                 $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
                                 $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
+                                $string->timemodified = $s[$lang][$component][$stringid][$branchcode]->timemodified;
                             } else {
                                 $string->translation = null;
                                 $string->translationid = null;
+                                $string->timemodified = null;
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
                                 if (!strstr($string->original, $substring) and !strstr($string->translation, $substring)) {
                                     continue;
+                                }
+                            }
+                            if (!empty($missing)) {
+                                // missing or outdated string only
+                                // English UTF-8 strings were added on Mon Feb 6 09:28:59 2006 by moodler (1139218139)
+                                // UTF-8 translations were added earlier on Tue Dec 6 23:13:15 2005 by Eloy. Therefore
+                                // if the original was part of the initial Martin's commit, it is considered to be older
+                                // even if the timemodified is later. Otherwise AMOS would report almost all strings
+                                // outdated
+                                if (!empty($string->translation)) {
+                                    if (($string->originalmodified == 1139218139) or ($string->originalmodified < $string->timemodified)) {
+                                        // such a string is considered up-to-date
+                                        continue;
+                                    }
                                 }
                             }
                             $this->strings[] = $string;
