@@ -264,16 +264,15 @@ class local_amos_translator implements renderable {
         }
         $rs->close();
 
-        $langs = array_keys($s);
-        $langs = array_flip($langs);
-        unset($langs['en']); // English is not translatable via AMOS
-        $langs = array_keys($langs);
         if (isset($s['en'])) {
             foreach ($s['en'] as $component => $t) {
                 foreach ($t as $stringid => $u) {
                     foreach ($u as $branchcode => $english) {
-                        reset($langs);
-                        foreach ($langs as $lang) {
+                        reset($languages);
+                        foreach ($languages as $lang) {
+                            if ($lang == 'en') {
+                                continue;
+                            }
                             $string = new stdclass();
                             $string->branch = mlang_version::by_code($branchcode)->label;
                             $string->language = $lang;

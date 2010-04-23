@@ -885,7 +885,7 @@ class mlang_version {
                 'branch'        => 'MOODLE_19_STABLE',
                 'dir'           => 'lang19',
                 'translatable'  => true,
-                'current'       => true,
+                'current'       => false,
             ),
             array(
                 'code'          => self::MOODLE_18,
