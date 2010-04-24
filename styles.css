@@ -46,40 +46,68 @@
     _white-space: pre;          /* IE only hack to re-specify in addition to word-wrap  */
 }
 
-.path-local-amos table.translator {
+.path-local-amos #amostranslator,
+.path-local-amos #amosstage {
     width: 90%;
     margin: 1em auto;
 }
 
-.path-local-amos table.translator tr {
+.path-local-amos #amosstage .commitformwrapper {
+    margin: 0em auto;
+}
+
+.path-local-amos #amostranslator tr,
+.path-local-amos #amosstage tr {
     border: 1px solid #ddd;
 }
 
-.path-local-amos table.translator .r0 {
+.path-local-amos #amosstage .r0,
+.path-local-amos #amostranslator .r0 {
     background-color: white;
 }
 
-.path-local-amos table.translator .r1 {
+.path-local-amos #amosstage .r1,
+.path-local-amos #amostranslator .r1 {
     background-color: #f9f9f9;
 }
 
 /* minimal width for these two columns */
-.path-local-amos table.translator .component,
-.path-local-amos table.translator .version {
+.path-local-amos #amostranslator .component,
+.path-local-amos #amostranslator .version,
+.path-local-amos #amosstage .component,
+.path-local-amos #amosstage .version {
     width: 1px;
 }
 
-.path-local-amos table.translator .original,
-.path-local-amos table.translator .translation {
+.path-local-amos #amostranslator .original,
+.path-local-amos #amostranslator .translation,
+.path-local-amos #amosstage .original,
+.path-local-amos #amosstage .translation {
     min-width: 35%;
 }
 
-.path-local-amos .translator .stringinfo .metainfo {
+.path-local-amos #amosstage .translation del {
+    color: #999;
+}
+
+.path-local-amos #amostranslator .translation.missing {
+    background-color: #ffd3d9;
+}
+
+.path-local-amos #amostranslator .translation.staged {
+    background-color: #d2ebff;
+}
+
+.path-local-amos #amostranslator .translation.translated {
+    background-color: #e7f1c3;
+}
+
+.path-local-amos #amostranslator .stringinfo .metainfo {
     color: #999;
     font-size: small;
 }
 
-.path-local-amos table.translator textarea.translation {
+.path-local-amos #amostranslator textarea.translation-edit {
     width: 100%;
     min-height: 4em;
 }

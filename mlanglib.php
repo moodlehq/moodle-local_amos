@@ -758,9 +758,12 @@ class mlang_stage {
 }
 
 /**
- * Starageable staging area
+ * Storageable staging area
  */
 class mlang_persistent_stage extends mlang_stage {
+
+    /** @var the identifer of this stage */
+    public $id;
 
     /**
      * TODO: short description.
@@ -769,7 +772,44 @@ class mlang_persistent_stage extends mlang_stage {
      * @return TODO
      */
     public static function instance_for_user(stdclass $user) {
-        return new mlang_persistent_stage();
+        $stage = new mlang_persistent_stage($user->id);
+        $stage->restore();
+        return $stage;
+    }
+
+    /**
+     * TODO: short description.
+     *
+     * @param int $id 
+     */
+    protected function __construct($id) {
+        $this->id = $id;
+    }
+
+    /**
+     * TODO: short description.
+     *
+     * @return TODO
+     */
+    public function store() {
+        $data = serialize($this->components);
+        $dir = make_upload_directory('amos/stages', false);
+        file_put_contents($dir . '/' . $this->id, $data);
+    }
+
+    /**
+     * TODO: short description.
+     *
+     * @return TODO
+     */
+    public function restore() {
+        global $CFG;
+
+        $storage = $CFG->dataroot . '/amos/stages/' . $this->id;
+        if (is_readable($storage)) {
+            $data = file_get_contents($storage);
+            $this->components = unserialize($data);
+        }
     }
 }
 

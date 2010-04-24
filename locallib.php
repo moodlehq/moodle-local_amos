@@ -185,19 +185,12 @@ class local_amos_translator implements renderable {
     /** @var array of stdclass strings to display */
     public $strings = array();
 
-    /* @var mlang_persistent_stage */
-    protected $stage = null;
-
     /**
      * @param local_amos_filter $filter
      * @param stdclass $user working with the translator
-     * @param moodle_url $handler processing the submitted translation
      */
-    public function __construct(local_amos_filter $filter, stdclass $user, moodle_url $handler) {
+    public function __construct(local_amos_filter $filter, stdclass $user) {
         global $DB;
-
-        $this->handler = $handler;
-        $this->stage = mlang_persistent_stage::instance_for_user($user);
 
         // get the list of strings to display according the current filter values
         $branches = $filter->get_data()->version;
@@ -245,15 +238,6 @@ class local_amos_translator implements renderable {
         $rs = $DB->get_recordset_sql($sql, $params);
         $s = array();
         foreach($rs as $r) {
-            if (!isset($s[$r->lang])) {
-                $s[$r->lang] = array();
-            }
-            if (!isset($s[$r->lang][$r->component])) {
-                $s[$r->lang][$r->component] = array();
-            }
-            if (!isset($s[$r->lang][$r->component][$r->stringid])) {
-                $s[$r->lang][$r->component][$r->stringid] = array();
-            }
             if (!isset($s[$r->lang][$r->component][$r->stringid][$r->branch])) {
                 $string = new stdclass();
                 $string->amosid = $r->id;
@@ -263,6 +247,19 @@ class local_amos_translator implements renderable {
             }
         }
         $rs->close();
+
+        // replace the loaded values with those already staged
+        $stage = mlang_persistent_stage::instance_for_user($user);
+        foreach($stage->get_iterator() as $component) {
+            foreach ($component->get_iterator() as $staged) {
+                $string = new stdclass();
+                $string->amosid = null;
+                $string->text = $staged->text;
+                $string->timemodified = $staged->timemodified;
+                $string->class = 'staged';
+                $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
+            }
+        }
 
         if (isset($s['en'])) {
             foreach ($s['en'] as $component => $t) {
@@ -286,10 +283,16 @@ class local_amos_translator implements renderable {
                                 $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
                                 $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
                                 $string->timemodified = $s[$lang][$component][$stringid][$branchcode]->timemodified;
+                                if (isset($s[$lang][$component][$stringid][$branchcode]->class)) {
+                                    $string->class = $s[$lang][$component][$stringid][$branchcode]->class;
+                                } else {
+                                    $string->class = 'translated';
+                                }
                             } else {
                                 $string->translation = null;
                                 $string->translationid = null;
                                 $string->timemodified = null;
+                                $string->class = 'missing';
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
                             if (!empty($substring)) {
@@ -318,40 +321,148 @@ class local_amos_translator implements renderable {
                 }
             }
         }
+
     }
 
     /**
      * Given AMOS string id, returns the suitable name of HTTP parameter to hold the translation
      *
      * @see self::decode_identifier()
+     * @param string $lang language code
      * @param int $amosid_original AMOS id of the English origin of the string
      * @param int $amosid_translation AMOS id of the string translation, if it exists
      * @return string to be safely used as a name of the textarea or HTTP parameter
      */
-    public static function encode_identifier($amosid_original, $amosid_translation=null) {
+    public static function encode_identifier($lang, $amosid_original, $amosid_translation=null) {
         if (empty($amosid_original) && ($amosid_original !== 0)) {
             throw new coding_exception('Illegal AMOS string identifier passed');
         }
-        return 's_' . $amosid_original . '_' . $amosid_translation;
+        return $lang . '_' . $amosid_original . '_' . $amosid_translation;
     }
 
     /**
      * Decodes the identifier encoded by {@see self::encode_identifier()}
      *
      * @param string $encoded
-     * @return array of (int)amosid_original, (int)amosid_translation
+     * @return array of (string)lang, (int)amosid_original, (int)amosid_translation
      */
     public static function decode_identifier($encoded) {
         $parts = split('_', $encoded, 3);
-        if (($parts[0] !== 's') || (count($parts) < 2)) {
+        if (count($parts) < 2) {
             throw new coding_exception('Invalid encoded identifier supplied');
         }
         $result = array();
-        $result[0] = $parts[1]; // amosid_original
+        $result[0] = $parts[0]; // lang code
+        $result[1] = $parts[1]; // amosid_original
         if (isset($parts[2])) {
-            $result[1] = $parts[2];
+            $result[2] = $parts[2];
         } else {
-            $result[1] = null;
+            $result[2] = null;
+        }
+        return $result;
+    }
+
+}
+
+/**
+ * Represents the persistant stage
+ */
+class local_amos_stage implements renderable {
+
+    /** @var array of stdclass to be rendered */
+    public $strings;
+
+    /**
+     * @param stdclass $user the owner of the stage
+     */
+    public function __construct(stdclass $user) {
+        global $DB;
+
+        $this->strings = array();
+        $stage = mlang_persistent_stage::instance_for_user($user);
+        $needed = array();
+
+        foreach($stage->get_iterator() as $component) {
+            foreach ($component->get_iterator() as $staged) {
+                if (!isset($needed[$component->version->code])) {
+                    $needed[$component->version->code] = array();
+                }
+                if (!isset($needed[$component->version->code][$component->lang])) {
+                    $needed[$component->version->code][$component->lang] = array();
+                }
+                if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
+                    $needed[$component->version->code][$component->lang][$component->name] = array();
+                }
+                $needed[$component->version->code][$component->lang][$component->name][] = $staged->id;
+                $string = new stdclass();
+                $string->component = $component->name;
+                $string->branch = $component->version->code;
+                $string->version = $component->version->label;
+                $string->language = $component->lang;
+                $string->stringid = $staged->id;
+                $string->text = $staged->text;
+                $string->timemodified = $staged->timemodified;
+                $string->original = null; // is populated in the next step
+                $string->current = null; // dtto
+                $string->new = $staged->text;
+                $this->strings[] = $string;
+            }
+        }
+        foreach ($needed as $branch => $languages) {
+            foreach ($languages as $language => $components) {
+                foreach ($components as $component => $strings) {
+                    $needed[$branch][$language][$component] = mlang_component::from_snapshot($component,
+                            $language, mlang_version::by_code($branch), null, false, false, $strings);
+                    $needed[$branch]['en'][$component] = mlang_component::from_snapshot($component,
+                            'en', mlang_version::by_code($branch), null, false, false, $strings);
+                }
+            }
+        }
+        foreach ($this->strings as $string) {
+            $string->original = $needed[$string->branch]['en'][$string->component]->get_string($string->stringid)->text;
+            if ($needed[$string->branch][$string->language][$string->component] instanceof mlang_component) {
+                $string->current = $needed[$string->branch][$string->language][$string->component]->get_string($string->stringid);
+                if ($string->current instanceof mlang_string) {
+                    $string->current = $string->current->text;
+                }
+            }
+        }
+    }
+
+    /**
+     * Given AMOS string id, returns the suitable name of HTTP parameter to hold the translation
+     *
+     * @see self::decode_identifier()
+     * @param string $lang language code
+     * @param int $amosid_original AMOS id of the English origin of the string
+     * @param int $amosid_translation AMOS id of the string translation, if it exists
+     * @return string to be safely used as a name of the textarea or HTTP parameter
+     */
+    public static function encode_identifier($lang, $amosid_original, $amosid_translation=null) {
+        if (empty($amosid_original) && ($amosid_original !== 0)) {
+            throw new coding_exception('Illegal AMOS string identifier passed');
+        }
+        return $lang . '_' . $amosid_original . '_' . $amosid_translation;
+    }
+
+    /**
+     * Decodes the identifier encoded by {@see self::encode_identifier()}
+     *
+     * @param string $encoded
+     * @return array of (string)lang, (int)amosid_original, (int)amosid_translation
+     */
+    public static function decode_identifier($encoded) {
+        $parts = split('_', $encoded, 3);
+        if (count($parts) < 2) {
+            throw new coding_exception('Invalid encoded identifier supplied');
+        }
+        $result = array();
+        $result[0] = $parts[0]; // lang code
+        $result[1] = $parts[1]; // amosid_original
+        if (isset($parts[2])) {
+            $result[2] = $parts[2];
+        } else {
+            $result[2] = null;
         }
         return $result;
     }

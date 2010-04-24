@@ -16,11 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Main AMOS translation page
- *
- * Displays strings filter and the translation table. Data submitted from the
- * whole translation table are handled by savebulk.php which should redirect
- * back here.
+ * View staged strings and allow the user to commit them
  *
  * @package   local-amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -29,33 +25,35 @@
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(__FILE__).'/mlanglib.php');
+
+$message = optional_param('message', null, PARAM_RAW);
 
 require_login(SITEID, false);
 require_capability('moodle/site:config', $PAGE->context);
 
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/amos/view.php');
-$PAGE->set_title('AMOS');
-$PAGE->set_heading('AMOS');
-$PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);
+$PAGE->set_url('/local/amos/stage.php');
+$PAGE->set_title('AMOS stage');
+$PAGE->set_heading('AMOS stage');
+
+if (isset($message)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER);
+    $stage->commit($message, array('source' => 'amos', 'userinfo' => fullname($USER) . '<' . $USER->email . '>'));
+    $stage->store();
+    redirect($PAGE->url);
+    die();
+}
 
 $output = $PAGE->get_renderer('local_amos');
 
-// create a renderable object that represents the filter form
-$filter = new local_amos_filter($PAGE->url);
-// save the filter settings into the sesssion
-$fdata = $filter->get_data();
-foreach ($fdata as $setting => $value) {
-    $USER->{'local_amos_' . $setting} = serialize($value);
-}
-
-// create a renderable object that represent the translation table
-$translator = new local_amos_translator($filter, $USER);
+// create a renderable object that represents the stage
+$stage = new local_amos_stage($USER);
 
 /// Output starts here
 echo $output->header();
-$currenttab = 'translator';
+$currenttab = 'stage';
 include(dirname(__FILE__) . '/tabs.php');
-echo $output->render($filter);
-echo $output->render($translator);
+echo $output->render($stage);
 echo $output->footer();

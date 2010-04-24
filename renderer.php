@@ -162,15 +162,16 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_translator(local_amos_translator $translator) {
 
         $table = new html_table();
+        $table->id = 'amostranslator';
         $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
-        $table->attributes['class'] = 'translator';
 
         if (empty($translator->strings)) {
             return $this->heading('No strings found');
         } else {
             $output = $this->heading('Found ' . count($translator->strings) . ' strings');
         }
+        $missing = 0;
 
         foreach ($translator->strings as $string) {
             $cells = array();
@@ -187,12 +188,18 @@ class local_amos_renderer extends plugin_renderer_base {
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation
+            if (empty($string->translation)) {
+                $missing++;
+            }
             $t = s($string->translation);
-            $sid = local_amos_translator::encode_identifier($string->originalid, $string->translationid);
-            //$t = html_writer::tag('textarea', $t, array('name' => $sid, 'class' => 'translation'));
-            $t = html_writer::tag('div', $t, array('id' => 'sid_' . $sid, 'class' => 'translation'));
+            $sid = local_amos_translator::encode_identifier($string->language, $string->originalid, $string->translationid);
+            $t = html_writer::tag('div', $t, array('class' => 'preformatted translation-view'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
             $cells[5] = new html_table_cell($t . $i);
+            $cells[5]->id = $sid;
+            $cells[5]->attributes['class'] = $string->class;
+            // todo check if the user can translate into this language, allowing for all users now
+            $cells[5]->attributes['class'] .= ' translateable';
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }
@@ -204,10 +211,71 @@ class local_amos_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Renders the stage
+     *
+     * @param local_amos_stage $stage
+     * @return string
+     */
+    protected function render_local_amos_stage(local_amos_stage $stage) {
+        global $CFG;
+
+        $table = new html_table();
+        $table->id = 'amosstage';
+        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
+        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
+
+        if (empty($stage->strings)) {
+            return $this->heading('No strings staged');
+        } else {
+            $output = $this->heading('Staged ' . count($stage->strings) . ' strings');
+        }
+
+        $form = html_writer::tag('textarea', '', array('name' => 'message'));
+        $form .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+        $form .= html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
+        $form = html_writer::tag('div', $form);
+        $form = html_writer::tag('form', $form, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+        $form = html_writer::tag('div', $form, array('class' => 'commitformwrapper'));
+        $output .= $form;
+
+        foreach ($stage->strings as $string) {
+            $cells = array();
+            // component name
+            $cells[0] = new html_table_cell($string->component);
+            // string identification code and some meta information
+            $t  = html_writer::tag('div', s($string->stringid), array('class' => 'stringid'));
+            $cells[1] = new html_table_cell($t);
+            // moodle version to put this translation onto
+            $cells[2] = new html_table_cell($string->version);
+            // original of the string
+            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            // the language in which the original is displayed
+            $cells[4] = new html_table_cell($string->language);
+            // the current and the new translation
+            $t1 = s($string->current);
+            $t1 = html_writer::tag('del', $t1, array());
+            $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
+            $t2 = s($string->new);
+            $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
+            $cells[5] = new html_table_cell($t2 . $t1);
+
+            $row = new html_table_row($cells);
+            $table->data[] = $row;
+        }
+
+        $output .= html_writer::table($table);
+        $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));
+
+        return $output;
+
+    }
+
+    /**
      * Returns formatted commit date and time
      *
      * In our git repos, timestamps are stored in UTC always and that is what standard got log
      * displays.
+     * TODO xxx not used, may be removed?
      *
      * @param int $timestamp
      * @return string formatted date and time
@@ -219,5 +287,7 @@ class local_amos_renderer extends plugin_renderer_base {
         date_default_timezone_set($tz);
         return $t;
     }
+
+
 }
 
