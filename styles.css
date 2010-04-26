@@ -1,3 +1,7 @@
+.path-local-amos .tabtree {
+    margin-bottom: 0em;
+}
+
 .path-local-amos .lazyform {
     border: 1px solid #eee;
     width: 90%;
@@ -52,8 +56,14 @@
     margin: 1em auto;
 }
 
-.path-local-amos #amosstage .commitformwrapper {
+.path-local-amos .commitformwrapper {
     margin: 0em auto;
+    text-align: center;
+}
+
+.path-local-amos .commitformwrapper textarea {
+    width: 30em;
+    min-height: 5em;
 }
 
 .path-local-amos #amostranslator tr,

@@ -232,8 +232,9 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $form = html_writer::tag('textarea', '', array('name' => 'message'));
         $form .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $form .= html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
-        $form = html_writer::tag('div', $form);
+        $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
+        $button = html_writer::tag('div', $button);
+        $form = html_writer::tag('div', $form . $button);
         $form = html_writer::tag('form', $form, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
         $form = html_writer::tag('div', $form, array('class' => 'commitformwrapper'));
         $output .= $form;
