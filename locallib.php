@@ -249,7 +249,7 @@ class local_amos_translator implements renderable {
         $rs->close();
 
         // replace the loaded values with those already staged
-        $stage = mlang_persistent_stage::instance_for_user($user);
+        $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         foreach($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {
                 $string = new stdclass();
@@ -365,7 +365,7 @@ class local_amos_translator implements renderable {
 }
 
 /**
- * Represents the persistant stage
+ * Represents the persistant stage to be displayed
  */
 class local_amos_stage implements renderable {
 
@@ -379,7 +379,7 @@ class local_amos_stage implements renderable {
         global $DB;
 
         $this->strings = array();
-        $stage = mlang_persistent_stage::instance_for_user($user);
+        $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         $needed = array();
 
         foreach($stage->get_iterator() as $component) {

@@ -225,9 +225,9 @@ class local_amos_renderer extends plugin_renderer_base {
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
 
         if (empty($stage->strings)) {
-            return $this->heading('No strings staged');
+            return $this->heading('There are no strings staged for commit.');
         } else {
-            $output = $this->heading('Staged ' . count($stage->strings) . ' strings');
+            $output = $this->heading('There are ' . count($stage->strings) . ' staged strings ready to be committed.');
         }
 
         $form = html_writer::tag('textarea', '', array('name' => 'message'));
@@ -258,7 +258,16 @@ class local_amos_renderer extends plugin_renderer_base {
             $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
             $t2 = s($string->new);
             $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
-            $cells[5] = new html_table_cell($t2 . $t1);
+            $unstage  = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'unstage', 'value' => $string->stringid));
+            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'component', 'value' => $string->component));
+            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'branch', 'value' => $string->branch));
+            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'lang', 'value' => $string->language));
+            $unstage .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Unstage'));
+            $unstage = html_writer::tag('div', $unstage);
+            $unstage = html_writer::tag('form', $unstage, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+            $unstage = html_writer::tag('div', $unstage, array('class' => 'unstagewrapper'));
+            $cells[5] = new html_table_cell($t2 . $t1 . $unstage);
 
             $row = new html_table_row($cells);
             $table->data[] = $row;

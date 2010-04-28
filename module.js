@@ -202,3 +202,6 @@ M.local_amos.submit_success = function(tid, outcome, args) {
 M.local_amos.submit_failure = function(tid, outcome, args) {
     alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
 }
+
+M.local_amos.init_stage = function(Y) {
+}

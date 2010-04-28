@@ -49,6 +49,8 @@ foreach ($fdata as $setting => $value) {
     $USER->{'local_amos_' . $setting} = serialize($value);
 }
 
+// just make sure that USER contains sesskey
+$sesskey = sesskey();
 // create a renderable object that represent the translation table
 $translator = new local_amos_translator($filter, $USER);
 

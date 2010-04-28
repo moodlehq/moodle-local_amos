@@ -50,7 +50,7 @@ $component = new mlang_component($record->component, $lang, mlang_version::by_co
 $string = new mlang_string($record->stringid, $text);
 $component->add_string($string);
 
-$stage = mlang_persistent_stage::instance_for_user($USER);
+$stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
 $stage->add($component, true);
 $stage->store();
 

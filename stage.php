@@ -27,7 +27,8 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
 
-$message = optional_param('message', null, PARAM_RAW);
+$message = optional_param('message', null, PARAM_RAW); // commit message
+$unstage = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
 
 require_login(SITEID, false);
 require_capability('moodle/site:config', $PAGE->context);
@@ -36,11 +37,27 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS stage');
 $PAGE->set_heading('AMOS stage');
+//$PAGE->requires->js_init_call('M.local_amos.init_stage');
 
 if (isset($message)) {
+    // committing the stage
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER);
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->commit($message, array('source' => 'amos', 'userinfo' => fullname($USER) . '<' . $USER->email . '>'));
+    $stage->store();
+    redirect($PAGE->url);
+    die();
+}
+if (!empty($unstage)) {
+    require_sesskey();
+    $name = required_param('component', PARAM_ALPHANUMEXT);
+    $branch = required_param('branch', PARAM_INT);
+    $lang = required_param('lang', PARAM_ALPHANUMEXT);
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $component = $stage->get_component($name, $lang, mlang_version::by_code($branch));
+    if ($component) {
+        $component->unlink_string($unstage);
+    }
     $stage->store();
     redirect($PAGE->url);
     die();
@@ -48,6 +65,8 @@ if (isset($message)) {
 
 $output = $PAGE->get_renderer('local_amos');
 
+// make sure that USER contains sesskey property
+$sesskey = sesskey();
 // create a renderable object that represents the stage
 $stage = new local_amos_stage($USER);
 

@@ -127,6 +127,10 @@ class mlang_component {
         }
         if (!empty($string) && is_array($string)) {
             foreach ($string as $id => $value) {
+                $id = clean_param($id, PARAM_STRINGID);
+                if (empty($id)) {
+                    continue;
+                }
                 if ($version->code <= mlang_version::MOODLE_19) {
                     $value = mlang_string::fix_syntax($value, 1);
                 } else {
@@ -763,49 +767,73 @@ class mlang_stage {
 class mlang_persistent_stage extends mlang_stage {
 
     /** @var the identifer of this stage */
-    public $id;
+    public $userid;
+
+    /** @var string name of the stage */
+    public $stageid;
 
     /**
-     * TODO: short description.
+     * Factory method returning an instance of the stage for the given user
      *
-     * @param stdclass $user 
-     * @return TODO
+     * For now, we use sesskey() as the only supported stage name. In the future, users will
+     * have control over their stages, giving them names etc.
+     *
+     * @param int $userid the owner of the stage
+     * @param string $stageid stage name
+     * @return mlang_persistent_stage instance
      */
-    public static function instance_for_user(stdclass $user) {
-        $stage = new mlang_persistent_stage($user->id);
+    public static function instance_for_user($userid, $stageid) {
+        $stage = new mlang_persistent_stage($userid, $stageid);
         $stage->restore();
         return $stage;
     }
 
     /**
-     * TODO: short description.
+     * Persistant stage constructor
      *
-     * @param int $id 
+     * @param int $userid the owner of the stage
+     * @param string $stageid stage name
      */
-    protected function __construct($id) {
-        $this->id = $id;
+    protected function __construct($userid, $stageid) {
+        if (empty($userid) or empty($stageid)) {
+            throw new coding_exception('Persistance stage identification failed');
+        }
+        $this->userid = $userid;
+        $this->stageid = $stageid;
     }
 
     /**
-     * TODO: short description.
+     * Make sure the storage is ready for {@link store()} call
      *
-     * @return TODO
+     * @return string|false full path to file to use or false if fail
+     */
+    protected function get_storage() {
+        if (!$dir = make_upload_directory('amos/stages/' . $this->userid, false)) {
+            return false;
+        }
+        return $dir . '/' . $this->stageid;
+    }
+
+    /**
+     * Save the staged strings into the storage
+     *
+     * @return boolean success status
      */
     public function store() {
+        if (!$storage = $this->get_storage()) {
+            return false;
+        }
         $data = serialize($this->components);
-        $dir = make_upload_directory('amos/stages', false);
-        file_put_contents($dir . '/' . $this->id, $data);
+        file_put_contents($storage, $data);
     }
 
     /**
-     * TODO: short description.
-     *
-     * @return TODO
+     * Load the staged strings from the storage
      */
     public function restore() {
         global $CFG;
 
-        $storage = $CFG->dataroot . '/amos/stages/' . $this->id;
+        $storage = $this->get_storage();
         if (is_readable($storage)) {
             $data = file_get_contents($storage);
             $this->components = unserialize($data);
