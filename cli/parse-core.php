@@ -210,6 +210,10 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             // ignore
             continue;
         }
+        if (strstr($file, 'portfolio_format_leap2a.php')) {
+            // MDL-22212
+            continue;
+        }
         if (substr($file, -4) !== '.php') {
             // this is not a valid string file
             continue;
