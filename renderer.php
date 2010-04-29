@@ -290,7 +290,7 @@ class local_amos_renderer extends plugin_renderer_base {
      * @param int $timestamp
      * @return string formatted date and time
      */
-    public static function commit_datetime($timestamp) {
+    protected static function commit_datetime($timestamp) {
         $tz = date_default_timezone_get();
         date_default_timezone_set('UTC');
         $t = date('Y-m-d H:i', $timestamp);
@@ -298,6 +298,37 @@ class local_amos_renderer extends plugin_renderer_base {
         return $t;
     }
 
+    /**
+     * Render repository records
+     *
+     * @param local_amos_log $records of stdclass full amos repository records
+     * @return string HTML
+     */
+    protected function render_local_amos_log(local_amos_log $log) {
+        $output = $this->heading('TODO: there will be filter here');
+        foreach ($log->records as $record) {
+            if ($record->deleted) {
+                $o = "DELETED STRING\n";
+            } else {
+                $o = "ADDED/MODIFIED STRING";
+            }
+            $o .= "\n";
+            $o .= "Date:   " . self::commit_datetime($record->timemodified) . "\n";
+            $o .= "Author: " . s($record->userinfo) . "\n";
+            $o .= "Source: " . $record->source . "\n";
+            if ($record->source == 'git') {
+                $o .= "Commit: " . $record->commithash . "\n";
+            }
+            $o .= "Language: " . $record->lang . "\n";
+            $o .= "Component: " . $record->component . "\n";
+            $o .= "Version: " . mlang_version::by_code($record->branch)->label . "\n";
+            $o .= "String: " . $record->stringid . "\n";
+            $o .= "\n";
+            $o .= s($record->commitmsg);
 
+            $output .= html_writer::tag('pre', $o, array('class' => 'logrecord'));
+        }
+        return $output;
+    }
 }
 

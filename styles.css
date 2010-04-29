@@ -126,3 +126,8 @@
 #page-local-amos-index h2.main {
     text-align: left;
 }
+
+.path-local-amos .logrecord {
+    border: 1px solid #ddd;
+    padding: 0.5em;
+}

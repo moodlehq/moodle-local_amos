@@ -466,5 +466,23 @@ class local_amos_stage implements renderable {
         }
         return $result;
     }
+}
 
+/**
+ * TODO: short description.
+ *
+ * TODO: long description.
+ */
+class local_amos_log implements renderable {
+    /** @var array of records to be displayed in the log */
+    public $records = array();
+
+    /**
+     * TODO: short description.
+     *
+     */
+    public function __construct() {
+        global $DB;
+        $this->records = $DB->get_records('amos_repository', null, 'timemodified DESC', '*', 0, 50);
+    }
 }

@@ -43,7 +43,7 @@ if (isset($message)) {
     // committing the stage
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $stage->commit($message, array('source' => 'amos', 'userinfo' => fullname($USER) . '<' . $USER->email . '>'));
+    $stage->commit($message, array('source' => 'amos', 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'));
     $stage->store();
     redirect($PAGE->url);
     die();
