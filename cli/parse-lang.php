@@ -107,7 +107,7 @@ chdir(AMOS_REPO_LANGS);
 // find the root commit
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git rev-list HEAD | tail -1";
+$gitcmd = AMOS_PATH_GIT .  " rev-list HEAD | tail -1";
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 if ($gitstatus <> 0) {
@@ -127,7 +127,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = "git whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
+$gitcmd = AMOS_PATH_GIT . " whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 
@@ -188,9 +188,9 @@ foreach ($gitout as $line) {
     $format = implode('%n', array('%an', '%ae', '%at', '%s')); // name, email, timestamp, subject
     $commitinfo = array();
     if ($commithash == $rootcommit) {
-        $gitcmd = "git log --format={$format} {$commithash}";
+        $gitcmd = AMOS_PATH_GIT . " log --format={$format} {$commithash}";
     } else {
-        $gitcmd = "git log --format={$format} {$commithash} ^{$commithash}^";
+        $gitcmd = AMOS_PATH_GIT . " log --format={$format} {$commithash} ^{$commithash}^";
     }
     exec($gitcmd, $commitinfo);
     $committer      = $commitinfo[0];
@@ -210,7 +210,7 @@ foreach ($gitout as $line) {
         continue;
     }
     $checkout = $tmp . '/' . $checkout;
-    exec("git show {$commithash}:{$file} > {$checkout}");
+    exec(AMOS_PATH_GIT . " show {$commithash}:{$file} > {$checkout}");
 
     // push the string on all branches where the English original is currently (or has ever been) defined
     // note that all English strings history must already be registered in AMOS repository

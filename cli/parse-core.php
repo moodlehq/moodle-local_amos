@@ -162,7 +162,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     chdir(AMOS_REPO_MOODLE);
     $gitout = array();
     $gitstatus = 0;
-    $gitcmd = "git whatchanged --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
+    $gitcmd = AMOS_PATH_GIT . " whatchanged --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
     echo "RUN {$gitcmd}\n";
     exec($gitcmd, $gitout, $gitstatus);
 
@@ -250,7 +250,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         // get some additional information of the commit
         $format = implode('%n', array('%an', '%ae', '%at', '%s', '%b')); // name, email, timestamp, subject, body
         $commitinfo = array();
-        $gitcmd = "git log --format={$format} {$commithash} ^{$commithash}~";
+        $gitcmd = AMOS_PATH_GIT . " log --format={$format} {$commithash} ^{$commithash}~";
         exec($gitcmd, $commitinfo);
         $committer      = $commitinfo[0];
         $committeremail = $commitinfo[1];
@@ -284,7 +284,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             continue;
         }
         $checkout = $tmp . '/' . $checkout;
-        exec("git show {$commithash}:{$file} > {$checkout}");
+        exec(AMOS_PATH_GIT . " show {$commithash}:{$file} > {$checkout}");
 
         // convert the php file into strings in the staging area
         $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified, mlang_component::name_from_filename($file));

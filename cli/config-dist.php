@@ -45,3 +45,8 @@ define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');
  * Full path to the directory where AMOS will generate installer strings
  */
 define('AMOS_EXPORT_INSTALLER_DIR', $CFG->dataroot . '/amos/export-install');
+
+/**
+ * Full path to git
+ */
+define('AMOS_PATH_GIT', '/usr/local/bin/git');
