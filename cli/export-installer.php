@@ -32,7 +32,8 @@ require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 if (! $strings = file($CFG->dirroot . '/install/stringnames.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) {
-    die('Unable to read stringnames.txt');
+    echo "Unable to read stringnames.txt\n";
+    exit(1);
 }
 $list = array();    // [component][stringid] => null
 foreach ($strings as $string) {
@@ -47,7 +48,8 @@ foreach ($strings as $string) {
 unset($strings);
 
 if (empty($list)) {
-    die("ERROR Unable to get the list of strings to export\n");
+    echo "ERROR Unable to get the list of strings to export\n";
+    exit(1);
 }
 $tree = mlang_tools::components_tree(array('branch' => mlang_version::MOODLE_20));
 $langs = array_keys($tree[mlang_version::MOODLE_20]);

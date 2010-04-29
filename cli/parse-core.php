@@ -170,7 +170,8 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
 
     if ($gitstatus <> 0) {
         // error occured
-        die('ERROR git-log');
+        echo "ERROR\n";
+        exit(1);
     }
 
     $commithash = '';

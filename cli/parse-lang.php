@@ -111,7 +111,8 @@ $gitcmd = AMOS_PATH_GIT .  " rev-list HEAD | tail -1";
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 if ($gitstatus <> 0) {
-    die('ERROR');
+    echo "ERROR\n";
+    exit(1);
 }
 $rootcommit = $gitout[0];
 
@@ -133,7 +134,8 @@ exec($gitcmd, $gitout, $gitstatus);
 
 if ($gitstatus <> 0) {
     // error occured
-    die('ERROR');
+    echo "ERROR\n";
+    exit(1);
 }
 
 $commithash = '';
