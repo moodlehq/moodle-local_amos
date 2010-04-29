@@ -308,21 +308,21 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = $this->heading('TODO: there will be filter here');
         foreach ($log->records as $record) {
             if ($record->deleted) {
-                $o = "DELETED STRING\n";
+                $o = "DELETED STRING";
             } else {
                 $o = "ADDED/MODIFIED STRING";
             }
-            $o .= "\n";
-            $o .= "Date:   " . self::commit_datetime($record->timemodified) . "\n";
-            $o .= "Author: " . s($record->userinfo) . "\n";
-            $o .= "Source: " . $record->source . "\n";
+            $o .= "\n\n";
+            $o .= "Date:      " . self::commit_datetime($record->timemodified) . "\n";
+            $o .= "Author:    " . s($record->userinfo) . "\n";
+            $o .= "Source:    " . $record->source . "\n";
             if ($record->source == 'git') {
-                $o .= "Commit: " . $record->commithash . "\n";
+                $o .= "Commit:    " . $record->commithash . "\n";
             }
-            $o .= "Language: " . $record->lang . "\n";
+            $o .= "Language:  " . $record->lang . "\n";
             $o .= "Component: " . $record->component . "\n";
-            $o .= "Version: " . mlang_version::by_code($record->branch)->label . "\n";
-            $o .= "String: " . $record->stringid . "\n";
+            $o .= "Version:   " . mlang_version::by_code($record->branch)->label . "\n";
+            $o .= "String:    " . $record->stringid . "\n";
             $o .= "\n";
             $o .= s($record->commitmsg);
 
