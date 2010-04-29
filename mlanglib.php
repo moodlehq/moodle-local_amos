@@ -134,8 +134,8 @@ class mlang_component {
                 if ($version->code <= mlang_version::MOODLE_19) {
                     $value = mlang_string::fix_syntax($value, 1);
                 } else {
-                    // TODO XXX change this once we start tracking new format
-                    $value = mlang_string::fix_syntax($value, 2, 1);
+                    //$value = mlang_string::fix_syntax($value, 2, 1);  // use this when expecting 1.x format
+                    $value = mlang_string::fix_syntax($value);          // use this when expecting 2.x format
                 }
                 $component->add_string(new mlang_string($id, $value, $timemodified), true);
             }

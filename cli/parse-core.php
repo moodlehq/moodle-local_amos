@@ -76,6 +76,7 @@ $MLANG_BROKEN_CHECKOUTS = array(
     'c5d0eaa9afecd924d720fbc0b206d144eb68db68_lang_en_utf8_question.php',
     '06e84d52bd52a4901e2512ea92d87b6192edeffa_lang_en_utf8_error.php',
     '4416da02db714807a71d8a28c19af3a834d2a266_lang_en_utf8_enrol_mnet.php',
+    'fd1d5455fde49baa64a37126f25f3d3fd6b6f3f2_mod_assignment_lang_en_assignment.php',
 );
 
 $MLANG_IGNORE_COMMITS = array(
@@ -126,11 +127,11 @@ $MLANG_IGNORE_COMMITS = array(
 );
 
 $MLANG_PARSE_BRANCHES = array(
-    'MOODLE_20_STABLE',
-    'MOODLE_19_STABLE',
-    'MOODLE_18_STABLE',
-    'MOODLE_17_STABLE',
     'MOODLE_16_STABLE',
+    'MOODLE_17_STABLE',
+    'MOODLE_18_STABLE',
+    'MOODLE_19_STABLE',
+    'MOODLE_20_STABLE',
 );
 
 $plugintypes = get_plugin_types(false);
@@ -154,10 +155,11 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
     }
 
-    // XXX temporarily freezing the start point at MOODLE_20_STABLE because of AMOS script testing
-    if ($branch == 'MOODLE_20_STABLE') {
-        $startat = '^61bb07c2573ec711a0e5d1ccafa313cf47b9fc22^';
-    }
+    // XXX if the reply of all AMOS scripts is needed (for example during the initial fetch of the strings),
+    // freeze the start point at MOODLE_20_STABLE here - this is the first commit containing AMOS script
+    //if ($branch == 'MOODLE_20_STABLE') {
+    //    $startat = '^61bb07c2573ec711a0e5d1ccafa313cf47b9fc22^';
+    //}
 
     chdir(AMOS_REPO_MOODLE);
     $gitout = array();
@@ -187,6 +189,13 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             $committime = substr($line, 58);
             continue;
         }
+        //if ($commithash == '30c8dd34f70437b15bd7960eb056d8de0c5e0375') {
+        //    // XXX now we reached the point when languages are in 'en' folder again
+        //    // skip processing of the branch. Edit the code to expect new strings format
+        //    // at MOODLE_20_STABLE
+        //    echo("Commit 30c8dd34f70437b15bd7960eb056d8de0c5e0375 reached, stopping the execution\n");
+        //    continue 2;
+        //}
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
             echo "IGNORED {$commithash}\n";
             continue;
