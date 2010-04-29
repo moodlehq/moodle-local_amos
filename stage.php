@@ -72,7 +72,5 @@ $stage = new local_amos_stage($USER);
 
 /// Output starts here
 echo $output->header();
-$currenttab = 'stage';
-include(dirname(__FILE__) . '/tabs.php');
 echo $output->render($stage);
 echo $output->footer();

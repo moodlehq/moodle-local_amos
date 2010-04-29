@@ -56,8 +56,6 @@ $translator = new local_amos_translator($filter, $USER);
 
 /// Output starts here
 echo $output->header();
-$currenttab = 'translator';
-include(dirname(__FILE__) . '/tabs.php');
 echo $output->render($filter);
 echo $output->render($translator);
 echo $output->footer();

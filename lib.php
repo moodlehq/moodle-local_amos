@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Integrates this plugin into the admin tree
+ * AMOS interface library
  *
  * @package   amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -25,5 +25,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add('root', new admin_category('amos', 'AMOS'));
-$ADMIN->add('amos', new admin_externalpage('amosinfo', 'View', $CFG->wwwroot.'/local/amos/view.php'));
+/**
+ * Puts AMOS into the global navigation tree.
+ *
+ * @param global_navigation $navigation
+ */
+function amos_extends_navigation(global_navigation $navigation) {
+    $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'));
+    $amos->add('Translator', new moodle_url('/local/amos/view.php'));
+    $amos->add('Stage', new moodle_url('/local/amos/view.php'));
+    $amos->add('Log', new moodle_url('/local/amos/log.php'));
+}

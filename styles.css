@@ -121,3 +121,8 @@
     width: 100%;
     min-height: 4em;
 }
+
+#page-local-amos-index h1.main,
+#page-local-amos-index h2.main {
+    text-align: left;
+}
