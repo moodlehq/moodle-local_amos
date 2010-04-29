@@ -16,15 +16,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of mlang
+ * AMOS upgrade scripts
  *
- * @package   mlang
+ * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+function xmldb_local_amos_upgrade($oldversion) {
+    global $CFG, $DB, $OUTPUT;
 
-$plugin->version  = 2010042900;
-$plugin->requires = 2010012500;  // Requires this Moodle version
-//$module->cron     = 60;
+    $dbman = $DB->get_manager();
+    $result = true;
+
+    if ($result && $oldversion < 2010042900) {
+
+    /// Define index ix_timemodified (not unique) to be added to amos_repository
+        $table = new xmldb_table('amos_repository');
+        $index = new xmldb_index('ix_timemodified', XMLDB_INDEX_NOTUNIQUE, array('timemodified'));
+
+    /// Conditionally launch add index ix_timemodified
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+    /// amos savepoint reached
+        upgrade_plugin_savepoint($result, 2010042900, 'local', 'amos');
+    }
+
+    return $result;
+}
