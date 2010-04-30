@@ -1262,6 +1262,7 @@ class mlang_tools {
             }
             $helpstring = file_get_contents($fullpath);
             $helpstring = preg_replace('|<h1>.*</h1>|i', '', $helpstring);
+            $helpstring = iconv('UTF-8', 'UTF-8//IGNORE', $helpstring);
             $helpstring = trim($helpstring);
             if (empty($helpstring)) {
                 continue;
