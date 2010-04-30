@@ -24,6 +24,11 @@
  * languages. If the string is already removed in the other language, the
  * removing commit is not recorded.
  *
+ * By default, the script checks just for the recent deletions, not older
+ * than one day. During the initial import and once per day, for example,
+ * run it with --full argument to re-check all the history, so that commits
+ * dated into past are propadagated as well (full check takes ~30 mins).
+ *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,6 +38,9 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
+require_once($CFG->libdir.'/clilib.php');
+
+list($options, $unrecognized) = cli_get_params(array('full'=>false), array('f'=>'full'));
 
 $mem = memory_get_usage();
 echo "LOADING COMPONENTS TREE... ";
@@ -51,6 +59,9 @@ foreach ($tree as $vercode => $languages) {
         echo "{$version->label} {$componentname} [{$mem} {$memdiff}]\n";
         $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
         foreach ($english->get_iterator() as $string) {
+            if (empty($options['full']) and $string->timemodified < time() - DAYSECS) {
+                continue;
+            }
             if ($string->deleted) {
                 $string->timemodified = local_amos_renderer::commit_datetime($string->timemodified);
                 $stage = new mlang_stage();

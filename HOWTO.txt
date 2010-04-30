@@ -10,7 +10,7 @@ HOW TO DEPLOY AMOS AND RELOAD THE HISTORY OF STRINGS
 6.  Modify cli/parse-core.php and uncomment XXX'ed code to hard code the
     startat commit hash
 7.  Re-run cli/parse-core.php to execute AMOS scripts from recent commits
-8.  Run cli/rev-cleanup.php to delete orphaned strings
+8.  Run cli/rev-cleanup.php --full to delete orphaned strings
 
 
 HOW TO KEEP AMOS DATA UP-TO-UPDATE
