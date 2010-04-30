@@ -142,7 +142,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = html_writer::tag('div', $output, array('id' => 'amosfilter'));
 
         // form
-        $attributes = array('method' => 'get',
+        $attributes = array('method' => 'post',
                             'action' => $filter->handler->out(),
                             'id'     => html_writer::random_id(),
                             'class'  => 'lazyform ' . $filter->lazyformname,
