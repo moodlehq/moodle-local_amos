@@ -103,7 +103,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, 'missing and outdated strings only');
         $fmis    = html_writer::tag('div', $fmis, array('class' => 'labelled_checkbox'));
 
-        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, 'help tooltips only');
+        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, 'help strings only');
         $fhlp    = html_writer::tag('div', $fhlp, array('class' => 'labelled_checkbox'));
 
         $output .= html_writer::tag('div', $fmis . $fhlp, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
