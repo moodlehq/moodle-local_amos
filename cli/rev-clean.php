@@ -32,6 +32,7 @@
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 $mem = memory_get_usage();
 echo "LOADING COMPONENTS TREE... ";
@@ -51,6 +52,7 @@ foreach ($tree as $vercode => $languages) {
         $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
         foreach ($english->get_iterator() as $string) {
             if ($string->deleted) {
+                $string->timemodified = local_amos_renderer::commit_datetime($string->timemodified);
                 $stage = new mlang_stage();
                 foreach (array_keys($tree[$vercode]) as $otherlang) {
                     if ($otherlang == 'en') {
@@ -71,7 +73,7 @@ The string {$string->id} was removed from the English language pack by
 {$string->extra->commithash}
 EOF;
                     echo "COMMIT removal of '{$string->id}' from '{$english->name}'\n";
-                    $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'David Mudrak <david@moodle.com>'), true);
+                    $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
                 }
                 $stage->clear();
                 unset($stage);
