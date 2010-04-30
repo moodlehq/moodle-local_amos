@@ -1250,17 +1250,19 @@ class mlang_tools {
      * @param mixed         $timestamp
      * @return mlang_stage
      */
-    protected static function migrate_helpfile($helpfile, $tostring, $tocomponent, $timestamp=null) {
-
-        return self::STATUS_OK;
+    protected static function migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp=null) {
+        global $CFG;
+        require_once($CFG->dirroot . '/local/amos/cli/config.php');
 
         $stage = new mlang_stage();
         foreach (array_keys(self::list_languages()) as $lang) {
-            $fullpath = 'TODO MUST BE PREPARED' . '/' . $lang . '_utf8/help/' . $helpfile;
+            $fullpath = AMOS_REPO_LANGS . '/' . $lang . '_utf8/help/' . $helpfile;
             if (! is_readable($fullpath)) {
                 continue;
             }
-            $helpstring = trim(file_get_contents($fullpath));
+            $helpstring = file_get_contents($fullpath);
+            $helpstring = preg_replace('|<h1>.*</h1>|i', '', $helpstring);
+            $helpstring = trim($helpstring);
             if (empty($helpstring)) {
                 continue;
             }
