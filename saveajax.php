@@ -56,6 +56,6 @@ $stage->store();
 
 header('Content-Type: application/json; charset: utf-8');
 $response = new stdclass();
-$response->text = $string->text;
+$response->text = s($string->text);
 
 echo json_encode($response);
