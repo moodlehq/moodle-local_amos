@@ -503,15 +503,18 @@ EOF;
 
         $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->assertEqual('mod/workshop/lang/en/workshop.php', $component->get_phpfile_location());
+        $this->assertEqual('lang/en/workshop.php', $component->get_phpfile_location(false));
 
-        $component = new mlang_component('workshopform_accumulative', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEqual('mod/workshop/form/accumulative/lang/en/workshopform_accumulative.php', $component->get_phpfile_location());
+        $component = new mlang_component('workshopform_accumulative', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('mod/workshop/form/accumulative/lang/cs/workshopform_accumulative.php', $component->get_phpfile_location());
+        $this->assertEqual('lang/cs/workshopform_accumulative.php', $component->get_phpfile_location(false));
 
         $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $this->assertEqual('lang/en_utf8/gradeexport_xml.php', $component->get_phpfile_location());
 
-        $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEqual('grade/export/xml/lang/en/gradeexport_xml.php', $component->get_phpfile_location());
+        $component = new mlang_component('gradeexport_xml', 'es', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual('grade/export/xml/lang/es/gradeexport_xml.php', $component->get_phpfile_location());
+        $this->assertEqual('lang/es/gradeexport_xml.php', $component->get_phpfile_location(false));
     }
 
     public function test_get_string_keys() {

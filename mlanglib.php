@@ -403,14 +403,17 @@ EOF
      *
      * This respects the component language and version. For Moodle 1.6 - 1.9, string files
      * are put into common lang/xx_utf8 directory. Since Moodle 2.0, every plugin type
-     * holds its own strings itself.
+     * holds its own strings itself. This may either return the path in the source tree
+     * (if $treeish param is true) or a path using a directory common for all components.
      *
-     * For example, for Workshop module this returns 'lang/xx_utf8/workshop.php' in 1.x and
-     * 'mod/workshop/lang/xx/workshop.php' in 2.x
+     * For example, for Workshop module this returns 'lang/xx_utf8/workshop.php' in 1.x,
+     * 'mod/workshop/lang/xx/workshop.php' in treeish 2.x and 'lang/xx/workshop.php' in
+     * non-treeish (flat) 2.x
      *
+     * @param bool $treeish shall the path respect the component location in the source code tree
      * @return string relative path to the file
      */
-    public function get_phpfile_location() {
+    public function get_phpfile_location($treeish=true) {
         global $CFG;
 
         if ($this->version->code <= mlang_version::MOODLE_19) {
@@ -419,16 +422,20 @@ EOF
 
         } else {
             // Moodle 2.x
-            list($type, $plugin) = normalize_component($this->name);
-            if ($type === 'core') {
-                return 'lang/' . $this->lang . '/' . $this->name . '.php';
-            } else {
-                $abspath = get_plugin_directory($type, $plugin);
-                if (substr($abspath, 0, strlen($CFG->dirroot)) !== $CFG->dirroot) {
-                    throw new coding_exception('Plugin directory outside dirroot');
+            if ($treeish) {
+                list($type, $plugin) = normalize_component($this->name);
+                if ($type === 'core') {
+                    return 'lang/' . $this->lang . '/' . $this->name . '.php';
+                } else {
+                    $abspath = get_plugin_directory($type, $plugin);
+                    if (substr($abspath, 0, strlen($CFG->dirroot)) !== $CFG->dirroot) {
+                        throw new coding_exception('Plugin directory outside dirroot');
+                    }
+                    $relpath = substr($abspath, strlen($CFG->dirroot) + 1);
+                    return $relpath . '/lang/' . $this->lang . '/' . $this->name . '.php';
                 }
-                $relpath = substr($abspath, strlen($CFG->dirroot) + 1);
-                return $relpath . '/lang/' . $this->lang . '/' . $this->name . '.php';
+            } else {
+                return 'lang/' . $this->lang . '/' . $this->name . '.php';
             }
         }
     }
