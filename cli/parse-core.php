@@ -190,13 +190,6 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             $committime = substr($line, 58);
             continue;
         }
-        //if ($commithash == '30c8dd34f70437b15bd7960eb056d8de0c5e0375') {
-        //    // XXX now we reached the point when languages are in 'en' folder again
-        //    // skip processing of the branch. Edit the code to expect new strings format
-        //    // at MOODLE_20_STABLE
-        //    echo("Commit 30c8dd34f70437b15bd7960eb056d8de0c5e0375 reached, stopping the execution\n");
-        //    continue 2;
-        //}
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
             echo "IGNORED {$commithash}\n";
             continue;
@@ -297,7 +290,19 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         exec(AMOS_PATH_GIT . " show {$commithash}:{$file} > {$checkout}");
 
         // convert the php file into strings in the staging area
-        $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified, mlang_component::name_from_filename($file));
+        if ($version->code >= mlang_version::MOODLE_20) {
+            if ($committime >= 1270908105) {
+                // since David's commit 30c8dd34f70437b15bd7960eb056d8de0c5e0375
+                // on 10th April 2010, strings are in the new format
+                $checkoutformat = 2;
+            } else {
+                $checkoutformat = 1;
+            }
+        } else {
+            $checkoutformat = 1;
+        }
+        $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified,
+                                                   mlang_component::name_from_filename($file), $checkoutformat);
         $stage = new mlang_stage();
         $stage->add($component);
         $stage->rebase($timemodified, true, $timemodified);

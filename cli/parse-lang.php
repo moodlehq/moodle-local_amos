@@ -218,8 +218,9 @@ foreach ($gitout as $line) {
     // note that all English strings history must already be registered in AMOS repository
     foreach (array('MOODLE_20_STABLE', 'MOODLE_19_STABLE', 'MOODLE_18_STABLE', 'MOODLE_17_STABLE', 'MOODLE_16_STABLE') as $branch) {
         $version = mlang_version::by_branch($branch);
-        // get the translated strings from PHP file
-        $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified, mlang_component::name_from_filename($file));
+        // get the translated strings from PHP file - the lang repository in in 1.x format
+        $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified,
+                                                   mlang_component::name_from_filename($file), null, null, 1);
         // get the most recent snapshot of English strings including those deleted
         // beware - we are caching the English snapshots so do not modify English strings while migrating langs
         if (!isset($eng[$branch])) {

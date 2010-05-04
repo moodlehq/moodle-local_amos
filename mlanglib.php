@@ -106,12 +106,13 @@ class mlang_component {
      * @param string $filepath full path to the file to load
      * @param string $lang lang pack we are part of
      * @param mlang_version $version the branch to put this string on
-     * @param string $name use this as a component name instead of guessing from the file name
      * @param int $timemodified use this as a timestamp of string modification instead of the filemtime()
+     * @param string $name use this as a component name instead of guessing from the file name
+     * @param int $format in what string format the file is written - 1 for 1.x string, 2 for 2.x strings
      * @throw Exception
      * @return mlang_component
      */
-    public static function from_phpfile($filepath, $lang, mlang_version $version, $timemodified=null, $name=null) {
+    public static function from_phpfile($filepath, $lang, mlang_version $version, $timemodified=null, $name=null, $format=null) {
         if (empty($name)) {
             $name = self::name_from_filename($filepath);
         }
@@ -125,18 +126,30 @@ class mlang_component {
         } else {
             throw new Exception('Strings definition file ' . $filepath . ' not readable');
         }
+        if ($version->code <= mlang_version::MOODLE_19) {
+            // we are going to import strings for 1.x branch
+            $target = 1;
+            if (is_null($format)) {
+                $format = 1;
+            }
+            if ($format !== 1) {
+                throw new coding_exception('For Moodle 1.x, only strings in legacy format are supported.');
+            }
+        } else {
+            // we are going to import strings for 2.x branch
+            $target = 2;
+            if (is_null($format)) {
+                $format = 2;
+            }
+        }
+
         if (!empty($string) && is_array($string)) {
             foreach ($string as $id => $value) {
                 $id = clean_param($id, PARAM_STRINGID);
                 if (empty($id)) {
                     continue;
                 }
-                if ($version->code <= mlang_version::MOODLE_19) {
-                    $value = mlang_string::fix_syntax($value, 1);
-                } else {
-                    //$value = mlang_string::fix_syntax($value, 2, 1);  // use this when expecting 1.x format
-                    $value = mlang_string::fix_syntax($value);          // use this when expecting 2.x format
-                }
+                $value = mlang_string::fix_syntax($value, $target, $format);
                 $component->add_string(new mlang_string($id, $value, $timemodified), true);
             }
         } else {
@@ -536,7 +549,6 @@ class mlang_string {
         if (is_null($from)) {
             $from = $format;
         }
-
         if (($format === 2) && ($from === 2)) {
             // sanity translations of 2.x strings
             $clean = trim($text);

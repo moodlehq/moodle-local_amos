@@ -176,13 +176,23 @@ EOF;
         $tmp = make_upload_directory('temp/amos', false);
         $filepath = $tmp . '/mlangunittest.php';
         file_put_contents($filepath, $filecontents);
-        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+
+        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'), null, null, 1);
         $this->assertTrue($component->has_string('about'));
         $this->assertTrue($component->has_string('pluginname'));
         $this->assertTrue($component->has_string('author'));
         $this->assertTrue($component->has_string('syntax'));
         $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
         $this->assertEqual('What {$a}\'Pe%"be', $component->get_string('syntax')->text);
+        $component->clear();
+
+        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('about'));
+        $this->assertTrue($component->has_string('pluginname'));
+        $this->assertTrue($component->has_string('author'));
+        $this->assertTrue($component->has_string('syntax'));
+        $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
+        $this->assertEqual('What $a\'Pe%%"be', $component->get_string('syntax')->text);
         $component->clear();
 
         $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
