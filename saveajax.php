@@ -28,15 +28,17 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 require_login(SITEID, false);
-require_capability('moodle/site:config', $PAGE->context);
-
-$stringid = optional_param('stringid', null, PARAM_ALPHANUMEXT);
-$text   = optional_param('text', null, PARAM_RAW);
-
-if (! confirm_sesskey()) {
+if (!has_capability('local/amos:stage', get_system_context())) {
     header('HTTP/1.1 403 Forbidden');
     die();
 }
+if (!confirm_sesskey()) {
+    header('HTTP/1.1 403 Forbidden');
+    die();
+}
+
+$stringid = optional_param('stringid', null, PARAM_ALPHANUMEXT);
+$text   = optional_param('text', null, PARAM_RAW);
 
 if (is_null($stringid) or is_null($text)) {
     header('HTTP/1.1 400 Bad Request');

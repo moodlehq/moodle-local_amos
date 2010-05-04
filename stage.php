@@ -31,7 +31,7 @@ $message = optional_param('message', null, PARAM_RAW); // commit message
 $unstage = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
 
 require_login(SITEID, false);
-require_capability('moodle/site:config', $PAGE->context);
+require_capability('local/amos:stage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');

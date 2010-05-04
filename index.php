@@ -27,7 +27,6 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 require_login(SITEID, false);
-require_capability('moodle/site:config', $PAGE->context);
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/index.php');
@@ -54,10 +53,21 @@ echo '<ol>
       </ol>';
 
 echo $output->heading('Your privileges', 2);
-// TODO this will be displayed according the configuration
-echo '<ul>
-        <li>You are AMOS manager and can do anything at this tool.</li>
-        <li>You can translate any language.</li>
-      </ul>';
+$caps = array();
+if (has_capability('local/amos:manage', get_system_context())) {
+    $caps[] = get_string('amos:manage', 'local_amos');
+}
+if (has_capability('local/amos:stage', get_system_context())) {
+    $caps[] = get_string('amos:stage', 'local_amos');
+}
+if (has_capability('local/amos:commit', get_system_context())) {
+    $caps[] = get_string('amos:commit', 'local_amos');
+}
+if (empty($caps)) {
+    echo 'You have read-only access to public information.';
+} else {
+    $caps = '<li>' . implode("</li>\n<li>", $caps) . '</li>';
+    echo html_writer::tag('ul', $caps);
+}
 
 echo $output->footer();

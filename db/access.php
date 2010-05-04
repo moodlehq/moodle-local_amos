@@ -16,16 +16,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for AMOS local module
+ * Capability definitions for AMOS local plugin
  *
- * @package   local-amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
+ * @package   local_amos
+ * @copyright 2010 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['amos:commit'] = 'Commit the staged strings into the main repository';
-$string['amos:manage'] = 'Manage AMOS portal';
-$string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
-$string['pluginname'] = 'AMOS';
+$capabilities = array(
+
+    // Ability to set-up AMOS portal and assign translators of languages
+    'local/amos:manage' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
+    ),
+
+    // Ability to stage translations using the translation tool or via uploading a file
+    'local/amos:stage' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
+    ),
+
+    // Ability to commit the stage into AMOS repository
+    'local/amos:commit' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
+    ),
+
+);
