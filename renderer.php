@@ -115,11 +115,24 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'item text yui3-gd'));
         $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
         $output .= html_writer::tag('label', 'Substring', array('for' => 'amosfilter_ftxt'));
-        $output .= html_writer::tag('div', 'String must contain given text (comma separated list of values)', array('class' => 'description'));
+        $output .= html_writer::tag('div', 'String must contain given text', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
+
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+
+        // string identifier
+        $output .= html_writer::start_tag('div', array('class' => 'item text yui3-gd'));
+        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::tag('label', 'String identifier', array('for' => 'amosfilter_ftxt'));
+        $output .= html_writer::tag('div', 'The key in the array of strings', array('class' => 'description'));
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+
+        $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filter->get_data()->stringid));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');

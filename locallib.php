@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring');
+        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -124,6 +124,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->substring)) {
             $data->substring = '';
         }
+        if (is_null($data->stringid)) {
+            $data->stringid = '';
+        }
 
         return $data;
     }
@@ -172,6 +175,7 @@ class local_amos_filter implements renderable {
         $data->missing      = optional_param('fmis', false, PARAM_BOOL);
         $data->helps        = optional_param('fhlp', false, PARAM_BOOL);
         $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
+        $data->stringid     = trim(optional_param('fsid', '', PARAM_STRINGID));
 
         return $data;
     }
@@ -193,15 +197,16 @@ class local_amos_translator implements renderable {
         global $DB;
 
         // get the list of strings to display according the current filter values
-        $branches = $filter->get_data()->version;
-        $languages = array_merge(array('en'), $filter->get_data()->language);
+        $branches   = $filter->get_data()->version;
+        $languages  = array_merge(array('en'), $filter->get_data()->language);
         $components = $filter->get_data()->component;
         if (empty($branches) or empty($components) or empty($languages)) {
             return;
         }
-        $missing = $filter->get_data()->missing;
-        $helps = $filter->get_data()->helps;
-        $substring = $filter->get_data()->substring;
+        $missing    = $filter->get_data()->missing;
+        $helps      = $filter->get_data()->helps;
+        $substring  = $filter->get_data()->substring;
+        $stringid   = $filter->get_data()->stringid;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
@@ -228,9 +233,15 @@ class local_amos_translator implements renderable {
         if ($helps) {
             $sql .= "      AND r.stringid LIKE '%\\\\_help'";
         }
+        if ($stringid) {
+            $sql .= "      AND r.stringid = :stringid";
+            $params = array('stringid' => $stringid);
+        } else {
+            $params = array();
+        }
         $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch";
 
-        $params = array_merge(
+        $params = array_merge($params,
             $inner_paramsbranches, $inner_paramslanguages, $inner_paramcomponents,
             $outer_paramsbranches, $outer_paramslanguages, $outer_paramcomponents
         );
