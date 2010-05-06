@@ -171,6 +171,7 @@ string';
 \$string['pluginname'] = 'AMOS';
 \$string['author'] = 'David Mudrak';
 \$string['syntax'] = 'What \$a\\'Pe%%\\"be';
+\$string['percents'] = '%%Y-%%m-%%d-%%H-%%M';
 
 EOF;
         $tmp = make_upload_directory('temp/amos', false);
@@ -184,6 +185,7 @@ EOF;
         $this->assertTrue($component->has_string('syntax'));
         $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
         $this->assertEqual('What {$a}\'Pe%"be', $component->get_string('syntax')->text);
+        $this->assertEqual('%Y-%m-%d-%H-%M', $component->get_string('percents')->text);
         $component->clear();
 
         $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -193,6 +195,7 @@ EOF;
         $this->assertTrue($component->has_string('syntax'));
         $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
         $this->assertEqual('What $a\'Pe%%"be', $component->get_string('syntax')->text);
+        $this->assertEqual('%%Y-%%m-%%d-%%H-%%M', $component->get_string('percents')->text);
         $component->clear();
 
         $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
@@ -202,6 +205,7 @@ EOF;
         $this->assertTrue($component->has_string('syntax'));
         $this->assertEqual("Multiline\nstring", $component->get_string('about')->text);
         $this->assertEqual('What $a\'Pe%%\\"be', $component->get_string('syntax')->text);
+        $this->assertEqual('%%Y-%%m-%%d-%%H-%%M', $component->get_string('percents')->text);
         $component->clear();
 
         unlink($filepath);
