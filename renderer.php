@@ -181,11 +181,9 @@ class local_amos_renderer extends plugin_renderer_base {
 
         if (empty($translator->strings)) {
             return $this->heading('No strings found');
-        } else {
-            $output = $this->heading('Found ' . count($translator->strings) . ' strings');
         }
-        $missing = 0;
 
+        $missing = 0;
         foreach ($translator->strings as $string) {
             $cells = array();
             // component name
@@ -217,9 +215,47 @@ class local_amos_renderer extends plugin_renderer_base {
             $table->data[] = $row;
         }
 
+        $heading = 'Found: '.$translator->numofrows.' &nbsp;&nbsp;&nbsp; Missing: '.$translator->numofmissing.' ('.$missing.')';
+        $output = $this->heading_with_help($heading, 'foundinfo', 'local_amos');
+        $pages = ceil($translator->numofrows / local_amos_translator::PERPAGE);
+        $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output .= html_writer::table($table);
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
 
+        return $output;
+    }
+
+    /**
+     * Displays paginator
+     *
+     * @param int $numofpages
+     * @param int $current current page number, numbering from 1 to n
+     * @param moodle_url $handler
+     * @return string
+     */
+    protected static function page_links($numofpages, $current) {
+        global $PAGE;
+
+        if ($numofpages == 0) {
+            return '';
+        }
+        $output = '';
+        if ($current > 1) {
+            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), '&lt;&lt; '));
+        }
+        for ($i = 1; $i <= $numofpages; $i++) {
+            if ($i == $current) {
+                $link = html_writer::tag('span', $i, array('class' => 'current'));
+            } else {
+                $url = new moodle_url($PAGE->url, array('fpg' => $i));
+                $link = html_writer::link($url, $i);
+                $link = html_writer::tag('span', $link);
+            }
+            $output .= ' ' . $link;
+        }
+        if ($current < $numofpages) {
+            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => $numofpages)), '&gt;&gt; '));
+        }
         return $output;
     }
 

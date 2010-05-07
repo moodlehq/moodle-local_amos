@@ -28,4 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
+$string['foundinfo'] = 'Number of found strings';
+$string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
 $string['pluginname'] = 'AMOS';

@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid');
+        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'page');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -69,6 +69,12 @@ class local_amos_filter implements renderable {
             } else {
                 $data->{$field} = $default->{$field};
             }
+        }
+
+        // pagination is not part of POSTed form, can't use get_data_submitted() therefore
+        $page = optional_param('fpg', null, PARAM_INT);
+        if (!empty($page)) {
+            $data->page = $page;
         }
 
         // if the user did not check any version, use the default instead of none
@@ -126,6 +132,9 @@ class local_amos_filter implements renderable {
         }
         if (is_null($data->stringid)) {
             $data->stringid = '';
+        }
+        if (is_null($data->page)) {
+            $data->page = 1;
         }
 
         return $data;
@@ -185,6 +194,18 @@ class local_amos_filter implements renderable {
  * Represents the translation tool
  */
 class local_amos_translator implements renderable {
+
+    /** @const int number of rows per page */
+    const PERPAGE = 100;
+
+    /** @var int total number of the rows int the table */
+    public $numofrows = 0;
+
+    /** @var total number of untranslated strings */
+    public $numofmissing = 0;
+
+    /** @var int */
+    public $currentpage = 1;
 
     /** @var array of stdclass strings to display */
     public $strings = array();
@@ -272,6 +293,9 @@ class local_amos_translator implements renderable {
             }
         }
 
+        $this->currentpage = $filter->get_data()->page;
+        $from = ($this->currentpage - 1) * self::PERPAGE + 1;
+        $to = $this->currentpage * self::PERPAGE;
         if (isset($s['en'])) {
             foreach ($s['en'] as $component => $t) {
                 foreach ($t as $stringid => $u) {
@@ -325,6 +349,15 @@ class local_amos_translator implements renderable {
                                         continue;
                                     }
                                 }
+                            }
+                            $this->numofrows++;
+                            if (is_null($string->translation)) {
+                                $this->numofmissing++;
+                            }
+                            // keep just strings from the current page
+                            if ($this->numofrows < $from or $this->numofrows > $to) {
+                                unset($string);
+                                continue;
                             }
                             $this->strings[] = $string;
                         }

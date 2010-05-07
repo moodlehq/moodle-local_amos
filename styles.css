@@ -131,3 +131,20 @@
     border: 1px solid #ddd;
     padding: 0.5em;
 }
+
+.path-local-amos .pagination {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1em;
+    text-align: center;
+    font-size: 120%;
+}
+
+.path-local-amos .pagination span {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.path-local-amos .pagination .current {
+    font-weight: bold;
+}
