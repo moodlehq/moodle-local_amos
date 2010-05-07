@@ -220,6 +220,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $pages = ceil($translator->numofrows / local_amos_translator::PERPAGE);
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output .= html_writer::table($table);
+        $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
 
         return $output;
