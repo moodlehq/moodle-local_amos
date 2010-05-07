@@ -29,20 +29,6 @@ function xmldb_local_amos_upgrade($oldversion) {
     $dbman = $DB->get_manager();
     $result = true;
 
-    if ($result && $oldversion < 2010042900) {
-
-    /// Define index ix_timemodified (not unique) to be added to amos_repository
-        $table = new xmldb_table('amos_repository');
-        $index = new xmldb_index('ix_timemodified', XMLDB_INDEX_NOTUNIQUE, array('timemodified'));
-
-    /// Conditionally launch add index ix_timemodified
-        if (!$dbman->index_exists($table, $index)) {
-            $dbman->add_index($table, $index);
-        }
-
-    /// amos savepoint reached
-        upgrade_plugin_savepoint($result, 2010042900, 'local', 'amos');
-    }
 
     return $result;
 }

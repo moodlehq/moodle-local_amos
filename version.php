@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2010050403;
+$plugin->version  = 2010050700;
 $plugin->requires = 2010012500;  // Requires this Moodle version
 //$module->cron     = 60;
