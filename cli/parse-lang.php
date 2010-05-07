@@ -220,7 +220,7 @@ foreach ($gitout as $line) {
         $version = mlang_version::by_branch($branch);
         // get the translated strings from PHP file - the lang repository in in 1.x format
         $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified,
-                                                   mlang_component::name_from_filename($file), null, null, 1);
+                                                   mlang_component::name_from_filename($file), 1);
         // get the most recent snapshot of English strings including those deleted
         // beware - we are caching the English snapshots so do not modify English strings while migrating langs
         if (!isset($eng[$branch])) {
