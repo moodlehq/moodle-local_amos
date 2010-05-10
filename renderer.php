@@ -237,7 +237,7 @@ class local_amos_renderer extends plugin_renderer_base {
     protected static function page_links($numofpages, $current) {
         global $PAGE;
 
-        if ($numofpages == 0) {
+        if ($numofpages < 2) {
             return '';
         }
         $output = '';
