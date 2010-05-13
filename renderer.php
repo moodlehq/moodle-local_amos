@@ -176,7 +176,8 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amostranslator';
-        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
+        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang',
+                get_string('translatortranslation', 'local_amos') . $this->help_icon('translatortranslation', 'local_amos'));
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
 
         if (empty($translator->strings)) {
@@ -209,8 +210,10 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells[5] = new html_table_cell($t . $i);
             $cells[5]->id = $sid;
             $cells[5]->attributes['class'] = $string->class;
-            // todo check if the user can translate into this language, allowing for all users now
             $cells[5]->attributes['class'] .= ' translateable';
+            if ($string->committable) {
+                $cells[5]->attributes['class'] .= ' committable';
+            }
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }
@@ -271,24 +274,11 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amosstage';
-        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang', 'Translation');
+        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang',
+                get_string('stagetranslation', 'local_amos') . $this->help_icon('stagetranslation', 'local_amos'));
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
 
-        if (empty($stage->strings)) {
-            return $this->heading('There are no strings staged for commit.');
-        } else {
-            $output = $this->heading('There are ' . count($stage->strings) . ' staged strings ready to be committed.');
-        }
-
-        $form = html_writer::tag('textarea', '', array('name' => 'message'));
-        $form .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
-        $button = html_writer::tag('div', $button);
-        $form = html_writer::tag('div', $form . $button);
-        $form = html_writer::tag('form', $form, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $form = html_writer::tag('div', $form, array('class' => 'commitformwrapper'));
-        $output .= $form;
-
+        $committable = 0;
         foreach ($stage->strings as $string) {
             $cells = array();
             // component name
@@ -318,12 +308,43 @@ class local_amos_renderer extends plugin_renderer_base {
             $unstage = html_writer::tag('form', $unstage, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
             $unstage = html_writer::tag('div', $unstage, array('class' => 'unstagewrapper'));
             $cells[5] = new html_table_cell($t2 . $t1 . $unstage);
-
+            if ($string->committable and !(trim($string->current) === trim($string->new))) {
+                $cells[5]->attributes['class'] .= ' committable';
+                $committable++;
+            }
+            if (!$string->committable) {
+                $cells[5]->attributes['class'] .= ' uncommittable';
+            }
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }
+        $table = html_writer::table($table);
 
-        $output .= html_writer::table($table);
+        $commitform = html_writer::tag('textarea', '', array('name' => 'message'));
+        $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+        $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
+        $button = html_writer::tag('div', $button);
+        $commitform = html_writer::tag('div', $commitform . $button);
+        $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+        $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper'));
+
+        $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1, 'sesskey' => sesskey()));
+        $prunebutton = $this->single_button($pruneurl, 'Prune');
+
+        $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1, 'sesskey' => sesskey()));
+        $rebasebutton = $this->single_button($rebaseurl, 'Rebase');
+
+
+        $output = $this->heading('There are ' . count($stage->strings) . ' staged strings, ' . $committable . ' of them can be committed.');
+        if ($committable) {
+            $output .= $commitform;
+        }
+
+        if (!empty($stage->strings)) {
+            $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
+            $output .= html_writer::tag('fieldset', $legend . $prunebutton . $rebasebutton, array('class' => 'actionbuttons'));
+            $output .= $table;
+        }
         $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));
 
         return $output;

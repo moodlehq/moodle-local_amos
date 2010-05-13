@@ -29,6 +29,8 @@ require_once(dirname(__FILE__).'/mlanglib.php');
 
 $message = optional_param('message', null, PARAM_RAW); // commit message
 $unstage = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
+$prune   = optional_param('prune', null, PARAM_INT);
+$rebase  = optional_param('rebase', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', get_system_context());
@@ -37,16 +39,17 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS stage');
 $PAGE->set_heading('AMOS stage');
-//$PAGE->requires->js_init_call('M.local_amos.init_stage');
+$PAGE->requires->js_init_call('M.local_amos.init_stage');
 
-if (isset($message)) {
+if (!empty($message)) {
     // committing the stage
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    $stage->prune($allowed);
     $stage->commit($message, array('source' => 'amos', 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'));
     $stage->store();
     redirect($PAGE->url);
-    die();
 }
 if (!empty($unstage)) {
     require_sesskey();
@@ -60,7 +63,21 @@ if (!empty($unstage)) {
     }
     $stage->store();
     redirect($PAGE->url);
-    die();
+}
+if (!empty($prune)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    $stage->prune($allowed);
+    $stage->store();
+    redirect($PAGE->url);
+}
+if (!empty($rebase)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage->rebase();
+    $stage->store();
+    redirect($PAGE->url);
 }
 
 $output = $PAGE->get_renderer('local_amos');

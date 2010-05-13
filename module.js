@@ -69,7 +69,7 @@ M.local_amos.init_translator = function(Y) {
         var translateable = translator.all('.translateable');
         translateable.on('click', M.local_amos.make_editable);
         // in case of missing strings, turn editing mode on by default
-        var missing = translator.all('.translateable.missing.translation');
+        var missing = translator.all('.committable.missing.translation');
         missing.each(function(cell) { M.local_amos.editor_on(cell); });
     }
 }
@@ -204,4 +204,11 @@ M.local_amos.submit_failure = function(tid, outcome, args) {
 }
 
 M.local_amos.init_stage = function(Y) {
+    M.local_amos.Y  = Y;
+
+    Y.all('.stagewrapper form').on('submit', function(e) {
+        if (!confirm('This can not be undone. Are you sure?')) {
+            e.halt();
+        }
+    });
 }

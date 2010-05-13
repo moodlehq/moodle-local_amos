@@ -56,14 +56,34 @@
     margin: 1em auto;
 }
 
-.path-local-amos .commitformwrapper {
+.path-local-amos .stagewrapper .commitformwrapper {
     margin: 0em auto;
     text-align: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    width: 80%;
 }
 
-.path-local-amos .commitformwrapper textarea {
+.path-local-amos .stagewrapper .commitformwrapper textarea {
     width: 30em;
     min-height: 5em;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton,
+.path-local-amos .stagewrapper .actionbuttons .singlebutton form,
+.path-local-amos .stagewrapper .actionbuttons .singlebutton form div {
+    display: inline;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton {
+}
+
+.path-local-amos .stagewrapper .actionbuttons {
+    text-align: center;
+    margin: 1em auto;
+    padding: 10px;
+    width: 80%;
+    border: 1px solid #ddd;
 }
 
 .path-local-amos #amostranslator tr,
@@ -100,16 +120,18 @@
     color: #999;
 }
 
-.path-local-amos #amostranslator .translation.missing {
+.path-local-amos #amostranslator .translation.committable.missing,
+.path-local-amos #amosstage .translation.uncommittable {
     background-color: #ffd3d9;
+}
+
+.path-local-amos #amostranslator .translation.committable,
+.path-local-amos #amosstage .translation.committable {
+    background-color: #e7f1c3;
 }
 
 .path-local-amos #amostranslator .translation.staged {
     background-color: #d2ebff;
-}
-
-.path-local-amos #amostranslator .translation.translated {
-    background-color: #e7f1c3;
 }
 
 .path-local-amos #amostranslator .stringinfo .metainfo {

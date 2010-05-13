@@ -686,11 +686,6 @@ class mlang_stage {
                     // re-adding a deleted string - will be committed
                     continue;
                 }
-                if ($stagedstring->deleted && $capstring->deleted) {
-                    // do not record repeated removals
-                    $component->unlink_string($stagedstring->id);
-                    continue;
-                }
                 if (!mlang_string::differ($stagedstring, $capstring)) {
                     // the staged string is the same as the most recent one in the repository
                     $component->unlink_string($stagedstring->id);
@@ -761,6 +756,24 @@ class mlang_stage {
         } catch (Exception $e) {
             // this is here in order not to clear the stage, just re-throw the exception
             $transaction->rollback($e);
+        }
+    }
+
+    /**
+     * Remove all components that do not belong to any of the given languages
+     *
+     * @param array $keeplangs (string)langcode => (string)langcode - list of languages to keep, 'X' means all languages
+     */
+    public function prune(array $keeplangs) {
+        if (!empty($keeplangs['X'])) {
+            // keep all
+            return;
+        }
+        foreach ($this->components as $cx => $component) {
+            if (empty($keeplangs[$component->lang])) {
+                $component->clear();
+                unset($this->components[$cx]);
+            }
         }
     }
 
@@ -1095,6 +1108,25 @@ class mlang_tools {
 
         return $cache;
 
+    }
+
+    /**
+     * For the given user, returns a list of languges she is allowed commit into
+     *
+     * Language code 'X' has a special meaning - the user is allowed to edit all languages.
+     *
+     * @param mixed $userid user id
+     * @return array of (string)langcode => (string)langcode
+     */
+    public static function list_allowed_languages($userid) {
+        global $DB;
+
+        $records = $DB->get_records('amos_translators', array('userid' => $userid));
+        $langs = array();
+        foreach ($records as $record) {
+            $langs[$record->lang] = $record->lang;
+        }
+        return $langs;
     }
 
     /**

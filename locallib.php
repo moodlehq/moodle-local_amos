@@ -314,6 +314,7 @@ class local_amos_translator implements renderable {
                             $string->original = $english->text;
                             $string->originalid = $english->amosid;
                             $string->originalmodified = $english->timemodified;
+                            $string->committable = false;
                             if (isset($s[$lang][$component][$stringid][$branchcode])) {
                                 $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
                                 $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
@@ -365,7 +366,12 @@ class local_amos_translator implements renderable {
                 }
             }
         }
-
+        $allowedlangs = mlang_tools::list_allowed_languages($user->id);
+        foreach ($this->strings as $string) {
+            if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
+                $string->committable = true;
+            }
+        }
     }
 
     /**
@@ -449,6 +455,7 @@ class local_amos_stage implements renderable {
                 $string->original = null; // is populated in the next step
                 $string->current = null; // dtto
                 $string->new = $staged->text;
+                $string->committable = false;
                 $this->strings[] = $string;
             }
         }
@@ -462,7 +469,11 @@ class local_amos_stage implements renderable {
                 }
             }
         }
+        $allowedlangs = mlang_tools::list_allowed_languages($user->id);
         foreach ($this->strings as $string) {
+            if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
+                $string->committable = true;
+            }
             $string->original = $needed[$string->branch]['en'][$string->component]->get_string($string->stringid)->text;
             if ($needed[$string->branch][$string->language][$string->component] instanceof mlang_component) {
                 $string->current = $needed[$string->branch][$string->language][$string->component]->get_string($string->stringid);
