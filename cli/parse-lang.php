@@ -46,14 +46,19 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * than a real function.
  */
 function amos_parse_lang_commit() {
-    global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $startatlock;
+    global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $checkout, $startatlock;
 
     $stage->rebase($timemodified, true, $timemodified);
-    $stage->commit($commitmsg, array(
-        'source' => 'git',
-        'userinfo' => $committer . ' <' . $committeremail . '>',
-        'commithash' => $commithash
-    ), true);
+    try {
+        $stage->commit($commitmsg, array(
+            'source' => 'git',
+            'userinfo' => $committer . ' <' . $committeremail . '>',
+            'commithash' => $commithash
+        ), true);
+    } catch (dml_write_exception $e) {
+        echo "FAILED COMMIT $checkout\n";
+        $stage->clear();
+    }
 
     // remember the processed commithash
     file_put_contents($startatlock, $commithash);
