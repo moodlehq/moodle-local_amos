@@ -209,9 +209,6 @@ class mlang_component {
                  WHERE r.branch=:outer_branch
                        AND r.lang=:outer_lang
                        AND r.component=:outer_component";
-        if (empty($deleted)) {
-            $sql .= "  AND r.deleted = 0";
-        }
         if (!empty($stringids)) {
             $sql .= "  AND r.stringid $outer_strsql";
         }
@@ -219,6 +216,11 @@ class mlang_component {
         $rs = $DB->get_recordset_sql($sql, $params);
         $component = new mlang_component($name, $lang, $version);
         foreach ($rs as $r) {
+            if (empty($deleted) and $r->deleted) {
+                // we do not want to include deleted strings - note that this must be checked here and not
+                // in SQL above so that the same string can be deleted and re-added again
+                continue;
+            }
             if ($fullinfo) {
                 $extra = new stdclass();
                 foreach ($r as $property => $value) {
@@ -671,6 +673,10 @@ class mlang_stage {
                 }
                 if ($stagedstring->deleted && empty($capstring->deleted)) {
                     // the staged string object is the removal record - will be committed
+                    continue;
+                }
+                if (empty($stagedstring->deleted) && $capstring->deleted) {
+                    // re-adding a deleted string - will be committed
                     continue;
                 }
                 if (!mlang_string::differ($stagedstring, $capstring)) {
