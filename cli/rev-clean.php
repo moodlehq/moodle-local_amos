@@ -34,6 +34,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (isset($_SERVER['REMOTE_ADDR'])) {
+    error_log('AMOS cli scripts can not be called via the web interface');
+    exit;
+}
+
+// Do not set moodle cookie because we do not need it here, it is better to emulate session
+define('NO_MOODLE_COOKIES', true);
+
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');

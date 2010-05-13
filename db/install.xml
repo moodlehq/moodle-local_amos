@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20100507" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20100513" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history" NEXT="amos_languages">
+    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history" NEXT="amos_commits">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="commitid"/>
+        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The commit thatt introduced this change" PREVIOUS="id" NEXT="branch"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="commitid" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
         <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
         <FIELD NAME="stringid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="text"/>
         <FIELD NAME="text" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The localized string text" PREVIOUS="stringid" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="text" NEXT="commitmsg"/>
-        <FIELD NAME="commitmsg" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Commit message" PREVIOUS="timemodified" NEXT="commithash"/>
-        <FIELD NAME="commithash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="The git commit hash that introduced this string" PREVIOUS="commitmsg" NEXT="source"/>
-        <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The source of this string - git, email etc." PREVIOUS="commithash" NEXT="deleted"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs" PREVIOUS="source" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="If the author is known in the local user table, store their id here" PREVIOUS="deleted" NEXT="userinfo"/>
-        <FIELD NAME="userinfo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Helps to identify the author of the change, for example a name from CVS commit" PREVIOUS="userid"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The effective timestamp of the change" PREVIOUS="text" NEXT="deleted"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs" PREVIOUS="timemodified"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
-        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_commit"/>
+        <KEY NAME="fk_commit" TYPE="foreign" FIELDS="commitid" REFTABLE="amos_commits" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="ix_snapshot" UNIQUE="false" FIELDS="component, lang, branch" COMMENT="Optimised for getting a snapshot of all current strings in one component" NEXT="ix_lang"/>
@@ -30,50 +26,22 @@
         <INDEX NAME="ix_timemodified" UNIQUE="false" FIELDS="timemodified" COMMENT="This index allows to search for the recent records in the log output" PREVIOUS="ix_lang"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_languages" COMMENT="The list of all languages known to Moodle" PREVIOUS="amos_repository" NEXT="amos_translators">
+    <TABLE NAME="amos_commits" COMMENT="Keeps all commit related meta-data" PREVIOUS="amos_repository" NEXT="amos_translators">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="lang"/>
-        <FIELD NAME="lang" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Language code as is used in Moodle" PREVIOUS="id" NEXT="thislanguage"/>
-        <FIELD NAME="thislanguage" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="The localized name of the language" PREVIOUS="lang" NEXT="thislanguageint"/>
-        <FIELD NAME="thislanguageint" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="The international name of the language" PREVIOUS="thislanguage" NEXT="iso6391"/>
-        <FIELD NAME="iso6391" TYPE="char" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="Two letters language code according the obsolete ISO 639-1" PREVIOUS="thislanguageint" NEXT="iso6392"/>
-        <FIELD NAME="iso6392" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="The code of the language according ISO 693-2" PREVIOUS="iso6391" NEXT="alphabet"/>
-        <FIELD NAME="alphabet" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="The language alphabet - comma separated list of characters, used for filtering of names, items etc." PREVIOUS="iso6392" NEXT="backupnameformat"/>
-        <FIELD NAME="backupnameformat" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The timestamp format to append by default to a backup file name" PREVIOUS="alphabet" NEXT="decsep"/>
-        <FIELD NAME="decsep" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Decimals separator when formatting grades and other decimal numbers" PREVIOUS="backupnameformat" NEXT="thousandssep"/>
-        <FIELD NAME="thousandssep" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Separator of thousands when formatting grades, currency and other numbers" PREVIOUS="decsep" NEXT="listsep"/>
-        <FIELD NAME="listsep" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="The default separator of the items in various lists" PREVIOUS="thousandssep" NEXT="firstdayofweek"/>
-        <FIELD NAME="firstdayofweek" TYPE="int" LENGTH="1" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" COMMENT="0 for Sunday, 1 for Monday" PREVIOUS="listsep" NEXT="locale"/>
-        <FIELD NAME="locale" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="UNIX locale for the given language" PREVIOUS="firstdayofweek" NEXT="localewin"/>
-        <FIELD NAME="localewin" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Windows locale of the given language" PREVIOUS="locale" NEXT="localewincharset"/>
-        <FIELD NAME="localewincharset" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Windows charset to use for the given language for purposes of converting into UTF8" PREVIOUS="localewin" NEXT="oldcharset"/>
-        <FIELD NAME="oldcharset" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The charset of the language used before Moodle switched into UTF8" PREVIOUS="localewincharset" NEXT="strftimedate"/>
-        <FIELD NAME="strftimedate" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Default date formatting string" PREVIOUS="oldcharset" NEXT="strftimedatefullshort"/>
-        <FIELD NAME="strftimedatefullshort" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Date formatting string using numbers" PREVIOUS="strftimedate" NEXT="strftimedateshort"/>
-        <FIELD NAME="strftimedateshort" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Date formatting string without a year" PREVIOUS="strftimedatefullshort" NEXT="strftimedatetime"/>
-        <FIELD NAME="strftimedatetime" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Default date+time formatting string" PREVIOUS="strftimedateshort" NEXT="strftimedatetimeshort"/>
-        <FIELD NAME="strftimedatetimeshort" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Compact date+time formatting string" PREVIOUS="strftimedatetime" NEXT="strftimedaydate"/>
-        <FIELD NAME="strftimedaydate" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Day of the week+date formatting string" PREVIOUS="strftimedatetimeshort" NEXT="strftimedaydatetime"/>
-        <FIELD NAME="strftimedaydatetime" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Day of the week+date+time formatting string" PREVIOUS="strftimedaydate" NEXT="strftimedayshort"/>
-        <FIELD NAME="strftimedayshort" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Day of the week+date without year format string" PREVIOUS="strftimedaydatetime" NEXT="strftimedaytime"/>
-        <FIELD NAME="strftimedaytime" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Day of the week+time formatting string" PREVIOUS="strftimedayshort" NEXT="strftimemonthyear"/>
-        <FIELD NAME="strftimemonthyear" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Month and year formatting string" PREVIOUS="strftimedaytime" NEXT="strftimerecent"/>
-        <FIELD NAME="strftimerecent" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Default date/time format string for recent activity reports" PREVIOUS="strftimemonthyear" NEXT="strftimerecentfull"/>
-        <FIELD NAME="strftimerecentfull" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Full date and time format for recent activity reports" PREVIOUS="strftimerecent" NEXT="strftimetime"/>
-        <FIELD NAME="strftimetime" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Time only formatting string" PREVIOUS="strftimerecentfull" NEXT="thisdirection"/>
-        <FIELD NAME="thisdirection" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Direction of writing the letters in the languages - ltr (left to right) or rtl (right to left)" PREVIOUS="strftimetime" NEXT="thisdirectionvertical"/>
-        <FIELD NAME="thisdirectionvertical" TYPE="char" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="The common book spin for the language - either ttb or btt" PREVIOUS="thisdirection" NEXT="parentlanguage"/>
-        <FIELD NAME="parentlanguage" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Then lang field of parent language" PREVIOUS="thisdirectionvertical" NEXT="maintainer"/>
-        <FIELD NAME="maintainer" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The name of the current maintainer of the language pack" PREVIOUS="parentlanguage" NEXT="maintaineremail"/>
-        <FIELD NAME="maintaineremail" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The public contact email address of the current maintainer" PREVIOUS="maintainer"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="source"/>
+        <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The source of this string - git, email etc." PREVIOUS="id" NEXT="timecommitted"/>
+        <FIELD NAME="timecommitted" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="source" NEXT="commitmsg"/>
+        <FIELD NAME="commitmsg" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Commit message" PREVIOUS="timecommitted" NEXT="commithash"/>
+        <FIELD NAME="commithash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="The git commit hash that introduced this string" PREVIOUS="commitmsg" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="If the author is known in the local user table, store their id here" PREVIOUS="commithash" NEXT="userinfo"/>
+        <FIELD NAME="userinfo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Helps to identify the author of the change, for example a name from CVS commit" PREVIOUS="userid"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="ux_lang"/>
-        <KEY NAME="ux_lang" TYPE="unique" FIELDS="lang" COMMENT="Unique index on the Moodle identifier of the language" PREVIOUS="primary" NEXT="fx_parent"/>
-        <KEY NAME="fx_parent" TYPE="foreign" FIELDS="parentlanguage" REFTABLE="amos_languages" REFFIELDS="lang" COMMENT="Foreign key to the parent language" PREVIOUS="ux_lang"/>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_languages">
+    <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_commits">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the translator's user account" PREVIOUS="id" NEXT="lang"/>

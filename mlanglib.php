@@ -122,6 +122,7 @@ class mlang_component {
             if (empty($timemodified)) {
                 $timemodified = filemtime($filepath);
             }
+            $a = ''; // empty placeholder to prevent PHP notices
             include($filepath);
         } else {
             throw new Exception('Strings definition file ' . $filepath . ' not readable');
@@ -183,7 +184,8 @@ class mlang_component {
             $params = array_merge($params, $inner_strparams, $outer_strparams);
         }
         if ($fullinfo) {
-            $sql = "SELECT r.*";
+            $sql = "SELECT r.id, r.commitid, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted,
+                           c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
         } else {
             $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted";
         }
@@ -205,14 +207,19 @@ class mlang_component {
                        AND r.lang = j.lang
                        AND r.component = j.component
                        AND r.stringid = j.stringid
-                       AND r.timemodified = j.timemodified)
-                 WHERE r.branch=:outer_branch
+                       AND r.timemodified = j.timemodified)";
+        if ($fullinfo) {
+            $sql .= "
+             LEFT JOIN {amos_commits} c
+                    ON (r.commitid = c.id)";
+        }
+        $sql.= " WHERE r.branch=:outer_branch
                        AND r.lang=:outer_lang
                        AND r.component=:outer_component";
         if (!empty($stringids)) {
             $sql .= "  AND r.stringid $outer_strsql";
         }
-        $sql .= " ORDER BY r.stringid, r.id";
+        $sql.= " ORDER BY r.stringid, r.id";
         $rs = $DB->get_recordset_sql($sql, $params);
         $component = new mlang_component($name, $lang, $version);
         foreach ($rs as $r) {
@@ -679,6 +686,11 @@ class mlang_stage {
                     // re-adding a deleted string - will be committed
                     continue;
                 }
+                if ($stagedstring->deleted && $capstring->deleted) {
+                    // do not record repeated removals
+                    $component->unlink_string($stagedstring->id);
+                    continue;
+                }
                 if (!mlang_string::differ($stagedstring, $capstring)) {
                     // the staged string is the same as the most recent one in the repository
                     $component->unlink_string($stagedstring->id);
@@ -701,46 +713,55 @@ class mlang_stage {
     /**
      * Commit the strings in the staging area, by default rebasing first
      *
+     * Meta information are the columns in amos_commits table: source, userinfo, commithash etc.
+     *
      * @param string $message commit message
      * @param array $meta optional meta information
      * @param bool $skiprebase if true, do not rebase before committing
      */
     public function commit($message='', array $meta=null, $skiprebase=false) {
+        global $DB;
+
         if (empty($skiprebase)) {
             $this->rebase();
         }
-        foreach ($this->components as $cx => $component) {
-            foreach ($component->get_iterator() as $string) {
-                $record = new stdclass();
-                if (!empty($meta)) {
-                    foreach ($meta as $field => $value) {
-                        $record->{$field} = $value;
-                    }
-                }
-                $record->branch     = $component->version->code;
-                $record->lang       = $component->lang;
-                $record->component  = $component->name;
-                $record->stringid   = $string->id;
-                $record->text       = $string->text;
-                $record->timemodified = $string->timemodified;
-                $record->deleted    = $string->deleted;
-                $record->commitmsg  = trim($message);
-
-                $this->commit_low_add($record);
-            }
+        if (empty($this->components)) {
+            // nothing to commit
+            return;
         }
-        $this->clear();
-    }
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $commit = new stdclass();
+            if (!empty($meta)) {
+                foreach ($meta as $field => $value) {
+                    $commit->{$field} = $value;
+                }
+            }
+            $commit->commitmsg = trim($message);
+            $commit->timecommitted = time();
+            $commit->id = $DB->insert_record('amos_commits', $commit);
 
-    /**
-     * Low level commit
-     *
-     * @param stdclass $record repository record to be inserted into strings database
-     * @return new record identifier
-     */
-    protected function commit_low_add(stdclass $record) {
-        global $DB;
-        return $DB->insert_record('amos_repository', $record);
+            foreach ($this->components as $cx => $component) {
+                foreach ($component->get_iterator() as $string) {
+                    $record = new stdclass();
+                    $record->commitid   = $commit->id;
+                    $record->branch     = $component->version->code;
+                    $record->lang       = $component->lang;
+                    $record->component  = $component->name;
+                    $record->stringid   = $string->id;
+                    $record->text       = $string->text;
+                    $record->timemodified = $string->timemodified;
+                    $record->deleted    = $string->deleted;
+
+                    $DB->insert_record('amos_repository', $record);
+                }
+            }
+            $transaction->allow_commit();
+            $this->clear();
+        } catch (Exception $e) {
+            // this is here in order not to clear the stage, just re-throw the exception
+            $transaction->rollback($e);
+        }
     }
 
     /**

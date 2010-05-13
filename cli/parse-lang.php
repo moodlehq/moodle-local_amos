@@ -25,12 +25,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+if (isset($_SERVER['REMOTE_ADDR'])) {
+    error_log('AMOS cli scripts can not be called via the web interface');
+    exit;
+}
+
 set_time_limit(0);
 $starttime = microtime();
-
-// this cron script might be considered to be a CLI script even when accessed over HTTP,
-// we do not want HTML in output and there is no real session ;-)
-define('CLI_SCRIPT', true);
 
 // Do not set moodle cookie because we do not need it here, it is better to emulate session
 define('NO_MOODLE_COOKIES', true);
@@ -39,21 +40,24 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-// send mime type and encoding
-if (check_browser_version('MSIE')) {
-    //ugly IE hack to work around downloading instead of viewing
-    @header('Content-Type: text/html; charset=utf-8');
-    echo "<xmp>"; //<pre> is not good enough for us here
-} else {
-    //send proper plaintext header
-    @header('Content-Type: text/plain; charset=utf-8');
+/**
+ * This is a helper function that just contains a block of code that needs to be
+ * executed from two different places in this script. Consider it more as C macro
+ * than a real function.
+ */
+function amos_parse_lang_commit() {
+    global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $startatlock;
+
+    $stage->rebase($timemodified, true, $timemodified);
+    $stage->commit($commitmsg, array(
+        'source' => 'git',
+        'userinfo' => $committer . ' <' . $committeremail . '>',
+        'commithash' => $commithash
+    ), true);
+
+    // remember the processed commithash
+    file_put_contents($startatlock, $commithash);
 }
-
-// no more headers and buffers
-while(@ob_end_flush());
-
-// increase memory limit (PHP 5.2 does different calculation, we need more memory now)
-@raise_memory_limit('128M');
 
 $tmp = make_upload_directory('amos/temp', false);
 $var = make_upload_directory('amos/var', false);
@@ -138,6 +142,7 @@ if ($gitstatus <> 0) {
     exit(1);
 }
 
+$stage = new mlang_stage();
 $commithash = '';
 foreach ($gitout as $line) {
     $line = trim($line);
@@ -147,7 +152,8 @@ foreach ($gitout as $line) {
     if (substr($line, 0, 7) == 'COMMIT:') {
         // remember the processed commithash
         if (!empty($commithash)) {
-            file_put_contents($startatlock, $commithash);
+            // new commit is here - if we have something to push into AMOS repository, do it now
+            amos_parse_lang_commit();
         }
         $commithash = substr($line, 7);
         continue;
@@ -229,10 +235,10 @@ foreach ($gitout as $line) {
         if (!isset($eng[$branch][$component->name])) {
             $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
         }
-        // keep just those defined in English on that branch - this is where we are replaying branching of lang packs
-        // strings deleted from English are are not marked as deleted in the translation yet - run rev-clean.php to
-        // propagate removal of English strings
-        // langconfig.php is not compared with English because it may contain extra string like parentlanguage
+        // keep just those defined in English on that branch - this is where we are reconstruct branching of lang packs.
+        // strings deleted from English are not marked as deleted in the translation yet - run rev-clean.php to
+        // propagate removal of English strings.
+        // langconfig.php is not compared with English because it may contain extra string like parentlanguage.
         if ($component->name !== 'langconfig') {
             $component->intersect($eng[$branch][$component->name]);
         } elseif ($version->code >= mlang_version::MOODLE_20) {
@@ -242,22 +248,12 @@ foreach ($gitout as $line) {
                 }
             }
         }
-        // and let us commit added/modified strings
-        $stage = new mlang_stage();
         $stage->add($component);
-        $stage->rebase($timemodified, true, $timemodified);
-        try {
-            $stage->commit($commitmsg, array(
-                    'source' => 'git',
-                    'userinfo' => $committer . ' <' . $committeremail . '>',
-                    'commithash' => $commithash
-                ), true);
-        } catch (dml_write_exception $e) {
-            echo "FAILED COMMIT $checkout\n";
-        }
         $component->clear();
         unset($component);
     }
     unlink($checkout);
 }
+// we just parsed the last git commit - let us commit what we have
+amos_parse_lang_commit();
 echo "DONE\n";
