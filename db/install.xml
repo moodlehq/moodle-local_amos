@@ -49,7 +49,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
-        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="uq_user_lang"/>
+        <KEY NAME="uq_user_lang" TYPE="unique" FIELDS="userid, lang" PREVIOUS="fk_user"/>
       </KEYS>
     </TABLE>
   </TABLES>

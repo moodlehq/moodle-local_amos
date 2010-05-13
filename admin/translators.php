@@ -25,7 +25,9 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once(dirname(dirname(__FILE__)).'/mlanglib.php');
-//require_once(dirname(dirname(__FILE__)).'/locallib.php');
+
+$add = optional_param('add', null, PARAM_INT);  // userid to grant privileges to edit a language
+$del = optional_param('del', null, PARAM_INT);  // userid to revoke privileges from editing a language
 
 require_login(SITEID, false);
 require_capability('local/amos:manage', get_system_context());
@@ -35,9 +37,38 @@ $PAGE->set_url('/local/amos/admin/translators.php');
 $PAGE->set_title('AMOS ADMIN Translators');
 $PAGE->set_heading('Translators');
 
+// available translators
+$available = get_users_by_capability(get_system_context(), 'local/amos:commit',
+        $fields='u.id,u.firstname,u.lastname,u.email', $sort='u.lastname,u.firstname');
+
+if (!empty($add) and array_key_exists($add, $available)) {
+    require_sesskey();
+    $lang = required_param('lang', PARAM_SAFEDIR);
+    if (empty($lang)) {
+        print_error('err_invalidlangcode', 'local_amos');
+    }
+    $DB->insert_record('amos_translators', (object)array('userid' => $add, 'lang' => $lang));
+    redirect($PAGE->url);
+}
+
+if (!empty($del)) {
+    require_sesskey();
+    $lang = required_param('lang', PARAM_SAFEDIR);
+    if (empty($lang)) {
+        print_error('err_invalidlangcode', 'local_amos');
+    }
+    $DB->delete_records('amos_translators', array('userid' => $del, 'lang' => $lang));
+    redirect($PAGE->url);
+}
+
+$options = array();
+foreach ($available as $userid => $user) {
+    $options[$userid] = fullname($user) . ' &lt;' . $user->email . '&gt;';
+}
+
 /// Output starts here
 echo $OUTPUT->header();
-$languages = array_merge(array('*' => '(All languages)'), mlang_tools::list_languages());
+$languages = array_merge(array('X' => '(All languages)'), mlang_tools::list_languages());
 foreach ($languages as $langcode => $langname) {
     $list[$langcode] = (object)array('langname' => $langname, 'translators' => array());
 }
@@ -52,11 +83,15 @@ foreach ($translators as $translator) {
         continue;
     }
     $name = $OUTPUT->user_picture($translator, array('size' => 20)).fullname($translator).' &lt;'.$translator->email.'&gt;';
-    $list[$translator->lang]->translators[$translator->id] = $name;
+    $url = new moodle_url($PAGE->url, array('lang' => $translator->lang, 'del' => $translator->id, 'sesskey' => sesskey()));
+    $delicon = $OUTPUT->action_icon($url, new pix_icon('t/delete', 'Revoke'));
+    $list[$translator->lang]->translators[$translator->id] = $name . $delicon;
 }
 $rows = array();
 foreach ($list as $langcode => $item) {
-    $rows[] = new html_table_row(array($langcode, $item->langname, implode("<br />\n", $item->translators)));
+    $url = new moodle_url($PAGE->url, array('lang' => $langcode, 'sesskey' => sesskey()));
+    $form = $OUTPUT->render(new single_select($url, 'add', array_diff_key($options, $item->translators)));
+    $rows[] = new html_table_row(array($langcode, $item->langname, $form . implode("<br />\n", $item->translators)));
 }
 $t = new html_table();
 $t->head = array('Code', 'Language', 'Allowed translators');
