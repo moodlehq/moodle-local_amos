@@ -61,7 +61,15 @@ if (has_capability('local/amos:stage', get_system_context())) {
     $caps[] = get_string('amos:stage', 'local_amos');
 }
 if (has_capability('local/amos:commit', get_system_context())) {
-    $caps[] = get_string('amos:commit', 'local_amos');
+    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    if (empty($allowed)) {
+        $allowed = 'no languages allowed - please contact AMOS manager';
+    } elseif (!empty($allowed['X'])) {
+        $allowed = 'all languages';
+    } else {
+        $allowed = implode(', ', $allowed);
+    }
+    $caps[] = get_string('amos:commit', 'local_amos') . ' (' . $allowed . ')';
 }
 if (empty($caps)) {
     echo 'You have read-only access to public information.';
