@@ -30,7 +30,7 @@
         <INDEX NAME="ix_timemodified" UNIQUE="false" FIELDS="timemodified" COMMENT="This index allows to search for the recent records in the log output" PREVIOUS="ix_lang"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_languages" COMMENT="The list of all languages known to Moodle" PREVIOUS="amos_repository">
+    <TABLE NAME="amos_languages" COMMENT="The list of all languages known to Moodle" PREVIOUS="amos_repository" NEXT="amos_translators">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Language code as is used in Moodle" PREVIOUS="id" NEXT="thislanguage"/>
@@ -71,6 +71,17 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="ux_lang"/>
         <KEY NAME="ux_lang" TYPE="unique" FIELDS="lang" COMMENT="Unique index on the Moodle identifier of the language" PREVIOUS="primary" NEXT="fx_parent"/>
         <KEY NAME="fx_parent" TYPE="foreign" FIELDS="parentlanguage" REFTABLE="amos_languages" REFFIELDS="lang" COMMENT="Foreign key to the parent language" PREVIOUS="ux_lang"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_languages">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the translator's user account" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="lang" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The language code that the translator is allowed to translate, or asterisk for all languages." PREVIOUS="userid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
   </TABLES>

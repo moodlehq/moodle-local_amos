@@ -32,7 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 function amos_extends_navigation(global_navigation $navigation) {
     $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'));
-    $amos->add('Translator', new moodle_url('/local/amos/view.php'));
-    $amos->add('Stage', new moodle_url('/local/amos/stage.php'));
+    if (has_capability('local/amos:stage', get_system_context())) {
+        $amos->add('Translator', new moodle_url('/local/amos/view.php'));
+        $amos->add('Stage', new moodle_url('/local/amos/stage.php'));
+    }
     $amos->add('Log', new moodle_url('/local/amos/log.php'));
+    if (has_capability('local/amos:manage', get_system_context())) {
+        $admin = $amos->add('Admin');
+        $admin->add('Translators', new moodle_url('/local/amos/admin/translators.php'));
+
+    }
 }
