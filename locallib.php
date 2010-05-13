@@ -491,8 +491,9 @@ class local_amos_stage implements renderable {
  * TODO: long description.
  */
 class local_amos_log implements renderable {
-    /** @var array of records to be displayed in the log */
-    public $records = array();
+
+    /** @var array of commit records to be displayed in the log */
+    public $commits = array();
 
     /**
      * TODO: short description.
@@ -500,6 +501,40 @@ class local_amos_log implements renderable {
      */
     public function __construct() {
         global $DB;
-        $this->records = $DB->get_records('amos_repository', null, 'timemodified DESC', '*', 0, 50);
+
+        $commitids = $DB->get_records('amos_commits', array(), 'timecommitted DESC', 'id', 0, 50);
+        list($csql, $params) = $DB->get_in_or_equal(array_keys($commitids));
+
+        $sql = "SELECT r.id, c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo,
+                       r.commitid, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted
+                  FROM {amos_commits} c
+                  JOIN {amos_repository} r
+                    ON (c.id = r.commitid)
+                 WHERE c.id $csql
+              ORDER BY c.timecommitted DESC, r.branch DESC, r.lang, r.component, r.stringid";
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $r) {
+            if (!isset($this->commits[$r->commitid])) {
+                $commit = new stdclass();
+                $commit->id = $r->commitid;
+                $commit->source = $r->source;
+                $commit->timecommitted = $r->timecommitted;
+                $commit->commitmsg = $r->commitmsg;
+                $commit->commithash = $r->commithash;
+                $commit->userid = $r->userid;
+                $commit->userinfo = $r->userinfo;
+                $commit->strings = array();
+                $this->commits[$r->commitid] = $commit;
+            }
+            $string = new stdclass();
+            $string->branch = mlang_version::by_code($r->branch)->label;
+            $string->component = $r->component;
+            $string->lang = $r->lang;
+            $string->stringid = $r->stringid;
+            $string->deleted = $r->deleted;
+            $this->commits[$r->commitid]->strings[] = $string;
+        }
+        $rs->close();
     }
 }

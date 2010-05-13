@@ -376,26 +376,34 @@ class local_amos_renderer extends plugin_renderer_base {
      */
     protected function render_local_amos_log(local_amos_log $log) {
         $output = $this->heading('TODO: there will be filter here');
-        foreach ($log->records as $record) {
-            if ($record->deleted) {
-                $o = "DELETED STRING";
-            } else {
-                $o = "ADDED/MODIFIED STRING";
+        foreach ($log->commits as $commit) {
+            $o  = '';
+            $o .= "Date:      " . self::commit_datetime($commit->timecommitted) . "\n";
+            $o .= "Author:    " . s($commit->userinfo) . "\n";
+            $o .= "Source:    " . $commit->source . "\n";
+            if ($commit->source == 'git') {
+                $o .= "Commit:    " . $commit->commithash . "\n";
             }
-            $o .= "\n\n";
-            $o .= "Date:      " . self::commit_datetime($record->timemodified) . "\n";
-            $o .= "Author:    " . s($record->userinfo) . "\n";
-            $o .= "Source:    " . $record->source . "\n";
-            if ($record->source == 'git') {
-                $o .= "Commit:    " . $record->commithash . "\n";
-            }
-            $o .= "Language:  " . $record->lang . "\n";
-            $o .= "Component: " . $record->component . "\n";
-            $o .= "Version:   " . mlang_version::by_code($record->branch)->label . "\n";
-            $o .= "String:    " . $record->stringid . "\n";
             $o .= "\n";
-            $o .= s($record->commitmsg);
-
+            $o .= s($commit->commitmsg);
+            $o .= "\n";
+            $o .= "\n";
+            foreach ($commit->strings as $string) {
+                if ($string->deleted) {
+                    $o .= "- ";
+                } else {
+                    $o .= "+ ";
+                }
+                list($type, $plugin) = normalize_component($string->component);
+                if ($type == 'core' and is_null($plugin)) {
+                    $component = 'core';
+                } else {
+                    $component = $type . '_' . $plugin;
+                }
+                $o .= sprintf('%4s', $string->branch) . ' ';
+                $o .= sprintf('%-5s', $string->lang) . ' ';
+                $o .= ' [' . $component . ',' . $string->stringid . "]\n";
+            }
             $output .= html_writer::tag('pre', $o, array('class' => 'logrecord'));
         }
         return $output;
