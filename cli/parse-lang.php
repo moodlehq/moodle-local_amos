@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 function amos_parse_lang_commit() {
     global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $checkout, $startatlock;
 
-    $stage->rebase($timemodified, true, $timemodified);
+    $stage->rebase();
     try {
         $stage->commit($commitmsg, array(
             'source' => 'git',
@@ -234,9 +234,6 @@ foreach ($gitout as $line) {
                                                    mlang_component::name_from_filename($file), 1);
         // get the most recent snapshot of English strings including those deleted
         // beware - we are caching the English snapshots so do not modify English strings while migrating langs
-        if (!isset($eng[$branch])) {
-            $eng[$branch] = array();
-        }
         if (!isset($eng[$branch][$component->name])) {
             $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
         }
