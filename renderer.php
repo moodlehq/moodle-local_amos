@@ -245,7 +245,7 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         $output = '';
         if ($current > 1) {
-            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), '&lt;&lt; '));
+            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => $current - 1)), '&lt;&lt; '));
         }
         for ($i = 1; $i <= $numofpages; $i++) {
             if ($i == $current) {
@@ -258,7 +258,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $output .= ' ' . $link;
         }
         if ($current < $numofpages) {
-            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => $numofpages)), '&gt;&gt; '));
+            $output .= html_writer::tag('span', html_writer::link(new moodle_url($PAGE->url, array('fpg' => $current + 1)), '&gt;&gt; '));
         }
         return $output;
     }
