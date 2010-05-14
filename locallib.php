@@ -291,6 +291,7 @@ class local_amos_translator implements renderable {
                 $string->amosid = null;
                 $string->text = $staged->text;
                 $string->timemodified = $staged->timemodified;
+                $string->timeupdated = $r->timemodified;
                 $string->class = 'staged';
                 $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
             }
@@ -328,12 +329,18 @@ class local_amos_translator implements renderable {
                                 } else {
                                     $string->class = 'translated';
                                 }
+                                if ($string->originalmodified > max($string->timemodified, $string->timeupdated)) {
+                                    $string->outdated = true;
+                                } else {
+                                    $string->outdated = false;
+                                }
                             } else {
                                 $string->translation = null;
                                 $string->translationid = null;
                                 $string->timemodified = null;
                                 $string->timeupdated = null;
                                 $string->class = 'missing';
+                                $string->outdated = false;
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
                             if (!empty($substring)) {
@@ -353,7 +360,7 @@ class local_amos_translator implements renderable {
                                         // outdated
                                         continue; // do not display this string
                                     }
-                                    if ($string->originalmodified < max($string->timemodified, $string->timeupdated)) {
+                                    if (empty($string->outdated)) {
                                         continue; // it is considered up-top-date - do not display it
                                     }
                                 }

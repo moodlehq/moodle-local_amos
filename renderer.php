@@ -207,12 +207,24 @@ class local_amos_renderer extends plugin_renderer_base {
             $sid = local_amos_translator::encode_identifier($string->language, $string->originalid, $string->translationid);
             $t = html_writer::tag('div', $t, array('class' => 'preformatted translation-view'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
-            $cells[5] = new html_table_cell($t . $i);
+            if ($string->outdated and $string->committable and $string->translation) {
+                $c  = html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'update_' . $string->translationid,
+                        'name' => 'updates[]', 'value' => $string->translationid));
+                $help = $this->help_icon('markuptodate', 'local_amos');
+                $c .= html_writer::tag('label', 'mark as up-to-date' . $help, array('for' => 'update_' . $string->translationid));
+                $c  = html_writer::tag('div', $c, array('class' => 'uptodatewrapper'));
+            } else {
+                $c = '';
+            }
+            $cells[5] = new html_table_cell($t . $c . $i);
             $cells[5]->id = $sid;
             $cells[5]->attributes['class'] = $string->class;
             $cells[5]->attributes['class'] .= ' translateable';
             if ($string->committable) {
                 $cells[5]->attributes['class'] .= ' committable';
+            }
+            if ($string->outdated) {
+                $cells[5]->attributes['class'] .= ' outdated';
             }
             $row = new html_table_row($cells);
             $table->data[] = $row;

@@ -31,11 +31,15 @@ $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
+$string['markuptodate'] = 'Marking the translation as up-to-date';
+$string['markuptodate_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Review the translation. If you find it up-to-date, click the checkbox. Edit it otherwise.';
+$string['markuptodate_link'] = 'local/amos/outdatedstrings';
 $string['pluginname'] = 'AMOS';
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 
 * Green - the string is already translated and you are allowed to modify the translation and commit it.
+* Yellow - the string is committable but may be out-dated. The English version could be modified after the string had been translated.
 * Red - the string is not translated and you are allowed to translate it and commit the translation.
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';

@@ -71,7 +71,20 @@ M.local_amos.init_translator = function(Y) {
         // in case of missing strings, turn editing mode on by default
         var missing = translator.all('.committable.missing.translation');
         missing.each(function(cell) { M.local_amos.editor_on(cell); });
+        // catch all clicks to up-to-date marker
+        var updaters = translator.all('.uptodatewrapper input, .uptodatewrapper label');
+        updaters.on('click', M.local_amos.mark_update);
     }
+}
+
+M.local_amos.mark_update = function(e) {
+    var checkbox = e.currentTarget;
+    var amosid = checkbox.get('id').split('_', 2)[1];
+    var checked  = checkbox.get('checked');
+    if (checked) {
+        M.local_amos.uptodate(amosid);
+    }
+    e.stopPropagation();
 }
 
 /**
@@ -101,6 +114,10 @@ M.local_amos.editor_on = function(cell, focus) {
     }
     current.setStyle('display', 'none');
     Y.detach('click', M.local_amos.make_editable, cell);
+    var updater = cell.one('.uptodatewrapper');
+    if (updater) {
+        updater.setStyle('display', 'none');
+    }
 }
 
 /**
@@ -143,6 +160,10 @@ M.local_amos.editor_blur = function(e) {
     if (Y.Lang.trim(oldtext) == Y.Lang.trim(newtext)) {
         // no change
         M.local_amos.editor_off(cell, null, null);
+        var updater = cell.one('.uptodatewrapper');
+        if (updater) {
+            updater.setStyle('display', 'block');
+        }
     } else {
         editor.set('disabled', true);
         M.local_amos.submit(cell, editor);
@@ -161,7 +182,6 @@ M.local_amos.submit = function(cell, editor) {
         method: 'POST',
         data: 'stringid=' + cell.get('id') + '&text=' + encodeURIComponent(editor.get('value')) + '&sesskey=' + M.cfg.sesskey,
         on: {
-            start   : M.local_amos.submit_start,
             success : M.local_amos.submit_success,
             failure : M.local_amos.submit_failure,
         },
@@ -205,10 +225,72 @@ M.local_amos.submit_failure = function(tid, outcome, args) {
 
 M.local_amos.init_stage = function(Y) {
     M.local_amos.Y  = Y;
-
     Y.all('.stagewrapper form').on('submit', function(e) {
         if (!confirm('This can not be undone. Are you sure?')) {
             e.halt();
         }
     });
+}
+
+/**
+ * Send AJAX request to mark a translation as up-to-date
+ *
+ * @param {String} amosid the identifer of the string in amos_repository table
+ */
+M.local_amos.uptodate = function(amosid) {
+    var Y = M.local_amos.Y;
+    // stop the IO queue so we can add to it
+    Y.io.queue.stop();
+
+    // configure the async request
+    var uri = M.cfg.wwwroot + '/local/amos/uptodate.ajax.php';
+    var cfg = {
+        method: 'POST',
+        data: 'amosid=' + amosid + '&sesskey=' + M.cfg.sesskey,
+        on: {
+            success : M.local_amos.uptodate_success,
+            failure : M.local_amos.uptodate_failure,
+        },
+        arguments: {
+            amosid: amosid,
+        }
+    };
+
+    // add a new async request into the queue
+    Y.io.queue(uri, cfg);
+
+    // re-start queue processing
+    Y.io.queue.start();
+}
+
+/**
+ * Callback function for IO transaction
+ *
+ * @param {Int} tid transaction identifier
+ * @param {Object} outcome from server
+ * @param {Mixed} args
+ */
+M.local_amos.uptodate_success = function(tid, outcome, args) {
+    var Y = M.local_amos.Y;
+    var amosid = args.amosid;
+
+    try {
+        outcome = Y.JSON.parse(outcome.responseText);
+    } catch(e) {
+        alert('AJAX error - can not parse response');
+        return;
+    }
+
+    var timeupdated = outcome.timeupdated;
+    if (timeupdated > 0) {
+        var translator = Y.one('#amostranslator');
+        var checkbox = translator.one('#update_' + amosid);
+        var cell = checkbox.get('parentNode').get('parentNode');
+        checkbox.get('parentNode').remove(); // remove whole wrapping div
+        cell.removeClass('outdated');
+    }
+}
+
+M.local_amos.uptodate_failure = function(tid, outcome, args) {
+    alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
 }

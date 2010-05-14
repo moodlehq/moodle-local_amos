@@ -130,8 +130,18 @@
     background-color: #e7f1c3;
 }
 
-.path-local-amos #amostranslator .translation.staged {
+.path-local-amos #amostranslator .translation.committable.outdated {
+    background-color: #f3f2aa;
+}
+
+.path-local-amos #amostranslator .translation.staged,
+.path-local-amos #amostranslator .translation.staged.outdated {
     background-color: #d2ebff;
+}
+
+.path-local-amos #amostranslator .uptodatewrapper {
+    margin: 5px 0px 0px;
+    text-align: right;
 }
 
 .path-local-amos #amostranslator .stringinfo .metainfo {
