@@ -86,6 +86,8 @@ foreach ($tree as $vercode => $languages) {
                             $stage->add($other);
                         }
                     }
+                    $other->clear();
+                    unset($other);
                 }
                 $stage->rebase();
                 if ($stage->has_component()) {
@@ -93,13 +95,13 @@ foreach ($tree as $vercode => $languages) {
                     $msg = <<<EOF
 Propagating removal of the string
 
-The string {$string->id} was removed from the English language pack by
+The string '{$string->id}' was removed from the English language pack by
 {$string->extra->userinfo} at {$string->timemodified}. Their commit message was:
 {$string->extra->commitmsg}
 {$string->extra->commithash}
 EOF;
                     echo "COMMIT removal of '{$string->id}' from '{$english->name}'\n";
-                    $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
+                    $stage->commit($msg, array('source' => 'revclean', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
                 }
                 $stage->clear();
                 unset($stage);
