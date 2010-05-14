@@ -430,20 +430,15 @@ class local_amos_stage implements renderable {
 
         $this->strings = array();
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
-        $needed = array();
+        $needed = array();  // describes all strings that we will have to load to displaye the stage
 
         foreach($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {
-                if (!isset($needed[$component->version->code])) {
-                    $needed[$component->version->code] = array();
-                }
-                if (!isset($needed[$component->version->code][$component->lang])) {
-                    $needed[$component->version->code][$component->lang] = array();
-                }
                 if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
                     $needed[$component->version->code][$component->lang][$component->name] = array();
                 }
                 $needed[$component->version->code][$component->lang][$component->name][] = $staged->id;
+                $needed[$component->version->code]['en'][$component->name][] = $staged->id;
                 $string = new stdclass();
                 $string->component = $component->name;
                 $string->branch = $component->version->code;
@@ -464,8 +459,6 @@ class local_amos_stage implements renderable {
                 foreach ($components as $component => $strings) {
                     $needed[$branch][$language][$component] = mlang_component::from_snapshot($component,
                             $language, mlang_version::by_code($branch), null, false, false, $strings);
-                    $needed[$branch]['en'][$component] = mlang_component::from_snapshot($component,
-                            'en', mlang_version::by_code($branch), null, false, false, $strings);
                 }
             }
         }
