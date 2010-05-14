@@ -234,7 +234,7 @@ class local_amos_translator implements renderable {
         list($outer_sqlbranches, $outer_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'outerbranch00000');
         list($outer_sqllanguages, $outer_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'outerlang00000');
         list($outer_sqlcomponents, $outer_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'outercomp00000');
-        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified
+        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated
                   FROM {amos_repository} r
                   JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
                           FROM {amos_repository}
@@ -277,6 +277,7 @@ class local_amos_translator implements renderable {
                 $string->amosid = $r->id;
                 $string->text = $r->text;
                 $string->timemodified = $r->timemodified;
+                $string->timeupdated = $r->timeupdated;
                 $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
             }
         }
@@ -321,6 +322,7 @@ class local_amos_translator implements renderable {
                                 $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
                                 $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
                                 $string->timemodified = $s[$lang][$component][$stringid][$branchcode]->timemodified;
+                                $string->timeupdated = $s[$lang][$component][$stringid][$branchcode]->timeupdated;
                                 if (isset($s[$lang][$component][$stringid][$branchcode]->class)) {
                                     $string->class = $s[$lang][$component][$stringid][$branchcode]->class;
                                 } else {
@@ -330,26 +332,29 @@ class local_amos_translator implements renderable {
                                 $string->translation = null;
                                 $string->translationid = null;
                                 $string->timemodified = null;
+                                $string->timeupdated = null;
                                 $string->class = 'missing';
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
                                 if (!strstr($string->original, $substring) and !strstr($string->translation, $substring)) {
-                                    continue;
+                                    continue; // do not display this strings
                                 }
                             }
-                            if (!empty($missing)) {
+                            if ($missing) {
                                 // missing or outdated string only
-                                // English UTF-8 strings were added on Mon Feb 6 09:28:59 2006 by moodler (1139218139)
-                                // UTF-8 translations were added earlier on Tue Dec 6 23:13:15 2005 by Eloy. Therefore
-                                // if the original was part of the initial Martin's commit, it is considered to be older
-                                // even if the timemodified is later. Otherwise AMOS would report almost all strings
-                                // outdated
                                 if (!empty($string->translation)) {
-                                    if (($string->originalmodified == 1139218139) or ($string->originalmodified < $string->timemodified)) {
-                                        // such a string is considered up-to-date
-                                        continue;
+                                    if ($string->originalmodified == 1139218139) {
+                                        // English UTF-8 strings were added on Mon Feb 6 09:28:59 2006 by moodler (1139218139)
+                                        // UTF-8 translations were added earlier on Tue Dec 6 23:13:15 2005 by Eloy. Therefore
+                                        // if the original was part of the initial Martin's commit, it is considered to be older
+                                        // even if the timemodified is later. Otherwise AMOS would report almost all strings
+                                        // outdated
+                                        continue; // do not display this string
+                                    }
+                                    if ($string->originalmodified < max($string->timemodified, $string->timeupdated)) {
+                                        continue; // it is considered up-top-date - do not display it
                                     }
                                 }
                             }
