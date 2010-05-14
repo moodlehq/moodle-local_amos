@@ -404,7 +404,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $o .= sprintf('%-8s', $string->lang) . ' ';
                 $o .= ' [' . $component . ',' . $string->stringid . "]\n";
             }
-            $output .= html_writer::tag('pre', $o, array('class' => 'logrecord'));
+            $output .= html_writer::tag('pre', $o, array('class' => 'preformatted logrecord'));
         }
         return $output;
     }
