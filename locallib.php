@@ -338,7 +338,7 @@ class local_amos_translator implements renderable {
                             unset($s[$lang][$component][$stringid][$branchcode]);
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
-                                if (!strstr($string->original, $substring) and !strstr($string->translation, $substring)) {
+                                if (!stristr($string->original, $substring) and !stristr($string->translation, $substring)) {
                                     continue; // do not display this strings
                                 }
                             }
