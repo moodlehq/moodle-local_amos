@@ -253,6 +253,8 @@ class local_amos_translator implements renderable {
                        AND r.deleted = 0";
         if ($helps) {
             $sql .= "      AND r.stringid LIKE '%\\\\_help'";
+        } else {
+            $sql .= "      AND r.stringid NOT LIKE '%\\\\_link'";
         }
         if ($stringid) {
             $sql .= "      AND r.stringid = :stringid";
