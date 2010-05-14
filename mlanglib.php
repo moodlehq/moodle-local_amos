@@ -1057,10 +1057,11 @@ class mlang_tools {
      * The language must have defined its name in langconfig. This method takes the value from the most
      * recent branch and time stamp.
      *
+     * @param bool $english shall the English be included?
      * @param bool $usecache can the internal cache be used?
      * @return array (string)langcode => (string)langname
      */
-    public static function list_languages($usecache=true) {
+    public static function list_languages($english=true, $usecache=true) {
         global $DB;
         static $cache = null;
 
@@ -1082,7 +1083,11 @@ class mlang_tools {
             $rs->close();
         }
 
-        return $cache;
+        if ($english) {
+            return $cache;
+        } else {
+            return array_diff($cache, array('en' => 'English'));
+        }
     }
 
     /**
@@ -1270,7 +1275,7 @@ class mlang_tools {
      */
     protected static function copy_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
         $stage = new mlang_stage();
-        foreach (array_keys(self::list_languages()) as $lang) {
+        foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
             $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
             if ($from->has_string($fromstring) and !$to->has_string($tostring)) {
@@ -1299,7 +1304,7 @@ class mlang_tools {
      */
     protected static function move_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
         $stage = new mlang_stage();
-        foreach (array_keys(self::list_languages()) as $lang) {
+        foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
             $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
             if ($src = $from->get_string($fromstring)) {
@@ -1333,7 +1338,7 @@ class mlang_tools {
         require_once($CFG->dirroot . '/local/amos/cli/config.php');
 
         $stage = new mlang_stage();
-        foreach (array_keys(self::list_languages()) as $lang) {
+        foreach (array_keys(self::list_languages(false)) as $lang) {
             $fullpath = AMOS_REPO_LANGS . '/' . $lang . '_utf8/help/' . $helpfile;
             if (! is_readable($fullpath)) {
                 continue;
