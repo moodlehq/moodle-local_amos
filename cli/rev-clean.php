@@ -71,18 +71,25 @@ foreach ($tree as $vercode => $languages) {
                 continue;
             }
             if ($string->deleted) {
-                $string->timemodified = local_amos_renderer::commit_datetime($string->timemodified);
+                // propagate removal of this string to all other languages where it is present
                 $stage = new mlang_stage();
                 foreach (array_keys($tree[$vercode]) as $otherlang) {
                     if ($otherlang == 'en') {
                         continue;
                     }
-                    $other = new mlang_component($english->name, $otherlang, $english->version);
-                    $other->add_string(new mlang_string($string->id, '[deleted]', null, 1));
-                    $stage->add($other);
+                    $other = mlang_component::from_snapshot($componentname, $otherlang, $version, null, true, false, array($string->id));
+                    if ($other->has_string($string->id)) {
+                        $current = $other->get_string($string->id);
+                        if (!$current->deleted) {
+                            $current->deleted = true;
+                            $current->timestamp = null;
+                            $stage->add($other);
+                        }
+                    }
                 }
                 $stage->rebase();
                 if ($stage->has_component()) {
+                    $string->timemodified = local_amos_renderer::commit_datetime($string->timemodified);
                     $msg = <<<EOF
 Propagating removal of the string
 
