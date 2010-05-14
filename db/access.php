@@ -34,11 +34,13 @@ $capabilities = array(
         'legacy' => array()
     ),
 
-    // Ability to stage translations using the translation tool or via uploading a file
+    // Ability to stage translations using the translation tool
     'local/amos:stage' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
     ),
 
     // Ability to commit the stage into AMOS repository
