@@ -351,18 +351,8 @@ class local_amos_translator implements renderable {
                             }
                             if ($missing) {
                                 // missing or outdated string only
-                                if (!empty($string->translation)) {
-                                    if ($string->originalmodified == 1139218139) {
-                                        // English UTF-8 strings were added on Mon Feb 6 09:28:59 2006 by moodler (1139218139)
-                                        // UTF-8 translations were added earlier on Tue Dec 6 23:13:15 2005 by Eloy. Therefore
-                                        // if the original was part of the initial Martin's commit, it is considered to be older
-                                        // even if the timemodified is later. Otherwise AMOS would report almost all strings
-                                        // outdated
-                                        continue; // do not display this string
-                                    }
-                                    if (empty($string->outdated)) {
-                                        continue; // it is considered up-top-date - do not display it
-                                    }
+                                if ($string->translation and !$string->outdated) {
+                                    continue; // it is considered up-top-date - do not display it
                                 }
                             }
                             $this->numofrows++;
