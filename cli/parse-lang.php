@@ -232,17 +232,12 @@ foreach ($gitout as $line) {
         // get the translated strings from PHP file - the lang repository in in 1.x format
         $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified,
                                                    mlang_component::name_from_filename($file), 1);
-        // get the most recent snapshot of English strings including those deleted
-        // beware - we are caching the English snapshots so do not modify English strings while migrating langs
-        if (!isset($eng[$branch][$component->name])) {
-            $eng[$branch][$component->name] = mlang_component::from_snapshot($component->name, 'en', $version, null, true);
-        }
+        $encomponent = mlang_component::from_snapshot($component->name, 'en', $version, $timemodified);
+
         // keep just those defined in English on that branch - this is where we are reconstruct branching of lang packs.
-        // strings deleted from English are not marked as deleted in the translation yet - run rev-clean.php to
-        // propagate removal of English strings.
         // langconfig.php is not compared with English because it may contain extra string like parentlanguage.
         if ($component->name !== 'langconfig') {
-            $component->intersect($eng[$branch][$component->name]);
+            $component->intersect($encomponent);
         } elseif ($version->code >= mlang_version::MOODLE_20) {
             if ($parentlanguage = $component->get_string('parentlanguage')) {
                 if (substr($parentlanguage->text, -5) == '_utf8') {
