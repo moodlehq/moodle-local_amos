@@ -391,7 +391,7 @@ class local_amos_translator implements renderable {
         if (empty($amosid_original) && ($amosid_original !== 0)) {
             throw new coding_exception('Illegal AMOS string identifier passed');
         }
-        return $lang . '_' . $amosid_original . '_' . $amosid_translation;
+        return $lang . '___' . $amosid_original . '___' . $amosid_translation;
     }
 
     /**
@@ -401,7 +401,7 @@ class local_amos_translator implements renderable {
      * @return array of (string)lang, (int)amosid_original, (int)amosid_translation
      */
     public static function decode_identifier($encoded) {
-        $parts = split('_', $encoded, 3);
+        $parts = split('___', $encoded, 3);
         if (count($parts) < 2) {
             throw new coding_exception('Invalid encoded identifier supplied');
         }
