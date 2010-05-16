@@ -43,7 +43,7 @@ $available = get_users_by_capability(get_system_context(), 'local/amos:commit',
 
 if (!empty($add) and array_key_exists($add, $available)) {
     require_sesskey();
-    $lang = required_param('lang', PARAM_SAFEDIR);
+    $lang = required_param('langcode', PARAM_SAFEDIR);
     if (empty($lang)) {
         print_error('err_invalidlangcode', 'local_amos');
     }
@@ -53,7 +53,7 @@ if (!empty($add) and array_key_exists($add, $available)) {
 
 if (!empty($del)) {
     require_sesskey();
-    $lang = required_param('lang', PARAM_SAFEDIR);
+    $lang = required_param('langcode', PARAM_SAFEDIR);
     if (empty($lang)) {
         print_error('err_invalidlangcode', 'local_amos');
     }
@@ -83,13 +83,13 @@ foreach ($translators as $translator) {
         continue;
     }
     $name = $OUTPUT->user_picture($translator, array('size' => 20)).fullname($translator).' &lt;'.$translator->email.'&gt;';
-    $url = new moodle_url($PAGE->url, array('lang' => $translator->lang, 'del' => $translator->id, 'sesskey' => sesskey()));
+    $url = new moodle_url($PAGE->url, array('langcode' => $translator->lang, 'del' => $translator->id, 'sesskey' => sesskey()));
     $delicon = $OUTPUT->action_icon($url, new pix_icon('t/delete', 'Revoke'));
     $list[$translator->lang]->translators[$translator->id] = $name . $delicon;
 }
 $rows = array();
 foreach ($list as $langcode => $item) {
-    $url = new moodle_url($PAGE->url, array('lang' => $langcode, 'sesskey' => sesskey()));
+    $url = new moodle_url($PAGE->url, array('langcode' => $langcode, 'sesskey' => sesskey()));
     $form = $OUTPUT->render(new single_select($url, 'add', array_diff_key($options, $item->translators)));
     $rows[] = new html_table_row(array($langcode, $item->langname, $form . implode("<br />\n", $item->translators)));
 }
