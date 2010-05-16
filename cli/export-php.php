@@ -58,10 +58,13 @@ remove_dir(AMOS_EXPORT_DIR, true);
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     foreach ($languages as $langcode => $components) {
+        if ($langcode == 'en') {
+            continue;
+        }
         foreach ($components as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->get_phpfile_location();
+                $file = AMOS_EXPORT_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->get_phpfile_location(false);
                 if (!file_exists(dirname($file))) {
                     mkdir(dirname($file), 0772, true);
                 }
