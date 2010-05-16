@@ -291,7 +291,7 @@ class local_amos_translator implements renderable {
                 $string->amosid = null;
                 $string->text = $staged->text;
                 $string->timemodified = $staged->timemodified;
-                $string->timeupdated = $r->timemodified;
+                $string->timeupdated = $staged->timemodified;
                 $string->class = 'staged';
                 $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
             }
