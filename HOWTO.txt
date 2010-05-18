@@ -17,8 +17,10 @@ HOW TO REPOPULATE THE HISTORY AGAIN
 
 Reinstall the plugin via Moodle interface to cleanup DB tables and run
 
+$ crontab -e
 $ rm /var/www/data/moodle-amos/amos/var/*
-$ php cli/parse-core.php && php cli/parse-lang.php && echo 61bb07c2573ec711a0e5d1ccafa313cf47b9fc22 > /var/www/data/moodle-amos/amos/var/MOODLE_20_STABLE.startat && php cli/parse-core.php && php cli/rev-clean.php --help
+$ php cli/parse-core.php && php cli/parse-lang.php && echo 61bb07c2573ec711a0e5d1ccafa313cf47b9fc22 > /var/www/data/moodle-amos/amos/var/MOODLE_20_STABLE.startat && php cli/parse-core.php && php cli/rev-clean.php --full
+$ crontab -e
 
 HOW TO KEEP AMOS DATA UP-TO-UPDATE
 ==================================
