@@ -414,7 +414,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 }
                 $o .= sprintf('%4s', $string->branch) . ' ';
                 $o .= sprintf('%-8s', $string->lang) . ' ';
-                $o .= ' [' . $component . ',' . $string->stringid . "]\n";
+                $o .= ' [' . $string->stringid . ',' . $component . "]\n";
             }
             $output .= html_writer::tag('pre', $o, array('class' => 'preformatted logrecord'));
         }
