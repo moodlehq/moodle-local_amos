@@ -106,7 +106,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, 'help strings only');
         $fhlp    = html_writer::tag('div', $fhlp, array('class' => 'labelled_checkbox'));
 
-        $output .= html_writer::tag('div', $fmis . $fhlp, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
+        $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, 'staged strings only');
+        $fstg    = html_writer::tag('div', $fstg, array('class' => 'labelled_checkbox'));
+
+        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
@@ -310,16 +313,13 @@ class local_amos_renderer extends plugin_renderer_base {
             $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
             $t2 = s($string->new);
             $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
-            $unstage  = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'unstage', 'value' => $string->stringid));
-            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'component', 'value' => $string->component));
-            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'branch', 'value' => $string->branch));
-            $unstage .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'lang', 'value' => $string->language));
-            $unstage .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Unstage'));
-            $unstage = html_writer::tag('div', $unstage);
-            $unstage = html_writer::tag('form', $unstage, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-            $unstage = html_writer::tag('div', $unstage, array('class' => 'unstagewrapper'));
-            $cells[5] = new html_table_cell($t2 . $t1 . $unstage);
+            $unstageurl = new moodle_url('/local/amos/stage.php', array(
+                    'unstage'   => $string->stringid,
+                    'component' => $string->component,
+                    'branch'    => $string->branch,
+                    'lang'      => $string->language));
+            $unstagebutton = $this->single_button($unstageurl, 'Unstage', 'post', array('class' => 'singlebutton protected'));
+            $cells[5] = new html_table_cell($t2 . $t1 . $unstagebutton);
             if ($string->committable and !(trim($string->current) === trim($string->new))) {
                 $cells[5]->attributes['class'] .= ' committable';
                 $committable++;
@@ -338,14 +338,33 @@ class local_amos_renderer extends plugin_renderer_base {
         $button = html_writer::tag('div', $button);
         $commitform = html_writer::tag('div', $commitform . $button);
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper'));
+        $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper protected'));
 
-        $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1, 'sesskey' => sesskey()));
-        $prunebutton = $this->single_button($pruneurl, 'Prune');
+        $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1));
+        $prunebutton = $this->single_button($pruneurl, 'Prune non-committable', 'post', array('class'=>'singlebutton protected'));
 
-        $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1, 'sesskey' => sesskey()));
-        $rebasebutton = $this->single_button($rebaseurl, 'Rebase');
+        $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1));
+        $rebasebutton = $this->single_button($rebaseurl, 'Rebase', 'post', array('class'=>'singlebutton protected'));
 
+        $i = 0;
+        foreach ($stage->filterfields->fver as $fver) {
+            $params['fver['.$i.']'] = $fver;
+            $i++;
+        }
+        $i = 0;
+        foreach ($stage->filterfields->flng as $flng) {
+            $params['flng['.$i.']'] = $flng;
+            $i++;
+        }
+        $i = 0;
+        foreach ($stage->filterfields->fcmp as $fcmp) {
+            $params['fcmp['.$i.']'] = $fcmp;
+            $i++;
+        }
+        $params['fstg'] = 1;
+        $params['__lazyform_amosfilter'] = 1;
+        $editurl = new moodle_url('/local/amos/view.php', $params);
+        $editbutton = $this->single_button($editurl, 'Edit staged strings');
 
         $output = $this->heading('There are ' . count($stage->strings) . ' staged strings, ' . $committable . ' of them can be committed.');
         if ($committable) {
@@ -354,7 +373,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         if (!empty($stage->strings)) {
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend . $prunebutton . $rebasebutton, array('class' => 'actionbuttons'));
+            $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton, array('class' => 'actionbuttons'));
             $output .= $table;
         }
         $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));

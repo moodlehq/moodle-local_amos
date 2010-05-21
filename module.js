@@ -354,7 +354,7 @@ M.local_amos.uptodate_failure = function(tid, outcome, args) {
 M.local_amos.init_stage = function(Y) {
     M.local_amos.Y  = Y;
     // protect from accidental submissions
-    Y.all('.stagewrapper form').on('submit', function(e) {
+    Y.all('.stagewrapper .protected form').on('submit', function(e) {
         if (!confirm('This can not be undone. Are you sure?')) {
             e.halt();
         }

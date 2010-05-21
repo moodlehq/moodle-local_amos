@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'page');
+        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'stagedonly', 'page');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -133,6 +133,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->stringid)) {
             $data->stringid = '';
         }
+        if (is_null($data->stagedonly)) {
+            $data->stagedonly = false;
+        }
         if (is_null($data->page)) {
             $data->page = 1;
         }
@@ -185,6 +188,7 @@ class local_amos_filter implements renderable {
         $data->helps        = optional_param('fhlp', false, PARAM_BOOL);
         $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
         $data->stringid     = trim(optional_param('fsid', '', PARAM_STRINGID));
+        $data->stagedonly   = optional_param('fstg', false, PARAM_BOOL);
 
         return $data;
     }
@@ -228,6 +232,7 @@ class local_amos_translator implements renderable {
         $helps      = $filter->get_data()->helps;
         $substring  = $filter->get_data()->substring;
         $stringid   = $filter->get_data()->stringid;
+        $stagedonly = $filter->get_data()->stagedonly;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
@@ -343,6 +348,10 @@ class local_amos_translator implements renderable {
                                 $string->outdated = false;
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
+
+                            if ($stagedonly and $string->class != 'staged') {
+                                continue;   // do not display this string
+                            }
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
                                 if (!stristr($string->original, $substring) and !stristr($string->translation, $substring)) {
@@ -426,6 +435,9 @@ class local_amos_stage implements renderable {
     /** @var array of stdclass to be rendered */
     public $strings;
 
+    /** @var stdclass holds the info needed to mimic a filter form */
+    public $filterfields;
+
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -458,14 +470,23 @@ class local_amos_stage implements renderable {
                 $this->strings[] = $string;
             }
         }
+        $fver = array();
+        $flng = array();
+        $fcmp = array();
         foreach ($needed as $branch => $languages) {
+            $fver[$branch] = true;
             foreach ($languages as $language => $components) {
+                $flng[$language] = true;
                 foreach ($components as $component => $strings) {
+                    $fcmp[$component] = true;
                     $needed[$branch][$language][$component] = mlang_component::from_snapshot($component,
                             $language, mlang_version::by_code($branch), null, false, false, $strings);
                 }
             }
         }
+        $this->filterfields->fver = array_keys($fver);
+        $this->filterfields->flng = array_keys($flng);
+        $this->filterfields->fcmp = array_keys($fcmp);
         $allowedlangs = mlang_tools::list_allowed_languages($user->id);
         foreach ($this->strings as $string) {
             if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {

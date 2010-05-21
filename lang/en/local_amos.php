@@ -44,8 +44,9 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
 $string['stageactions'] = 'Stage actions';
-$string['stageactions_help'] = '* Prune - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
-* Rebase - unstage all staged strings that do not modify the current translation. Stage is rebased automatically before it is committed.';
+$string['stageactions_help'] = '* Edit staged strings - modifies the translator filter settings so that only staged translations are displayed.
+* Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
+* Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background colot of the cell means:
 
