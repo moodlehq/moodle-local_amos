@@ -32,6 +32,15 @@ M.local_amos = M.local_amos || {};
 M.local_amos.Y = {};
 
 /**
+ * Local stack to control pending requests sent to server by AJAX
+ */
+M.local_amos.ajaxqueue = [];
+
+////////////////////////////////////////////////////////////////////////////////
+// TRANSLATOR //////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/**
  * Initialize JS support for the main translation page, called from view.php
  *
  * @param {Object} Y YUI instance
@@ -74,9 +83,28 @@ M.local_amos.init_translator = function(Y) {
         // catch all clicks to up-to-date marker
         var updaters = translator.all('.uptodatewrapper input, .uptodatewrapper label');
         updaters.on('click', M.local_amos.mark_update);
+        // protect from leaving the page if there is a pending ajax request
+        var links = Y.all('a');
+        links.on('click', function(e) {
+            if (M.local_amos.ajaxqueue.length > 0) {
+                var a = e.currentTarget;
+                var href = a.get('href');
+                var id = a.get('id');
+                if (!id.match('^helpicon')) {
+                    if (!confirm('There are some pending AJAX requests. Do you really want to leave the page?')) {
+                        e.halt();
+                    }
+                }
+            }
+        });
     }
 }
 
+/**
+ * Event handler when a user clicks 'mark as up-to-date'
+ *
+ * @param {Y.Event} e
+ */
 M.local_amos.mark_update = function(e) {
     var checkbox = e.currentTarget;
     var amosid = checkbox.get('id').split('_', 2)[1];
@@ -149,6 +177,11 @@ M.local_amos.editor_off = function(cell, newtext, newclass) {
     cell.on('click', M.local_amos.make_editable);
 }
 
+/**
+ * Event handler when translation input field looses focus
+ *
+ * @param {Y.Event} e
+ */
 M.local_amos.editor_blur = function(e) {
     var Y           = M.local_amos.Y;
     var editor      = e.currentTarget;
@@ -170,6 +203,12 @@ M.local_amos.editor_blur = function(e) {
     }
 }
 
+/**
+ * Send the translation to the server to be staged
+ *
+ * @param {Y.Node} cell
+ * @param {Y.Node} editor
+ */
 M.local_amos.submit = function(cell, editor) {
     var Y = M.local_amos.Y;
 
@@ -177,10 +216,11 @@ M.local_amos.submit = function(cell, editor) {
     Y.io.queue.stop();
 
     // configure the async request
+    var cellid = cell.get('id');
     var uri = M.cfg.wwwroot + '/local/amos/saveajax.php';
     var cfg = {
         method: 'POST',
-        data: 'stringid=' + cell.get('id') + '&text=' + encodeURIComponent(editor.get('value')) + '&sesskey=' + M.cfg.sesskey,
+        data: 'stringid=' + cellid + '&text=' + encodeURIComponent(editor.get('value')) + '&sesskey=' + M.cfg.sesskey,
         on: {
             success : M.local_amos.submit_success,
             failure : M.local_amos.submit_failure,
@@ -192,6 +232,7 @@ M.local_amos.submit = function(cell, editor) {
 
     // add a new async request into the queue
     Y.io.queue(uri, cfg);
+    M.local_amos.ajaxqueue.push(cellid);
 
     // re-start queue processing
     Y.io.queue.start();
@@ -216,20 +257,19 @@ M.local_amos.submit_success = function(tid, outcome, args) {
     }
 
     var newtext = outcome.text;
+    M.local_amos.ajaxqueue.shift();
     M.local_amos.editor_off(cell, newtext, 'staged');
 }
 
+/**
+ * Callback function for IO transaction
+ *
+ * @param {Int} tid transaction identifier
+ * @param {Object} outcome from server
+ * @param {Mixed} args
+ */
 M.local_amos.submit_failure = function(tid, outcome, args) {
     alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
-}
-
-M.local_amos.init_stage = function(Y) {
-    M.local_amos.Y  = Y;
-    Y.all('.stagewrapper form').on('submit', function(e) {
-        if (!confirm('This can not be undone. Are you sure?')) {
-            e.halt();
-        }
-    });
 }
 
 /**
@@ -291,6 +331,32 @@ M.local_amos.uptodate_success = function(tid, outcome, args) {
     }
 }
 
+/**
+ * Callback function for IO transaction
+ *
+ * @param {Int} tid transaction identifier
+ * @param {Object} outcome from server
+ * @param {Mixed} args
+ */
 M.local_amos.uptodate_failure = function(tid, outcome, args) {
     alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// STAGE ///////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Initialize JS support for the stage page, called from stage.php
+ *
+ * @param {Object} Y YUI instance
+ */
+M.local_amos.init_stage = function(Y) {
+    M.local_amos.Y  = Y;
+    // protect from accidental submissions
+    Y.all('.stagewrapper form').on('submit', function(e) {
+        if (!confirm('This can not be undone. Are you sure?')) {
+            e.halt();
+        }
+    });
 }
