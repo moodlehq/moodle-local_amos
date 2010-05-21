@@ -91,7 +91,7 @@ M.local_amos.init_translator = function(Y) {
                 var href = a.get('href');
                 var id = a.get('id');
                 if (!id.match('^helpicon')) {
-                    if (!confirm('There are some pending AJAX requests. Do you really want to leave the page?')) {
+                    if (!confirm('There are unsaved changes on this page waiting to get processed. Do you really want to leave the page?')) {
                         e.halt();
                     }
                 }
