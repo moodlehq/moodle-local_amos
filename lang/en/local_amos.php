@@ -48,7 +48,7 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
 * Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.';
 $string['stagetranslation'] = 'Translation';
-$string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background colot of the cell means:
+$string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
 * Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
