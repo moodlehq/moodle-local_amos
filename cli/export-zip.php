@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Exports the most recent version of Moodle strings into Moodle PHP format
+ * Prepares language packages in Moodle ZIP format to be published
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -47,26 +47,41 @@ foreach ($rs as $record) {
     $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
 }
 $rs->close();
-
-remove_dir(AMOS_EXPORT_DIR, true);
+$packer = get_file_packer('application/zip');
+$status = true; // success indicator
+remove_dir(AMOS_EXPORT_ZIP_DIR, true);
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
+    $md5 = '';
     foreach ($languages as $langcode => $components) {
         if ($langcode == 'en') {
             continue;
         }
+        mkdir(AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode, 0772, true);
+        $zipfiles = array();
+        $langname = $langcode; // fallback to be replaced by localized name
         foreach ($components as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->get_phpfile_location(false);
-                if (!file_exists(dirname($file))) {
-                    mkdir(dirname($file), 0772, true);
-                }
-                echo "$file\n";
+                $file = AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->name . '.php';
                 $component->export_phpfile($file);
+                $zipfiles[$langcode . '/' . $component->name . '.php'] = $file;
+            }
+            if ($component->name == 'langconfig' and $component->has_string('thislanguage')) {
+                $langname = $component->get_string('thislanguage')->text;
             }
             $component->clear();
         }
+        $zipfile = AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip';
+        $status = $status and $packer->archive_to_pathname($zipfiles, $zipfile);
+        if ($status) {
+            echo "$zipfile\n";
+            remove_dir(AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode);
+        } else {
+            exit(1);
+        }
+        $md5 .= $langcode . ',' . md5_file($zipfile) . ',' . $langname . "\n";
     }
+    file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'languages.md5', $md5);
 }
-echo "DONE\n";
+exit(0);

@@ -986,7 +986,16 @@ class mlang_version {
     }
 
     /**
-     * @return array
+     * Holds the information about Moodle branches
+     *
+     * code         - internal integer code to be stored in database
+     * label        - human readable version number
+     * branch       - the name of the branch in git
+     * dir          - the name of the directory under http://download.moodle.org/langpack/
+     * translatable - allow translations
+     * current      - use the version by default in the translator
+     *
+     * @return array of array
      */
     protected static function versions_info() {
         return array(
@@ -994,7 +1003,7 @@ class mlang_version {
                 'code'          => self::MOODLE_21,
                 'label'         => '2.1',
                 'branch'        => 'MOODLE_21_STABLE',
-                'dir'           => 'lang21',
+                'dir'           => '2.1',
                 'translatable'  => false,
                 'current'       => false,
             ),
@@ -1002,7 +1011,7 @@ class mlang_version {
                 'code'          => self::MOODLE_20,
                 'label'         => '2.0',
                 'branch'        => 'MOODLE_20_STABLE',
-                'dir'           => 'lang20',
+                'dir'           => '2.0',
                 'translatable'  => true,
                 'current'       => true,
             ),
@@ -1010,7 +1019,7 @@ class mlang_version {
                 'code'          => self::MOODLE_19,
                 'label'         => '1.9',
                 'branch'        => 'MOODLE_19_STABLE',
-                'dir'           => 'lang19',
+                'dir'           => '1.9',
                 'translatable'  => true,
                 'current'       => false,
             ),
@@ -1018,7 +1027,7 @@ class mlang_version {
                 'code'          => self::MOODLE_18,
                 'label'         => '1.8',
                 'branch'        => 'MOODLE_18_STABLE',
-                'dir'           => 'lang18',
+                'dir'           => '1.8',
                 'translatable'  => true,
                 'current'       => false,
             ),
@@ -1026,7 +1035,7 @@ class mlang_version {
                 'code'          => self::MOODLE_17,
                 'label'         => '1.7',
                 'branch'        => 'MOODLE_17_STABLE',
-                'dir'           => 'lang17',
+                'dir'           => '1.7',
                 'translatable'  => true,
                 'current'       => false,
             ),
@@ -1034,7 +1043,7 @@ class mlang_version {
                 'code'          => self::MOODLE_16,
                 'label'         => '1.6',
                 'branch'        => 'MOODLE_16_STABLE',
-                'dir'           => 'lang16',
+                'dir'           => '1.6',
                 'translatable'  => true,
                 'current'       => false,
             ),
