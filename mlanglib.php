@@ -1081,8 +1081,8 @@ class mlang_tools {
                      WHERE component = ?
                        AND stringid  = ?
                        AND deleted   = 0
-                  ORDER BY lang, branch DESC, timemodified DESC";
-            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguage'));
+                  ORDER BY text, branch DESC, timemodified DESC";
+            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
                     // use the first returned value, all others are historical records
