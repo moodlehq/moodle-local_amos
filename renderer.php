@@ -70,7 +70,7 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         unset($options['en']); // English is not translatable via AMOS
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
-                    array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 2));
+                    array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 3));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_flng_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
