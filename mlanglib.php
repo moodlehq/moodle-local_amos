@@ -990,7 +990,7 @@ class mlang_version {
      * label        - human readable version number
      * branch       - the name of the branch in git
      * dir          - the name of the directory under http://download.moodle.org/langpack/
-     * translatable - allow translations
+     * translatable - allow commits into the AMOS repository on this branch
      * current      - use the version by default in the translator
      *
      * @return array of array
@@ -1018,7 +1018,7 @@ class mlang_version {
                 'label'         => '1.9',
                 'branch'        => 'MOODLE_19_STABLE',
                 'dir'           => '1.9',
-                'translatable'  => true,
+                'translatable'  => false,
                 'current'       => false,
             ),
             array(
@@ -1026,7 +1026,7 @@ class mlang_version {
                 'label'         => '1.8',
                 'branch'        => 'MOODLE_18_STABLE',
                 'dir'           => '1.8',
-                'translatable'  => true,
+                'translatable'  => false,
                 'current'       => false,
             ),
             array(
@@ -1034,7 +1034,7 @@ class mlang_version {
                 'label'         => '1.7',
                 'branch'        => 'MOODLE_17_STABLE',
                 'dir'           => '1.7',
-                'translatable'  => true,
+                'translatable'  => false,
                 'current'       => false,
             ),
             array(
@@ -1042,7 +1042,7 @@ class mlang_version {
                 'label'         => '1.6',
                 'branch'        => 'MOODLE_16_STABLE',
                 'dir'           => '1.6',
-                'translatable'  => true,
+                'translatable'  => false,
                 'current'       => false,
             ),
         );
