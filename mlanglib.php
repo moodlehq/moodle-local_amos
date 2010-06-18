@@ -770,7 +770,7 @@ class mlang_stage {
             return;
         }
         foreach ($this->components as $cx => $component) {
-            if (empty($keeplangs[$component->lang])) {
+            if (empty($component->version->translatable) or empty($keeplangs[$component->lang])) {
                 $component->clear();
                 unset($this->components[$cx]);
             }

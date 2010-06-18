@@ -384,6 +384,9 @@ class local_amos_translator implements renderable {
             if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
+            if (empty(mlang_version::by_code($string->branch)->translatable)) {
+                $string->committable = false;
+            }
         }
     }
 
@@ -498,6 +501,9 @@ class local_amos_stage implements renderable {
                 if ($string->current instanceof mlang_string) {
                     $string->current = $string->current->text;
                 }
+            }
+            if (empty(mlang_version::by_code($string->branch)->translatable)) {
+                $string->committable = false;
             }
         }
     }
