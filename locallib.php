@@ -79,7 +79,7 @@ class local_amos_filter implements renderable {
 
         // if the user did not check any version, use the default instead of none
         if (empty($data->version)) {
-            foreach (mlang_version::list_translatable() as $version) {
+            foreach (mlang_version::list_all() as $version) {
                 if ($version->current) {
                     $data->version[] = $version->code;
                 }
@@ -109,7 +109,7 @@ class local_amos_filter implements renderable {
         }
 
         if (empty($data->version)) {
-            foreach (mlang_version::list_translatable() as $version) {
+            foreach (mlang_version::list_all() as $version) {
                 if ($version->current) {
                     $data->version[] = $version->code;
                 }
@@ -159,7 +159,7 @@ class local_amos_filter implements renderable {
         $data->version = array();
         $fver = optional_param('fver', null, PARAM_INT);
         if (!is_null($fver)) {
-            foreach (mlang_version::list_translatable() as $version) {
+            foreach (mlang_version::list_all() as $version) {
                 if (in_array($version->code, $fver)) {
                     $data->version[] = $version->code;
                 }

@@ -48,7 +48,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
         $fver = '';
-        foreach (mlang_version::list_translatable() as $version) {
+        foreach (mlang_version::list_all() as $version) {
             $checkbox = html_writer::checkbox('fver[]', $version->code, in_array($version->code, $filter->get_data()->version),
                     $version->label);
             $fver .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));

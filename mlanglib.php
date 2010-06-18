@@ -966,12 +966,10 @@ class mlang_version {
      *
      * @return array of mlang_version
      */
-    public static function list_translatable() {
+    public static function list_all() {
         $list = array();
         foreach (self::versions_info() as $ver) {
-            if ($ver['translatable']) {
-                $list[$ver['code']] = new mlang_version($ver);
-            }
+            $list[$ver['code']] = new mlang_version($ver);
         }
         return $list;
     }
