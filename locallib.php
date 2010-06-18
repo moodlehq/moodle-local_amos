@@ -316,6 +316,7 @@ class local_amos_translator implements renderable {
                             }
                             $string = new stdclass();
                             $string->branch = mlang_version::by_code($branchcode)->label;
+                            $string->branchcode = mlang_version::by_code($branchcode)->code;
                             $string->language = $lang;
                             $string->component = $component;
                             $string->stringid = $stringid;
@@ -384,7 +385,7 @@ class local_amos_translator implements renderable {
             if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
-            if (empty(mlang_version::by_code($string->branch)->translatable)) {
+            if (empty(mlang_version::by_code($string->branchcode)->translatable)) {
                 $string->committable = false;
             }
         }
