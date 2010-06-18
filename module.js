@@ -74,9 +74,9 @@ M.local_amos.init_translator = function(Y) {
     fcmpselectnone.on('click', function(e) { fcmp.all('option').set('selected', false); });
 
     if (translator) {
-        // make all translateable fields editable
-        var translateable = translator.all('.translateable');
-        translateable.on('click', M.local_amos.make_editable);
+        // make all translatable fields editable
+        var translatable = translator.all('.translatable');
+        translatable.on('click', M.local_amos.make_editable);
         // in case of missing strings, turn editing mode on by default
         var missing = translator.all('.committable.missing.translation');
         missing.each(function(cell) { M.local_amos.editor_on(cell); });

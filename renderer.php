@@ -222,7 +222,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells[5] = new html_table_cell($t . $c . $i);
             $cells[5]->id = $sid;
             $cells[5]->attributes['class'] = $string->class;
-            $cells[5]->attributes['class'] .= ' translateable';
+            $cells[5]->attributes['class'] .= ' translatable';
             if ($string->committable) {
                 $cells[5]->attributes['class'] .= ' committable';
             }
