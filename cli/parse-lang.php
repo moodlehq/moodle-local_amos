@@ -114,16 +114,17 @@ $MLANG_BROKEN_CHECKOUTS = array(
 chdir(AMOS_REPO_LANGS);
 
 // find the root commit
-$gitout = array();
-$gitstatus = 0;
-$gitcmd = AMOS_PATH_GIT .  " rev-list HEAD | tail -1";
-echo "RUN {$gitcmd}\n";
-exec($gitcmd, $gitout, $gitstatus);
-if ($gitstatus <> 0) {
-    echo "ERROR\n";
-    exit(1);
-}
-$rootcommit = $gitout[0];
+//$gitout = array();
+//$gitstatus = 0;
+//$gitcmd = AMOS_PATH_GIT .  " rev-list HEAD | tail -1";
+//echo "RUN {$gitcmd}\n";
+//exec($gitcmd, $gitout, $gitstatus);
+//if ($gitstatus <> 0) {
+//    echo "ERROR\n";
+//    exit(1);
+//}
+//$rootcommit = $gitout[0];
+$rootcommit = '1a3e88ac5edec427cb3f1154edab665b8af160e3';
 
 // find all commits that touched the repository since the last save point
 $startatlock = "{$var}/LANG.startat";
