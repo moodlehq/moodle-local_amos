@@ -54,7 +54,7 @@ function amos_parse_core_commit() {
         'source' => 'git',
         'userinfo' => $committer . ' <' . $committeremail . '>',
         'commithash' => $commithash
-    ), true);
+    ), true, $timemodified);
 
     // execute AMOS script if the commit message contains some
     if ($version->code >= mlang_version::MOODLE_20) {
@@ -69,7 +69,7 @@ function amos_parse_core_commit() {
                         'source' => 'commitscript',
                         'userinfo' => $committer . ' <' . $committeremail . '>',
                         'commithash' => $commithash
-                    ), true);
+                    ), true, $timemodified);
                 } elseif ($changes < 0) {
                     echo "EXIT STATUS $changes\n";
                 }

@@ -713,8 +713,9 @@ class mlang_stage {
      * @param string $message commit message
      * @param array $meta optional meta information
      * @param bool $skiprebase if true, do not rebase before committing
+     * @param int $timecommitted timestamp of the commit, defaults to now
      */
-    public function commit($message='', array $meta=null, $skiprebase=false) {
+    public function commit($message='', array $meta=null, $skiprebase=false, $timecommitted=null) {
         global $DB;
 
         if (empty($skiprebase)) {
@@ -733,7 +734,10 @@ class mlang_stage {
                 }
             }
             $commit->commitmsg = trim($message);
-            $commit->timecommitted = time();
+            if (is_null($timecommitted)) {
+                $timecommitted = time();
+            }
+            $commit->timecommitted = $timecommitted;
             $commit->id = $DB->insert_record('amos_commits', $commit);
 
             foreach ($this->components as $cx => $component) {

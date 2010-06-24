@@ -54,7 +54,7 @@ function amos_parse_lang_commit() {
             'source' => 'git',
             'userinfo' => $committer . ' <' . $committeremail . '>',
             'commithash' => $commithash
-        ), true);
+        ), true, $timemodified);
     } catch (dml_write_exception $e) {
         echo "FAILED COMMIT $checkout\n";
         $stage->clear();
