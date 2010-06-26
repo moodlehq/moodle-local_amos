@@ -581,17 +581,17 @@ EOF;
     public function test_list_languages() {
         $stage = new mlang_stage();
         $component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'English'));
+        $component->add_string(new mlang_string('thislanguageint', 'English'));
         $stage->add($component);
         $component->clear();
 
         $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'Cestina'));
+        $component->add_string(new mlang_string('thislanguageint', 'Czech'));
         $stage->add($component);
         $component->clear();
 
         $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'CS'));
+        $component->add_string(new mlang_string('thislanguageint', 'CS'));
         $stage->add($component);
         $component->clear();
 
@@ -603,7 +603,7 @@ EOF;
         $this->assertTrue(array_key_exists('cs', $langs));
         $this->assertTrue(array_key_exists('en', $langs));
         $this->assertEqual($langs['en'], 'English');
-        $this->assertEqual($langs['cs'], 'Cestina');
+        $this->assertEqual($langs['cs'], 'Czech');
         // todo test caching
     }
 

@@ -1065,8 +1065,8 @@ class mlang_tools {
     /**
      * Returns a list of all languages known in the strings repository
      *
-     * The language must have defined its name in langconfig. This method takes the value from the most
-     * recent branch and time stamp.
+     * The language must have defined its international name in langconfig.
+     * This method takes the value from the most recent branch and time stamp.
      *
      * @param bool $english shall the English be included?
      * @param bool $usecache can the internal cache be used?
@@ -1083,7 +1083,7 @@ class mlang_tools {
                      WHERE component = ?
                        AND stringid  = ?
                        AND deleted   = 0
-                  ORDER BY text, branch DESC, timemodified DESC";
+                  ORDER BY branch DESC, text, timemodified DESC";
             $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
