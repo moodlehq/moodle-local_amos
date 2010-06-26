@@ -69,7 +69,7 @@ function amos_parse_core_commit() {
                         'source' => 'commitscript',
                         'userinfo' => $committer . ' <' . $committeremail . '>',
                         'commithash' => $commithash
-                    ), true, $timemodified);
+                    ), true);
                 } elseif ($changes < 0) {
                     echo "EXIT STATUS $changes\n";
                 }
