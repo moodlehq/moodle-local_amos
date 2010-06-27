@@ -662,7 +662,7 @@ EOF;
         $stage->commit('Adding some testing strings', array('source' => 'unittest'));
         unset($stage);
 
-        $stage = mlang_tools::execute('MOV [ldap,auth],[pluginname,auth_ldap]', $version);
+        $stage = mlang_tools::execute('MOV [ldap,core_auth],[pluginname,auth_ldap]', $version);
         $stage->commit('Moving string ldap into auth_ldap', array('source' => 'unittest'));
         unset($stage);
 
@@ -675,7 +675,7 @@ EOF;
         $component->clear();
 
         $component = mlang_component::from_snapshot('auth', 'en', $version);
-        $this->assertFalse($component->has_string('ldap'));
+        $this->assertTrue($component->has_string('ldap'));  // English string are not affected by AMOS script!
         $component->clear();
 
         $component = mlang_component::from_snapshot('auth_ldap', 'en', $version);
