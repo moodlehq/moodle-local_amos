@@ -1059,8 +1059,9 @@ class mlang_version {
 class mlang_tools {
 
     /** return stati of {@see self::execute()} */
-    const STATUS_OK                 = 0;
-    const STATUS_SYNTAX_ERROR       = -1;
+    const STATUS_OK                     =  0;
+    const STATUS_SYNTAX_ERROR           = -1;
+    const STATUS_UNKNOWN_INSTRUCTION    = -2;
 
     /**
      * Returns a list of all languages known in the strings repository
@@ -1236,8 +1237,12 @@ class mlang_tools {
             if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
                 array_map('trim', $matches);
                 $fromcomponent = self::legacy_component_name($matches[2]);
-                $tocomponent =   self::legacy_component_name($matches[4]);
-                return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                $tocomponent = self::legacy_component_name($matches[4]);
+                if ($fromcomponent and $tocomponent) {
+                    return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                } else {
+                    return self::STATUS_SYNTAX_ERROR;
+                }
             } else {
                 return self::STATUS_SYNTAX_ERROR;
             }
@@ -1247,8 +1252,12 @@ class mlang_tools {
             if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
                 array_map('trim', $matches);
                 $fromcomponent = self::legacy_component_name($matches[2]);
-                $tocomponent =   self::legacy_component_name($matches[4]);
-                return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                $tocomponent = self::legacy_component_name($matches[4]);
+                if ($fromcomponent and $tocomponent) {
+                    return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                } else {
+                    return self::STATUS_SYNTAX_ERROR;
+                }
             } else {
                 return self::STATUS_SYNTAX_ERROR;
             }
@@ -1259,14 +1268,21 @@ class mlang_tools {
                 array_map('trim', $matches);
                 $helpfile = clean_param($matches[1], PARAM_PATH);
                 $tocomponent = self::legacy_component_name($matches[3]);
-                return self::migrate_helpfile($version, $helpfile, $matches[2], $tocomponent, $timestamp);
+                if ($helpfile and $tocomponent) {
+                    return self::migrate_helpfile($version, $helpfile, $matches[2], $tocomponent, $timestamp);
+                } else {
+                    return self::STATUS_SYNTAX_ERROR;
+                }
             } else {
                 return self::STATUS_SYNTAX_ERROR;
             }
             break;
         case 'REM':
+            // todo send message to subscribed users
             return self::STATUS_OK;
             break;
+        default:
+            return self::STATUS_UNKNOWN_INSTRUCTION;
         }
     }
 
@@ -1375,9 +1391,14 @@ class mlang_tools {
      * Given a newstyle component name (aka frankenstyle), returns the legacy style name
      *
      * @param string $newstyle name like core, core_admin, mod_workshop or auth_ldap
-     * @return string legacy style like moodle, admin, workshop or auth_ldap
+     * @return string|false legacy style like moodle, admin, workshop or auth_ldap, false in case of error
      */
     protected static function legacy_component_name($newstyle) {
+        $newstyle = trim($newstyle);
+        if (preg_match('/[^a-z_\.-]/', $newstyle)) {
+            // only letters and underscore should be allowed - blame component 'moodle.org' for the dot
+            return false;
+        }
         if ($newstyle == 'core') {
             return 'moodle';
         }

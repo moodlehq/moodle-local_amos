@@ -34,6 +34,15 @@ if (empty($CFG->unittestprefix)) {
 require_once($CFG->dirroot . '/local/amos/mlanglib.php'); // Include the code to test
 
 /**
+ * Makes protected method accessible for testing purposes
+ */
+class testable_mlang_tools extends mlang_tools {
+    public static function legacy_component_name($newstyle) {
+        return parent::legacy_component_name($newstyle);
+    }
+}
+
+/**
  * Test cases for the internal workshop api
  */
 class mlang_test extends UnitTestCase {
@@ -685,4 +694,14 @@ EOF;
         $component->clear();
     }
 
+    public function test_legacy_component_name() {
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('core'), 'moodle');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('core_grades'), 'grades');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('block_foobar'), 'block_foobar');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('mod_foobar'), 'foobar');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name(' mod_whitespace  '), 'whitespace');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('[syntaxerr'), false);
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('syntaxerr,'), false);
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('syntax err'), false);
+    }
 }
