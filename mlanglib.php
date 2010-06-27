@@ -1268,8 +1268,12 @@ class mlang_tools {
                 array_map('trim', $matches);
                 $helpfile = clean_param($matches[1], PARAM_PATH);
                 $tocomponent = self::legacy_component_name($matches[3]);
-                if ($helpfile and $tocomponent) {
-                    return self::migrate_helpfile($version, $helpfile, $matches[2], $tocomponent, $timestamp);
+                $tostring = $matches[2];
+                if ($tostring !== clean_param($tostring, PARAM_STRINGID)) {
+                    return self::STATUS_SYNTAX_ERROR;
+                }
+                if ($helpfile and $tocomponent and $tostring) {
+                    return self::migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp);
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
