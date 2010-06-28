@@ -764,19 +764,22 @@ class mlang_stage {
     }
 
     /**
-     * Remove all components that do not belong to any of the given languages
+     * Remove all components that do not belong to any of the given languages or the branch is not translatable via AMOS
      *
      * @param array $keeplangs (string)langcode => (string)langcode - list of languages to keep, 'X' means all languages
      */
     public function prune(array $keeplangs) {
-        if (!empty($keeplangs['X'])) {
-            // keep all
-            return;
-        }
         foreach ($this->components as $cx => $component) {
-            if (empty($component->version->translatable) or empty($keeplangs[$component->lang])) {
+            if (empty($component->version->translatable)) {
+                // commits not allowed into this branch via AMOS web interface
                 $component->clear();
                 unset($this->components[$cx]);
+                continue;
+            }
+            if (empty($keeplangs['X']) and empty($keeplangs[$component->lang])) {
+                $component->clear();
+                unset($this->components[$cx]);
+                continue;
             }
         }
     }
