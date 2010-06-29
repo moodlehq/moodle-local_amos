@@ -312,6 +312,17 @@ class mlang_component {
     }
 
     /**
+     * Returns the number of strings in the component
+     *
+     * Beware - if deleted strings are loaded into this component, they are counted, too.
+     *
+     * @return int
+     */
+    public function get_number_of_strings() {
+        return count($this->strings);
+    }
+
+    /**
      * Adds new string into the collection
      *
      * @param mlang_string $string to add
@@ -1019,14 +1030,14 @@ class mlang_version {
      */
     protected static function versions_info() {
         return array(
-            array(
-                'code'          => self::MOODLE_21,
-                'label'         => '2.1',
-                'branch'        => 'MOODLE_21_STABLE',
-                'dir'           => '2.1',
-                'translatable'  => false,
-                'current'       => false,
-            ),
+//            array(
+//                'code'          => self::MOODLE_21,
+//                'label'         => '2.1',
+//                'branch'        => 'MOODLE_21_STABLE',
+//                'dir'           => '2.1',
+//                'translatable'  => false,
+//                'current'       => false,
+//            ),
             array(
                 'code'          => self::MOODLE_20,
                 'label'         => '2.0',

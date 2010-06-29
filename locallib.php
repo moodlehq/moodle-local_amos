@@ -176,7 +176,7 @@ class local_amos_filter implements renderable {
         }
 
         $data->component = array();
-        $fcmp = optional_param('fcmp', null, PARAM_SAFEDIR);
+        $fcmp = optional_param('fcmp', null, PARAM_FILE);
         if (!is_null($fcmp)) {
             foreach ($fcmp as $component) {
                 // todo if valid component
@@ -561,5 +561,55 @@ class local_amos_log implements renderable {
             $this->commits[$r->commitid]->strings[] = $string;
         }
         $rs->close();
+    }
+}
+
+/**
+ * Represents data to be displayed at http://download.moodle.org/langpack/x.x/ index page
+ */
+class local_amos_index_page implements renderable {
+
+    /** @var array */
+    public $langpacks = array();
+
+    /** @var array */
+    protected $packinfo = array();
+
+    /** @var array */
+    protected $numofenglish = array();
+
+    /**
+     * Initialize data
+     *
+     * @param array $packinfo data structure prepared by cli/export-zip.php
+     * @param array $numofenglish data structure prepared by cli/export-zip.php
+     */
+    public function __construct(array $packinfo, array $numofenglish) {
+        $this->packinfo = fullclone($packinfo);
+        $this->numogenglish = fullclone($numofenglish);
+        $totalenglish = 0;
+        foreach ($numofenglish as $component => $defined) {
+            $totalenglish += $defined;
+        }
+        foreach ($this->packinfo as $langcode => $info) {
+            $langpack = new stdclass();
+            $langpack->langname = $info['langname'];
+            $langpack->filename = $langcode.'.zip';
+            //$langpack->filesize = TODO
+            $langpack->modified = $info['modified'];
+
+            // calculate the translation statistics
+            $langpack->totaltranslated = 0;
+            foreach ($info['numofstrings'] as $component => $translated) {
+                $langpack->totaltranslated += $translated;
+            }
+            $langpack->totalenglish = $totalenglish;
+            if ($langpack->totalenglish == 0) {
+                $langpack->ratio = null;
+            } else {
+                $langpack->ratio = $langpack->totaltranslated / $langpack->totalenglish;
+            }
+        }
+        $this->langpacks[] = $langpack;
     }
 }

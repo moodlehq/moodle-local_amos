@@ -439,5 +439,37 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         return $output;
     }
-}
 
+    /**
+     * Render index page of http://download.moodle.org/langpack/x.x/
+     *
+     * Output of this renderer is expected to be saved into the file index.php and uploaded to the server
+     *
+     * @param local_amos_index_page $data
+     * @return string HTML
+     */
+    protected function render_local_amos_index_page(local_amos_index_page $data) {
+
+        $output = '<?php
+require(dirname(dirname(dirname(__FILE__)))."/config.php");
+require(dirname(dirname(dirname(__FILE__)))."/menu.php");
+
+print_header("Moodle: Download: Language Packs", "Moodle Downloads",
+        "<a href=\"$CFG->wwwroot/\">Download</a> -> Language Packs",
+        "", "", true, " ", $navmenu);
+$current = "lang";
+require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
+
+print_simple_box_start("center", "100%", "#FFFFFF", 20);
+';
+        $output .= $this->heading('Moodle 2.0 language packs');
+
+        $table = new html_table();
+        $table->head = array('Language', 'Download', 'Size', 'Translation ratio');
+        foreach ($data->langpacks as $langpack) {
+            // todo
+        }
+
+        return $output;
+    }
+}
