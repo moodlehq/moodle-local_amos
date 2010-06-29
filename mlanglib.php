@@ -472,6 +472,21 @@ EOF
         }
         return $removed;
     }
+
+    /**
+     * Returns timemodified stamp of the most recent string in the component
+     *
+     * @return int timestamp, 0 if the component is empty
+     */
+    public function get_recent_timemodified() {
+        $recent = 0;
+        foreach ($this->get_iterator() as $string) {
+            if ($string->timemodified > $recent) {
+                $recent = $string->timemodified;
+            }
+        }
+        return $recent;
+    }
 }
 
 /**

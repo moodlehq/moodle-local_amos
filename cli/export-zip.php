@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Prepares language packages in Moodle ZIP format to be published
+ * Prepares language packages for Moodle 2.0 in ZIP format to be published
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -32,16 +32,17 @@ if (isset($_SERVER['REMOTE_ADDR'])) {
 define('NO_MOODLE_COOKIES', true);
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->libdir  . '/filelib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 // Let us get an information about existing components
 $sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
           FROM {amos_repository}
-         WHERE deleted=0
+         WHERE deleted=0 and branch=?
       GROUP BY branch,lang,component
       ORDER BY branch,lang,component";
-$rs = $DB->get_recordset_sql($sql);
+$rs = $DB->get_recordset_sql($sql, array(mlang_version::MOODLE_20));
 $tree = array();    // [branch][language][component] => numofstrings
 foreach ($rs as $record) {
     $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
@@ -49,21 +50,35 @@ foreach ($rs as $record) {
 $rs->close();
 $packer = get_file_packer('application/zip');
 $status = true; // success indicator
-remove_dir(AMOS_EXPORT_ZIP_DIR, true);
+
+// prepare the final directory to be rsynced with download.moodle.org
+if (!is_dir(AMOS_EXPORT_ZIP_DIR)) {
+    mkdir(AMOS_EXPORT_ZIP_DIR, 0772);
+}
+
+// cleanup a temporary area where new ZIP files will be generated and their MD5 calculated
+fulldelete($CFG->dataroot.'/amos/temp/export-zip');
+
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
-    $md5 = '';
+    $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
     foreach ($languages as $langcode => $components) {
         if ($langcode == 'en') {
             continue;
         }
-        mkdir(AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode, 0772, true);
+        mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0772, true);
         $zipfiles = array();
+        $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack
         $langname = $langcode; // fallback to be replaced by localized name
         foreach ($components as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
+            $modified = $component->get_recent_timemodified();
+            if ($packinfo[$langcode]['modified'] < $modified) {
+                $packinfo[$langcode]['modified'] = $modified;
+            }
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->name . '.php';
+                // $file = AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->name . '.php';
+                $file = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'/'.$component->name.'.php';
                 $component->export_phpfile($file);
                 $zipfiles[$langcode . '/' . $component->name . '.php'] = $file;
             }
@@ -72,15 +87,73 @@ foreach ($tree as $vercode => $languages) {
             }
             $component->clear();
         }
-        $zipfile = AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip';
+        $zipfile = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'.zip';
         $status = $status and $packer->archive_to_pathname($zipfiles, $zipfile);
         if ($status) {
             echo "$zipfile\n";
-            remove_dir(AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode);
+            fulldelete($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode);
         } else {
+            echo "ERROR Unable to ZIP\n";
             exit(1);
         }
-        $md5 .= $langcode . ',' . md5_file($zipfile) . ',' . $langname . "\n";
+        $packinfo[$langcode]['md5'] = md5_file($zipfile);
+        $packinfo[$langcode]['langname'] = $langname;
+    }
+    if (!file_exists($CFG->dataroot.'/amos/var/export-zip/'.$version->dir.'/packinfo.ser')) {
+        if (!is_dir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir)) {
+            mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0772, true);
+        }
+        $oldpackinfo = array();
+    } else {
+        $oldpackinfo = unserialize(file_get_contents($CFG->dataroot.'/amos/var/export-zip/'.$version->dir.'/packinfo.ser'));
+    }
+
+    // find the updated packages and move them into the folder for rsync
+    $md5 = ''; // the contents of languages.md5
+    $newpackinfo = array();
+    foreach ($packinfo as $langcode => $info) {
+        $updated = false;
+        if (!file_exists(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip')) {
+            $updated = true;
+        } elseif (!isset($oldpackinfo[$langcode])) {
+            $updated = true;
+        } else {
+            $oldinfo = $oldpackinfo[$langcode];
+            if ($info['modified'] != $oldinfo['modified']) {
+                $updated = true;
+            }
+        }
+
+        // ZIP file created during this run of script
+        $newzip = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'.zip';
+        // currently published ZIP file
+        $currentzip = AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip';
+        if ($updated) {
+            // replace the current file with the updated one
+            if (!is_dir(dirname($currentzip))) {
+                mkdir(dirname($currentzip), 0772, true);
+            }
+            rename($newzip, $currentzip);
+            // update the MD5 record
+            $md5 .= $langcode . ',' . $info['md5'] . ',' . $info['langname'] . "\n";
+            $newpackinfo[$langcode] = $info;
+        } else {
+            // keep the currently published ZIP file
+            unlink($newzip);
+            // keep the current MD5 record
+            $md5 .= $langcode . ',' . $oldinfo['md5'] . ',' . $oldinfo['langname'] . "\n";
+            $newpackinfo[$langcode] = $oldinfo;
+        }
+    }
+    // store the packinfo
+    if (!is_dir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir)) {
+        mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0772, true);
+    }
+    file_put_contents($CFG->dataroot.'/amos/var/export-zip/'.$version->dir.'/packinfo.ser', serialize($newpackinfo));
+
+    // store md5's of packages
+    if (!is_dir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir)) {
+        mkdir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir, 0772, true);
     }
     file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'languages.md5', $md5);
 }

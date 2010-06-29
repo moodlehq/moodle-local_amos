@@ -704,4 +704,14 @@ EOF;
         $this->assertEqual(testable_mlang_tools::legacy_component_name('syntaxerr,'), false);
         $this->assertEqual(testable_mlang_tools::legacy_component_name('syntax err'), false);
     }
+
+    public function test_component_get_recent_timemodified() {
+        $now = time();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual(0, $component->get_recent_timemodified());
+        $component->add_string(new mlang_string('first', 'Hello', $now - 5));
+        $component->add_string(new mlang_string('second', 'Moodle', $now - 12));
+        $component->add_string(new mlang_string('third', 'World', $now - 4));
+        $this->assertEqual($now - 4, $component->get_recent_timemodified());
+    }
 }

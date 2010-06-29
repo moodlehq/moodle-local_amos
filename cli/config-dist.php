@@ -43,6 +43,7 @@ define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');
 
 /**
  * Full path to the directory where AMOS will generate language ZIP packs
+ * This can be synced with the download server.
  */
 define('AMOS_EXPORT_ZIP_DIR', $CFG->dataroot . '/amos/export-zip');
 
