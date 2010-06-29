@@ -385,7 +385,7 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Returns formatted commit date and time
      *
-     * In our git repos, timestamps are stored in UTC always and that is what standard got log
+     * In our git repos, timestamps are stored in UTC always and that is what standard git log
      * displays.
      *
      * @param int $timestamp
@@ -394,7 +394,7 @@ class local_amos_renderer extends plugin_renderer_base {
     public static function commit_datetime($timestamp) {
         $tz = date_default_timezone_get();
         date_default_timezone_set('UTC');
-        $t = date('Y-m-d H:i', $timestamp);
+        $t = date('Y-m-d H:i e', $timestamp);
         date_default_timezone_set($tz);
         return $t;
     }
