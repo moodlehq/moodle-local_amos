@@ -127,7 +127,7 @@ foreach ($tree as $vercode => $languages) {
     $md5updated = false; // is the rebuild of languages.md5 needed?
     $newpackinfo = array();
     foreach ($packinfo as $langcode => $info) {
-        $updated = false
+        $updated = false;
         if (!file_exists(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip')) {
             $updated = true;
         } elseif (!isset($oldpackinfo[$langcode])) {
