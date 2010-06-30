@@ -124,9 +124,10 @@ foreach ($tree as $vercode => $languages) {
 
     // find the updated packages and move them into the folder for rsync
     $md5 = ''; // the contents of languages.md5
+    $md5updated = false; // is the rebuild of languages.md5 needed?
     $newpackinfo = array();
     foreach ($packinfo as $langcode => $info) {
-        $updated = false;
+        $updated = false
         if (!file_exists(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip')) {
             $updated = true;
         } elseif (!isset($oldpackinfo[$langcode])) {
@@ -151,6 +152,7 @@ foreach ($tree as $vercode => $languages) {
             rename($newzip, $currentzip);
             // update the MD5 record
             $md5 .= $langcode . ',' . $info['md5'] . ',' . $info['langname'] . "\n";
+            $md5updated = true;
             $newpackinfo[$langcode] = $info;
         } else {
             echo "KEEP $version->dir/$langcode.zip\n";
@@ -171,7 +173,9 @@ foreach ($tree as $vercode => $languages) {
     if (!is_dir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir)) {
         mkdir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir, 0755, true);
     }
-    file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'languages.md5', $md5);
+    if ($md5updated) {
+        file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'languages.md5', $md5);
+    }
 
     // prepare new index.php for the download server
     // todo
