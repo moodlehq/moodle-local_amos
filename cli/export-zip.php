@@ -53,9 +53,13 @@ $rs->close();
 $packer = get_file_packer('application/zip');
 $status = true; // success indicator
 
+// setup.php sets umask to 0000 due to recursion issues in mkdir()
+// let us try to set it to more sane value
+umask(0022);
+
 // prepare the final directory to be rsynced with download.moodle.org
 if (!is_dir(AMOS_EXPORT_ZIP_DIR)) {
-    mkdir(AMOS_EXPORT_ZIP_DIR, 0772);
+    mkdir(AMOS_EXPORT_ZIP_DIR, 0755);
 }
 
 // cleanup a temporary area where new ZIP files will be generated and their MD5 calculated
@@ -69,7 +73,7 @@ foreach ($tree as $vercode => $languages) {
         if ($langcode == 'en') {
             continue;
         }
-        mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0772, true);
+        mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true);
         $zipfiles = array();
         $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack
         $packinfo[$langcode]['numofstrings'] = array(); // number of translated strings, per-component
@@ -111,7 +115,7 @@ foreach ($tree as $vercode => $languages) {
     }
     if (!file_exists($CFG->dataroot.'/amos/var/export-zip/'.$version->dir.'/packinfo.ser')) {
         if (!is_dir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir)) {
-            mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0772, true);
+            mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0755, true);
         }
         $oldpackinfo = array();
     } else {
@@ -142,7 +146,7 @@ foreach ($tree as $vercode => $languages) {
             echo "UPDATE $version->dir/$langcode.zip\n";
             // replace the current file with the updated one
             if (!is_dir(dirname($currentzip))) {
-                mkdir(dirname($currentzip), 0772, true);
+                mkdir(dirname($currentzip), 0755, true);
             }
             rename($newzip, $currentzip);
             // update the MD5 record
@@ -159,13 +163,13 @@ foreach ($tree as $vercode => $languages) {
     }
     // store the packinfo
     if (!is_dir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir)) {
-        mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0772, true);
+        mkdir($CFG->dataroot.'/amos/var/export-zip/'.$version->dir, 0755, true);
     }
     file_put_contents($CFG->dataroot.'/amos/var/export-zip/'.$version->dir.'/packinfo.ser', serialize($newpackinfo));
 
     // store md5's of packages
     if (!is_dir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir)) {
-        mkdir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir, 0772, true);
+        mkdir(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir, 0755, true);
     }
     file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'languages.md5', $md5);
 

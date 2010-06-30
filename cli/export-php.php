@@ -60,7 +60,7 @@ foreach ($tree as $vercode => $languages) {
             if ($component->has_string()) {
                 $file = AMOS_EXPORT_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->get_phpfile_location(false);
                 if (!file_exists(dirname($file))) {
-                    mkdir(dirname($file), 0772, true);
+                    mkdir(dirname($file), 0755, true);
                 }
                 echo "$file\n";
                 $component->export_phpfile($file);

@@ -88,7 +88,7 @@ foreach ($list as $componentname => $stringids) {
         if ($component->has_string()) {
             $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $version->dir . '/install/lang/' . $lang . '/' . $component->name . '.php';
             if (!file_exists(dirname($file))) {
-                mkdir(dirname($file), 0772, true);
+                mkdir(dirname($file), 0755, true);
             }
             echo "$file\n";
             $component->export_phpfile($file, $phpdoc);
