@@ -461,8 +461,7 @@ $current = "lang";
 require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
-?>
-';
+?>';
         $output .= $this->heading('Moodle '.$data->version->label.' language packs');
 
         $table = new html_table();
@@ -478,12 +477,12 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
             } else {
                 $row[3] = self::commit_datetime($langpack->modified);
             }
-            if ($langpack->parent == 'en') {
+            if ($langpack->parent == 'en' && substr($langcode, 0, 3) != 'en_') {
                 // standard package
                 if (!is_null($langpack->ratio)) {
                     $barmax = 500; // pixels
                     $barwidth = floor($barmax * $langpack->ratio);
-                    $barvalue = sprintf('%d %%', $langpack->ratio * 100).' ('.$langpack->totaltranslated.'/'.$langpack->totalenglish.')';
+                    $barvalue = sprintf('%d %%', $langpack->ratio * 100).' <span style="color:#666">('.$langpack->totaltranslated.'/'.$langpack->totalenglish.')</span>';
                     if ($langpack->ratio >= 0.8) {
                         $bg = '#e7f1c3'; // green
                     } elseif ($langpack->ratio >= 0.6) {
@@ -499,13 +498,15 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
                     $row[4] = '';
                 }
             } else {
-                // variant
+                // variant of parent language
                 $row[4] = $langpack->totaltranslated.' modifications';
             }
             $table->data[] = $row;
         }
         $output .= html_writer::table($table);
+        $output .= '<div style="margin-top: 1em; text-align:center;">';
         $output .= html_writer::tag('em', 'Generated: '.self::commit_datetime($data->timemodified), array('class'=>'timemodified'));
+        $output .= "</div>\n";
         $output .= '<?php
 print_simple_box_end();
 print_footer();
