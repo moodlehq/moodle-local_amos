@@ -68,22 +68,13 @@ fulldelete($CFG->dataroot.'/amos/temp/export-zip');
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
-    $numofenglish = array(); // number of strings defined in the English pack, per component
     foreach ($languages as $langcode => $components) {
-        if ($langcode == 'en') {
-            continue;
-        }
         mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true);
         $zipfiles = array();
         $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack
         $packinfo[$langcode]['numofstrings'] = array(); // number of translated strings, per-component
         $langname = $langcode; // fallback to be replaced by localized name
         foreach ($components as $componentname => $unused) {
-            if (!isset($numofenglish[$componentname])) {
-                $component = mlang_component::from_snapshot($componentname, 'en', $version);
-                $numofenglish[$componentname] = $component->get_number_of_strings();
-                $component->clear();
-            }
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             $modified = $component->get_recent_timemodified();
             $packinfo[$langcode]['numofstrings'][$componentname] = $component->get_number_of_strings();
@@ -181,9 +172,9 @@ foreach ($tree as $vercode => $languages) {
     }
 
     // prepare new index.php for the download server
-    $indexpage = new local_amos_index_page($newpackinfo, $numofenglish);
-    $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
-    $indexpagehtml = $output->render($indexpage);
-    file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
+    //$indexpage = new local_amos_index_page($newpackinfo);
+    //$output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
+    //$indexpagehtml = $output->render($indexpage);
+    //file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
 }
 exit(0);

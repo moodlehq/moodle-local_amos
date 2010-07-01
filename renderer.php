@@ -471,7 +471,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
         foreach ($data->langpacks as $langcode => $langpack) {
             $row = array();
             $row[0] = $langpack->langname;
-            $row[1] = $langpack->filename;
+            $row[1] = '<a href="'.$langpack->filename.'">'.$langpack->filename.'</a>';
             $row[2] = display_size($langpack->filesize);
             if (time() - $langpack->modified < WEEKSECS) {
                 $row[3] = html_writer::tag('strong', self::commit_datetime($langpack->modified), array('class'=>'recentlymodified'));
