@@ -483,7 +483,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
                 if (!is_null($langpack->ratio)) {
                     $barmax = 500; // pixels
                     $barwidth = floor($barmax * $langpack->ratio);
-                    $barvalue = sprintf('%d %%', $langpack->ratio * 100);
+                    $barvalue = sprintf('%d %%', $langpack->ratio * 100).' ('.$langpack->totaltranslated.'/'.$langpack->totalenglish.')';
                     if ($langpack->ratio >= 0.8) {
                         $bg = '#e7f1c3'; // green
                     } elseif ($langpack->ratio >= 0.6) {
@@ -493,7 +493,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
                     } else {
                         $bg = '#ffd3d9'; // red
                     }
-                    $row[4] = '<div style="width:'.$barmax.'px;">
+                    $row[4] = '<div style="width:100%">
                                 <div style="width:'.$barwidth.'px;background-color:'.$bg.';float:left;margin-right: 5px;">&nbsp;</div><span>'.$barvalue.'</span></div>';
                 } else {
                     $row[4] = '';

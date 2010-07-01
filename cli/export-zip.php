@@ -86,7 +86,6 @@ foreach ($tree as $vercode => $languages) {
                 $packinfo[$langcode]['modified'] = $modified;
             }
             if ($component->has_string()) {
-                // $file = AMOS_EXPORT_ZIP_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->name . '.php';
                 $file = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'/'.$component->name.'.php';
                 $component->export_phpfile($file);
                 $zipfiles[$langcode . '/' . $component->name . '.php'] = $file;
