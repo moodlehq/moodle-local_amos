@@ -69,6 +69,10 @@ foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
     foreach ($languages as $langcode => $components) {
+        if ($langcode == 'en') {
+            // do not export English strings
+            continue;
+        }
         mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true);
         $zipfiles = array();
         $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack
@@ -172,9 +176,9 @@ foreach ($tree as $vercode => $languages) {
     }
 
     // prepare new index.php for the download server
-    //$indexpage = new local_amos_index_page($newpackinfo);
-    //$output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
-    //$indexpagehtml = $output->render($indexpage);
-    //file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
+    $indexpage = new local_amos_index_page($version, $newpackinfo);
+    $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
+    $indexpagehtml = $output->render($indexpage);
+    file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
 }
 exit(0);

@@ -463,7 +463,7 @@ require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>
 ';
-        $output .= $this->heading('Moodle 2.0 language packs');
+        $output .= $this->heading('Moodle '.$data->version->label.' language packs');
 
         $table = new html_table();
         $table->head = array('Language', 'Download', 'Size', 'Modified', 'Translation ratio');
@@ -505,6 +505,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
             $table->data[] = $row;
         }
         $output .= html_writer::table($table);
+        $output .= html_writer::tag('em', 'Generated: '.self::commit_datetime($data->timemodified), array('class'=>'timemodified'));
         $output .= '<?php
 print_simple_box_end();
 print_footer();

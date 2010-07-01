@@ -569,27 +569,39 @@ class local_amos_log implements renderable {
  */
 class local_amos_index_page implements renderable {
 
+    /** @var mlang_version */
+    public $version = null;
+
     /** @var array */
     public $langpacks = array();
+
+    /** @var int */
+    public $timemodified;
 
     /** @var array */
     protected $packinfo = array();
 
-    /** @var array */
-    protected $numofenglish = array();
-
     /**
      * Initialize data
      *
+     * @param mlang_version $version we are generating page for
      * @param array $packinfo data structure prepared by cli/export-zip.php
-     * @param array $numofenglish data structure prepared by cli/export-zip.php
      */
-    public function __construct(array $packinfo, array $numofenglish) {
+    public function __construct(mlang_version $version, array $packinfo) {
+
+        $this->version  = $version;
         $this->packinfo = fullclone($packinfo);
-        $this->numogenglish = fullclone($numofenglish);
+        $this->timemodified = time();
+
+        // get the number of strings for installed plugins
+        // only the installed plugins are taken into statistics calculation
+        $installed = local_amos_installed_components(); // todo pass $version here and the function will
+                                                        // get the list via MNet system RPC call to a remote host
         $totalenglish = 0;
-        foreach ($numofenglish as $component => $defined) {
-            $totalenglish += $defined;
+        foreach ($installed as $componentname => $unused) {
+            $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
+            $totalenglish += $component->get_number_of_strings();
+            $component->clear();
         }
         foreach ($this->packinfo as $langcode => $info) {
             $langpack = new stdclass();
@@ -606,7 +618,9 @@ class local_amos_index_page implements renderable {
             if ($langpack->parent == 'en') {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
-                    $langpack->totaltranslated += $translated;
+                    if (isset($installed[$component])) {
+                        $langpack->totaltranslated += $translated;
+                    }
                 }
                 $langpack->totalenglish = $totalenglish;
                 if ($langpack->totalenglish == 0) {
@@ -625,4 +639,41 @@ class local_amos_index_page implements renderable {
             $this->langpacks[] = $langpack;
         }
     }
+}
+
+/**
+ * Returns a list of all components installed on the server
+ *
+ * All returned items can be used for get_string() calls. The components installed
+ * at the AMOS server are considered as "standard" for the purpose of translation
+ * statistics calculation.
+ *
+ * @return array (string)legacyname => (string)frankenstylename
+ */
+function local_amos_installed_components() {
+
+    $list = array(); // to be returned
+
+    $coresubsystems = get_core_subsystems();
+    ksort($coresubsystems); // should be but just in case
+    foreach ($coresubsystems as $name => $location) {
+        $list[$name] = 'core_'.$name;
+    }
+
+    $plugintypes = get_plugin_types();
+    foreach ($plugintypes as $type => $location) {
+        $pluginlist = get_plugin_list($type);
+        foreach ($pluginlist as $name => $ununsed) {
+            if ($type == 'mod') {
+                if (array_key_exists($name, $list)) {
+                    throw new Exception('Activity module and core subsystem name collision');
+                }
+                $list[$name] = $type.'_'.$name;
+            } else {
+                $list[$type.'_'.$name] = $type.'_'.$name;
+            }
+        }
+    }
+
+    return $list;
 }
