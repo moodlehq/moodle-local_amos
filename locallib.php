@@ -595,21 +595,34 @@ class local_amos_index_page implements renderable {
             $langpack = new stdclass();
             $langpack->langname = $info['langname'];
             $langpack->filename = $langcode.'.zip';
-            //$langpack->filesize = TODO
+            $langpack->filesize = $info['filesize'];
             $langpack->modified = $info['modified'];
-
-            // calculate the translation statistics
-            $langpack->totaltranslated = 0;
-            foreach ($info['numofstrings'] as $component => $translated) {
-                $langpack->totaltranslated += $translated;
-            }
-            $langpack->totalenglish = $totalenglish;
-            if ($langpack->totalenglish == 0) {
-                $langpack->ratio = null;
+            if (!empty($info['parent'])) {
+                $langpack->parent = $info['parent'];
             } else {
-                $langpack->ratio = $langpack->totaltranslated / $langpack->totalenglish;
+                $langpack->parent = 'en';
             }
+            // calculate the translation statistics
+            if ($langpack->parent == 'en') {
+                $langpack->totaltranslated = 0;
+                foreach ($info['numofstrings'] as $component => $translated) {
+                    $langpack->totaltranslated += $translated;
+                }
+                $langpack->totalenglish = $totalenglish;
+                if ($langpack->totalenglish == 0) {
+                    $langpack->ratio = null;
+                } else {
+                    $langpack->ratio = $langpack->totaltranslated / $langpack->totalenglish;
+                }
+            } else {
+                $langpack->totaltranslated = 0;
+                foreach ($info['numofstrings'] as $component => $translated) {
+                    $langpack->totaltranslated += $translated;
+                }
+                $langpack->totalenglish = $totalenglish;
+                $langpack->ratio = null;
+            }
+            $this->langpacks[] = $langpack;
         }
-        $this->langpacks[] = $langpack;
     }
 }

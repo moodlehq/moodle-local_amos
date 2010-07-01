@@ -99,6 +99,9 @@ foreach ($tree as $vercode => $languages) {
             if ($component->name == 'langconfig' and $component->has_string('thislanguage')) {
                 $langname = $component->get_string('thislanguage')->text;
             }
+            if ($component->name == 'langconfig' and $component->has_string('parentlanguage')) {
+                $packinfo[$langcode]['parent'] = $component->get_string('parentlanguage')->text;
+            }
             $component->clear();
         }
         $zipfile = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'.zip';
@@ -178,10 +181,9 @@ foreach ($tree as $vercode => $languages) {
     }
 
     // prepare new index.php for the download server
-    // todo
-    //$indexpage = new local_amos_index_page($newpackinfo, $numofenglish);
-    //$output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
-    //$indexpagehtml = $output->render($indexpage);
-    //file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
+    $indexpage = new local_amos_index_page($newpackinfo, $numofenglish);
+    $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
+    $indexpagehtml = $output->render($indexpage);
+    file_put_contents(AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
 }
 exit(0);

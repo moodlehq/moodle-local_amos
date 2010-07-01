@@ -461,14 +461,54 @@ $current = "lang";
 require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
+?>
 ';
         $output .= $this->heading('Moodle 2.0 language packs');
 
         $table = new html_table();
-        $table->head = array('Language', 'Download', 'Size', 'Translation ratio');
-        foreach ($data->langpacks as $langpack) {
-            // todo
+        $table->head = array('Language', 'Download', 'Size', 'Modified', 'Translation ratio');
+        $table->width = '100%';
+        foreach ($data->langpacks as $langcode => $langpack) {
+            $row = array();
+            $row[0] = $langpack->langname;
+            $row[1] = $langpack->filename;
+            $row[2] = display_size($langpack->filesize);
+            if (time() - $langpack->modified < WEEKSECS) {
+                $row[3] = html_writer::tag('strong', self::commit_datetime($langpack->modified), array('class'=>'recentlymodified'));
+            } else {
+                $row[3] = self::commit_datetime($langpack->modified);
+            }
+            if ($langpack->parent == 'en') {
+                // standard package
+                if (!is_null($langpack->ratio)) {
+                    $barmax = 500; // pixels
+                    $barwidth = floor($barmax * $langpack->ratio);
+                    $barvalue = sprintf('%d %%', $langpack->ratio * 100);
+                    if ($langpack->ratio >= 0.8) {
+                        $bg = '#e7f1c3'; // green
+                    } elseif ($langpack->ratio >= 0.6) {
+                        $bg = '#d2ebff'; // blue
+                    } elseif ($langpack->ratio >= 0.4) {
+                        $bg = '#f3f2aa'; // yellow
+                    } else {
+                        $bg = '#ffd3d9'; // red
+                    }
+                    $row[4] = '<div style="width:'.$barmax.'px;">
+                                <div style="width:'.$barwidth.'px;background-color:'.$bg.';float:left;margin-right: 5px;">&nbsp;</div><span>'.$barvalue.'</span></div>';
+                } else {
+                    $row[4] = '';
+                }
+            } else {
+                // variant
+                $row[4] = $langpack->totaltranslated.' modifications';
+            }
+            $table->data[] = $row;
         }
+        $output .= html_writer::table($table);
+        $output .= '<?php
+print_simple_box_end();
+print_footer();
+';
 
         return $output;
     }
