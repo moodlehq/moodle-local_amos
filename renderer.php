@@ -469,7 +469,12 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
         $table->width = '100%';
         foreach ($data->langpacks as $langcode => $langpack) {
             $row = array();
-            $row[0] = $langpack->langname;
+            if ($langpack->parent == 'en') {
+                // standard pack of a variant of English
+                $row[0] = $langpack->langname;
+            } else {
+                $row[0] = html_writer::tag('em', $langpack->langname, array('style'=>'margin-left:1em;'));
+            }
             $row[1] = '<a href="'.$langpack->filename.'">'.$langpack->filename.'</a>';
             $row[2] = display_size($langpack->filesize);
             if (time() - $langpack->modified < WEEKSECS) {
