@@ -172,6 +172,33 @@ class mlang_test extends UnitTestCase {
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
     }
 
+    public function test_deleted_has_same_timemodified() {
+        $now = time();
+        $stage = new mlang_stage();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('welcome', 'Welcome', $now));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('First string in AMOS', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('welcome', '', $now, true));
+        $stage->add($component);
+        $stage->commit('Marking string as deleted', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string());
+        $component->clear();
+        unset($component);
+    }
+
     public function test_component_from_phpfile_legacy_format() {
         $filecontents = <<<EOF
 <?php

@@ -226,6 +226,8 @@ class mlang_component {
             if (empty($deleted) and $r->deleted) {
                 // we do not want to include deleted strings - note that this must be checked here and not
                 // in SQL above so that the same string can be deleted and re-added again
+                $component->unlink_string($r->stringid);    // this is needed because there can be two strings with
+                                                            // the same timemodified, one deleted, one not
                 continue;
             }
             if ($fullinfo) {
