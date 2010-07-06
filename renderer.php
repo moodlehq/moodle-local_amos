@@ -203,7 +203,8 @@ class local_amos_renderer extends plugin_renderer_base {
             if ($translator->currentpage > 1) {
                 $output  = $this->heading('No strings found on page '.$translator->currentpage);
                 $output .= html_writer::tag('div',
-                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), '&lt;&lt; go to the previous page'),
+                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), '&lt;&lt; go to the first page') . ' | '.
+                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), '&lt; go to the previous page'),
                         array('style' => 'text-align:center'));
                 $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
             } else {
