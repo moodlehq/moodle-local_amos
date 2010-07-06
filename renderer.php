@@ -508,7 +508,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
             } else {
                 $row[3] = self::commit_datetime($langpack->modified);
             }
-            if ($langpack->parent == 'en' && substr($langcode, 0, 3) != 'en_') {
+            if ($langpack->parent == 'en' and substr($langcode, 0, 3) != 'en_') {
                 // standard package
                 if (!is_null($langpack->ratio)) {
                     $barmax = 500; // pixels
