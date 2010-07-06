@@ -82,10 +82,24 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', 'Show strings of these components', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
-        $options = array();
+        $optionscore = array();
+        $optionsstandard = array();
+        $optionscontrib = array();
+        $installed = local_amos_installed_components();
         foreach (mlang_tools::list_components() as $componentname => $undefined) {
-            $options[$componentname] = $componentname;
+            list($ctype, $cname) = normalize_component($componentname);
+            if ($ctype == 'core') {
+                $optionscore[$componentname] = $installed[$componentname];
+            } elseif (isset($installed[$componentname])) {
+                $optionsstandard[$componentname] = $installed[$componentname];
+            } else {
+                $optionscontrib[$componentname] = $componentname;
+            }
         }
+        asort($optionscore);
+        asort($optionsstandard);
+        ksort($optionscontrib);
+        $options = array(array('Core subsystems' => $optionscore), array('Standard plugins' => $optionsstandard), array('Non-standard' => $optionscontrib));
         $output .= html_writer::select($options, 'fcmp[]', $filter->get_data()->component, '',
                     array('id' => 'amosfilter_fcmp', 'multiple' => 'multiple', 'size' => 5));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
