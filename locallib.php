@@ -652,7 +652,7 @@ class local_amos_index_page implements renderable {
  */
 function local_amos_installed_components() {
 
-    $list = array(); // to be returned
+    $list['moodle'] = 'core';
 
     $coresubsystems = get_core_subsystems();
     ksort($coresubsystems); // should be but just in case
