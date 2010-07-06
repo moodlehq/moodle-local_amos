@@ -73,6 +73,20 @@ M.local_amos.init_translator = function(Y) {
     var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
     fcmpselectnone.on('click', function(e) { fcmp.all('option').set('selected', false); });
 
+    // display the "loading" icon after the filter button is pressed
+    var fform       = Y.one('#amosfilter_form');
+    var fsubmit     = fform.one('input.submit');
+    var translatorw = Y.one('.translatorwrapper');
+    var ficonholder = fform.one('#amosfilter_submitted_icon');
+    var ficonhtml   = '<img src="'+M.cfg.loadingicon+'" class="spinner" style="display:none" />';
+    ficonholder.set('innerHTML', ficonhtml);
+
+    fform.on('submit', function(e) {
+                fsubmit.set('value', 'Processing...');
+                ficonholder.one('img').setStyle('display', 'inline');
+                translatorw.setStyle('display', 'none');
+                });
+
     if (translator) {
         // make all translatable fields editable
         var translatable = translator.all('.translatable');

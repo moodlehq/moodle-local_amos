@@ -150,7 +150,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save filter settings'));
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save filter settings', 'class' => 'submit'));
+        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
@@ -160,7 +161,7 @@ class local_amos_renderer extends plugin_renderer_base {
         // form
         $attributes = array('method' => 'post',
                             'action' => $filter->handler->out(),
-                            'id'     => html_writer::random_id(),
+                            'id'     => 'amosfilter_form',
                             'class'  => 'lazyform ' . $filter->lazyformname,
                         );
         $output = html_writer::tag('form', $output, $attributes);
@@ -190,9 +191,12 @@ class local_amos_renderer extends plugin_renderer_base {
                 $output .= html_writer::tag('div',
                         html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), '&lt;&lt; go to the previous page'),
                         array('style' => 'text-align:center'));
-                return $output;
+                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
+            } else {
+                $output = $this->heading('No strings found');
+                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
             }
-            return $this->heading('No strings found');
+            return $output;
         }
 
         $missing = 0;
