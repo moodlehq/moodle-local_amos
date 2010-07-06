@@ -508,7 +508,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
             } else {
                 $row[3] = self::commit_datetime($langpack->modified);
             }
-            if ($langpack->parent == 'en' and substr($langcode, 0, 3) != 'en_') {
+            if (($langpack->parent == 'en') and (substr($langcode, 0, 3) != 'en_')) {
                 // standard package
                 if (!is_null($langpack->ratio)) {
                     $barmax = 500; // pixels
@@ -530,7 +530,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
                 }
             } else {
                 // variant of parent language
-                $row[4] = $langpack->totaltranslated.' modifications';
+                $row[4] = $langpack->totaltranslated.' modifications against '.$langpack->parent;
             }
             $table->data[] = $row;
         }

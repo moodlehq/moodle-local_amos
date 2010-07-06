@@ -598,9 +598,11 @@ class local_amos_index_page implements renderable {
         $installed = local_amos_installed_components(); // todo pass $version here and the function will
                                                         // get the list via MNet system RPC call to a remote host
         $totalenglish = 0;
+        $english = array();
         foreach ($installed as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
-            $totalenglish += $component->get_number_of_strings();
+            $english[$componentname] = $component->get_number_of_strings();
+            $totalenglish += $english[$componentname];
             $component->clear();
         }
         foreach ($this->packinfo as $langcode => $info) {
@@ -619,7 +621,7 @@ class local_amos_index_page implements renderable {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
                     if (isset($installed[$component])) {
-                        $langpack->totaltranslated += $translated;
+                        $langpack->totaltranslated += min($translated, $english[$component]);
                     }
                 }
                 $langpack->totalenglish = $totalenglish;
