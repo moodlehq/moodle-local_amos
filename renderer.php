@@ -176,6 +176,7 @@ class local_amos_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function render_local_amos_translator(local_amos_translator $translator) {
+        global $PAGE;
 
         $table = new html_table();
         $table->id = 'amostranslator';
@@ -184,6 +185,13 @@ class local_amos_renderer extends plugin_renderer_base {
         $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
 
         if (empty($translator->strings)) {
+            if ($translator->currentpage > 1) {
+                $output  = $this->heading('No strings found on page '.$translator->currentpage);
+                $output .= html_writer::tag('div',
+                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), '&lt;&lt; go to the previous page'),
+                        array('style' => 'text-align:center'));
+                return $output;
+            }
             return $this->heading('No strings found');
         }
 
