@@ -638,7 +638,7 @@ class local_amos_index_page implements renderable {
                 $langpack->totalenglish = $totalenglish;
                 $langpack->ratio = null;
             }
-            $this->langpacks[] = $langpack;
+            $this->langpacks[$langcode] = $langpack;
         }
     }
 }
