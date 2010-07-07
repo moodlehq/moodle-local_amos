@@ -40,6 +40,6 @@ function amos_extends_navigation(global_navigation $navigation) {
     if (has_capability('local/amos:manage', get_system_context())) {
         $admin = $amos->add('Admin');
         $admin->add('Translators', new moodle_url('/local/amos/admin/translators.php'));
-
+        $admin->add('New language', new moodle_url('/local/amos/admin/newlanguage.php'));
     }
 }
