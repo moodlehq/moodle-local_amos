@@ -71,7 +71,6 @@ class local_amos_filter implements renderable {
             }
         }
 
-        // pagination is not part of POSTed form, can't use get_data_submitted() therefore
         $page = optional_param('fpg', null, PARAM_INT);
         if (!empty($page)) {
             $data->page = $page;
@@ -189,6 +188,9 @@ class local_amos_filter implements renderable {
         $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
         $data->stringid     = trim(optional_param('fsid', '', PARAM_STRINGID));
         $data->stagedonly   = optional_param('fstg', false, PARAM_BOOL);
+
+        // reset the paginator to the first page every time the filter is saved
+        $data->page = 1;
 
         return $data;
     }
