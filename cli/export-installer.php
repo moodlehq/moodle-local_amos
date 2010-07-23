@@ -82,6 +82,8 @@ $phpdoc = <<<EOF
 
 EOF;
 
+$status = 0; // exit status, 0 means no problems
+
 foreach ($list as $componentname => $stringids) {
     foreach ($langs as $lang) {
         $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false, array_keys($stringids));
@@ -90,10 +92,20 @@ foreach ($list as $componentname => $stringids) {
             if (!file_exists(dirname($file))) {
                 mkdir(dirname($file), 0755, true);
             }
-            echo "$file\n";
+            //echo "$file\n";
             $component->export_phpfile($file, $phpdoc);
+        }
+        if ($lang == 'en') {
+            // check that all string were exported
+            foreach (array_keys($stringids) as $stringid) {
+                if (!$component->has_string($stringid)) {
+                    echo "ERROR Unknown $stringid,$componentname\n";
+                    $status = 1;
+                }
+            }
         }
         $component->clear();
     }
 }
 echo "DONE\n";
+exit($status);
