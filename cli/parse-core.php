@@ -150,6 +150,8 @@ $MLANG_IGNORE_COMMITS = array(
     // the following commits just move a string file
     '34d6a78987fa61f81bf37f5c4c2ee3e7a01d4d1c',
     '8118207b6fd8607eeca1aa7bef327e8280e3e5f8',
+    // the removal of mod_hotpot from core:
+    '91b9560bd63e5582781e910573ee0887b558ca12',
 );
 
 $MLANG_PARSE_BRANCHES = array(
