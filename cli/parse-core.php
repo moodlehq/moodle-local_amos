@@ -42,6 +42,74 @@ require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
+ * This is a hacky way how to populate a forum at lang.moodle.org with commits into the core
+ *
+ * @param mlang_stage $stage
+ * @param string $commitmsg
+ * @param string $committer
+ * @param string $committeremail
+ * @param string $commithash
+ * @param string $fullcommitmsg
+ * @return void
+ */
+function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg) {
+    global $CFG; $DB;
+    require_once($CFG->dirroot.'/mod/forum/lib.php');
+
+    if ($CFG->wwwroot !== 'http://lang.moodle.org') {
+        // this is intended for lang.moodle.org portal only
+        return;
+    }
+
+    if (!$stage->has_component()) {
+        // nothing to commit
+        return;
+    }
+
+    // these are hard-coded values of a forum to inject commit messages into
+    $courseid = 2;  // course 'Translating Moodle'
+    $cmid = 7;      // forum 'Notification of string changes'
+    $userid = 2;    // user 'AMOS bot'
+
+    $cm = get_coursemodule_from_id('forum', $cmid);
+
+    $discussion = new stdclass();
+    $discussion->course = $courseid;
+    $discussion->forum = $cm->instance;
+    $discussion->name = s(substr('[AMOS commit] ' . $commitmsg, 0, 255));
+    $discussion->message = $fullcommitmsg . "\n\n";
+    $discussion->message .= 'http://github.com/moodle/moodle/commit/'.$commithash . "\n\n";
+
+    foreach ($stage->get_iterator() as $component) {
+        foreach ($component->get_iterator() as $string) {
+            if ($string->deleted) {
+                $sign = '-  ';
+            } else {
+                $sign = '+  ';
+            }
+
+            list($type, $plugin) = normalize_component($component->name);
+            if ($type == 'core' and is_null($plugin)) {
+                $name = 'core';
+            } else {
+                $name = $type . '_' . $plugin;
+            }
+
+            $discussion->message .= $sign . $component->version->label . ' en [' . $string->id . ',' . $name . "]\n";
+        }
+    }
+
+    $discussion->message = s($discussion->message);
+    $discussion->messageformat = FORMAT_MOODLE;
+    $discussion->messagetrust = 0;
+    $discussion->attachments = null;
+    $discussion->mailnow = 1;
+
+    $message = null;
+    forum_add_discussion($discussion, null, $message, $userid);
+}
+
+/**
  * This is a helper function that just contains a block of code that needs to be
  * executed from two different places in this script. Consider it more as C macro
  * than a real function.
@@ -50,6 +118,7 @@ function amos_parse_core_commit() {
     global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $version, $fullcommitmsg, $startatlock;
 
     $stage->rebase($timemodified, true, $timemodified);
+    amos_core_commit_notify($stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg);
     $stage->commit($commitmsg, array(
         'source' => 'git',
         'userinfo' => $committer . ' <' . $committeremail . '>',
