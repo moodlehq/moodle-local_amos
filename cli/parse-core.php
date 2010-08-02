@@ -77,7 +77,9 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
     $discussion->course = $courseid;
     $discussion->forum = $cm->instance;
     $discussion->name = s(substr('[AMOS commit] ' . $commitmsg, 0, 255));
-    $discussion->message = $fullcommitmsg . "\n\n";
+    $discussion->message = 'Author: ' . $committer . "\n";
+    $discussion->message .= $fullcommitmsg . "\n\n";
+    $discussion->message .= 'http://git.moodle.org/gw?p=moodle.git;a=commit;h='.$commithash . "\n";
     $discussion->message .= 'http://github.com/moodle/moodle/commit/'.$commithash . "\n\n";
 
     foreach ($stage->get_iterator() as $component) {
