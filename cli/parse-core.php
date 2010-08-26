@@ -26,10 +26,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if (isset($_SERVER['REMOTE_ADDR'])) {
-    error_log('AMOS cli scripts can not be called via the web interface');
-    exit;
-}
+define('CLI_SCRIPT', true);
 
 set_time_limit(0);
 $starttime = microtime();
