@@ -493,6 +493,7 @@ require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>';
         $output .= $this->heading('Moodle '.$data->version->label.' language packs');
+        $output .= $this->heading('There are currently a total of '.count($data->langpacks).' language packs for this version', 3);
 
         $table = new html_table();
         $table->head = array('Language', 'Download', 'Size', 'Modified', 'Translation ratio');
