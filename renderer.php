@@ -494,9 +494,16 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>';
         $output .= $this->heading('Moodle '.$data->version->label.' language packs');
         $output .= $this->heading('There are currently a total of '.count($data->langpacks).' language packs for this version', 3);
+        $output .= html_writer::tag('p', 'These zip files are generated hourly from the work of translators in the
+            <a href=" http://lang.moodle.org/">Moodle languages portal</a>. Contact details for language pack maintainers are
+            listed in the <a href="http://docs.moodle.org/en/Translation_credits">Translation credits</a>.');
+        $output .= html_writer::tag('p', 'Note: All language packs are work-in-progress, as developers continue to add new language strings to Moodle. The most commonly used strings are generally translated first.');
+        $output .= html_writer::tag('h3', 'Language pack installation');
+        $output .= html_writer::tag('p', 'To install additional language packs on your Moodle site, access Site Administration > Language > Language packs then select the languages you require and click on the "Install selected language pack" button.');
+        $output .= html_writer::tag('p', 'For further information, including details of how to install language packs manually, please refer to the <a href="http://docs.moodle.org/en/Language_packs">Language packs documentation</a>.');
 
         $table = new html_table();
-        $table->head = array('Language', 'Download', 'Size', 'Modified', 'Translation ratio');
+        $table->head = array('Language', 'Download', 'Size', 'Last updated', 'Percentage of language strings translated');
         $table->width = '100%';
         foreach ($data->langpacks as $langcode => $langpack) {
             $row = array();
@@ -535,7 +542,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
                 }
             } else {
                 // variant of parent language
-                $row[4] = $langpack->totaltranslated.' modifications against '.$langpack->parent;
+                $row[4] = $langpack->totaltranslated.' changes from '.$langpack->parent;
             }
             $table->data[] = $row;
         }
