@@ -25,9 +25,6 @@
 
 define('CLI_SCRIPT', true);
 
-// Do not set moodle cookie because we do not need it here, it is better to emulate session
-define('NO_MOODLE_COOKIES', true);
-
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->libdir  . '/filelib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
