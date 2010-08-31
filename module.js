@@ -153,6 +153,7 @@ M.local_amos.editor_on = function(cell, focus) {
     var editor      = Y.Node.create('<textarea class="translation-edit">' + stext + '</textarea>');
     editor.on('blur', M.local_amos.editor_blur);
     cell.append(editor);
+    editor.setStyle('height', cell.getComputedStyle('height'));
     if (focus) {
         editor.focus();
     }
