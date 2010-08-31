@@ -226,7 +226,9 @@ class local_amos_renderer extends plugin_renderer_base {
             // moodle version to put this translation onto
             $cells[2] = new html_table_cell($string->branch);
             // original of the string
-            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            $o = html_writer::tag('div', s($string->original), array('class' => 'preformatted english'));
+            $g = html_writer::tag('div', '', array('class' => 'googleicon'));
+            $cells[3] = $o.$g;
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation

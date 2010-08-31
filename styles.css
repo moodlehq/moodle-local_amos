@@ -154,6 +154,21 @@
     min-height: 4em;
 }
 
+.path-local-amos #amostranslator .googleicon img {
+    cursor: pointer;
+}
+
+.path-local-amos #amostranslator .googletranslation {
+    background-color: #ebeff9;
+    padding: 3px;
+}
+
+.path-local-amos #amostranslator .googleerror {
+    background-color: #ffd3d9;
+    border: 1px dotted #dd0000;
+    padding: 3px;
+}
+
 #page-local-amos-index h1.main,
 #page-local-amos-index h2.main {
     text-align: left;
@@ -179,4 +194,8 @@
 
 .path-local-amos .pagination .current {
     font-weight: bold;
+}
+
+.path-local-amos .googlebranding {
+    text-align: center;
 }

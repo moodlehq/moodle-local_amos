@@ -37,6 +37,11 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS');
 $PAGE->set_heading('AMOS');
+if (empty($CFG->googleapikey)) {
+    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi'));
+} else {
+    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi', array('key'=>$CFG->googleapikey)));
+}
 $PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);
 
 $output = $PAGE->get_renderer('local_amos');
@@ -58,4 +63,5 @@ $translator = new local_amos_translator($filter, $USER);
 echo $output->header();
 echo $output->render($filter);
 echo $output->render($translator);
+echo $output->box('', 'googlebranding', 'googlebranding');
 echo $output->footer();

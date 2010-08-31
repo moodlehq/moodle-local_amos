@@ -112,6 +112,8 @@ M.local_amos.init_translator = function(Y) {
             }
         });
     }
+
+    google.load('language', 1, {'callback' : M.local_amos.init_google_translator});
 }
 
 /**
@@ -354,6 +356,63 @@ M.local_amos.uptodate_success = function(tid, outcome, args) {
  */
 M.local_amos.uptodate_failure = function(tid, outcome, args) {
     alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
+}
+
+/**
+ * Initialize Google translator features, called immediately after their API is loaded
+ */
+M.local_amos.init_google_translator = function() {
+    var Y = M.local_amos.Y;
+    var translator = Y.one('#amostranslator');
+    var iconcontainers = translator.all('.googleicon');
+    iconcontainers.each(M.local_amos.init_google_icon);
+    icons = translator.all('.googleicon img');
+    icons.on('click', M.local_amos.google_translate);
+    google.language.getBranding('googlebranding');
+}
+
+/**
+ * Stores the information of whether the given language is translatable via Google
+ */
+M.local_amos.translatable = M.local_amos.translatable || []
+
+/**
+ * Prepare an icon for Google translation
+ *
+ * @param {Y.Node} container the div container of the icon
+ */
+M.local_amos.init_google_icon = function(container, index, iconcontainers) {
+    var Y = M.local_amos.Y;
+    var iconhtml = '<img src="' + M.util.image_url('google', 'local_amos') + '" />';
+    var lang = container.get('parentNode').get('parentNode').one('td.lang').get('innerHTML');
+    if (Y.Lang.isUndefined(M.local_amos.translatable[lang])) {
+        M.local_amos.translatable[lang] = google.language.isTranslatable(lang);
+    }
+    if (M.local_amos.translatable[lang]) {
+        container.set('innerHTML', iconhtml);
+    }
+}
+
+/**
+ * @param {Y.Event} e
+ */
+M.local_amos.google_translate = function(e) {
+    var Y = M.local_amos.Y;
+    var english = e.currentTarget.get('parentNode').get('parentNode').one('.english').get('innerHTML');
+    var lang = e.currentTarget.get('parentNode').get('parentNode').get('parentNode').one('td.lang').get('innerHTML');
+    e.currentTarget.set('src', M.cfg.loadingicon);
+    google.language.translate(english, 'en', lang, function(result) {
+        if (!result.error) {
+            container = e.currentTarget.get('parentNode');
+            container.set('innerHTML', result.translation);
+            container.replaceClass('googleicon', 'googletranslation');
+            container.addClass('preformatted');
+        } else {
+            container = e.currentTarget.get('parentNode');
+            container.set('innerHTML', result.error.message);
+            container.replaceClass('googleicon', 'googleerror');
+        }
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////////////
