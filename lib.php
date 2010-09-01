@@ -36,6 +36,9 @@ function amos_extends_navigation(global_navigation $navigation) {
         $amos->add('Translator', new moodle_url('/local/amos/view.php'));
         $amos->add('Stage', new moodle_url('/local/amos/stage.php'));
     }
+    if (has_capability('local/amos:stash', get_system_context())) {
+        $amos->add('Stashes', new moodle_url('/local/amos/stash.php'));
+    }
     $amos->add('Log', new moodle_url('/local/amos/log.php'));
     if (has_capability('local/amos:manage', get_system_context())) {
         $admin = $amos->add('Admin');

@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
 $string['amos:manage'] = 'Manage AMOS portal';
+$string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['foundinfo'] = 'Number of found strings';
@@ -43,14 +44,24 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Red - the string is not translated and you are allowed to translate it and commit the translation.
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
+$string['stashactions'] = 'Stash actions';
+$string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be shared with other users and/or they can be offered to the official language pack maintainers for inclusion into the language pack.';
 $string['stageactions'] = 'Stage actions';
 $string['stageactions_help'] = '* Edit staged strings - modifies the translator filter settings so that only staged translations are displayed.
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
-* Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.';
+* Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.
+* Unstage all - clears the stage, all staged translations are lost.';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
 * Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
-
+$string['ownstashactions'] = 'Action';
+$string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.
+* Pop - move the translated strings from the stasg into the stage and drop the stash (that is Apply and Drop).
+* Drop - throw away the stashed strings.
+* Pull request - make the stash available to the official language maintainers so they can apply your work into their stage, review it and eventually commit.';
+$string['requestactions'] = 'Action';
+$string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
+* Hide - blocks the pull request so that it is not displayed to you any more.';

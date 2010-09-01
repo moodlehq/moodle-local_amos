@@ -741,4 +741,8 @@ EOF;
         $component->add_string(new mlang_string('third', 'World', $now - 4));
         $this->assertEqual($now - 4, $component->get_recent_timemodified());
     }
+
+    public function test_stash_push() {
+
+    }
 }

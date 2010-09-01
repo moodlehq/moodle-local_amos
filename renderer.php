@@ -372,11 +372,28 @@ class local_amos_renderer extends plugin_renderer_base {
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
         $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper protected'));
 
+        $stashform  = html_writer::label('Stash title', 'stashtitle', true);
+        $stashform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+        $stashform .= html_writer::empty_tag('input', array('name' => 'new', 'value' => 1, 'type' => 'hidden'));
+        $stashform .= html_writer::empty_tag('input', array('name' => 'name',
+                                                            'value' => 'WIP - '.userdate(time(), get_string('strftimedaydatetime', 'langconfig')),
+                                                            'type' => 'text',
+                                                            'size' => 50,
+                                                            'id' => 'stashtitle',
+                                                            'maxlength' => 255));
+        $stashform .= html_writer::empty_tag('input', array('value' => 'Push all staged strings into a new stash', 'type' => 'submit'));
+        $stashform  = html_writer::tag('div', $stashform);
+        $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
+        $stashform  = html_writer::tag('div', $stashform, array('class' => 'stashformwrapper'));
+
         $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1));
         $prunebutton = $this->single_button($pruneurl, 'Prune non-committable', 'post', array('class'=>'singlebutton protected'));
 
         $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1));
         $rebasebutton = $this->single_button($rebaseurl, 'Rebase', 'post', array('class'=>'singlebutton protected'));
+
+        $unstageallurl = new moodle_url('/local/amos/stage.php', array('unstageall' => 1));
+        $unstageallbutton = $this->single_button($unstageallurl, 'Unstage all', 'post', array('class'=>'singlebutton protected unstageall'));
 
         $i = 0;
         foreach ($stage->filterfields->fver as $fver) {
@@ -405,7 +422,12 @@ class local_amos_renderer extends plugin_renderer_base {
 
         if (!empty($stage->strings)) {
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton, array('class' => 'actionbuttons'));
+            $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
+                                        array('class' => 'actionbuttons'));
+
+            $legend = html_writer::tag('legend', get_string('stashactions', 'local_amos') . $this->help_icon('stashactions', 'local_amos'));
+            $output .= html_writer::tag('fieldset', $legend.$stashform, array('class' => 'actionbuttons'));
+
             $output .= $table;
         }
         $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));

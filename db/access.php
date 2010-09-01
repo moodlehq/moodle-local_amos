@@ -50,4 +50,13 @@ $capabilities = array(
         'legacy' => array()
     ),
 
+    // Ability to stash a stage
+    'local/amos:stash' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
+
 );

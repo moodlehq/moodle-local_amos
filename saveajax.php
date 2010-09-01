@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -55,6 +57,7 @@ $component->add_string($string);
 $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
 $stage->add($component, true);
 $stage->store();
+mlang_stash::autosave($stage);
 
 header('Content-Type: application/json; charset: utf-8');
 $response = new stdclass();

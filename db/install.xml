@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20100515" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20100901" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -42,7 +42,7 @@
         <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_commits">
+    <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_commits" NEXT="amos_stashes">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the translator's user account" PREVIOUS="id" NEXT="lang"/>
@@ -53,6 +53,43 @@
         <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="uq_user_lang"/>
         <KEY NAME="uq_user_lang" TYPE="unique" FIELDS="userid, lang" PREVIOUS="fk_user"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="amos_stashes" COMMENT="Keeps the information about the stashes in the stashpool" PREVIOUS="amos_translators" NEXT="amos_hidden_requests">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ownerid"/>
+        <FIELD NAME="ownerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the user who owns this stash" PREVIOUS="id" NEXT="hash"/>
+        <FIELD NAME="hash" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique hash of the content that servers as the filename" PREVIOUS="ownerid" NEXT="languages"/>
+        <FIELD NAME="languages" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="List of languages that are contained in the stashed stage" PREVIOUS="hash" NEXT="components"/>
+        <FIELD NAME="components" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="List of components that are stored in the stashed stage" PREVIOUS="languages" NEXT="strings"/>
+        <FIELD NAME="strings" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of strings in the stashed stage" PREVIOUS="components" NEXT="shared"/>
+        <FIELD NAME="shared" TYPE="int" LENGTH="3" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Boolean, whether the stash is shared with other users" PREVIOUS="strings" NEXT="pullrequest"/>
+        <FIELD NAME="pullrequest" TYPE="int" LENGTH="3" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Boolean, whether the stash is offered to the language maintainers for inclusion into the official lang pack" PREVIOUS="shared" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of then the stash was created" PREVIOUS="pullrequest" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the record was recently modified, eg shared or requested for pull" PREVIOUS="timecreated" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The name or title of the stash" PREVIOUS="timemodified" NEXT="message"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="The full message describing the stash. It is used as the default commit message when the stash is pullreguested." PREVIOUS="name"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="ownerid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_hash" UNIQUE="true" FIELDS="hash"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_hidden_requests" COMMENT="Records of all pull requests that the maintainer wants to hide" PREVIOUS="amos_stashes">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the maintainer" PREVIOUS="id" NEXT="stashid"/>
+        <FIELD NAME="stashid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the stash to hide" PREVIOUS="userid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
+        <KEY NAME="fk_user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ux_userid_stashid" UNIQUE="true" FIELDS="userid, stashid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

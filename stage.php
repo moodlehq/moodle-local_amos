@@ -27,10 +27,11 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
 
-$message = optional_param('message', null, PARAM_RAW); // commit message
-$unstage = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
-$prune   = optional_param('prune', null, PARAM_INT);
-$rebase  = optional_param('rebase', null, PARAM_INT);
+$message    = optional_param('message', null, PARAM_RAW); // commit message
+$unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
+$prune      = optional_param('prune', null, PARAM_INT);
+$rebase     = optional_param('rebase', null, PARAM_INT);
+$unstageall = optional_param('unstageall', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', get_system_context());
@@ -77,6 +78,13 @@ if (!empty($rebase)) {
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->rebase();
+    $stage->store();
+    redirect($PAGE->url);
+}
+if (!empty($unstageall)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage->clear();
     $stage->store();
     redirect($PAGE->url);
 }

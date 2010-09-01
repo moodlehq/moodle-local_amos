@@ -75,7 +75,8 @@
     display: inline;
 }
 
-.path-local-amos .stagewrapper .actionbuttons .singlebutton {
+.path-local-amos .stagewrapper .actionbuttons .singlebutton.unstageall {
+    margin-left: 2em;
 }
 
 .path-local-amos .stagewrapper .actionbuttons {
@@ -199,3 +200,29 @@
 .path-local-amos .googlebranding {
     text-align: center;
 }
+
+.path-local-amos .stashlist {
+    margin: 10px auto;
+    max-width: 80%;
+}
+
+.path-local-amos .stashlist .singlebutton,
+.path-local-amos .stashlist .singlebutton form,
+.path-local-amos .stashlist .singlebutton form div {
+    display: inline;
+}
+
+.path-local-amos .stashlist .userpicture {
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.path-local-amos .stashlist .singlebutton.pullrequest {
+    margin-left: 10px;
+}
+
+.path-local-amos .singlebutton.togglehidden {
+    text-align: center;
+}
+
+
