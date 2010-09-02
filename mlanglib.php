@@ -1075,6 +1075,10 @@ class mlang_stash {
             $record->components     = $components;
             $record->strings        = $strings;
             $record->timemodified   = time();
+            if ($this->name === 'AUTOSAVE') {
+                $record->shared         = 0;
+                $record->pullrequest    = 0;
+            }
 
             $DB->update_record('amos_stashes', $record);
         }

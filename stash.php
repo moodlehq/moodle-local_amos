@@ -172,7 +172,7 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
             $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('pop' => $stash->id)), 'Pop');
         }
         $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('drop' => $stash->id)), 'Drop');
-        if (empty($stash->pullrequest)) {
+        if (empty($stash->pullrequest) and $stash->name !== 'AUTOSAVE') {
             $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('pullrequest' => $stash->id)), 'Pull request',
                                               'post', array('class'=>'singlebutton pullrequest'));
         } else {
