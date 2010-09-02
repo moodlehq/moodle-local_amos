@@ -268,7 +268,7 @@ if (has_capability('local/amos:commit', get_system_context())) {
 
             $cells = array();
             $cells[0] = new html_table_cell(html_writer::tag('strong', s($stash->name), array('class' => 'name')) .
-                                           html_writer::tag('div', s($stash->message), array('class' => 'message')));
+                                           html_writer::tag('div', format_text($stash->message), array('class' => 'message')));
             $cells[0]->colspan = 4;
             $cells[0]->attributes['class'] = 'namemessage';
             $row = new html_table_row($cells);
