@@ -981,7 +981,7 @@ class mlang_stash {
      */
     public static function instance_from_stage(mlang_persistent_stage $stage, $name='') {
         $instance = new mlang_stash($stage->userid);
-        $instance->name = s($name);
+        $instance->name = $name;
         $instance->set_stage($stage);
         return $instance;
     }
