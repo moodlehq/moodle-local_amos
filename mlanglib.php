@@ -1450,6 +1450,8 @@ class mlang_tools {
             $rs->close();
         }
 
+        asort($cache);
+
         if ($english) {
             return $cache;
         } else {
