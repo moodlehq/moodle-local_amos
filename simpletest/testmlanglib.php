@@ -742,6 +742,15 @@ EOF;
         $this->assertEqual($now - 4, $component->get_recent_timemodified());
     }
 
+    public function test_component_get_number_of_strings() {
+        $component = new mlang_component('withemptystrings', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('foo', 'Foo'));
+        $component->add_string(new mlang_string('bar', 'Bar'));
+        $component->add_string(new mlang_string('empty', ''));
+        $this->assertEqual($component->get_number_of_strings(), 3);
+        $this->assertEqual($component->get_number_of_strings(false), 2);
+    }
+
     public function test_stash_push() {
 
     }

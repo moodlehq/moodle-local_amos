@@ -317,11 +317,24 @@ class mlang_component {
      * Returns the number of strings in the component
      *
      * Beware - if deleted strings are loaded into this component, they are counted, too.
+     * (this may get optional in the future if needed)
      *
+     * @param bool $countempty shall empty strings be counted?
      * @return int
      */
-    public function get_number_of_strings() {
-        return count($this->strings);
+    public function get_number_of_strings($countempty = true) {
+        if ($countempty) {
+            return count($this->strings);
+
+        } else {
+            $number = 0;
+            foreach ($this->strings as $stringid => $string) {
+                if (!empty($string->text)) {
+                    $number++;
+                }
+            }
+            return $number;
+        }
     }
 
     /**
