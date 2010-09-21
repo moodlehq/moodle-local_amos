@@ -603,7 +603,7 @@ class local_amos_index_page implements renderable {
         $english = array();
         foreach ($installed as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
-            $english[$componentname] = $component->get_number_of_strings(false);
+            $english[$componentname] = $component->get_number_of_strings();
             $totalenglish += $english[$componentname];
             $component->clear();
         }

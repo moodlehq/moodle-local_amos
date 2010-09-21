@@ -75,7 +75,7 @@ foreach ($tree as $vercode => $languages) {
         foreach ($components as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             $modified = $component->get_recent_timemodified();
-            $packinfo[$langcode]['numofstrings'][$componentname] = $component->get_number_of_strings(false);
+            $packinfo[$langcode]['numofstrings'][$componentname] = $component->get_number_of_strings();
             if ($packinfo[$langcode]['modified'] < $modified) {
                 $packinfo[$langcode]['modified'] = $modified;
             }
