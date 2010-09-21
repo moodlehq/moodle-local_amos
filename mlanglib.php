@@ -329,7 +329,7 @@ class mlang_component {
         } else {
             $number = 0;
             foreach ($this->strings as $stringid => $string) {
-                if (!empty($string->text)) {
+                if ($string->text !== '') {
                     $number++;
                 }
             }
