@@ -41,12 +41,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
 
         // version checkboxes
-        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Version', array('for' => 'amosfilter_fver'));
         $output .= html_writer::tag('div', 'Show strings from these Moodle versions', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $fver = '';
         foreach (mlang_version::list_all() as $version) {
             $checkbox = html_writer::checkbox('fver[]', $version->code, in_array($version->code, $filter->get_data()->version),
@@ -58,12 +58,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // language selector
-        $output .= html_writer::start_tag('div', array('class' => 'item select yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item select'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Languages', array('for' => 'amosfilter_flng'));
         $output .= html_writer::tag('div', 'Display translations in these languages', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $options = mlang_tools::list_languages();
         foreach ($options as $langcode => $langname) {
             $options[$langcode] = $langname . ' (' . $langcode . ')';
@@ -76,12 +76,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // component selector
-        $output .= html_writer::start_tag('div', array('class' => 'item select yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item select'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Component', array('for' => 'amosfilter_fcmp'));
         $output .= html_writer::tag('div', 'Show strings of these components', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $optionscore = array();
         $optionsstandard = array();
         $optionscontrib = array();
@@ -107,12 +107,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // other filter settings
-        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Miscellaneous', array('for' => 'amosfilter_fmis'));
         $output .= html_writer::tag('div', 'Additional conditions on strings to display', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
 
         $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, 'missing and outdated strings only');
         $fmis    = html_writer::tag('div', $fmis, array('class' => 'labelled_checkbox'));
@@ -129,12 +129,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // must contain string
-        $output .= html_writer::start_tag('div', array('class' => 'item text yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item text'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Substring', array('for' => 'amosfilter_ftxt'));
         $output .= html_writer::tag('div', 'String must contain given text', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
 
@@ -142,12 +142,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // string identifier
-        $output .= html_writer::start_tag('div', array('class' => 'item text yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item text'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'String identifier', array('for' => 'amosfilter_ftxt'));
         $output .= html_writer::tag('div', 'The key in the array of strings', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filter->get_data()->stringid));
 
@@ -159,11 +159,11 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
 
         // submit
-        $output .= html_writer::start_tag('div', array('class' => 'item submit yui3-gd'));
-        $output .= html_writer::start_tag('div', array('class' => 'label yui3-u first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item submit'));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element yui3-u'));
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save filter settings', 'class' => 'submit'));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
         $output .= html_writer::end_tag('div');

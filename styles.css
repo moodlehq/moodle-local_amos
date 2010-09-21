@@ -14,11 +14,22 @@
 }
 
 .path-local-amos .lazyform .item {
+    display: block;
     margin-bottom: 5px;
 }
 
 .path-local-amos .lazyform .item .label {
+    display: inline-block;
     text-align: right;
+    width: 35%;
+    margin-right: 10px;
+    vertical-align: top;
+}
+
+.path-local-amos .lazyform .item .element {
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
 }
 
 .path-local-amos .lazyform .item.select .actions {
