@@ -517,7 +517,6 @@ require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>';
         $output .= $this->heading('Moodle '.$data->version->label.' language packs');
-        $output .= $this->heading('There are currently a total of '.count($data->langpacks).' language packs for this version', 3);
         $output .= html_writer::tag('p', 'These zip files are generated hourly from the work of translators in the
             <a href=" http://lang.moodle.org/">Moodle languages portal</a>. Contact details for language pack maintainers are
             listed in the <a href="http://docs.moodle.org/en/Translation_credits">Translation credits</a>.');
@@ -525,7 +524,15 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
         $output .= html_writer::tag('h3', 'Language pack installation');
         $output .= html_writer::tag('p', 'To install additional language packs on your Moodle site, access Site Administration > Language > Language packs then select the languages you require and click on the "Install selected language pack" button.');
         $output .= html_writer::tag('p', 'For further information, including details of how to install language packs manually, please refer to the <a href="http://docs.moodle.org/en/Language_packs">Language packs documentation</a>.');
-
+        $output .= html_writer::tag('p', 'Work has started on '.$data->numoflangpacks.' language packs for Moodle 2.0. There are currently:');
+        $output .= html_writer::start_tag('table', array('border' => 0, 'width' => '80%', 'style' => 'margin:0.5em auto;'));
+        $output .= html_writer::start_tag('tr');
+        $output .= html_writer::tag('td', $data->percents['80'].' packs with more than 80% translated', array('style'=>'background-color:#e7f1c3;'));
+        $output .= html_writer::tag('td', $data->percents['60'].' packs with more than 60% translated', array('style'=>'background-color:#d2ebff;'));
+        $output .= html_writer::tag('td', $data->percents['40'].' packs with more than 40% translated', array('style'=>'background-color:#f3f2aa;'));
+        $output .= html_writer::tag('td', $data->percents['0'].' packs with less than 40% translated', array('style'=>'background-color:#ffd3d9;'));
+        $output .= html_writer::end_tag('tr');
+        $output .= html_writer::end_tag('table');
         $table = new html_table();
         $table->head = array('Language', 'Download', 'Size', 'Last updated', 'Percentage of language strings translated');
         $table->width = '100%';

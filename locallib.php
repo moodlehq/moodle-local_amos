@@ -580,6 +580,15 @@ class local_amos_index_page implements renderable {
     /** @var int */
     public $timemodified;
 
+    /** @var number of strings in the English official language pack */
+    public $totalenglish = 0;
+
+    /** @var number of available lang packs (without English) */
+    public $numoflangpacks = 0;
+
+    /** @var number of lang packs having more that xx% of the string translated */
+    public $percents = array();
+
     /** @var array */
     protected $packinfo = array();
 
@@ -594,20 +603,22 @@ class local_amos_index_page implements renderable {
         $this->version  = $version;
         $this->packinfo = fullclone($packinfo);
         $this->timemodified = time();
-
+        $this->percents = array('0' => 0, '40' => 0, '60' => 0, '80' => 0); // percents => number of langpacks
         // get the number of strings for installed plugins
         // only the installed plugins are taken into statistics calculation
         $installed = local_amos_installed_components(); // todo pass $version here and the function will
                                                         // get the list via MNet system RPC call to a remote host
-        $totalenglish = 0;
         $english = array();
         foreach ($installed as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
             $english[$componentname] = $component->get_number_of_strings();
-            $totalenglish += $english[$componentname];
+            $this->totalenglish += $english[$componentname];
             $component->clear();
         }
         foreach ($this->packinfo as $langcode => $info) {
+            if ($langcode !== 'en') {
+                $this->numoflangpacks++;
+            }
             $langpack = new stdclass();
             $langpack->langname = $info['langname'];
             $langpack->filename = $langcode.'.zip';
@@ -626,18 +637,25 @@ class local_amos_index_page implements renderable {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
                 }
-                $langpack->totalenglish = $totalenglish;
-                if ($langpack->totalenglish == 0) {
+                if ($this->totalenglish == 0) {
                     $langpack->ratio = null;
                 } else {
-                    $langpack->ratio = $langpack->totaltranslated / $langpack->totalenglish;
+                    $langpack->ratio = $langpack->totaltranslated / $this->totalenglish;
+                    if ($langpack->ratio > 0.8) {
+                        $this->percents['80']++;
+                    } elseif ($langpack->ratio > 0.6) {
+                        $this->percents['60']++;
+                    } elseif ($langpack->ratio > 0.4) {
+                        $this->percents['40']++;
+                    } else {
+                        $this->percents['0']++;
+                    }
                 }
             } else {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
                     $langpack->totaltranslated += $translated;
                 }
-                $langpack->totalenglish = $totalenglish;
                 $langpack->ratio = null;
             }
             $this->langpacks[$langcode] = $langpack;

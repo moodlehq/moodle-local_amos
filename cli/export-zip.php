@@ -62,6 +62,7 @@ fulldelete($CFG->dataroot.'/amos/temp/export-zip');
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
+    $numoftranslated = 0; // the number of lang packs with at least 20% translated strings
     foreach ($languages as $langcode => $components) {
         /*if ($langcode == 'en') {
             // do not export English strings
