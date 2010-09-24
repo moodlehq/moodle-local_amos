@@ -63,10 +63,10 @@ foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
     foreach ($languages as $langcode => $components) {
-        if ($langcode == 'en') {
+        /*if ($langcode == 'en') {
             // do not export English strings
             continue;
-        }
+        }*/
         mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true);
         $zipfiles = array();
         $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack

@@ -531,8 +531,8 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
         $table->width = '100%';
         foreach ($data->langpacks as $langcode => $langpack) {
             $row = array();
-            if ($langpack->parent == 'en') {
-                // standard pack of a variant of English
+            if ($langpack->parent == 'en' and (substr($langcode, 0, 3) != 'en_')) {
+                // standard pack without parent
                 $row[0] = $langpack->langname;
             } else {
                 $row[0] = html_writer::tag('em', $langpack->langname, array('style'=>'margin-left:1em;'));
