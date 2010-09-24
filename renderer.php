@@ -524,7 +524,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
         $output .= html_writer::tag('h3', 'Language pack installation');
         $output .= html_writer::tag('p', 'To install additional language packs on your Moodle site, access Site Administration > Language > Language packs then select the languages you require and click on the "Install selected language pack" button.');
         $output .= html_writer::tag('p', 'For further information, including details of how to install language packs manually, please refer to the <a href="http://docs.moodle.org/en/Language_packs">Language packs documentation</a>.');
-        $output .= html_writer::tag('p', 'Work has started on '.$data->numoflangpacks.' language packs for Moodle 2.0. There are currently:');
+        $output .= html_writer::tag('p', 'Moodle is available in English by default. Translation work has started on '.$data->numoflangpacks.' language packs for Moodle 2.0. There are currently:');
         $output .= html_writer::start_tag('table', array('border' => 0, 'width' => '80%', 'style' => 'margin:0.5em auto;'));
         $output .= html_writer::start_tag('tr');
         $output .= html_writer::tag('td', $data->percents['80'].' languages with more than 80% translated', array('style'=>'background-color:#e7f1c3;'));
