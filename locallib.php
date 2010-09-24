@@ -608,11 +608,18 @@ class local_amos_index_page implements renderable {
         // only the installed plugins are taken into statistics calculation
         $installed = local_amos_installed_components(); // todo pass $version here and the function will
                                                         // get the list via MNet system RPC call to a remote host
-        $english = array();
+        $english = array(); // holds the number of English strings per component
+        $nontranslatable = array(); // holds the number of strings per component that can not be translated via AMOS
+                                    // and therefore we should consider them as translated when calculating the ratio
         foreach ($installed as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
             $english[$componentname] = $component->get_number_of_strings();
             $this->totalenglish += $english[$componentname];
+            foreach ($component->get_iterator() as $string) {
+                if (substr($string->id, -5) === '_link') {
+                    $nontranslatable[$componentname]++;
+                }
+            }
             $component->clear();
         }
         foreach ($this->packinfo as $langcode => $info) {
@@ -633,6 +640,9 @@ class local_amos_index_page implements renderable {
             if ($langpack->parent == 'en') {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
+                    if (!empty($nontranslatable[$component])) {
+                        $translated += $nontranslatable[$component];
+                    }
                     if (isset($installed[$component])) {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
