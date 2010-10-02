@@ -1,0 +1,25 @@
+$string['notincodeblock'] = 'This should not be found';
+<?php
+
+var_dump($CFG); // hackers might do this
+
+// commented line $string['commented1'] = 'Should not be parsed';
+
+/**
+ * phpDocs comment
+ *
+ * $string['commented2'] = 'Should not be parsed';
+ */
+
+/*
+$string['commented3'] = 'Should not be parsed';
+*/
+
+$string['valid1'] = 'This is {$a} valid string {$a->and} should be parsed';
+$string['valid2'] = 'Multiline
+string';
+$string['valid3'] = 'What \$a\'Pe%%\\"be'; // comment
+$string[ 'valid4'   ]    = '$string[\'self\'] = \'Eh?\';'   ;
+$string['valid5'] = 'First';$string['valid6'] = 'Second';
+
+?>

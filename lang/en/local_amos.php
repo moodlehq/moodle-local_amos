@@ -30,6 +30,7 @@ $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['err_invalidlangcode'] = 'Invalid error code';
+$string['err_parser'] = 'Parsing error: {$a}';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
 $string['markuptodate'] = 'Marking the translation as up-to-date';

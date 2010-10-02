@@ -249,11 +249,15 @@ class mlang_component {
     }
 
     /**
+     * Calculate a identifier of a given component name, language and version
+     *
+     * Such identifier can be used as a key in component collections (associative arrays).
+     *
      * @param string $name the name of the component, eg. 'role', 'glossary', 'datafield_text' etc.
      * @param string $lang
      * @param mlang_version $version
+     * @return string
      */
-
     public static function calculate_identifier($name, $lang, mlang_version $version) {
         return md5($name . '#' . $lang . '@' . $version->code);
     }
