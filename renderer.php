@@ -228,7 +228,12 @@ class local_amos_renderer extends plugin_renderer_base {
             // original of the string
             $o = html_writer::tag('div', s($string->original), array('class' => 'preformatted english'));
             $g = html_writer::tag('div', '', array('class' => 'googleicon'));
-            $cells[3] = $o.$g;
+            $p = '';
+            if (preg_match('/\{\$a(->.+)?\}/', $string->original)) {
+                $p = html_writer::tag('div', $this->help_icon('placeholder', 'local_amos',
+                        get_string('placeholderwarning', 'local_amos')), array('class' => 'placeholderinfo'));
+            }
+            $cells[3] = $o.$g.$p;
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation

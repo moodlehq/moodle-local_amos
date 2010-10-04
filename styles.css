@@ -166,8 +166,14 @@
     min-height: 4em;
 }
 
+.path-local-amos #amostranslator .googleicon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .path-local-amos #amostranslator .googleicon img {
     cursor: pointer;
+    vertical-align: middle;
 }
 
 .path-local-amos #amostranslator .googletranslation {
@@ -179,6 +185,11 @@
     background-color: #ffd3d9;
     border: 1px dotted #dd0000;
     padding: 3px;
+}
+
+.path-local-amos #amostranslator .placeholderinfo {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 #page-local-amos-index h1.main,

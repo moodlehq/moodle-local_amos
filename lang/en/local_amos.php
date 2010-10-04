@@ -67,6 +67,11 @@ $string['ownstashactions_help'] = '* Apply - copy the translated strings from th
 * Pop - move the translated strings from the stasg into the stage and drop the stash (that is Apply and Drop).
 * Drop - throw away the stashed strings.
 * Pull request - make the stash available to the official language maintainers so they can apply your work into their stage, review it and eventually commit.';
+$string['placeholder'] = 'Placeholders';
+$string['placeholder_help'] = 'Placeholders are special statements like `{$a}` or `{$a->something}` within the string. They are replaced with a value when the string is actually printed.
+
+It is important to copy them exactly as they are in the original string. Do not translate them nor change their left-to-right orientation.';
+$string['placeholderwarning'] = 'string contains a placeholder';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';
