@@ -59,4 +59,13 @@ $capabilities = array(
         )
     ),
 
+    // Ability to import strings from uploaded file and stage them
+    'local/amos:importfile' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
+
 );

@@ -709,3 +709,28 @@ function local_amos_installed_components() {
 
     return $list;
 }
+
+/**
+ * Returns the options used for {@link importfile_form.php}
+ *
+ * @return array
+ */
+function local_amos_importfile_options() {
+
+    $options = array();
+
+    $options['versions'] = array();
+    $options['versioncurrent'] = null;
+    foreach (mlang_version::list_all() as $version) {
+        if ($version->translatable) {
+            $options['versions'][$version->code] = $version->label;
+            if ($version->current) {
+                $options['versioncurrent'] = $version->code;
+            }
+        }
+    }
+    $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
+    $options['languagecurrent'] = current_language();
+
+    return $options;
+}

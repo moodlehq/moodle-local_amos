@@ -26,6 +26,7 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
+require_once(dirname(__FILE__).'/importfile_form.php');
 
 $message    = optional_param('message', null, PARAM_RAW); // commit message
 $unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
@@ -99,4 +100,11 @@ $stage = new local_amos_stage($USER);
 /// Output starts here
 echo $output->header();
 echo $output->render($stage);
+
+// form to import
+if (has_capability('local/amos:importfile', get_system_context())) {
+    $importform = new local_amos_importfile_form(new moodle_url('/local/amos/importfile.php'), local_amos_importfile_options());
+    $importform->display();
+}
+
 echo $output->footer();
