@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
+$string['amos:importfile'] = 'Import strings from uploaded file';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
@@ -34,6 +35,13 @@ $string['err_parser'] = 'Parsing error: {$a}';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
 $string['importfile'] = 'Import translated strings from file';
+$string['importfile_help'] = 'If you have your strings translated offline, you can stage them via this form.
+
+* The file must be valid Moodle PHP strings definition file. Look at `/lang/en/` directory of your Moodle installation for examples.
+* Name of the file must match the one with English strings definitons for the given component (like `moodle.php`, `assignment.php` or `enrol_manual.php`).
+
+All strings found in the file will be staged for the selected version and language.';
+$string['importfile_link'] = 'local/amos/importfile';
 $string['language'] = 'Language';
 $string['languages'] = 'Languages';
 $string['markuptodate'] = 'Marking the translation as up-to-date';
@@ -56,6 +64,8 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
 * Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
+$string['stagestringsnone'] = 'There are no staged strings';
+$string['stagestringssome'] = 'There are {$a->staged} staged strings, {$a->committable} of them can be committed';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 

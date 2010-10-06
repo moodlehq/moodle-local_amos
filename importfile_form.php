@@ -29,9 +29,6 @@ require_once($CFG->libdir.'/formslib.php');
 class local_amos_importfile_form extends moodleform {
     function definition() {
         $mform =& $this->_form;
-        $options = $this->_customdata['versions'];
-
-        $mform->addElement('header', 'importhdr', get_string('importfile', 'local_amos'));
 
         $mform->addElement('select', 'version', get_string('version', 'local_amos'), $this->_customdata['versions']);
         $mform->setDefault('version', $this->_customdata['versioncurrent']);

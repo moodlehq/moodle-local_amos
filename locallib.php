@@ -444,6 +444,9 @@ class local_amos_stage implements renderable {
     /** @var stdclass holds the info needed to mimic a filter form */
     public $filterfields;
 
+    /** $var local_amos_importfile_form form to import data */
+    public $importform;
+
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -453,6 +456,10 @@ class local_amos_stage implements renderable {
         $this->strings = array();
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         $needed = array();  // describes all strings that we will have to load to displaye the stage
+
+        if (has_capability('local/amos:importfile', get_system_context(), $user)) {
+            $this->importform = new local_amos_importfile_form(new moodle_url('/local/amos/importfile.php'), local_amos_importfile_options());
+        }
 
         foreach($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {

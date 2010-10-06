@@ -100,11 +100,4 @@ $stage = new local_amos_stage($USER);
 /// Output starts here
 echo $output->header();
 echo $output->render($stage);
-
-// form to import
-if (has_capability('local/amos:importfile', get_system_context())) {
-    $importform = new local_amos_importfile_form(new moodle_url('/local/amos/importfile.php'), local_amos_importfile_options());
-    $importform->display();
-}
-
 echo $output->footer();

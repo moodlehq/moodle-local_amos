@@ -420,12 +420,27 @@ class local_amos_renderer extends plugin_renderer_base {
         $editurl = new moodle_url('/local/amos/view.php', $params);
         $editbutton = $this->single_button($editurl, 'Edit staged strings');
 
-        $output = $this->heading('There are ' . count($stage->strings) . ' staged strings, ' . $committable . ' of them can be committed.');
-        if ($committable) {
-            $output .= $commitform;
-        }
+        if (empty($stage->strings)) {
+            $output = $this->heading(get_string('stagestringsnone', 'local_amos'));
 
-        if (!empty($stage->strings)) {
+            if ($stage->importform) {
+                $legend = html_writer::tag('legend', get_string('importfile', 'local_amos') . $this->help_icon('importfile', 'local_amos'));
+                ob_start();
+                $stage->importform->display();
+                $importform = ob_get_contents();
+                ob_end_clean();
+                $output .= html_writer::tag('fieldset', $legend.$importform, array('class' => 'importform'));
+            }
+
+        } else {
+            $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
+            $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+            unset($a);
+
+            if ($committable) {
+                $output .= $commitform;
+            }
+
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
             $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
                                         array('class' => 'actionbuttons'));

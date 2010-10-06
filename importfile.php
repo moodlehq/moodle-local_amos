@@ -30,8 +30,6 @@ require_once(dirname(__FILE__).'/mlanglib.php');
 require_once(dirname(__FILE__).'/mlangparser.php');
 require_once(dirname(__FILE__).'/importfile_form.php');
 
-$importfile = optional_param('importfile', null, PARAM_RAW);
-
 require_login(SITEID, false);
 require_capability('local/amos:importfile', get_system_context());
 

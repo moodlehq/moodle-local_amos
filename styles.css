@@ -98,6 +98,22 @@
     border: 1px solid #ddd;
 }
 
+.path-local-amos .stagewrapper fieldset.importform {
+    margin: 1em auto;
+    width: 80%;
+    border: 1px solid #ddd;
+}
+
+.path-local-amos .stagewrapper fieldset legend {
+    font-weight: bold;
+    margin-left: 10px;
+    padding: 3px 10px;
+    border: 1px solid #ddd;
+    background-color: #eee;
+    background-image: url([[pix:theme|hgradient]]);
+    background-repeat: repeat-x;
+}
+
 .path-local-amos #amostranslator tr,
 .path-local-amos #amosstage tr {
     border: 1px solid #ddd;
