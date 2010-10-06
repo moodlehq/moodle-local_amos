@@ -27,6 +27,19 @@
  */
 
 /**
+ * Base exception thrown by low level language manipulation operations
+ */
+class mlang_exception extends moodle_exception {
+    /**
+     * @param string $hint short description of problem
+     * @param string $debuginfo detailed information how to fix problem
+     */
+    function __construct($hint, $debuginfo=null) {
+        parent::__construct('err_exception', 'local_amos', '', $hint, $debuginfo);
+    }
+}
+
+/**
  * Provides iteration features for mlang classes
  *
  * This class just forwards all iteration related calls to the aggregated iterator
@@ -632,7 +645,7 @@ class mlang_string {
             $clean = str_replace('%', '%%', $clean); // duplicate %
 
         } else {
-            throw new coding_exception('Unknown get_string() format version');
+            throw new mlang_exception('Unknown get_string() format version');
         }
         return $clean;
     }
@@ -1650,6 +1663,46 @@ class mlang_tools {
             return self::STATUS_UNKNOWN_INSTRUCTION;
         }
     }
+
+    /**
+     * Merges all strings from one component to another and fixes syntax if needed
+     *
+     * If the string already exists in the target component, it is skipped (even
+     * if it is set as deleted there). Does not modify the source component.
+     *
+     * @param mlang_component $source component to take strings from
+     * @param mlang_component $target component to add strings to
+     * @return void modifies $target component
+     */
+    public static function merge(mlang_component $source, mlang_component $target) {
+
+        if ($source->version->code <= mlang_version::MOODLE_19) {
+            $sourceformat = 1;
+        } else {
+            $sourceformat = 2;
+        }
+
+        if ($target->version->code <= mlang_version::MOODLE_19) {
+            throw new mlang_exception('Can not merge into Moodle 1.x branches');
+        } else {
+            $targetformat = 2;
+        }
+
+        foreach ($source->get_iterator() as $string) {
+            $stringid = clean_param($string->id, PARAM_STRINGID);
+            if (empty($stringid)) {
+                throw new mlang_exception('Invalid string identifier '.s($string->id));
+            }
+            if (!$target->has_string($stringid)) {
+                $text = mlang_string::fix_syntax($string->text, $targetformat, $sourceformat);
+                $target->add_string(new mlang_string($stringid, $text));
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Internal implementation
+    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Copy one string to another at the given version branch for all languages in the repository

@@ -76,7 +76,7 @@ class mlang_parser_factory {
 /**
  * Exception thrown by parsers
  */
-class mlang_parser_exception extends moodle_exception {
+class mlang_parser_exception extends mlang_exception {
 
     /**
      * @param string $hint short description of problem

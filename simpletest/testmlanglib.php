@@ -742,6 +742,37 @@ EOF;
         $this->assertEqual($now - 4, $component->get_recent_timemodified());
     }
 
+    public function test_merge_strings_from_another_component() {
+        // prepare two components with some strings
+        $component19 = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component19->add_string(new mlang_string('first', 'First $a'));
+        $component19->add_string(new mlang_string('second', 'Second \"string\"'));
+        $component19->add_string(new mlang_string('third', 'Third'));
+        $component19->add_string(new mlang_string('fifth', 'Fifth \"string\"'));
+
+        $component20 = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component20->add_string(new mlang_string('second', '*deleted*', null, true));
+        $component20->add_string(new mlang_string('third', 'Third already merged'));
+        $component20->add_string(new mlang_string('fourth', 'Fourth only in component20'));
+        // merge component19 into component20
+        mlang_tools::merge($component19, $component20);
+        // check the results
+        $this->assertEqual(4, $component19->get_number_of_strings());
+        $this->assertEqual(5, $component20->get_number_of_strings());
+        $this->assertEqual('First {$a}', $component20->get_string('first')->text);
+        $this->assertEqual('*deleted*', $component20->get_string('second')->text);
+        $this->assertTrue($component20->get_string('second')->deleted);
+        $this->assertEqual('Third already merged', $component20->get_string('third')->text);
+        $this->assertEqual('Fourth only in component20', $component20->get_string('fourth')->text);
+        $this->assertFalse($component19->has_string('fourth'));
+        $this->assertEqual('Fifth "string"', $component20->get_string('fifth')->text);
+        // clear source component and make sure that strings are still in the new one
+        $component19->clear();
+        unset($component19);
+        $this->assertEqual(5, $component20->get_number_of_strings());
+        $this->assertEqual('First {$a}', $component20->get_string('first')->text);
+    }
+
     public function test_stash_push() {
 
     }
