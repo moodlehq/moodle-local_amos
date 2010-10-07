@@ -447,6 +447,9 @@ class local_amos_stage implements renderable {
     /** $var local_amos_importfile_form form to import data */
     public $importform;
 
+    /** @var local_amos_merge_form to merge strings form another branch */
+    public $mergeform;
+
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -459,6 +462,10 @@ class local_amos_stage implements renderable {
 
         if (has_capability('local/amos:importfile', get_system_context(), $user)) {
             $this->importform = new local_amos_importfile_form(new moodle_url('/local/amos/importfile.php'), local_amos_importfile_options());
+        }
+
+        if (has_capability('local/amos:commit', get_system_context(), $user)) {
+            $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
         }
 
         foreach($stage->get_iterator() as $component) {
@@ -737,6 +744,45 @@ function local_amos_importfile_options() {
         }
     }
     $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
+    $options['languagecurrent'] = current_language();
+
+    return $options;
+}
+
+/**
+ * Returns the options used by {@link merge_form.php}
+ *
+ * @return array
+ */
+function local_amos_merge_options() {
+    global $USER;
+
+    $options = array();
+
+    $options['sourceversions'] = array();
+    $options['targetversions'] = array();
+    $options['defaultsourceversion'] = null;
+    $options['defaulttargetversion'] = null;
+    foreach (mlang_version::list_all() as $version) {
+        $options['sourceversions'][$version->code] = $version->label;
+        if (!$version->current and is_null($options['defaultsourceversion'])) {
+            $options['defaultsourceversion'] = $version->code;
+        }
+        if ($version->translatable) {
+            $options['targetversions'][$version->code] = $version->label;
+            if ($version->current) {
+                $options['defaulttargetversion'] = $version->code;
+            }
+        }
+    }
+
+    $langsall     = mlang_tools::list_languages(false);
+    $langsallowed = mlang_tools::list_allowed_languages($USER->id);
+    if (in_array('X', $langsallowed)) {
+        $options['languages'] = array_merge(array('' => get_string('choosedots')), $langsall);
+    } else {
+        $options['languages'] = array_merge(array('' => get_string('choosedots')), array_intersect_key($langsall, $langsallowed));
+    }
     $options['languagecurrent'] = current_language();
 
     return $options;

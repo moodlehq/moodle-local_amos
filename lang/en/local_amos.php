@@ -48,6 +48,10 @@ $string['languages'] = 'Languages';
 $string['markuptodate'] = 'Marking the translation as up-to-date';
 $string['markuptodate_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Review the translation. If you find it up-to-date, click the checkbox. Edit it otherwise.';
 $string['markuptodate_link'] = 'local/amos/outdatedstrings';
+$string['merge'] = 'Merge';
+$string['mergestrings'] = 'Merge strings from another branch';
+$string['mergestrings_help'] = 'This will pick and stage all strings from the source branch that are not translated yet in the target branch and are used there. You can use this tool to copy a translated string into all other versions of the pack. Only language pack maintainers can use this tool.';
+$string['mergestrings_link'] = 'local/amos/merge';
 $string['nostringtoimport'] = 'No valid string found in the file. Make sure the file has correct filename and is properly formatted.';
 $string['pluginname'] = 'AMOS';
 $string['translatortranslation'] = 'Translation';
@@ -86,4 +90,6 @@ $string['placeholderwarning'] = 'string contains a placeholder';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';
+$string['sourceversion'] = 'Source version';
+$string['targetversion'] = 'Target version';
 $string['version'] = 'Version';

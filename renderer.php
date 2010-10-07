@@ -429,7 +429,16 @@ class local_amos_renderer extends plugin_renderer_base {
                 $stage->importform->display();
                 $importform = ob_get_contents();
                 ob_end_clean();
-                $output .= html_writer::tag('fieldset', $legend.$importform, array('class' => 'importform'));
+                $output .= html_writer::tag('fieldset', $legend.$importform, array('class' => 'wrappedmform importform'));
+            }
+
+            if ($stage->mergeform) {
+                $legend = html_writer::tag('legend', get_string('mergestrings', 'local_amos') . $this->help_icon('mergestrings', 'local_amos'));
+                ob_start();
+                $stage->mergeform->display();
+                $mergeform = ob_get_contents();
+                ob_end_clean();
+                $output .= html_writer::tag('fieldset', $legend.$mergeform, array('class' => 'wrappedmform mergeform'));
             }
 
         } else {
