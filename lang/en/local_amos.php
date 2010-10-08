@@ -67,7 +67,7 @@ $string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashe
 $string['stageactions'] = 'Stage actions';
 $string['stageactions_help'] = '* Edit staged strings - modifies the translator filter settings so that only staged translations are displayed.
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
-* Rebase - unstage all translations that do not modify the current translation. Stage is rebased automatically before it is committed.
+* Rebase - unstage all translations that either do not modify the current translation or are older than the most recent translation in the repository. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
 $string['stagestringsnone'] = 'There are no staged strings';
 $string['stagestringssome'] = 'There are {$a->staged} staged strings, {$a->committable} of them can be committed';
