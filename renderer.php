@@ -489,7 +489,21 @@ class local_amos_renderer extends plugin_renderer_base {
      * @return string HTML
      */
     protected function render_local_amos_log(local_amos_log $log) {
-        $output = $this->heading('TODO: there will be filter here');
+
+        if ($log->numofcommits == 0) {
+            return $this->heading(get_string('nostringsfound', 'local_amos'));
+        }
+
+        $a = (object)array('found' => $log->numofcommits, 'limit' => local_amos_log::LIMITCOMMITS);
+        if ($log->numofcommits > local_amos_log::LIMITCOMMITS) {
+            $output = $this->heading(get_string('numofcommitsabovelimit', 'local_amos', $a));
+        } else {
+            $output = $this->heading(get_string('numofcommitsunderlimit', 'local_amos', $a));
+        }
+
+        $a = (object)array('strings' => $log->numofstrings, 'commits' => count($log->commits));
+        $output .= $this->heading(get_string('numofmatchingstrings', 'local_amos', $a));
+
         foreach ($log->commits as $commit) {
             $o  = '';
             $o .= "Date:      " . self::commit_datetime($commit->timecommitted) . "\n";

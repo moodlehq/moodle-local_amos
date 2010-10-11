@@ -25,7 +25,8 @@
  */
 
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->dirroot . '/local/amos/log_form.php');
 
 require_login(SITEID);
 
@@ -35,9 +36,22 @@ $PAGE->set_title('AMOS Log');
 $PAGE->set_heading('AMOS Log');
 
 $output = $PAGE->get_renderer('local_amos');
-$records = new local_amos_log();
+
+$filterform = new local_amos_log_form();
+$filter = array();
+if ($formdata = $filterform->get_data()) {
+    $filter = (array)$formdata;
+    if (empty($formdata->langenabled)) {
+        unset($filter['lang']);
+    }
+    if (empty($formdata->componentenabled)) {
+        unset($filter['component']);
+    }
+}
+$records = new local_amos_log($filter);
 
 /// Output starts here
 echo $output->header();
+$filterform->display();
 echo $output->render($records);
 echo $output->footer();
