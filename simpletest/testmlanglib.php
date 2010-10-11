@@ -721,6 +721,65 @@ EOF;
         $component->clear();
     }
 
+    public function test_execution_strings_move() {
+        $stage = new mlang_stage();
+        $version = mlang_version::by_branch('MOODLE_20_STABLE');
+        $now = time();
+
+        // this block emulates parse-core.php
+        $component = new mlang_component('admin', 'en', $version);
+        $component->add_string(new mlang_string('configsitepolicy', 'OLD', $now - 2));
+        $stage->add($component);
+        $stage->rebase($now - 2, true, $now - 2);
+        $stage->commit('Committed initial English string', array('source' => 'unittest'), true, $now - 2);
+        $component->clear();
+        unset($component);
+
+        // this block emulates parse-lang.php
+        $component = new mlang_component('admin', 'cs', $version);
+        $component->add_string(new mlang_string('configsitepolicy', 'OLD in cs', $now - 1));
+        $stage->add($component);
+        $stage->rebase();
+        $stage->commit('Committed initial Czech translation', array('source' => 'unittest'), true, $now - 1);
+        $component->clear();
+        unset($component);
+
+        // this block emulates parse-core.php again later
+        // now the string is moved in the English pack by the developer who provides AMOS script in commit message
+        // this happened in b593d49d593ee778f525b4074f5ee7978c5e2960
+        $component = new mlang_component('admin', 'en', $version);
+        $component->add_string(new mlang_string('sitepolicy_help', 'NEW', $now));
+        $component->add_string(new mlang_string('configsitepolicy', 'OLD', $now, true));
+        $commitmsg = 'MDL-24570 multiple sitepolicy fixes + adding new separate guest user policy
+AMOS BEGIN
+ MOV [configsitepolicy,core_admin],[sitepolicy_help,core_admin]
+AMOS END';
+        $stage->add($component);
+        $stage->rebase($now, true, $now);
+        $stage->commit($commitmsg, array('source' => 'unittest'), true, $now);
+        $component->clear();
+        unset($component);
+
+        // execute AMOS script if the commit message contains some
+        if ($version->code >= mlang_version::MOODLE_20) {
+            $instructions = mlang_tools::extract_script_from_text($commitmsg);
+            if (!empty($instructions)) {
+                foreach ($instructions as $instruction) {
+                    $changes = mlang_tools::execute($instruction, $version, $now);
+                    $changes->rebase($now);
+                    $changes->commit($commitmsg, array('source' => 'commitscript'), true, $now);
+                    unset($changes);
+                }
+            }
+        }
+
+        // check the results
+        $component = mlang_component::from_snapshot('admin', 'cs', $version, $now);
+        $this->assertTrue($component->has_string('sitepolicy_help'));
+        $this->assertEqual('OLD in cs', $component->get_string('sitepolicy_help')->text);
+        $this->assertEqual(1, $component->get_number_of_strings());
+    }
+
     public function test_legacy_component_name() {
         $this->assertEqual(testable_mlang_tools::legacy_component_name('core'), 'moodle');
         $this->assertEqual(testable_mlang_tools::legacy_component_name('core_grades'), 'grades');
