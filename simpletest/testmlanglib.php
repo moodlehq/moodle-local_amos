@@ -612,6 +612,13 @@ EOF;
         $this->assertEqual(2, count($script));
         $this->assertEqual('MOV a,b', $script[0]);
         $this->assertEqual('CPY  c,d', $script[1]);
+
+        // if there is no empty line between commit subject and AMOS script:
+        $oneliner2 = 'Blah blah blah AMOS   BEGIN  CMD AMOS END blah blah';
+        $script = mlang_tools::extract_script_from_text($oneliner2);
+        $this->assertIsA($script, 'array');
+        $this->assertEqual(1, count($script));
+        $this->assertEqual('CMD', $script[0]);
     }
 
     public function test_list_languages() {

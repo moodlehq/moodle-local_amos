@@ -1578,7 +1578,7 @@ class mlang_tools {
      */
     public static function extract_script_from_text($text) {
         $lines = array();
-        if (preg_match('/^\s*AMOS\s+(BEGIN|START)\s+(.+)\s+AMOS\s+END\s*$/sm', $text, $matches)) {
+        if (preg_match('/^.*\bAMOS\s+(BEGIN|START)\s+(.+)\s+AMOS\s+END\b.*$/sm', $text, $matches)) {
             $lines = array_filter(array_map('trim', explode("\n", $matches[2])));
         }
         return $lines;
