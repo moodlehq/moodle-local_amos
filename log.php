@@ -38,7 +38,6 @@ $PAGE->set_heading('AMOS Log');
 $output = $PAGE->get_renderer('local_amos');
 
 $filterform = new local_amos_log_form();
-$filter = array();
 if ($formdata = $filterform->get_data()) {
     $filter = (array)$formdata;
     if (empty($formdata->langenabled)) {
@@ -47,11 +46,13 @@ if ($formdata = $filterform->get_data()) {
     if (empty($formdata->componentenabled)) {
         unset($filter['component']);
     }
+    $records = new local_amos_log($filter);
 }
-$records = new local_amos_log($filter);
 
 /// Output starts here
 echo $output->header();
 $filterform->display();
-echo $output->render($records);
+if (isset($records)) {
+    echo $output->render($records);
+}
 echo $output->footer();
