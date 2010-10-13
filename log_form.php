@@ -39,11 +39,13 @@ class local_amos_log_form extends moodleform {
         $mform->addElement('header', 'logfiltercommits', get_string('logfiltercommits', 'local_amos'));
 
         // Committed after
-        $mform->addElement('date_time_selector', 'committedafter', get_string('logfiltercommittedafter', 'local_amos'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'committedafter', get_string('logfiltercommittedafter', 'local_amos'),
+                array('optional' => true, 'timezone' => 'UTC', 'applydst' => false));
         $mform->setDefault('committedafter', $USER->lastlogin);
 
         // Committed before
-        $mform->addElement('date_time_selector', 'committedbefore', get_string('logfiltercommittedbefore', 'local_amos'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'committedbefore', get_string('logfiltercommittedbefore', 'local_amos'),
+                array('optional' => true, 'timezone' => 'UTC', 'applydst' => false));
         $mform->setAdvanced('committedbefore');
 
         // Committer
