@@ -237,7 +237,7 @@ class local_amos_renderer extends plugin_renderer_base {
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation
-            if (empty($string->translation)) {
+            if (empty($string->translation) and $string->translation !== '0') {
                 $missing++;
             }
             $t = s($string->translation);
