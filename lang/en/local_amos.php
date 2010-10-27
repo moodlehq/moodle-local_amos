@@ -104,7 +104,7 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['ownstashactions'] = 'Action';
 $string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.
-* Pop - move the translated strings from the stasg into the stage and drop the stash (that is Apply and Drop).
+* Pop - move the translated strings from the stash into the stage and drop the stash (that is Apply and Drop).
 * Drop - throw away the stashed strings.
 * Pull request - make the stash available to the official language maintainers so they can apply your work into their stage, review it and eventually commit.';
 $string['placeholder'] = 'Placeholders';
