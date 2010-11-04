@@ -365,6 +365,10 @@ M.local_amos.uptodate_failure = function(tid, outcome, args) {
 M.local_amos.init_google_translator = function() {
     var Y = M.local_amos.Y;
     var translator = Y.one('#amostranslator');
+    if (translator == null) {
+        // no strings available at the page
+        return;
+    }
     var iconcontainers = translator.all('.googleicon');
     iconcontainers.each(M.local_amos.init_google_icon);
     icons = translator.all('.googleicon img');
