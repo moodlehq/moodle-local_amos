@@ -39,5 +39,10 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2010090107, 'local', 'amos');
     }
 
+    if ($oldversion < 2010110400) {
+        $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_greylist');
+        upgrade_plugin_savepoint(true, 2010110400, 'local', 'amos');
+    }
+
     return $result;
 }

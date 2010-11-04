@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20100901" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20101104" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -77,7 +77,7 @@
         <INDEX NAME="ix_hash" UNIQUE="true" FIELDS="hash"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_hidden_requests" COMMENT="Records of all pull requests that the maintainer wants to hide" PREVIOUS="amos_stashes">
+    <TABLE NAME="amos_hidden_requests" COMMENT="Records of all pull requests that the maintainer wants to hide" PREVIOUS="amos_stashes" NEXT="amos_greylist">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the maintainer" PREVIOUS="id" NEXT="stashid"/>
@@ -89,6 +89,20 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="ux_userid_stashid" UNIQUE="true" FIELDS="userid, stashid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_greylist" COMMENT="Defines the strings that were greylisted, that is they were marked as candidates for removal in the next release." PREVIOUS="amos_hidden_requests">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Branch code" PREVIOUS="id" NEXT="component"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string" PREVIOUS="branch" NEXT="stringid"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier" PREVIOUS="component"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uq_branch_component_stringid" UNIQUE="true" FIELDS="branch, component, stringid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
