@@ -18,9 +18,10 @@
 /**
  * English strings for AMOS local module
  *
- * @package   local-amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local
+ * @subpackage amos
+ * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,6 +36,11 @@ $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
+$string['greylisted'] = 'Greylisted strings';
+$string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\' and appear greyed out in the AMOS interface. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
+
+If you notice a greylisted string which is still being used in Moodle, please inform us by a forum post in Translating Moodle course at this site. Otherwise, you can save valuable time by translating strings which are most likely used in Moodle and ignoring greylisted strings.';
+$string['greylistedwarning'] = 'string is greylisted';
 $string['importfile'] = 'Import translated strings from file';
 $string['importfile_help'] = 'If you have your strings translated offline, you can stage them via this form.
 

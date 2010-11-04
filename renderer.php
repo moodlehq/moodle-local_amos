@@ -123,7 +123,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, 'staged strings only');
         $fstg    = html_writer::tag('div', $fstg, array('class' => 'labelled_checkbox'));
 
-        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
+        $flst    = html_writer::checkbox('flst', 1, $filter->get_data()->greylisted, 'greylisted strings only');
+        $flst    = html_writer::tag('div', $flst, array('class' => 'labelled_checkbox'));
+
+        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg.$flst, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
@@ -233,7 +236,15 @@ class local_amos_renderer extends plugin_renderer_base {
                 $p = html_writer::tag('div', $this->help_icon('placeholder', 'local_amos',
                         get_string('placeholderwarning', 'local_amos')), array('class' => 'placeholderinfo'));
             }
-            $cells[3] = $o.$g.$p;
+            $l = '';
+            if ($string->greylisted) {
+                $l = html_writer::tag('div', $this->help_icon('greylisted', 'local_amos',
+                        get_string('greylistedwarning', 'local_amos')), array('class' => 'greylistedinfo'));
+            }
+            $cells[3] = new html_table_cell($o.$g.$p.$l);
+            if ($string->greylisted) {
+                $cells[3]->attributes['class'] .= ' greylisted';
+            }
             // the language in which the original is displayed
             $cells[4] = new html_table_cell($string->language);
             // Translation

@@ -148,6 +148,10 @@
     color: #999;
 }
 
+.path-local-amos #amostranslator .original.greylisted {
+    background-color: #f8f8f8;
+}
+
 .path-local-amos #amostranslator .translation.committable.missing,
 .path-local-amos #amosstage .translation.uncommittable {
     background-color: #ffd3d9;
@@ -182,6 +186,8 @@
     min-height: 4em;
 }
 
+.path-local-amos #amostranslator .placeholderinfo,
+.path-local-amos #amostranslator .greylistedinfo,
 .path-local-amos #amostranslator .googleicon {
     display: inline-block;
     vertical-align: middle;
@@ -201,11 +207,6 @@
     background-color: #ffd3d9;
     border: 1px dotted #dd0000;
     padding: 3px;
-}
-
-.path-local-amos #amostranslator .placeholderinfo {
-    display: inline-block;
-    vertical-align: middle;
 }
 
 #page-local-amos-index h1.main,

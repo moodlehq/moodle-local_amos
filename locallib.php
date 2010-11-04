@@ -47,7 +47,7 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'stagedonly', 'page');
+        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'stagedonly', 'greylisted', 'page');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -135,6 +135,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->stagedonly)) {
             $data->stagedonly = false;
         }
+        if (is_null($data->greylisted)) {
+            $data->greylisted = false;
+        }
         if (is_null($data->page)) {
             $data->page = 1;
         }
@@ -188,6 +191,7 @@ class local_amos_filter implements renderable {
         $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
         $data->stringid     = trim(optional_param('fsid', '', PARAM_STRINGID));
         $data->stagedonly   = optional_param('fstg', false, PARAM_BOOL);
+        $data->greylisted   = optional_param('flst', false, PARAM_BOOL);
 
         // reset the paginator to the first page every time the filter is saved
         $data->page = 1;
@@ -235,12 +239,35 @@ class local_amos_translator implements renderable {
         $substring  = $filter->get_data()->substring;
         $stringid   = $filter->get_data()->stringid;
         $stagedonly = $filter->get_data()->stagedonly;
+        $greylisted = $filter->get_data()->greylisted;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
         list($outer_sqlbranches, $outer_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'outerbranch00000');
         list($outer_sqllanguages, $outer_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'outerlang00000');
         list($outer_sqlcomponents, $outer_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'outercomp00000');
+
+        // get the greylisted strings first
+        $sql = "SELECT branch, component, stringid
+                  FROM {amos_greylist}
+                 WHERE branch $inner_sqlbranches
+                   AND component $inner_sqlcomponents";
+        if ($stringid) {
+            $sql .= " AND stringid = :stringid";
+            $params = array('stringid' => $stringid);
+        } else {
+            $params = array();
+        }
+        $sql .= " ORDER BY branch, component, stringid";
+        $params = array_merge($params, $inner_paramsbranches, $inner_paramcomponents);
+        $greylist = array();
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $s) {
+            $greylist[$s->branch][$s->component][$s->stringid] = true;
+        }
+        $rs->close();
+
+        // get all the strings for the translator
         $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated
                   FROM {amos_repository} r
                   JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
@@ -350,9 +377,17 @@ class local_amos_translator implements renderable {
                                 $string->class = 'missing';
                                 $string->outdated = false;
                             }
+                            if (isset($greylist[$branchcode][$component][$stringid])) {
+                                $string->greylisted = true;
+                            } else {
+                                $string->greylisted = false;
+                            }
                             unset($s[$lang][$component][$stringid][$branchcode]);
 
                             if ($stagedonly and $string->class != 'staged') {
+                                continue;   // do not display this string
+                            }
+                            if ($greylisted and !$string->greylisted) {
                                 continue;   // do not display this string
                             }
                             if (!empty($substring)) {
