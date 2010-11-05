@@ -73,6 +73,20 @@ M.local_amos.init_translator = function(Y) {
     var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
     fcmpselectnone.on('click', function(e) { fcmp.all('option').set('selected', false); });
 
+    // make greylist related checkboxed mutally exclusive
+    var fglo = filter.one('#amosfilter_fglo');
+    var fwog = filter.one('#amosfilter_fwog');
+    fglo.on('change', function(e) {
+        if (fglo.get('checked')) {
+            fwog.set('checked', false);
+        }
+    });
+    fwog.on('change', function(e) {
+        if (fwog.get('checked')) {
+            fglo.set('checked', false);
+        }
+    });
+
     // display the "loading" icon after the filter button is pressed
     var fform       = Y.one('#amosfilter_form');
     var fsubmit     = fform.one('input.submit');

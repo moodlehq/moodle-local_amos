@@ -47,7 +47,9 @@ class local_amos_filter implements renderable {
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
-        $this->fields = array('version', 'language', 'component', 'missing', 'helps', 'substring', 'stringid', 'stagedonly', 'greylisted', 'page');
+        $this->fields = array(
+            'version', 'language', 'component', 'missing', 'helps', 'substring',
+            'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -135,8 +137,11 @@ class local_amos_filter implements renderable {
         if (is_null($data->stagedonly)) {
             $data->stagedonly = false;
         }
-        if (is_null($data->greylisted)) {
-            $data->greylisted = false;
+        if (is_null($data->greylistedonly)) {
+            $data->greylistedonly = false;
+        }
+        if (is_null($data->withoutgreylisted)) {
+            $data->withoutgreylisted = false;
         }
         if (is_null($data->page)) {
             $data->page = 1;
@@ -186,12 +191,13 @@ class local_amos_filter implements renderable {
             }
         }
 
-        $data->missing      = optional_param('fmis', false, PARAM_BOOL);
-        $data->helps        = optional_param('fhlp', false, PARAM_BOOL);
-        $data->substring    = trim(optional_param('ftxt', '', PARAM_RAW));
-        $data->stringid     = trim(optional_param('fsid', '', PARAM_STRINGID));
-        $data->stagedonly   = optional_param('fstg', false, PARAM_BOOL);
-        $data->greylisted   = optional_param('flst', false, PARAM_BOOL);
+        $data->missing              = optional_param('fmis', false, PARAM_BOOL);
+        $data->helps                = optional_param('fhlp', false, PARAM_BOOL);
+        $data->substring            = trim(optional_param('ftxt', '', PARAM_RAW));
+        $data->stringid             = trim(optional_param('fsid', '', PARAM_STRINGID));
+        $data->stagedonly           = optional_param('fstg', false, PARAM_BOOL);
+        $data->greylistedonly       = optional_param('fglo', false, PARAM_BOOL);
+        $data->withoutgreylisted    = optional_param('fwog', false, PARAM_BOOL);
 
         // reset the paginator to the first page every time the filter is saved
         $data->page = 1;
@@ -234,12 +240,13 @@ class local_amos_translator implements renderable {
         if (empty($branches) or empty($components) or empty($languages)) {
             return;
         }
-        $missing    = $filter->get_data()->missing;
-        $helps      = $filter->get_data()->helps;
-        $substring  = $filter->get_data()->substring;
-        $stringid   = $filter->get_data()->stringid;
-        $stagedonly = $filter->get_data()->stagedonly;
-        $greylisted = $filter->get_data()->greylisted;
+        $missing            = $filter->get_data()->missing;
+        $helps              = $filter->get_data()->helps;
+        $substring          = $filter->get_data()->substring;
+        $stringid           = $filter->get_data()->stringid;
+        $stagedonly         = $filter->get_data()->stagedonly;
+        $greylistedonly     = $filter->get_data()->greylistedonly;
+        $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
         list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
         list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
         list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
@@ -387,7 +394,10 @@ class local_amos_translator implements renderable {
                             if ($stagedonly and $string->class != 'staged') {
                                 continue;   // do not display this string
                             }
-                            if ($greylisted and !$string->greylisted) {
+                            if ($greylistedonly and !$string->greylisted) {
+                                continue;   // do not display this string
+                            }
+                            if ($withoutgreylisted and $string->greylisted) {
                                 continue;   // do not display this string
                             }
                             if (!empty($substring)) {

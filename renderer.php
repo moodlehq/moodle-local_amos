@@ -41,7 +41,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
 
         // version checkboxes
-        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup'));
+        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
         $output .= html_writer::start_tag('div', array('class' => 'label first'));
         $output .= html_writer::tag('label', 'Version', array('for' => 'amosfilter_fver'));
         $output .= html_writer::tag('div', 'Show strings from these Moodle versions', array('class' => 'description'));
@@ -59,7 +59,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // language selector
         $output .= html_writer::start_tag('div', array('class' => 'item select'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', 'Languages', array('for' => 'amosfilter_flng'));
         $output .= html_writer::tag('div', 'Display translations in these languages', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -77,7 +77,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // component selector
         $output .= html_writer::start_tag('div', array('class' => 'item select'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', 'Component', array('for' => 'amosfilter_fcmp'));
         $output .= html_writer::tag('div', 'Show strings of these components', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -107,8 +107,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // other filter settings
-        $output .= html_writer::start_tag('div', array('class' => 'item checkboxgroup'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', 'Miscellaneous', array('for' => 'amosfilter_fmis'));
         $output .= html_writer::tag('div', 'Additional conditions on strings to display', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -123,17 +123,25 @@ class local_amos_renderer extends plugin_renderer_base {
         $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, 'staged strings only');
         $fstg    = html_writer::tag('div', $fstg, array('class' => 'labelled_checkbox'));
 
-        $flst    = html_writer::checkbox('flst', 1, $filter->get_data()->greylisted, 'greylisted strings only');
-        $flst    = html_writer::tag('div', $flst, array('class' => 'labelled_checkbox'));
+        $fgrey   = html_writer::start_tag('div', array('id' => 'amosfilter_fgrey', 'class' => 'checkboxgroup'));
+        $fgrey  .= html_writer::tag('div',
+                        html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, 'greylisted strings only',
+                                                array('id' => 'amosfilter_fglo')),
+                        array('class' => 'labelled_checkbox'));
+        $fgrey  .= html_writer::tag('div',
+                        html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, 'without greylisted strings',
+                                                array('id' => 'amosfilter_fwog')),
+                        array('class' => 'labelled_checkbox'));
+        $fgrey  .= html_writer::end_tag('div');
 
-        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg.$flst, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup vertical'));
+        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg.$fgrey, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
         // must contain string
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', 'Substring', array('for' => 'amosfilter_ftxt'));
         $output .= html_writer::tag('div', 'String must contain given text', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -146,7 +154,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // string identifier
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', 'String identifier', array('for' => 'amosfilter_ftxt'));
         $output .= html_writer::tag('div', 'The key in the array of strings', array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -158,12 +166,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // hidden fields
+        $output .= html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => '__lazyform_' . $filter->lazyformname, 'value' => 1));
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $output .= html_writer::end_tag('div');
 
         // submit
         $output .= html_writer::start_tag('div', array('class' => 'item submit'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
