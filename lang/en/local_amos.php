@@ -37,7 +37,7 @@ $string['err_parser'] = 'Parsing error: {$a}';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
 $string['greylisted'] = 'Greylisted strings';
-$string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\' and appear greyed out in the AMOS interface. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
+$string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\'. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
 
 If you notice a greylisted string which is still being used in Moodle, please inform us by a forum post in Translating Moodle course at this site. Otherwise, you can save valuable time by translating strings which are most likely used in Moodle and ignoring greylisted strings.';
 $string['greylistedwarning'] = 'string is greylisted';
