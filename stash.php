@@ -35,17 +35,16 @@ $pop            = optional_param('pop', null, PARAM_INT);
 $drop           = optional_param('drop', null, PARAM_INT);
 $pullrequest    = optional_param('pullrequest', null, PARAM_INT);
 $hide           = optional_param('hide', null, PARAM_INT);
-$showhidden     = optional_param('showhidden', false, PARAM_BOOL);  // show hidden pull requests
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
 
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/amos/stash.php', array('showhidden' => $showhidden));
+$PAGE->set_url('/local/amos/stash.php');
 navigation_node::override_active_url(new moodle_url('/local/amos/stash.php'));
 $PAGE->set_title('AMOS stashes');
 $PAGE->set_heading('AMOS stashes');
-//$PAGE->requires->js_init_call('M.local_amos.init_stash');
+$PAGE->requires->yui_module('moodle-local_amos-stash', 'M.local_amos.init_stash');
 
 if ($new) {
     // pushing the current stage into a new stash
@@ -151,42 +150,28 @@ if ($pullrequest) {
 
 // Own stashes
 if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 'timecreated DESC')) {
-    echo $output->heading('No own stashes found');
+    echo $output->heading(get_string('ownstashesnone', 'local_amos'));
 
 } else {
-    $table = new html_table();
-    $table->attributes['class'] = 'generaltable stashlist personal';
-    $table->head = array('Created', 'Name', 'Languages', 'Components', 'Strings',
-        get_string('ownstashactions', 'local_amos') . $output->help_icon('ownstashactions', 'local_amos'));
+    echo $output->heading(get_string('ownstashes', 'local_amos'));
 
-    foreach ($stashes as $stash) {
-        $row = array();
-        $row[0] = userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig'));
-        $row[1] = s($stash->name);
-        $row[2] = implode(', ', explode('/', trim($stash->languages, '/')));
-        $row[3] = implode(', ', explode('/', trim($stash->components, '/')));
-        $row[4] = s($stash->strings);
-        $row[5] = '';
+    foreach ($stashes as $stashdata) {
+        $stash = new local_amos_stash($stashdata, $USER);
         if (has_capability('local/amos:stage', get_system_context())) {
-            $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('apply' => $stash->id)), 'Apply');
-            $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('pop' => $stash->id)), 'Pop');
+            $stash->add_action('apply', new moodle_url($PAGE->url, array('apply' => $stash->id)), get_string('stashapply', 'local_amos'));
+            $stash->add_action('pop', new moodle_url($PAGE->url, array('pop' => $stash->id)), get_string('stashpop', 'local_amos'));
         }
-        $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('drop' => $stash->id)), 'Drop');
+        $stash->add_action('drop', new moodle_url($PAGE->url, array('drop' => $stash->id)), get_string('stashdrop', 'local_amos'));
         if ($stash->name !== 'AUTOSAVE') {
-            if (empty($stash->pullrequest)) {
-                $row[5] .= $output->single_button(new moodle_url($PAGE->url, array('pullrequest' => $stash->id)), 'Pull request',
-                                                  'post', array('class'=>'singlebutton pullrequest'));
-            } else {
-                $row[5] .= ' Pull request sent';
-            }
+            $stash->add_action('submit', new moodle_url($PAGE->url, array('submit' => $stash->id)), get_string('stashsubmit', 'local_amos'));
         }
-        $table->data[] = $row;
+
+        echo $output->render($stash);
     }
 
-    echo $output->heading('Own stashes');
-    echo html_writer::table($table);
 }
 
+/*
 // Pull requests
 if (has_capability('local/amos:commit', get_system_context())) {
     $translators = $DB->get_records('amos_translators', array('userid'=>$USER->id));
@@ -287,5 +272,6 @@ if (has_capability('local/amos:commit', get_system_context())) {
             'post', array('class' => 'singlebutton togglehidden'));
     }
 }
+ */
 
 echo $output->footer();

@@ -99,8 +99,16 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Red - the string is not translated and you are allowed to translate it and commit the translation.
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
-$string['stashactions'] = 'Stash actions';
-$string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be shared with other users and/or they can be offered to the official language pack maintainers for inclusion into the language pack.';
+$string['stashapply'] = 'Apply';
+$string['stashautosave'] = 'Automatically saved backup stash';
+$string['stashdrop'] = 'Drop';
+$string['stashpop'] = 'Pop';
+$string['stashsubmit'] = 'Submit';
+$string['stashactions'] = 'Stashing actions';
+$string['stashlanguages'] = '<span>Languages:</span> {$a}';
+$string['stashcomponents'] = '<span>Components:</span> {$a}';
+$string['stashstrings'] = '<span>Number of strings:</span> {$a}';
+$string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be sent to the official language pack maintainers for inclusion into the language pack.';
 $string['stageactions'] = 'Stage actions';
 $string['stageactions_help'] = '* Edit staged strings - modifies the translator filter settings so that only staged translations are displayed.
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
@@ -119,6 +127,8 @@ $string['ownstashactions_help'] = '* Apply - copy the translated strings from th
 * Pop - move the translated strings from the stash into the stage and drop the stash (that is Apply and Drop).
 * Drop - throw away the stashed strings.
 * Pull request - make the stash available to the official language maintainers so they can apply your work into their stage, review it and eventually commit.';
+$string['ownstashes'] = 'Own stashes';
+$string['ownstashesnone'] = 'No own stashes found';
 $string['placeholder'] = 'Placeholders';
 $string['placeholder_help'] = 'Placeholders are special statements like `{$a}` or `{$a->something}` within the string. They are replaced with a value when the string is actually printed.
 

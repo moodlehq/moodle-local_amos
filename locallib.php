@@ -1036,6 +1036,84 @@ class local_amos_index_page implements renderable {
 }
 
 /**
+ * Renderable stash
+ */
+class local_amos_stash implements renderable {
+
+    /** @var int identifier in the table of stashes */
+    public $id;
+    /** @var string title of the stash */
+    public $name;
+    /** @var int timestamp of when the stash was created */
+    public $timecreated;
+    /** @var stdClass the owner of the stash */
+    public $owner;
+    /** @var array of language names */
+    public $languages = array();
+    /** @var array of component names */
+    public $components = array();
+    /** @var int number of stashed strings */
+    public $strings = 0;
+    /** @var bool is autosave stash */
+    public $isautosave;
+
+    /** @var array of stdClasses representing stash actions */
+    protected $actions = array();
+
+    /**
+     * Constructor
+     *
+     * @param stdClass $record stash record from amos_stashes table
+     * @param stdClass $owner owner user data
+     */
+    public function __construct(stdClass $record, stdClass $owner) {
+
+        if ($record->ownerid != $owner->id) {
+            throw new coding_exception('Stash owner mismatch');
+        }
+
+        $this->id           = $record->id;
+        $this->name         = $record->name;
+        $this->timecreated  = $record->timecreated;
+        $this->strings      = $record->strings;
+        $this->components   = explode('/', trim($record->components, '/'));
+        $this->languages    = explode('/', trim($record->languages, '/'));
+        $this->owner        = $owner;
+
+        if ($record->hash === 'xxxxautosaveuser'.$this->owner->id) {
+            $this->isautosave = true;
+        } else {
+            $this->isautosave = false;
+        }
+    }
+
+    /**
+     * Register a new action that can be done with the stash
+     *
+     * @param string $id action identifier
+     * @param moodle_url $url action handler
+     * @param string $label action name
+     */
+    public function add_action($id, moodle_url $url, $label) {
+
+        $action             = new stdClass();
+        $action->id         = $id;
+        $action->url        = $url;
+        $action->label      = $label;
+        $this->actions[]    = $action;
+    }
+
+    /**
+     * Get the list of actions attached to this stash
+     *
+     * @return array of stdClasses with $url and $label properties
+     */
+    public function get_actions() {
+        return $this->actions;
+    }
+}
+
+/**
  * Returns a list of all components installed on the server
  *
  * All returned items can be used for get_string() calls. The components installed

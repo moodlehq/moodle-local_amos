@@ -953,20 +953,20 @@ class mlang_persistent_stage extends mlang_stage {
 }
 
 /**
- * Shareable persistant stage
+ * A stash is a snapshot of a stage
  */
 class mlang_stash {
 
     /** @var int identifier of the record in the database table amos_stashes */
     public $id;
 
-    /** @var object user who created the stash */
+    /** @var object user who owns the stash */
     public $ownerid;
 
     /** @var int the timestamp of when the stash was created */
     public $timecreated;
 
-    /** @var int|null the timestamp of when the stash was modified, eg shared */
+    /** @var int|null the timestamp of when the stash was modified */
     public $timemodified;
 
     /** @var string unique identification of the stage */
@@ -977,9 +977,6 @@ class mlang_stash {
 
     /** @var string message describing the stash */
     public $message;
-
-    /** @var bool is there a pull requested */
-    public $pullrequest;
 
     /** @var mlang_stage stored in the stash */
     protected $stage;
@@ -1013,7 +1010,7 @@ class mlang_stash {
         global $DB;
 
         if (empty($id)) {
-            throw new coding_exception('Invalid stahs identifier');
+            throw new coding_exception('Invalid stash identifier');
         }
 
         $record = $DB->get_record('amos_stashes', array('id' => $id), '*', MUST_EXIST);
@@ -1024,7 +1021,6 @@ class mlang_stash {
         $instance->timecreated  = $record->timecreated;
         $instance->name         = $record->name;
         $instance->message      = $record->message;
-        $instance->pullrequest  = $record->pullrequest;
 
         return $instance;
     }
@@ -1131,29 +1127,13 @@ class mlang_stash {
 
         $DB->delete_records('amos_hidden_requests', array('stashid' => $this->id));
         $DB->delete_records('amos_stashes', array('id' => $this->id, 'hash' => $this->hash, 'ownerid' => $this->ownerid));
-        $filename = $this->get_storage_filename();
-        unlink($filename);
-        @rmdir(dirname($filename));
-        @rmdir(dirname(dirname($filename)));
-    }
-
-    /**
-     * Makes the stash available for language translators
-     *
-     * @param mixed $name stash title to set
-     * @param mixed $message pullrequest message
-     */
-    public function send_pull_request($name, $message) {
-        global $DB;
-
-        $record = new stdclass();
-        $record->id = $this->id;
-        $record->name = $name;
-        $record->message = $message;
-        $record->pullrequest = 1;
-        $record->timemodified = time();
-
-        $DB->update_record('amos_stashes', $record);
+        // if the stash file is not referenced any more, delete it
+        if (!$DB->record_exists('amos_stashes', array('hash' => $this->hash))) {
+            $filename = $this->get_storage_filename();
+            unlink($filename);
+            @rmdir(dirname($filename));
+            @rmdir(dirname(dirname($filename)));
+        }
     }
 
     // INTERNAL API

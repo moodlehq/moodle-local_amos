@@ -679,4 +679,43 @@ print_footer();
 
         return $output;
     }
+
+    /**
+     * Render stash information
+     *
+     * @param local_amos_stash $stash
+     * @return string to be echo'ed
+     */
+    protected function render_local_amos_stash(local_amos_stash $stash) {
+
+        $output  = html_writer::start_tag('div', array('class' => 'stash'));
+        if ($stash->isautosave) {
+            $output .= html_writer::tag('h3', get_string('stashautosave', 'local_amos'));
+        } else {
+            $output .= html_writer::tag('h3', s($stash->name));
+        }
+        $output .= html_writer::tag('div', fullname($stash->owner), array('class' => 'owner'));
+        $output .= $this->output->user_picture($stash->owner);
+        $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
+                                    array('class' => 'timecreated'));
+        $output .= html_writer::tag('div', get_string('stashstrings', 'local_amos', $stash->strings),
+                                    array('class' => 'strings'));
+        $output .= html_writer::tag('div', get_string('stashlanguages', 'local_amos', s(implode(', ', $stash->languages))),
+                                    array('class' => 'languages'));
+        $output .= html_writer::tag('div', get_string('stashcomponents', 'local_amos', s(implode(', ', $stash->components))),
+                                    array('class' => 'components'));
+
+        $output .= html_writer::end_tag('div');
+
+        $actions = '';
+        foreach ($stash->get_actions() as $action) {
+            $actions .= $this->output->single_button($action->url, $action->label, 'post', array('class'=>'singlebutton '.$action->id));
+        }
+        if ($actions) {
+            $actions = html_writer::tag('div', $actions, array('class' => 'actions'));
+        }
+        $output = $this->output->box($output . $actions, 'generalbox stashwrapper');
+
+        return $output;
+    }
 }

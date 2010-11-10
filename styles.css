@@ -237,28 +237,57 @@
     text-align: center;
 }
 
-.path-local-amos .stashlist {
-    margin: 10px auto;
-    max-width: 80%;
-}
-
-.path-local-amos .stashlist .singlebutton,
-.path-local-amos .stashlist .singlebutton form,
-.path-local-amos .stashlist .singlebutton form div {
-    display: inline;
-}
-
-.path-local-amos .stashlist .userpicture {
-    margin-right: 4px;
-    vertical-align: middle;
-}
-
-.path-local-amos .stashlist .singlebutton.pullrequest {
-    margin-left: 10px;
-}
-
 .path-local-amos .singlebutton.togglehidden {
     text-align: center;
 }
 
+.path-local-amos .stashwrapper {
+    margin: 0px 0px 1em 0px;
+}
 
+.path-local-amos .stashwrapper {
+    background-color: white;
+}
+
+.path-local-amos .stashwrapper.mousein {
+    background-color: #f7f7f7;
+}
+
+.path-local-amos .stash {
+    position: relative; // to reset coordinate system for nested elements
+    border: 1px solid black;
+}
+
+.path-local-amos .stash h3 {
+    margin: 0px 0px 0px 40px;
+}
+
+.path-local-amos .stash div {
+    margin-left: 40px;
+}
+
+.path-local-amos .stash img.userpicture {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.path-local-amos .stash .strings span,
+.path-local-amos .stash .languages span,
+.path-local-amos .stash .components span {
+    font-style: italic;
+}
+
+.path-local-amos .stashwrapper .actions {
+    margin: 10px 0px 0px 40px;
+}
+
+.path-local-amos .stashwrapper .actions .singlebutton,
+.path-local-amos .stashwrapper .actions .singlebutton form,
+.path-local-amos .stashwrapper .actions .singlebutton form div {
+    display: inline;
+}
+
+.path-local-amos .stashwrapper .actions .singlebutton.pullrequest {
+    margin-left: 10px;
+}
