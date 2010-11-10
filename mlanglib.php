@@ -1577,11 +1577,30 @@ class mlang_tools {
      * @return array of the script lines
      */
     public static function extract_script_from_text($text) {
-        $lines = array();
-        if (preg_match('/^.*\bAMOS\s+(BEGIN|START)\s+(.+)\s+AMOS\s+END\b.*$/sm', $text, $matches)) {
-            $lines = array_filter(array_map('trim', explode("\n", $matches[2])));
+
+        if (!preg_match('/^.*\bAMOS\s+(BEGIN|START)\s+(.+)\s+AMOS\s+END\b.*$/sm', $text, $matches)) {
+            return array();
         }
-        return $lines;
+
+        // collapse all whitespace into single space
+        $script = preg_replace('/\s+/', ' ', trim($matches[2]));
+
+        // we need explicit list of known commands so that this parser can handle onliners well
+        $cmds = array('MOV', 'CPY', 'HLP', 'REM');
+
+        // put new line character before every known command
+        $cmdsfrom = array();
+        $cmdsto   = array();
+        foreach ($cmds as $cmd) {
+            $cmdsfrom[] = "$cmd ";
+            $cmdsto[]   = "\n$cmd ";
+        }
+        $script = str_replace($cmdsfrom, $cmdsto, $script);
+
+        // make array of non-empty lines
+        $lines = array_filter(array_map('trim', explode("\n", $script)));
+
+        return array_values($lines);
     }
 
     /**
@@ -1659,6 +1678,9 @@ class mlang_tools {
             // todo send message to subscribed users
             return self::STATUS_OK;
             break;
+        // WARNING: If a new command is added here, it must be also put into the list of known
+        // commands in self::extract_script_from_text(). It is not nice but we use new line
+        // as the delimiter and git may strip new lines if the script is part of the subject line.
         default:
             return self::STATUS_UNKNOWN_INSTRUCTION;
         }

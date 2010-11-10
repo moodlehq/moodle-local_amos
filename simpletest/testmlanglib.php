@@ -595,11 +595,12 @@ EOF;
         $emptyarray = mlang_tools::extract_script_from_text($noscript);
         $this->assertTrue(empty($emptyarray));
 
-        $oneliner = 'AMOS BEGIN command AMOS END';
+        $oneliner = 'MDL-12345 Some message AMOS   BEGIN  MOV   [a,  b],[c,d] CPY [e,f], [g ,h]  AMOS'."\t".'END BEGIN ignore AMOS   ';
         $script = mlang_tools::extract_script_from_text($oneliner);
         $this->assertIsA($script, 'array');
-        $this->assertEqual(1, count($script));
-        $this->assertEqual('command', $script[0]);
+        $this->assertEqual(2, count($script));
+        $this->assertEqual('MOV [a, b],[c,d]', $script[0]);
+        $this->assertEqual('CPY [e,f], [g ,h]', $script[1]);
 
         $multiline = 'This is a typical usage of AMOS script in a commit message
                     AMOS BEGIN
@@ -611,7 +612,7 @@ EOF;
         $this->assertIsA($script, 'array');
         $this->assertEqual(2, count($script));
         $this->assertEqual('MOV a,b', $script[0]);
-        $this->assertEqual('CPY  c,d', $script[1]);
+        $this->assertEqual('CPY c,d', $script[1]);
 
         // if there is no empty line between commit subject and AMOS script:
         $oneliner2 = 'Blah blah blah AMOS   BEGIN  CMD AMOS END blah blah';
