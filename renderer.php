@@ -208,9 +208,9 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amostranslator';
-        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang',
+        $table->head = array('String', 'Original', 'Lang',
                 get_string('translatortranslation', 'local_amos') . $this->help_icon('translatortranslation', 'local_amos'));
-        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
+        $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
 
         if (empty($translator->strings)) {
             if ($translator->currentpage > 1) {
@@ -230,14 +230,17 @@ class local_amos_renderer extends plugin_renderer_base {
         $missing = 0;
         foreach ($translator->strings as $string) {
             $cells = array();
-            // component name
-            $cells[0] = new html_table_cell($string->component);
-            // string identification code and some meta information
-            $t  = html_writer::tag('div', s($string->stringid), array('class' => 'stringid'));
-            $t .= html_writer::tag('div', s($string->metainfo), array('class' => 'metainfo'));
-            $cells[1] = new html_table_cell($t);
-            // moodle version to put this translation onto
-            $cells[2] = new html_table_cell($string->branch);
+            // string identification
+            list($type, $plugin) = normalize_component($string->component);
+            if ($type == 'core' and is_null($plugin)) {
+                $componentname = 'core';
+            } else {
+                $componentname = $type . '_' . $plugin;
+            }
+            $stringinfo = html_writer::tag('span', $string->branch, array('class'=>'version'));
+            $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
+                html_writer::tag('span', $componentname, array('class'=>'component')).']';
+            $cells[0] = new html_table_cell($stringinfo);
             // original of the string
             $o = html_writer::tag('div', s($string->original), array('class' => 'preformatted english'));
             $g = html_writer::tag('div', '', array('class' => 'googleicon'));
@@ -251,12 +254,12 @@ class local_amos_renderer extends plugin_renderer_base {
                 $l = html_writer::tag('div', $this->help_icon('greylisted', 'local_amos',
                         get_string('greylistedwarning', 'local_amos')), array('class' => 'greylistedinfo'));
             }
-            $cells[3] = new html_table_cell($o.$g.$p.$l);
+            $cells[1] = new html_table_cell($o.$g.$p.$l);
             if ($string->greylisted) {
-                $cells[3]->attributes['class'] .= ' greylisted';
+                $cells[1]->attributes['class'] .= ' greylisted';
             }
             // the language in which the original is displayed
-            $cells[4] = new html_table_cell($string->language);
+            $cells[2] = new html_table_cell($string->language);
             // Translation
             if (empty($string->translation) and $string->translation !== '0') {
                 $missing++;
@@ -274,15 +277,15 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $c = '';
             }
-            $cells[5] = new html_table_cell($t . $c . $i);
-            $cells[5]->id = $sid;
-            $cells[5]->attributes['class'] = $string->class;
-            $cells[5]->attributes['class'] .= ' translatable';
+            $cells[3] = new html_table_cell($t . $c . $i);
+            $cells[3]->id = $sid;
+            $cells[3]->attributes['class'] = $string->class;
+            $cells[3]->attributes['class'] .= ' translatable';
             if ($string->committable) {
-                $cells[5]->attributes['class'] .= ' committable';
+                $cells[3]->attributes['class'] .= ' committable';
             }
             if ($string->outdated) {
-                $cells[5]->attributes['class'] .= ' outdated';
+                $cells[3]->attributes['class'] .= ' outdated';
             }
             $row = new html_table_row($cells);
             $table->data[] = $row;
@@ -344,24 +347,28 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amosstage';
-        $table->head = array('Component', 'Identifier', 'Ver', 'Original', 'Lang',
+        $table->head = array('String', 'Original', 'Lang',
                 get_string('stagetranslation', 'local_amos') . $this->help_icon('stagetranslation', 'local_amos'));
-        $table->colclasses = array('component', 'stringinfo', 'version', 'original', 'lang', 'translation');
+        $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
 
         $committable = 0;
         foreach ($stage->strings as $string) {
             $cells = array();
-            // component name
-            $cells[0] = new html_table_cell($string->component);
-            // string identification code and some meta information
-            $t  = html_writer::tag('div', s($string->stringid), array('class' => 'stringid'));
-            $cells[1] = new html_table_cell($t);
-            // moodle version to put this translation onto
-            $cells[2] = new html_table_cell($string->version);
+            // string identification
+            list($type, $plugin) = normalize_component($string->component);
+            if ($type == 'core' and is_null($plugin)) {
+                $componentname = 'core';
+            } else {
+                $componentname = $type . '_' . $plugin;
+            }
+            $stringinfo = html_writer::tag('span', $string->version, array('class'=>'version'));
+            $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
+                html_writer::tag('span', $componentname, array('class'=>'component')).']';
+            $cells[0] = new html_table_cell($stringinfo);
             // original of the string
-            $cells[3] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            $cells[1] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
             // the language in which the original is displayed
-            $cells[4] = new html_table_cell($string->language);
+            $cells[2] = new html_table_cell($string->language);
             // the current and the new translation
             $t1 = s($string->current);
             $t1 = html_writer::tag('del', $t1, array());
@@ -374,13 +381,13 @@ class local_amos_renderer extends plugin_renderer_base {
                     'branch'    => $string->branch,
                     'lang'      => $string->language));
             $unstagebutton = $this->single_button($unstageurl, 'Unstage', 'post', array('class' => 'singlebutton protected'));
-            $cells[5] = new html_table_cell($t2 . $t1 . $unstagebutton);
+            $cells[3] = new html_table_cell($t2 . $t1 . $unstagebutton);
             if ($string->committable and !(trim($string->current) === trim($string->new))) {
-                $cells[5]->attributes['class'] .= ' committable';
+                $cells[3]->attributes['class'] .= ' committable';
                 $committable++;
             }
             if (!$string->committable) {
-                $cells[5]->attributes['class'] .= ' uncommittable';
+                $cells[3]->attributes['class'] .= ' uncommittable';
             }
             $row = new html_table_row($cells);
             $table->data[] = $row;

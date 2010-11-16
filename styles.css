@@ -131,18 +131,11 @@
 }
 
 /* minimal width for these two columns */
-.path-local-amos #amostranslator .component,
-.path-local-amos #amostranslator .version,
-.path-local-amos #amosstage .component,
-.path-local-amos #amosstage .version {
+.path-local-amos #amostranslator .stringinfo,
+.path-local-amos #amostranslator .lang,
+.path-local-amos #amosstage .stringinfo,
+.path-local-amos #amosstage .lang {
     width: 1px;
-}
-
-.path-local-amos #amostranslator .original,
-.path-local-amos #amostranslator .translation,
-.path-local-amos #amosstage .original,
-.path-local-amos #amosstage .translation {
-    min-width: 35%;
 }
 
 .path-local-amos #amosstage .translation del {
