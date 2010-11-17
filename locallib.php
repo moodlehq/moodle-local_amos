@@ -798,7 +798,11 @@ class local_amos_index_page implements renderable {
             $this->totalenglish += $english[$componentname];
             foreach ($component->get_iterator() as $string) {
                 if (substr($string->id, -5) === '_link') {
-                    $nontranslatable[$componentname]++;
+                    if (isset($nontranslatable[$componentname])) {
+                        $nontranslatable[$componentname]++;
+                    } else {
+                        $nontranslatable[$componentname] = 1;
+                    }
                 }
             }
             $component->clear();
