@@ -616,7 +616,7 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
             } else {
                 $row[0] = html_writer::tag('em', $langpack->langname, array('style'=>'margin-left:1em;'));
             }
-            $row[1] = '<a href="'.$langpack->filename.'">'.$langpack->filename.'</a>';
+            $row[1] = '<a href="http://download.moodle.org/download.php/langpack/'.$data->version->label.'/'.$langpack->filename.'">'.$langpack->filename.'</a>';
             $row[2] = display_size($langpack->filesize);
             if (time() - $langpack->modified < WEEKSECS) {
                 $row[3] = html_writer::tag('strong', self::commit_datetime($langpack->modified), array('class'=>'recentlymodified'));
