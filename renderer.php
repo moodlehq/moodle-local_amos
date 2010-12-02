@@ -269,10 +269,14 @@ class local_amos_renderer extends plugin_renderer_base {
             $t = html_writer::tag('div', $t, array('class' => 'preformatted translation-view'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
             if ($string->outdated and $string->committable and $string->translation) {
-                $c  = html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'update_' . $string->translationid,
-                        'name' => 'updates[]', 'value' => $string->translationid));
-                $help = $this->help_icon('markuptodate', 'local_amos');
-                $c .= html_writer::tag('label', 'mark as up-to-date' . $help, array('for' => 'update_' . $string->translationid));
+                if ($string->translationid) {
+                    $c = html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'update_' . $string->translationid,
+                            'name' => 'updates[]', 'value' => $string->translationid));
+                    $help = $this->help_icon('markuptodate', 'local_amos');
+                    $c .= html_writer::tag('label', 'mark as up-to-date' . $help, array('for' => 'update_' . $string->translationid));
+                } else {
+                    $c = $this->help_icon('outdatednotcommitted', 'local_amos', get_string('outdatednotcommittedwarning', 'local_amos'));
+                }
                 $c  = html_writer::tag('div', $c, array('class' => 'uptodatewrapper'));
             } else {
                 $c = '';
