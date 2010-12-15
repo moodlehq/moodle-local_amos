@@ -234,7 +234,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     echo "*****************************************\n";
     echo "BRANCH {$branch}\n";
     if ($branch == 'MOODLE_20_STABLE') {
-        $gitbranch = 'origin/cvshead';
+        $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
     }
