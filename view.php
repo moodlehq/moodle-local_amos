@@ -53,6 +53,7 @@ $fdata = $filter->get_data();
 foreach ($fdata as $setting => $value) {
     $USER->{'local_amos_' . $setting} = serialize($value);
 }
+$filter->set_permalink($PAGE->url, $fdata);
 
 // just make sure that USER contains sesskey
 $sesskey = sesskey();

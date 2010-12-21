@@ -85,6 +85,7 @@ $string['numofmatchingstrings'] = 'Withing that, {$a->strings} modifications in 
 $string['outdatednotcommitted'] = 'Outdated string';
 $string['outdatednotcommitted_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Please review the translation.';
 $string['outdatednotcommittedwarning'] = 'outdated';
+$string['permalink'] = 'permalink';
 $string['pluginname'] = 'AMOS';
 $string['pluginclasscore'] = 'Core subsystems';
 $string['pluginclassstandard'] = 'Standard plugins';

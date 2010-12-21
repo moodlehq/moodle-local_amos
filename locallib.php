@@ -41,12 +41,16 @@ class local_amos_filter implements renderable {
     /** @var string lazyform name */
     public $lazyformname;
 
+    /** @var moodle_url */
+    protected $permalink = null;
+
     /**
      * Creates the filter and sets the default filter values
      *
      * @param moodle_url $handler filter form action URL
      */
     public function __construct(moodle_url $handler) {
+
         $this->fields = array(
             'version', 'language', 'component', 'missing', 'helps', 'substring',
             'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
@@ -65,10 +69,13 @@ class local_amos_filter implements renderable {
 
         $default    = $this->get_data_default();
         $submitted  = $this->get_data_submitted();
+        $permalink  = $this->get_data_permalink();
 
         foreach ($this->fields as $field) {
             if (isset($submitted->{$field})) {
                 $data->{$field} = $submitted->{$field};
+            } else if (isset($permalink->{$field})) {
+                $data->{$field} = $permalink->{$field};
             } else {
                 $data->{$field} = $default->{$field};
             }
@@ -160,19 +167,22 @@ class local_amos_filter implements renderable {
     /**
      * Returns the form data as submitted by the user
      *
-     * @return object
+     * @return object|null
      */
     protected function get_data_submitted() {
-        $issubmitted = optional_param('__lazyform_' . $this->lazyformname, null, PARAM_BOOL);
-        if (empty($issubmitted)) {
+
+        $issubmitted = optional_param('__lazyform_' . $this->lazyformname, false, PARAM_BOOL);
+
+        if (!$issubmitted) {
             return null;
         }
+
         require_sesskey();
         $data = new stdclass();
 
         $data->version = array();
         $fver = optional_param('fver', null, PARAM_INT);
-        if (!is_null($fver)) {
+        if (is_array($fver)) {
             foreach (mlang_version::list_all() as $version) {
                 if (in_array($version->code, $fver)) {
                     $data->version[] = $version->code;
@@ -182,7 +192,7 @@ class local_amos_filter implements renderable {
 
         $data->language = array();
         $flng = optional_param('flng', null, PARAM_SAFEDIR);
-        if (!is_null($flng)) {
+        if (is_array($flng)) {
             foreach ($flng as $language) {
                 // todo if valid language code
                 $data->language[] = $language;
@@ -191,7 +201,7 @@ class local_amos_filter implements renderable {
 
         $data->component = array();
         $fcmp = optional_param('fcmp', null, PARAM_FILE);
-        if (!is_null($fcmp)) {
+        if (is_array($fcmp)) {
             foreach ($fcmp as $component) {
                 // todo if valid component
                 $data->component[] = $component;
@@ -212,6 +222,103 @@ class local_amos_filter implements renderable {
         $data->page = 1;
 
         return $data;
+    }
+
+    /**
+     * Returns the form data as set by explicit permalink
+     *
+     * @see self::set_permalink()
+     * @return object|null
+     */
+    protected function get_data_permalink() {
+
+        $ispermalink = optional_param('t', false, PARAM_INT);
+        if (empty($ispermalink)) {
+            return null;
+        }
+        $data = new stdclass();
+
+        $data->version = array();
+        $fver = optional_param('v', '', PARAM_RAW);
+        $fver = explode(',', $fver);
+        $fver = clean_param($fver, PARAM_INT);
+        if (!empty($fver) and is_array($fver)) {
+            foreach (mlang_version::list_all() as $version) {
+                if (in_array($version->code, $fver)) {
+                    $data->version[] = $version->code;
+                }
+            }
+        }
+
+        $data->language = array();
+        $flng = optional_param('l', '', PARAM_RAW);
+        $flng = explode(',', $flng);
+        $flng = clean_param($flng, PARAM_SAFEDIR);
+        if (!empty($flng) and is_array($flng)) {
+            foreach ($flng as $language) {
+                // todo if valid language code
+                $data->language[] = $language;
+            }
+        }
+
+        $data->component = array();
+        $fcmp = optional_param('c', '', PARAM_RAW);
+        $fcmp = explode(',', $fcmp);
+        $fcmp = clean_param($fcmp, PARAM_FILE);
+        if (!empty($fcmp) and is_array($fcmp)) {
+            foreach ($fcmp as $component) {
+                // todo if valid component
+                $data->component[] = $component;
+            }
+        }
+
+        $data->missing              = optional_param('m', false, PARAM_BOOL);
+        $data->helps                = optional_param('h', false, PARAM_BOOL);
+        $data->substring            = optional_param('s', '', PARAM_RAW);
+        $data->substringregex       = optional_param('r', false, PARAM_BOOL);
+        $data->substringcs          = optional_param('i', false, PARAM_BOOL);
+        $data->stringid             = trim(optional_param('d', '', PARAM_STRINGID));
+        $data->stagedonly           = optional_param('g', false, PARAM_BOOL);
+        $data->greylistedonly       = optional_param('o', false, PARAM_BOOL);
+        $data->withoutgreylisted    = optional_param('w', false, PARAM_BOOL);
+
+        // reset the paginator to the first page for permalinks
+        $data->page = 1;
+
+        return $data;
+    }
+
+    /**
+     * Prepare permanent link for the given filter data
+     *
+     * @param moodle_url $baseurl
+     * @param stdClass $fdata as returned by {@see self::get_data()}
+     * @return moodle_url $permalink
+     */
+    public function set_permalink(moodle_url $baseurl, stdClass $fdata) {
+
+        $this->permalink = new moodle_url($baseurl, array('t' => time()));
+        $this->permalink->param('v', implode(',', $fdata->version));
+        $this->permalink->param('l', implode(',', $fdata->language));
+        $this->permalink->param('c', implode(',', $fdata->component));
+        $this->permalink->param('m', (int)$fdata->missing);
+        $this->permalink->param('h', (int)$fdata->helps);
+        $this->permalink->param('s', $fdata->substring);
+        $this->permalink->param('r', (int)$fdata->substringregex);
+        $this->permalink->param('i', (int)$fdata->substringcs);
+        $this->permalink->param('d', $fdata->stringid);
+        $this->permalink->param('g', (int)$fdata->stagedonly);
+        $this->permalink->param('o', (int)$fdata->greylistedonly);
+        $this->permalink->param('w', (int)$fdata->withoutgreylisted);
+
+        return $this->permalink;
+    }
+
+    /**
+     * @return null|moodle_url permanent link to the filter settings
+     */
+    public function get_permalink() {
+        return $this->permalink;
     }
 }
 
