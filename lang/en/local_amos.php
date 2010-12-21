@@ -88,6 +88,7 @@ $string['pluginname'] = 'AMOS';
 $string['pluginclasscore'] = 'Core subsystems';
 $string['pluginclassstandard'] = 'Standard plugins';
 $string['pluginclassnonstandard'] = 'Non-standard plugins';
+$string['regex'] = 'regex';
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 

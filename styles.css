@@ -47,6 +47,10 @@
     margin: 0em 1.5em 0em 0.5em;
 }
 
+.path-local-amos .lazyform .inputmodifier {
+    margin-left: 0.5em;
+}
+
 .path-local-amos #amosfilter_fver .labelled_checkbox,
 .path-local-amos #amosfilter_fgrey .labelled_checkbox {
     display: inline;

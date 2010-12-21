@@ -49,7 +49,8 @@ class local_amos_filter implements renderable {
     public function __construct(moodle_url $handler) {
         $this->fields = array(
             'version', 'language', 'component', 'missing', 'helps', 'substring',
-            'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page');
+            'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
+            'substringregex');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -131,6 +132,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->substring)) {
             $data->substring = '';
         }
+        if (is_null($data->substringregex)) {
+            $data->substringregex = false;
+        }
         if (is_null($data->stringid)) {
             $data->stringid = '';
         }
@@ -193,7 +197,8 @@ class local_amos_filter implements renderable {
 
         $data->missing              = optional_param('fmis', false, PARAM_BOOL);
         $data->helps                = optional_param('fhlp', false, PARAM_BOOL);
-        $data->substring            = trim(optional_param('ftxt', '', PARAM_RAW));
+        $data->substring            = optional_param('ftxt', '', PARAM_RAW);
+        $data->substringregex       = optional_param('ftxr', false, PARAM_BOOL);
         $data->stringid             = trim(optional_param('fsid', '', PARAM_STRINGID));
         $data->stagedonly           = optional_param('fstg', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('fglo', false, PARAM_BOOL);
@@ -243,6 +248,7 @@ class local_amos_translator implements renderable {
         $missing            = $filter->get_data()->missing;
         $helps              = $filter->get_data()->helps;
         $substring          = $filter->get_data()->substring;
+        $substringregex     = $filter->get_data()->substringregex;
         $stringid           = $filter->get_data()->stringid;
         $stagedonly         = $filter->get_data()->stagedonly;
         $greylistedonly     = $filter->get_data()->greylistedonly;
@@ -402,8 +408,15 @@ class local_amos_translator implements renderable {
                             }
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
-                                if (!stristr($string->original, $substring) and !stristr($string->translation, $substring)) {
-                                    continue; // do not display this strings
+                                if (empty($substringregex)) {
+                                    if (!stristr($string->original, trim($substring)) and !stristr($string->translation, trim($substring))) {
+                                        continue; // do not display this strings
+                                    }
+                                } else {
+                                    // considered substring a regular expression
+                                    if (!preg_match("/$substring/i", $string->original) and !preg_match("/$substring/i", $string->translation)) {
+                                        continue;
+                                    }
                                 }
                             }
                             if ($missing) {
