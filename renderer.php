@@ -150,6 +150,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
         $output .= html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex, get_string('regex', 'local_amos'),
                     array('class' => 'inputmodifier'));
+        $output .= html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs, get_string('casesensitive', 'local_amos'),
+                    array('class' => 'inputmodifier'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');

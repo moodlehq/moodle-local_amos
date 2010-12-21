@@ -50,7 +50,7 @@ class local_amos_filter implements renderable {
         $this->fields = array(
             'version', 'language', 'component', 'missing', 'helps', 'substring',
             'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
-            'substringregex');
+            'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
     }
@@ -135,6 +135,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->substringregex)) {
             $data->substringregex = false;
         }
+        if (is_null($data->substringcs)) {
+            $data->substringcs = false;
+        }
         if (is_null($data->stringid)) {
             $data->stringid = '';
         }
@@ -199,6 +202,7 @@ class local_amos_filter implements renderable {
         $data->helps                = optional_param('fhlp', false, PARAM_BOOL);
         $data->substring            = optional_param('ftxt', '', PARAM_RAW);
         $data->substringregex       = optional_param('ftxr', false, PARAM_BOOL);
+        $data->substringcs          = optional_param('ftxs', false, PARAM_BOOL);
         $data->stringid             = trim(optional_param('fsid', '', PARAM_STRINGID));
         $data->stagedonly           = optional_param('fstg', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('fglo', false, PARAM_BOOL);
@@ -249,6 +253,7 @@ class local_amos_translator implements renderable {
         $helps              = $filter->get_data()->helps;
         $substring          = $filter->get_data()->substring;
         $substringregex     = $filter->get_data()->substringregex;
+        $substringcs        = $filter->get_data()->substringcs;
         $stringid           = $filter->get_data()->stringid;
         $stagedonly         = $filter->get_data()->stagedonly;
         $greylistedonly     = $filter->get_data()->greylistedonly;
@@ -409,13 +414,25 @@ class local_amos_translator implements renderable {
                             if (!empty($substring)) {
                                 // if defined, then either English or the translation must contain the substring
                                 if (empty($substringregex)) {
-                                    if (!stristr($string->original, trim($substring)) and !stristr($string->translation, trim($substring))) {
-                                        continue; // do not display this strings
+                                    if (empty($substringcs)) {
+                                        if (!stristr($string->original, trim($substring)) and !stristr($string->translation, trim($substring))) {
+                                            continue; // do not display this strings
+                                        }
+                                    } else {
+                                        if (!strstr($string->original, trim($substring)) and !strstr($string->translation, trim($substring))) {
+                                            continue; // do not display this strings
+                                        }
                                     }
                                 } else {
                                     // considered substring a regular expression
-                                    if (!preg_match("/$substring/i", $string->original) and !preg_match("/$substring/i", $string->translation)) {
-                                        continue;
+                                    if (empty($substringcs)) {
+                                        if (!preg_match("/$substring/i", $string->original) and !preg_match("/$substring/i", $string->translation)) {
+                                            continue;
+                                        }
+                                    } else {
+                                        if (!preg_match("/$substring/", $string->original) and !preg_match("/$substring/", $string->translation)) {
+                                            continue;
+                                        }
                                     }
                                 }
                             }

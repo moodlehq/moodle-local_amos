@@ -31,6 +31,7 @@ $string['amos:importfile'] = 'Import strings from uploaded file';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
+$string['casesensitive'] = 'case-sensitive';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';
