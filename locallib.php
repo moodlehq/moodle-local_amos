@@ -252,23 +252,37 @@ class local_amos_filter implements renderable {
 
         $data->language = array();
         $flng = optional_param('l', '', PARAM_RAW);
-        $flng = explode(',', $flng);
-        $flng = clean_param($flng, PARAM_SAFEDIR);
-        if (!empty($flng) and is_array($flng)) {
-            foreach ($flng as $language) {
-                // todo if valid language code
-                $data->language[] = $language;
+        if ($flng == '*') {
+            // all languages
+            foreach (mlang_tools::list_languages(false) as $langcode => $langname) {
+                $data->language[] = $langcode;
+            }
+        } else {
+            $flng = explode(',', $flng);
+            $flng = clean_param($flng, PARAM_SAFEDIR);
+            if (!empty($flng) and is_array($flng)) {
+                foreach ($flng as $language) {
+                    // todo if valid language code
+                    $data->language[] = $language;
+                }
             }
         }
 
         $data->component = array();
         $fcmp = optional_param('c', '', PARAM_RAW);
-        $fcmp = explode(',', $fcmp);
-        $fcmp = clean_param($fcmp, PARAM_FILE);
-        if (!empty($fcmp) and is_array($fcmp)) {
-            foreach ($fcmp as $component) {
-                // todo if valid component
+        if ($fcmp == '*') {
+            // all components
+            foreach (mlang_tools::list_components() as $component => $undefined) {
                 $data->component[] = $component;
+            }
+        } else {
+            $fcmp = explode(',', $fcmp);
+            $fcmp = clean_param($fcmp, PARAM_FILE);
+            if (!empty($fcmp) and is_array($fcmp)) {
+                foreach ($fcmp as $component) {
+                    // todo if valid component
+                    $data->component[] = $component;
+                }
             }
         }
 
@@ -299,8 +313,30 @@ class local_amos_filter implements renderable {
 
         $this->permalink = new moodle_url($baseurl, array('t' => time()));
         $this->permalink->param('v', implode(',', $fdata->version));
-        $this->permalink->param('l', implode(',', $fdata->language));
-        $this->permalink->param('c', implode(',', $fdata->component));
+
+        // list of languages or '*' if all are selected
+        $all = mlang_tools::list_languages(false);
+        foreach ($fdata->language as $selected) {
+            unset($all[$selected]);
+        }
+        if (empty($all)) {
+            $this->permalink->param('l', '*');
+        } else {
+            $this->permalink->param('l', implode(',', $fdata->language));
+        }
+        unset($all);
+
+        // list of components or '*' if all are selected
+        $all = mlang_tools::list_components();
+        foreach ($fdata->component as $selected) {
+            unset($all[$selected]);
+        }
+        if (empty($all)) {
+            $this->permalink->param('c', '*');
+        } else {
+            $this->permalink->param('c', implode(',', $fdata->component));
+        }
+        unset($all);
         $this->permalink->param('m', (int)$fdata->missing);
         $this->permalink->param('h', (int)$fdata->helps);
         $this->permalink->param('s', $fdata->substring);
