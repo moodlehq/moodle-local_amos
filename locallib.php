@@ -337,15 +337,19 @@ class local_amos_filter implements renderable {
             $this->permalink->param('c', implode(',', $fdata->component));
         }
         unset($all);
-        $this->permalink->param('m', (int)$fdata->missing);
-        $this->permalink->param('h', (int)$fdata->helps);
+
+        // substring and stringid
         $this->permalink->param('s', $fdata->substring);
-        $this->permalink->param('r', (int)$fdata->substringregex);
-        $this->permalink->param('i', (int)$fdata->substringcs);
         $this->permalink->param('d', $fdata->stringid);
-        $this->permalink->param('g', (int)$fdata->stagedonly);
-        $this->permalink->param('o', (int)$fdata->greylistedonly);
-        $this->permalink->param('w', (int)$fdata->withoutgreylisted);
+
+        // checkboxes
+        if ($fdata->missing)            $this->permalink->param('m', 1);
+        if ($fdata->helps)              $this->permalink->param('h', 1);
+        if ($fdata->substringregex)     $this->permalink->param('r', 1);
+        if ($fdata->substringcs)        $this->permalink->param('i', 1);
+        if ($fdata->stagedonly)         $this->permalink->param('g', 1);
+        if ($fdata->greylistedonly)     $this->permalink->param('o', 1);
+        if ($fdata->withoutgreylisted)  $this->permalink->param('w', 1);
 
         return $this->permalink;
     }
