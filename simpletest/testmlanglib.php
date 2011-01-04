@@ -350,11 +350,11 @@ EOF;
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEqual(4, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'numbers', 'lang' => 'en', 'stringid' => 'three', 'text' => 'Tree')));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'numbers', 'lang' => 'en', 'stringid' => 'three', 'text' => 'Three')));
+        $where = "component = 'numbers' AND lang = 'en' AND stringid = 'three'";
+        $this->assertTrue($DB->record_exists_select('amos_repository',
+                "$where AND ".$DB->sql_compare_text('text')." = ".$DB->sql_compare_text("'Tree'")));
+        $this->assertTrue($DB->record_exists_select('amos_repository',
+                "$where AND ".$DB->sql_compare_text('text')." = ".$DB->sql_compare_text("'Three'")));
 
         // get the most recent version (so called "cap") of the component
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
