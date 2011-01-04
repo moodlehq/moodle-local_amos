@@ -102,6 +102,7 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
 $string['stashapply'] = 'Apply';
 $string['stashautosave'] = 'Automatically saved backup stash';
+$string['stashautosave_help'] = 'This stash contains the most recent snapshot of your stage. You can use it as a backup for cases when all strings are unstaged by accident, for example. Use \'Apply\' action to copy all stashed strings back into the stage (will overwrite the string if it is already staged).';
 $string['stashdrop'] = 'Drop';
 $string['stashpop'] = 'Pop';
 $string['stashsubmit'] = 'Submit';
@@ -109,7 +110,7 @@ $string['stashactions'] = 'Stashing actions';
 $string['stashlanguages'] = '<span>Languages:</span> {$a}';
 $string['stashcomponents'] = '<span>Components:</span> {$a}';
 $string['stashstrings'] = '<span>Number of strings:</span> {$a}';
-$string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be sent to the official language pack maintainers for inclusion into the language pack.';
+$string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be submitted to the official language pack maintainers for inclusion into the language pack.';
 $string['stashsubmitdetails'] = 'Submitting details';
 $string['stashsubmitsubject'] = 'Subject';
 $string['stashsubmitmessage'] = 'Message';
@@ -128,12 +129,13 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
 * Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
-$string['ownstashactions'] = 'Action';
+$string['ownstashactions'] = 'Stash actions';
 $string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.
 * Pop - move the translated strings from the stash into the stage and drop the stash (that is Apply and Drop).
 * Drop - throw away the stashed strings.
-* Pull request - make the stash available to the official language maintainers so they can apply your work into their stage, review it and eventually commit.';
-$string['ownstashes'] = 'Own stashes';
+* Submit - opens a form for submitting the stash to the official language maintainers so they can include your contribution in the official language pack.';
+$string['ownstashes'] = 'Your stashes';
+$string['ownstashes_help'] = 'This is a list of all your stashes. ';
 $string['ownstashesnone'] = 'No own stashes found';
 $string['placeholder'] = 'Placeholders';
 $string['placeholder_help'] = 'Placeholders are special statements like `{$a}` or `{$a->something}` within the string. They are replaced with a value when the string is actually printed.

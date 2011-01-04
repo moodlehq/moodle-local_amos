@@ -691,8 +691,10 @@ print_footer();
         $output  = html_writer::start_tag('div', array('class' => 'stash'));
         if ($stash->isautosave) {
             $output .= html_writer::tag('h3', get_string('stashautosave', 'local_amos'));
+            $extraclasses = ' autosave';
         } else {
             $output .= html_writer::tag('h3', s($stash->name));
+            $extraclasses = '';
         }
         $output .= html_writer::tag('div', fullname($stash->owner), array('class' => 'owner'));
         $output .= $this->output->user_picture($stash->owner);
@@ -712,9 +714,10 @@ print_footer();
             $actions .= $this->output->single_button($action->url, $action->label, 'post', array('class'=>'singlebutton '.$action->id));
         }
         if ($actions) {
+            $actions .= $this->output->help_icon('ownstashactions', 'local_amos');
             $actions = html_writer::tag('div', $actions, array('class' => 'actions'));
         }
-        $output = $this->output->box($output . $actions, 'generalbox stashwrapper');
+        $output = $this->output->box($output . $actions, 'generalbox stashwrapper'.$extraclasses);
 
         return $output;
     }

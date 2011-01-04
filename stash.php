@@ -153,22 +153,38 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
     echo $output->heading(get_string('ownstashesnone', 'local_amos'));
 
 } else {
-    echo $output->heading(get_string('ownstashes', 'local_amos'));
+    // catch outout into these two
+    $autosavestash = '';
+    $ownstashes = '';
 
     foreach ($stashes as $stashdata) {
         $stash = local_amos_stash::instance_from_record($stashdata, $USER);
         if (has_capability('local/amos:stage', get_system_context())) {
             $stash->add_action('apply', new moodle_url($PAGE->url, array('apply' => $stash->id)), get_string('stashapply', 'local_amos'));
-            $stash->add_action('pop', new moodle_url($PAGE->url, array('pop' => $stash->id)), get_string('stashpop', 'local_amos'));
+            if (!$stash->isautosave) {
+                $stash->add_action('pop', new moodle_url($PAGE->url, array('pop' => $stash->id)), get_string('stashpop', 'local_amos'));
+            }
         }
-        $stash->add_action('drop', new moodle_url($PAGE->url, array('drop' => $stash->id)), get_string('stashdrop', 'local_amos'));
-        if ($stash->name !== 'AUTOSAVE') {
+        if (!$stash->isautosave) {
+            $stash->add_action('drop', new moodle_url($PAGE->url, array('drop' => $stash->id)), get_string('stashdrop', 'local_amos'));
             $stash->add_action('submit', new moodle_url($PAGE->url, array('submit' => $stash->id)), get_string('stashsubmit', 'local_amos'));
         }
 
-        echo $output->render($stash);
+        if ($stash->isautosave) {
+            $autosavestash .= $output->render($stash);
+        } else {
+            $ownstashes .= $output->render($stash);
+        }
     }
 
+    if ($autosavestash) {
+        echo $output->heading_with_help(get_string('stashautosave', 'local_amos'), 'stashautosave', 'local_amos');
+        echo $autosavestash;
+    }
+    if ($ownstashes) {
+        echo $output->heading(get_string('ownstashes', 'local_amos'));
+        echo $ownstashes;
+    }
 }
 
 /*
