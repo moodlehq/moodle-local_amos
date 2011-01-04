@@ -13,6 +13,7 @@ YUI.add('moodle-local_amos-stash', function(Y) {
     Y.extend(STASH, Y.Base, {
         initializer : function(config) {
             this.setUpActionBar();
+            this.protectDropStashButtons();
         },
 
         setUpActionBar : function() {
@@ -26,7 +27,16 @@ YUI.add('moodle-local_amos-stash', function(Y) {
                 e.currentTarget.removeClass('mousein');
                 e.currentTarget.one('.actions').setStyle('visibility', 'hidden');
             });
+        },
+
+        protectDropStashButtons : function() {
+            Y.all('.stashwrapper .actions .drop form').on('submit', function(e) {
+                if (!confirm(M.util.get_string('confirmaction', 'local_amos'))) {
+                    e.halt();
+                }
+            });
         }
+
     }, {
         NAME : 'amos_stash',
         ATTRS : {

@@ -1061,30 +1061,74 @@ class local_amos_stash implements renderable {
     protected $actions = array();
 
     /**
-     * Constructor
+     * Factory method using an instance if {@link mlang_stash} as a data source
+     *
+     * @param mlang_stash $stash
+     * @param stdClass $owner owner user data
+     * @return local_amos_stash new instance
+     */
+    public static function instance_from_mlang_stash(mlang_stash $stash, stdClass $owner) {
+
+        if ($stash->ownerid != $owner->id) {
+            throw new coding_exception('Stash owner mismatch');
+        }
+
+        $new                = new local_amos_stash();
+        $new->id            = $stash->id;
+        $new->name          = $stash->name;
+        $new->timecreated   = $stash->timecreated;
+
+        list($new->strings, $new->languages, $new->components) = $stash->analyze_stage();
+        $new->components    = explode('/', trim($new->components, '/'));
+        $new->languages     = explode('/', trim($new->languages, '/'));
+
+        $new->owner         = $owner;
+
+        if ($stash->hash === 'xxxxautosaveuser'.$new->owner->id) {
+            $new->isautosave = true;
+        } else {
+            $new->isautosave = false;
+        }
+
+        return $new;
+    }
+
+    /**
+     * Factory method using plain database record from amos_stashes table as a source
      *
      * @param stdClass $record stash record from amos_stashes table
      * @param stdClass $owner owner user data
+     * @return local_amos_stash new instance
      */
-    public function __construct(stdClass $record, stdClass $owner) {
+    public static function instance_from_record(stdClass $record, stdClass $owner) {
 
         if ($record->ownerid != $owner->id) {
             throw new coding_exception('Stash owner mismatch');
         }
 
-        $this->id           = $record->id;
-        $this->name         = $record->name;
-        $this->timecreated  = $record->timecreated;
-        $this->strings      = $record->strings;
-        $this->components   = explode('/', trim($record->components, '/'));
-        $this->languages    = explode('/', trim($record->languages, '/'));
-        $this->owner        = $owner;
+        $new                = new local_amos_stash();
+        $new->id            = $record->id;
+        $new->name          = $record->name;
+        $new->timecreated   = $record->timecreated;
+        $new->strings       = $record->strings;
+        $new->components    = explode('/', trim($record->components, '/'));
+        $new->languages     = explode('/', trim($record->languages, '/'));
+        $new->owner         = $owner;
 
-        if ($record->hash === 'xxxxautosaveuser'.$this->owner->id) {
-            $this->isautosave = true;
+        if ($record->hash === 'xxxxautosaveuser'.$new->owner->id) {
+            $new->isautosave = true;
         } else {
-            $this->isautosave = false;
+            $new->isautosave = false;
         }
+
+        return $new;
+    }
+
+    /**
+     * Constructor is not public, use one of factory methods above
+     */
+    protected function __construct() {
+        // does nothing
     }
 
     /**

@@ -28,13 +28,13 @@ require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
 require_once(dirname(__FILE__).'/stash_form.php');
 
-$name           = optional_param('name', null, PARAM_RAW);  // stash name
-$new            = optional_param('new', null, PARAM_BOOL);  // new stash requested
-$apply          = optional_param('apply', null, PARAM_INT);
-$pop            = optional_param('pop', null, PARAM_INT);
-$drop           = optional_param('drop', null, PARAM_INT);
-$pullrequest    = optional_param('pullrequest', null, PARAM_INT);
-$hide           = optional_param('hide', null, PARAM_INT);
+$name   = optional_param('name', null, PARAM_RAW);  // stash name
+$new    = optional_param('new', null, PARAM_BOOL);  // new stash requested
+$apply  = optional_param('apply', null, PARAM_INT);
+$pop    = optional_param('pop', null, PARAM_INT);
+$drop   = optional_param('drop', null, PARAM_INT);
+$submit = optional_param('submit', null, PARAM_INT);
+$hide   = optional_param('hide', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
@@ -45,6 +45,7 @@ navigation_node::override_active_url(new moodle_url('/local/amos/stash.php'));
 $PAGE->set_title('AMOS stashes');
 $PAGE->set_heading('AMOS stashes');
 $PAGE->requires->yui_module('moodle-local_amos-stash', 'M.local_amos.init_stash');
+$PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 
 if ($new) {
     // pushing the current stage into a new stash
@@ -59,7 +60,7 @@ if ($apply) {
     require_sesskey();
     require_capability('local/amos:stage', get_system_context());
     $stash = mlang_stash::instance_from_id($apply);
-    if (empty($stash->pullrequest) and $stash->ownerid != $USER->id) {
+    if ($stash->ownerid != $USER->id) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
@@ -106,18 +107,19 @@ if ($hide) {
     redirect($PAGE->url);
 }
 
-$pullrequestform = new local_amos_pullrequest_form();
+$submitform = new local_amos_submit_form();
 
-if ($pullrequestform->is_cancelled()) {
+if ($submitform->is_cancelled()) {
     redirect($PAGE->url);
 
-} elseif ($pullrequestdata = $pullrequestform->get_data()) {
-    $stash = mlang_stash::instance_from_id($pullrequestdata->stashid);
+} elseif ($submitdata = $submitform->get_data()) {
+    $stash = mlang_stash::instance_from_id($submitdata->stashid);
     if ($stash->ownerid != $USER->id) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
-    $stash->send_pull_request($pullrequestdata->name, $pullrequestdata->message);
+    // TODO
+    //$stash->send_pull_request($pullrequestdata->name, $pullrequestdata->message);
     redirect($PAGE->url);
 }
 
@@ -126,23 +128,21 @@ $output = $PAGE->get_renderer('local_amos');
 /// Output starts here
 echo $output->header();
 
-if ($pullrequest) {
+if ($submit) {
     require_sesskey();
-    $stash = mlang_stash::instance_from_id($pullrequest);
+    $stash = mlang_stash::instance_from_id($submit);
     if ($stash->ownerid != $USER->id) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
-    echo $output->heading('Pull request');
-    echo $output->box('This will make the stash available to the official language maintainers. They will be able to
-        pull your work into their stage, review it and eventually commit. Please provide a message for them describing
-        your work and why you would like to see your contribution included.');
-
-    $pullrequestform->set_data(array(
+    echo $output->heading_with_help(get_string('stashsubmitting', 'local_amos'), 'stashsubmitting', 'local_amos');
+    $stashinfo = local_amos_stash::instance_from_mlang_stash($stash, $USER);
+    echo $output->render($stashinfo);
+    $submitform->set_data(array(
         'name'    => s($stash->name),
         'stashid' => $stash->id,
     ));
-    $pullrequestform->display();
+    $submitform->display();
 
     echo $output->footer();
     die();
@@ -156,7 +156,7 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
     echo $output->heading(get_string('ownstashes', 'local_amos'));
 
     foreach ($stashes as $stashdata) {
-        $stash = new local_amos_stash($stashdata, $USER);
+        $stash = local_amos_stash::instance_from_record($stashdata, $USER);
         if (has_capability('local/amos:stage', get_system_context())) {
             $stash->add_action('apply', new moodle_url($PAGE->url, array('apply' => $stash->id)), get_string('stashapply', 'local_amos'));
             $stash->add_action('pop', new moodle_url($PAGE->url, array('pop' => $stash->id)), get_string('stashpop', 'local_amos'));

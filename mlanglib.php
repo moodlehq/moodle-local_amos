@@ -960,7 +960,7 @@ class mlang_stash {
     /** @var int identifier of the record in the database table amos_stashes */
     public $id;
 
-    /** @var object user who owns the stash */
+    /** @var int id of the user who owns the stash */
     public $ownerid;
 
     /** @var int the timestamp of when the stash was created */
@@ -1022,6 +1022,8 @@ class mlang_stash {
         $instance->name         = $record->name;
         $instance->message      = $record->message;
 
+        $instance->load_from_file();
+
         return $instance;
     }
 
@@ -1072,8 +1074,6 @@ class mlang_stash {
             $record->languages      = $languages;
             $record->components     = $components;
             $record->strings        = $strings;
-            $record->shared         = 0;
-            $record->pullrequest    = 0;
             $record->timecreated    = $this->timecreated;
             $record->timemodified   = null;
             $record->name           = $this->name;
@@ -1088,10 +1088,6 @@ class mlang_stash {
             $record->components     = $components;
             $record->strings        = $strings;
             $record->timemodified   = time();
-            if ($this->name === 'AUTOSAVE') {
-                $record->shared         = 0;
-                $record->pullrequest    = 0;
-            }
 
             $DB->update_record('amos_stashes', $record);
         }
@@ -1106,7 +1102,6 @@ class mlang_stash {
      */
     public function apply(mlang_stage $stage) {
 
-        $this->load_from_file();
         foreach ($this->stage->get_iterator() as $component) {
             $stage->add($component, true);
         }
@@ -1134,6 +1129,55 @@ class mlang_stash {
             @rmdir(dirname($filename));
             @rmdir(dirname(dirname($filename)));
         }
+    }
+
+    /**
+     * Returns the number of strings and the list of languages and components in the stashed stage
+     *
+     * @return array
+     */
+    public function analyze_stage() {
+        $strings = 0;
+        $languages = array();
+        $components = array();
+
+        foreach ($this->stage->get_iterator() as $component) {
+            if ($s = $component->get_number_of_strings()) {
+                $strings += $s;
+                if (!isset($components[$component->name])) {
+                    $components[$component->name] = true;
+                }
+                if (!isset($languages[$component->lang])) {
+                    $languages[$component->lang] = true;
+                }
+            }
+        }
+        $languages = '/'.implode('/', array_keys($languages)).'/';
+        $components = '/'.implode('/', array_keys($components)).'/';
+
+        return array($strings, $languages, $components);
+    }
+
+    /**
+     * Reads the stashed strings from the file, sets $this->stage
+     *
+     * This should be called exclusively by {@link self::instance_from_id()}
+     *
+     * @see self::save_into_file()
+     */
+    public function load_from_file() {
+
+        if (!is_null($this->stageserialized) or !is_null($this->stage)) {
+            throw new coding_exception('Already loaded stash can not be overwritten');
+        }
+
+        $filename = $this->get_storage_filename();
+
+        if (!is_readable($filename)) {
+            throw new coding_exception('Unable to read stash storage '.$filename);
+        }
+
+        $this->stage = unserialize(file_get_contents($filename));
     }
 
     // INTERNAL API
@@ -1171,33 +1215,6 @@ class mlang_stash {
     }
 
     /**
-     * Returns the number of strings and the list of languages and components in the stashed stage
-     *
-     * @return array
-     */
-    protected function analyze_stage() {
-        $strings = 0;
-        $languages = array();
-        $components = array();
-
-        foreach ($this->stage->get_iterator() as $component) {
-            if ($s = $component->get_number_of_strings()) {
-                $strings += $s;
-                if (!isset($components[$component->name])) {
-                    $components[$component->name] = true;
-                }
-                if (!isset($languages[$component->lang])) {
-                    $languages[$component->lang] = true;
-                }
-            }
-        }
-        $languages = '/'.implode('/', array_keys($languages)).'/';
-        $components = '/'.implode('/', array_keys($components)).'/';
-
-        return array($strings, $languages, $components);
-    }
-
-    /**
      * Dumps the stash contents into a file in moodledata/amos/stashes/
      *
      * @see self::load_from_file()
@@ -1215,26 +1232,6 @@ class mlang_stash {
         }
 
         file_put_contents($filename, $this->stageserialized);
-    }
-
-    /**
-     * Reads the stashed strings from the file, sets $this->stage
-     *
-     * @see self::save_into_file()
-     */
-    protected function load_from_file() {
-
-        if (!is_null($this->stageserialized) or !is_null($this->stage)) {
-            throw new coding_exception('Already loaded stash can not be overwritten');
-        }
-
-        $filename = $this->get_storage_filename();
-
-        if (!is_readable($filename)) {
-            throw new coding_exception('Unable to read stash storage');
-        }
-
-        $this->stage = unserialize(file_get_contents($filename));
     }
 
     /**

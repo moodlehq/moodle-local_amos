@@ -43,6 +43,7 @@ $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS stage');
 $PAGE->set_heading('AMOS stage');
 $PAGE->requires->js_init_call('M.local_amos.init_stage');
+$PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 
 if (!empty($message)) {
     // committing the stage
