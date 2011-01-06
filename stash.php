@@ -170,7 +170,7 @@ if ($submit) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
-    echo $output->heading_with_help(get_string('stashsubmitting', 'local_amos'), 'stashsubmitting', 'local_amos');
+    echo $output->heading_with_help(get_string('submitting', 'local_amos'), 'submitting', 'local_amos');
     $stashinfo = local_amos_stash::instance_from_mlang_stash($stash, $USER);
     echo $output->render($stashinfo);
     $submitform->set_data(array(

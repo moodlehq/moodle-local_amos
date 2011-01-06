@@ -423,7 +423,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $button = html_writer::tag('div', $button);
         $commitform = html_writer::tag('div', $commitform . $button);
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper protected'));
+        $commitform .= html_writer::tag('legend', get_string('commitstage', 'local_amos') . $this->help_icon('commitstage', 'local_amos'));
+        $commitform = html_writer::tag('fieldset', $commitform, array('class' => 'commitformwrapper protected'));
 
         $stashform  = html_writer::label('Stash title', 'stashtitle', true);
         $stashform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
@@ -439,14 +440,17 @@ class local_amos_renderer extends plugin_renderer_base {
         $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
         $stashform  = html_writer::tag('div', $stashform, array('class' => 'stashformwrapper'));
 
+        $submiturl = new moodle_url('/local/amos/stage.php', array('submit' => 1));
+        $submitbutton = $this->single_button($submiturl, get_string('stagesubmit', 'local_amos'), 'post', array('class'=>'singlebutton submit'));
+
         $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1));
-        $prunebutton = $this->single_button($pruneurl, 'Prune non-committable', 'post', array('class'=>'singlebutton protected'));
+        $prunebutton = $this->single_button($pruneurl, get_string('stageprune', 'local_amos'), 'post', array('class'=>'singlebutton protected prune'));
 
         $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1));
-        $rebasebutton = $this->single_button($rebaseurl, 'Rebase', 'post', array('class'=>'singlebutton protected'));
+        $rebasebutton = $this->single_button($rebaseurl, get_string('stagerebase', 'local_amos'), 'post', array('class'=>'singlebutton protected rebase'));
 
         $unstageallurl = new moodle_url('/local/amos/stage.php', array('unstageall' => 1));
-        $unstageallbutton = $this->single_button($unstageallurl, 'Unstage all', 'post', array('class'=>'singlebutton protected unstageall'));
+        $unstageallbutton = $this->single_button($unstageallurl, get_string('stageunstageall', 'local_amos'), 'post', array('class'=>'singlebutton protected unstageall'));
 
         $i = 0;
         foreach ($stage->filterfields->fver as $fver) {
@@ -466,7 +470,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $params['fstg'] = 1;
         $params['__lazyform_amosfilter'] = 1;
         $editurl = new moodle_url('/local/amos/view.php', $params);
-        $editbutton = $this->single_button($editurl, 'Edit staged strings');
+        $editbutton = $this->single_button($editurl, get_string('stageedit', 'local_amos'), 'post', array('class'=>'singlebutton edit'));
 
         if (empty($stage->strings)) {
             $output = $this->heading(get_string('stagestringsnone', 'local_amos'));
@@ -491,7 +495,11 @@ class local_amos_renderer extends plugin_renderer_base {
 
         } else {
             $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
-            $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+            if ($committable) {
+                $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+            } else {
+                $output = $this->heading(get_string('stagestringsnocommit', 'local_amos', $a));
+            }
             unset($a);
 
             if ($committable) {
@@ -499,7 +507,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
+            $output .= html_writer::tag('fieldset', $legend.$submitbutton.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
                                         array('class' => 'actionbuttons'));
 
             $legend = html_writer::tag('legend', get_string('stashactions', 'local_amos') . $this->help_icon('stashactions', 'local_amos'));

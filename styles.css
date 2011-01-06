@@ -2,6 +2,11 @@
     margin-bottom: 0em;
 }
 
+.path-local-amos form input[type="submit"] {
+    background-color: #eee;
+    padding: 1px;
+}
+
 .path-local-amos .lazyform {
     border: 1px solid #eee;
     width: 90%;
@@ -90,8 +95,27 @@
     display: inline;
 }
 
+.path-local-amos .stagewrapper .actionbuttons .singlebutton.submit {
+    margin-right: 2em;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton.submit input[type="submit"],
+.path-local-amos .stashwrapper .actions .singlebutton.submit input[type="submit"] {
+    background-color: #e7f1c3;
+}
+
 .path-local-amos .stagewrapper .actionbuttons .singlebutton.unstageall {
     margin-left: 2em;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton.unstageall input[type="submit"],
+.path-local-amos .stashwrapper .actions .singlebutton.drop input[type="submit"] {
+    background-color: #ffd3d9;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton.edit input[type="submit"],
+.path-local-amos .stashwrapper .actions .singlebutton.apply input[type="submit"] {
+    background-color: #d2ebff;
 }
 
 .path-local-amos .stagewrapper .actionbuttons {
