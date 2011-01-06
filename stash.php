@@ -118,8 +118,43 @@ if ($submitform->is_cancelled()) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
-    // TODO
-    //$stash->send_pull_request($pullrequestdata->name, $pullrequestdata->message);
+
+    // split the stashed components into separate packages by their language
+    $stage = new mlang_stage();
+    $langstages = array();  // (string)langcode => (mlang_stage)
+    $stash->apply($stage);
+    foreach ($stage->get_iterator() as $component) {
+        $lang = $component->lang;
+        if (!isset($langstages[$lang])) {
+            $langstages[$lang] = new mlang_stage();
+        }
+        $langstages[$lang]->add($component);
+    }
+    $stage->clear();
+    unset($stage);
+
+    // create new contribution record for every language and attach a new stash to it
+    foreach ($langstages as $lang => $stage) {
+        $langstash = mlang_stash::instance_from_stage($stage, 0, $submitdata->name);
+        $langstash->message = $submitdata->message;
+        $langstash->push();
+
+        $contribution               = new stdClass();
+        $contribution->authorid     = $USER->id;
+        $contribution->lang         = $lang;
+        $contribution->assignee     = null;
+        $contribution->subject      = $submitdata->name;
+        $contribution->message      = $submitdata->message;
+        $contribution->stashid      = $langstash->id;
+        $contribution->status       = 0; // TODO use some class constant
+        $contribution->timecreated  = $langstash->timecreated;
+        $contribution->timemodified = null;
+
+        $DB->insert_record('amos_contributions', $contribution);
+    }
+
+    // stash has been submited so it is dropped
+    $stash->drop();
     redirect($PAGE->url);
 }
 
@@ -153,7 +188,7 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
     echo $output->heading(get_string('ownstashesnone', 'local_amos'));
 
 } else {
-    // catch outout into these two
+    // catch output into these two variables
     $autosavestash = '';
     $ownstashes = '';
 

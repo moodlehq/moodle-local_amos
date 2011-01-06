@@ -960,7 +960,7 @@ class mlang_stash {
     /** @var int identifier of the record in the database table amos_stashes */
     public $id;
 
-    /** @var int id of the user who owns the stash or 0 if the stash is attached to a pull request */
+    /** @var int id of the user who owns the stash or 0 if the stash is attached to a contribution */
     public $ownerid;
 
     /** @var int the timestamp of when the stash was created */
