@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20101104" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20110106" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -91,7 +91,7 @@
         <INDEX NAME="ux_userid_stashid" UNIQUE="true" FIELDS="userid, stashid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_greylist" COMMENT="Defines the strings that were greylisted, that is they were marked as candidates for removal in the next release." PREVIOUS="amos_hidden_requests">
+    <TABLE NAME="amos_greylist" COMMENT="Defines the strings that were greylisted, that is they were marked as candidates for removal in the next release." PREVIOUS="amos_hidden_requests" NEXT="amos_contributions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
         <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Branch code" PREVIOUS="id" NEXT="component"/>
@@ -104,6 +104,26 @@
       <INDEXES>
         <INDEX NAME="uq_branch_component_stringid" UNIQUE="true" FIELDS="branch, component, stringid"/>
       </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_contributions" COMMENT="Contributed translations from the community" PREVIOUS="amos_greylist">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="authorid"/>
+        <FIELD NAME="authorid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="User who contributed" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this contribution belongs to." PREVIOUS="authorid" NEXT="assignee"/>
+        <FIELD NAME="assignee" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The maintainer who is supposed to merge this or NULL if not assigned" PREVIOUS="lang" NEXT="subject"/>
+        <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Subject of the contributed submission" PREVIOUS="assignee" NEXT="message"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Initial message describing the submission" PREVIOUS="subject" NEXT="stashid"/>
+        <FIELD NAME="stashid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Attached stash" PREVIOUS="message" NEXT="status"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The workflow status of the contribution" PREVIOUS="stashid" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was created" PREVIOUS="status" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was recently modified" PREVIOUS="timecreated"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_author"/>
+        <KEY NAME="fk_author" TYPE="foreign" FIELDS="authorid" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="fk_assignee"/>
+        <KEY NAME="fk_assignee" TYPE="foreign" FIELDS="assignee" REFTABLE="user" REFFIELDS="id" PREVIOUS="fk_author" NEXT="fk_stash"/>
+        <KEY NAME="fk_stash" TYPE="foreign" FIELDS="stashid" REFTABLE="amos_stashes" REFFIELDS="id" PREVIOUS="fk_assignee"/>
+      </KEYS>
     </TABLE>
   </TABLES>
 </XMLDB>
