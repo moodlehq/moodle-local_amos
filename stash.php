@@ -51,7 +51,7 @@ if ($new) {
     // pushing the current stage into a new stash
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $stash = mlang_stash::instance_from_stage($stage, $name);
+    $stash = mlang_stash::instance_from_stage($stage, $stage->userid, $name);
     $stash->push();
     redirect($PAGE->url);
 }

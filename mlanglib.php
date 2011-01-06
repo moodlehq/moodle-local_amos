@@ -960,7 +960,7 @@ class mlang_stash {
     /** @var int identifier of the record in the database table amos_stashes */
     public $id;
 
-    /** @var int id of the user who owns the stash */
+    /** @var int id of the user who owns the stash or 0 if the stash is attached to a pull request */
     public $ownerid;
 
     /** @var int the timestamp of when the stash was created */
@@ -987,14 +987,15 @@ class mlang_stash {
     // PUBLIC API
 
     /**
-     * Factory method returning new instance of the stash from the passed persistent stage
+     * Factory method returning new instance of the stash from the passed stage
      *
-     * @param mlang_persistent_stage $stage the stage to be stashed
+     * @param mlang_stage $stage the stage to be stashed
+     * @param int $ownerid the user id of the stash owner or 0 for a stash without owner
      * @param string $name optional stash name
      * @return mlang_stash instance
      */
-    public static function instance_from_stage(mlang_persistent_stage $stage, $name='') {
-        $instance = new mlang_stash($stage->userid);
+    public static function instance_from_stage(mlang_stage $stage, $ownerid=0, $name='') {
+        $instance = new mlang_stash($ownerid);
         $instance->name = $name;
         $instance->set_stage($stage);
         return $instance;
