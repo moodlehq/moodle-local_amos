@@ -74,8 +74,18 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', get
             $stage->add($component, true);
             $stage->store();
             mlang_stash::autosave($stage);
+
+        } else {
+            notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
         }
+
+    } else {
+        notice(get_string('nofiletoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
     }
+}
+
+if (!isset($stage) or !$stage->has_component()) {
+    notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
 }
 
 redirect(new moodle_url('/local/amos/stage.php'));

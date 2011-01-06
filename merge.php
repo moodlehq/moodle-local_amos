@@ -77,4 +77,9 @@ if ($data = $mergeform->get_data()) {
     $stage->store();
 }
 
+// if no new strings are merged, inform the user
+if (!$stage->has_component()) {
+    notice(get_string('nothingtomerge', 'local_amos'), new moodle_url('/local/amos/stage.php'));
+}
+
 redirect(new moodle_url('/local/amos/stage.php'));
