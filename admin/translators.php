@@ -94,7 +94,7 @@ foreach ($list as $langcode => $item) {
     $rows[] = new html_table_row(array($langcode, $item->langname, $form . implode("<br />\n", $item->translators)));
 }
 $t = new html_table();
-$t->head = array('Code', 'Language', 'Allowed translators');
+$t->head = array('Code', get_string('language'), get_string('maintainers', 'local_amos'));
 $t->data = $rows;
 echo html_writer::table($t);
 echo $OUTPUT->footer();

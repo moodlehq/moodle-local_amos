@@ -35,6 +35,7 @@ $string['casesensitive'] = 'case-sensitive';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['confirmaction'] = 'This can not be undone. Are you sure?';
+$string['contributions'] = 'Contributions';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';
@@ -73,6 +74,7 @@ $string['logfilterbranch'] = 'Versions';
 $string['logfilterlang'] = 'Languages';
 $string['logfiltercomponent'] = 'Components';
 $string['logfilterstringid'] = 'String identifier';
+$string['maintainers'] = 'Maintainers';
 $string['markuptodate'] = 'Marking the translation as up-to-date';
 $string['markuptodate_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Review the translation. If you find it up-to-date, click the checkbox. Edit it otherwise.';
 $string['markuptodate_link'] = 'local/amos/outdatedstrings';
@@ -80,6 +82,7 @@ $string['merge'] = 'Merge';
 $string['mergestrings'] = 'Merge strings from another branch';
 $string['mergestrings_help'] = 'This will pick and stage all strings from the source branch that are not translated yet in the target branch and are used there. You can use this tool to copy a translated string into all other versions of the pack. Only language pack maintainers can use this tool.';
 $string['mergestrings_link'] = 'local/amos/merge';
+$string['newlanguage'] = 'New language';
 $string['nostringsfound'] = 'No strings found, please modify the filter';
 $string['nostringtoimport'] = 'No valid string found in the file. Make sure the file has correct filename and is properly formatted.';
 $string['nofiletoimport'] = 'Please provide a file to import from.';
@@ -107,6 +110,7 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 $string['stashapply'] = 'Apply';
 $string['stashautosave'] = 'Automatically saved backup stash';
 $string['stashautosave_help'] = 'This stash contains the most recent snapshot of your stage. You can use it as a backup for cases when all strings are unstaged by accident, for example. Use \'Apply\' action to copy all stashed strings back into the stage (will overwrite the string if it is already staged).';
+$string['stashes'] = 'Stashes';
 $string['stashdrop'] = 'Drop';
 $string['stashpop'] = 'Pop';
 $string['stashsubmit'] = 'Submit to maintainers';
@@ -120,6 +124,7 @@ $string['stashsubmitsubject'] = 'Subject';
 $string['stashsubmitmessage'] = 'Message';
 $string['submitting'] = 'Submitting a contribution';
 $string['submitting_help'] = 'This will send translated strings to official language maintainers. They will be able to apply your work into their stage, review it and eventually commit. Please provide a message for them describing your work and why you would like to see your contribution included.';
+$string['stage'] = 'Stage';
 $string['stageedit'] = 'Edit staged strings';
 $string['stageprune'] = 'Prune non-committable';
 $string['stagerebase'] = 'Rebase';
@@ -139,6 +144,7 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
 * Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
+$string['translatortool'] = 'Translator';
 $string['ownstashactions'] = 'Stash actions';
 $string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.
 * Pop - move the translated strings from the stash into the stage and drop the stash (that is Apply and Drop).
