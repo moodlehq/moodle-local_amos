@@ -155,7 +155,7 @@ if ($submitform->is_cancelled()) {
 
     // stash has been submited so it is dropped
     $stash->drop();
-    redirect($PAGE->url);
+    redirect(new moodle_url('/local/amos/contrib.php'));
 }
 
 $output = $PAGE->get_renderer('local_amos');

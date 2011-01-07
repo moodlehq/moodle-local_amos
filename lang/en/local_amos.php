@@ -35,7 +35,17 @@ $string['casesensitive'] = 'case-sensitive';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['confirmaction'] = 'This can not be undone. Are you sure?';
+$string['contribincomingnone'] = 'No incoming contributions';
+$string['contribincomingsome'] = 'Incoming contributions ({$a})';
 $string['contributions'] = 'Contributions';
+$string['contribassignee'] = 'Assignee';
+$string['contribassigneenone'] = '-';
+$string['contribid'] = 'ID';
+$string['contribstatus'] = 'Status';
+$string['contribstatus0'] = 'New';
+$string['contribauthor'] = 'Author';
+$string['contribsubject'] = 'Subject';
+$string['contribtimemodified'] = 'Modified';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';
@@ -144,6 +154,7 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
 * Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
+$string['strings'] = 'Strings';
 $string['translatortool'] = 'Translator';
 $string['ownstashactions'] = 'Stash actions';
 $string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.

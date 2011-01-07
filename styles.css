@@ -315,3 +315,17 @@
 .path-local-amos .stashwrapper .actions .singlebutton.submit {
     margin-left: 10px;
 }
+
+.path-local-amos .contributionlist {
+    margin: 0px auto;
+}
+
+.path-local-amos .contributionlist .userpicture {
+    margin-right:10px;
+    vertical-align: middle;
+}
+
+.path-local-amos .contributionlist .status0 .id,
+.path-local-amos .contributionlist .status0 .status {
+    background-color: #d2ebff;
+}
