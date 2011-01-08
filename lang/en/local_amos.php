@@ -39,13 +39,28 @@ $string['contribincomingnone'] = 'No incoming contributions';
 $string['contribincomingsome'] = 'Incoming contributions ({$a})';
 $string['contributions'] = 'Contributions';
 $string['contribassignee'] = 'Assignee';
+$string['contribapply'] = 'Apply';
+$string['contribaccept'] = 'Accept';
+$string['contribreject'] = 'Reject';
 $string['contribassigneenone'] = '-';
+$string['contribassigntome'] = 'Assign to me';
+$string['contribresign'] = 'Resign';
 $string['contribid'] = 'ID';
 $string['contribstatus'] = 'Status';
 $string['contribstatus0'] = 'New';
+$string['contribstatus10'] = 'In review';
+$string['contribstatus20'] = 'Rejected';
+$string['contribstatus30'] = 'Accepted';
 $string['contribauthor'] = 'Author';
 $string['contribsubject'] = 'Subject';
 $string['contribtimemodified'] = 'Modified';
+$string['contribstartreview'] = 'Start review';
+$string['contriblanguage'] = 'Language';
+$string['contribcomponents'] = 'Components';
+$string['contribstrings'] = 'Strings';
+$string['contribstringsnone'] = '{$a->orig} (all of them are already present in the lang pack)';
+$string['contribstringseq'] = '{$a->orig} new';
+$string['contribstringssome'] = '{$a->orig} ({$a->same} of them are already included in the lang pack)';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';
@@ -152,7 +167,7 @@ $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
 * Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
-* Red - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
+* Blue - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['strings'] = 'Strings';
 $string['translatortool'] = 'Translator';

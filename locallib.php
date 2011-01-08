@@ -1078,7 +1078,12 @@ class local_amos_stash implements renderable {
         $new->name          = $stash->name;
         $new->timecreated   = $stash->timecreated;
 
-        list($new->strings, $new->languages, $new->components) = $stash->analyze_stage();
+        $stage = new mlang_stage();
+        $stash->apply($stage);
+        list($new->strings, $new->languages, $new->components) = mlang_stage::analyze($stage);
+        $stage->clear();
+        unset($stage);
+
         $new->components    = explode('/', trim($new->components, '/'));
         $new->languages     = explode('/', trim($new->languages, '/'));
 
@@ -1154,6 +1159,50 @@ class local_amos_stash implements renderable {
      */
     public function get_actions() {
         return $this->actions;
+    }
+}
+
+/**
+ * Represents renderable contribution infor
+ */
+class local_amos_contribution implements renderable {
+
+    const STATE_NEW         = 0;
+    const STATE_REVIEW      = 10;
+    const STATE_REJECTED    = 20;
+    const STATE_ACCEPTED    = 30;
+
+    /** @var stdClass */
+    public $info;
+    /** @var stdClass */
+    public $author;
+    /** @var stdClss */
+    public $assignee;
+    /** @var string */
+    public $language;
+    /** @var string */
+    public $components;
+    /** @var int number of strings */
+    public $strings;
+    /** @var int number of strings after rebase */
+    public $stringsreb;
+
+    public function __construct(stdClass $info, stdClass $author=null, stdClass $assignee=null) {
+        global $DB;
+
+        $this->info = $info;
+
+        if (empty($author)) {
+            $this->author = $DB->get_record('user', array('id' => $info->authorid));
+        } else {
+            $this->author = $author;
+        }
+
+        if (empty($assignee) and !empty($info->assignee)) {
+            $this->assignee = $DB->get_record('user', array('id' => $info->assignee));
+        } else {
+            $this->assignee = $assignee;
+        }
     }
 }
 

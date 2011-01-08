@@ -27,6 +27,13 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
+require_once($CFG->dirroot . '/comment/lib.php');
+
+$id     = optional_param('id', null, PARAM_INT);
+$assign = optional_param('assign', null, PARAM_INT);
+$resign = optional_param('resign', null, PARAM_INT);
+$apply  = optional_param('apply', null, PARAM_INT);
+$review = optional_param('review', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
@@ -39,10 +46,216 @@ $PAGE->set_heading(get_string('contributions', 'local_amos'));
 //$PAGE->requires->yui_module('moodle-local_amos-contrib', 'M.local_amos.init_contrib');
 //$PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 
+if ($assign) {
+    require_capability('local/amos:commit', get_system_context());
+    require_sesskey();
+
+    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+    foreach ($maintenances as $maintained) {
+        if ($maintained->lang === 'X') {
+            $maintainerof = 'all';
+            break;
+        }
+        $maintainerof[] = $maintained->lang;
+    }
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $assign), '*', MUST_EXIST);
+
+    if ($maintainerof !== 'all') {
+        if (!in_array($contribution->lang, $maintainerof)) {
+            print_error('contributionaccessdenied', 'local_amos');
+        }
+    }
+
+    $contribution->assignee = $USER->id;
+    $contribution->timemodified = time();
+    $DB->update_record('amos_contributions', $contribution);
+    redirect(new moodle_url($PAGE->url, array('id' => $assign)));
+    exit;
+}
+
+if ($resign) {
+    require_capability('local/amos:commit', get_system_context());
+    require_sesskey();
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $resign, 'assignee' => $USER->id), '*', MUST_EXIST);
+
+    $contribution->assignee = null;
+    $contribution->timemodified = time();
+    $DB->update_record('amos_contributions', $contribution);
+    redirect(new moodle_url($PAGE->url, array('id' => $resign)));
+    exit;
+}
+
+if ($apply) {
+    require_capability('local/amos:stage', get_system_context());
+    require_sesskey();
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $apply), '*', MUST_EXIST);
+
+    if ($contribution->authorid !== $USER->id) {
+        $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+        $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+        foreach ($maintenances as $maintained) {
+            if ($maintained->lang === 'X') {
+                $maintainerof = 'all';
+                break;
+            }
+            $maintainerof[] = $maintained->lang;
+        }
+
+        if ($maintainerof !== 'all') {
+            if (!in_array($contribution->lang, $maintainerof)) {
+                print_error('contributionaccessdenied', 'local_amos');
+            }
+        }
+    }
+
+    $stash = mlang_stash::instance_from_id($contribution->stashid);
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash->apply($stage);
+    $stage->store();
+
+    redirect(new moodle_url('/local/amos/stage.php'));
+    exit;
+}
+
+if ($review) {
+    require_capability('local/amos:commit', get_system_context());
+    require_sesskey();
+
+    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+    foreach ($maintenances as $maintained) {
+        if ($maintained->lang === 'X') {
+            $maintainerof = 'all';
+            break;
+        }
+        $maintainerof[] = $maintained->lang;
+    }
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $review), '*', MUST_EXIST);
+
+    if ($maintainerof !== 'all') {
+        if (!in_array($contribution->lang, $maintainerof)) {
+            print_error('contributionaccessdenied', 'local_amos');
+        }
+    }
+
+    $contribution->assignee = $USER->id;
+    $contribution->timemodified = time();
+    $contribution->status = local_amos_contribution::STATE_REVIEW;
+    $DB->update_record('amos_contributions', $contribution);
+
+    $stash = mlang_stash::instance_from_id($contribution->stashid);
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash->apply($stage);
+    $stage->store();
+
+    redirect(new moodle_url('/local/amos/stage.php'));
+    exit;
+}
+
 $output = $PAGE->get_renderer('local_amos');
+comment::init();
 
 // Output starts here
 echo $output->header();
+
+// Particular contribution record
+if ($id) {
+
+    if (has_capability('local/amos:commit', get_system_context())) {
+        $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+        $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+        foreach ($maintenances as $maintained) {
+            if ($maintained->lang === 'X') {
+                $maintainerof = 'all';
+                break;
+            }
+            $maintainerof[] = $maintained->lang;
+        }
+    } else {
+        $maintainerof = false;
+    }
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $id), '*', MUST_EXIST);
+
+    if ($contribution->authorid !== $USER->id) {
+        require_capability('local/amos:commit', get_system_context());
+        if ($maintainerof !== 'all') {
+            if (!in_array($contribution->lang, $maintainerof)) {
+                print_error('contributionaccessdenied', 'local_amos');
+            }
+        }
+        $author = $DB->get_record('user', array('id' => $contribution->authorid));
+    } else {
+        $author = $USER;
+    }
+
+    // get the contributed components and rebase them to see what would happen
+    $stash = mlang_stash::instance_from_id($contribution->stashid);
+    $stage = new mlang_stage();
+    $stash->apply($stage);
+    list($origstrings, $origlanguages, $origcomponents) = mlang_stage::analyze($stage);
+    $stage->rebase();
+    list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
+
+    if ($stage->has_component()) {
+
+    } else {
+        // nothing left after rebase
+    }
+
+    $contribinfo                = new local_amos_contribution($contribution, $author);
+    $contribinfo->language      = implode(', ', array_filter(array_map('trim', explode('/', $origlanguages))));
+    $contribinfo->components    = implode(', ', array_filter(array_map('trim', explode('/', $origcomponents))));
+    $contribinfo->strings       = $origstrings;
+    $contribinfo->stringsreb    = $rebasedstrings;
+
+    echo $output->render($contribinfo);
+
+    echo html_writer::start_tag('div', array('class' => 'contribactions'));
+    if ($maintainerof) {
+        if ($contribution->status == local_amos_contribution::STATE_NEW) {
+            echo $output->single_button(new moodle_url($PAGE->url, array('review' => $id)), get_string('contribstartreview', 'local_amos'),
+                    'post', array('class' => 'singlebutton review'));
+        }
+        if ($contribution->assignee == $USER->id) {
+            echo $output->single_button(new moodle_url($PAGE->url, array('resign' => $id)), get_string('contribresign', 'local_amos'),
+                    'post', array('class' => 'singlebutton resign'));
+        } else {
+            echo $output->single_button(new moodle_url($PAGE->url, array('assign' => $id)), get_string('contribassigntome', 'local_amos'),
+                    'post', array('class' => 'singlebutton assign'));
+        }
+    }
+    echo $output->single_button(new moodle_url($PAGE->url, array('apply' => $id)), get_string('contribapply', 'local_amos'),
+            'post', array('class' => 'singlebutton apply'));
+    if ($contribution->assignee == $USER->id) {
+        echo $output->single_button(new moodle_url($PAGE->url, array('accept' => $id)), get_string('contribaccept', 'local_amos'),
+                'post', array('class' => 'singlebutton accept'));
+        echo $output->single_button(new moodle_url($PAGE->url, array('reject' => $id)), get_string('contribreject', 'local_amos'),
+                'post', array('class' => 'singlebutton reject'));
+    }
+    echo html_writer::end_tag('div');
+
+    if (!empty($CFG->usecomments)) {
+        $options = new stdClass();
+        $options->context = get_system_context();
+        $options->area    = 'amos_contribution';
+        $options->itemid  = $contribution->id;
+        $options->showcount = true;
+        $options->component = 'local_amos';
+        $commentmanager = new comment($options);
+        $commentmanager->set_view_permission(true);
+        $commentmanager->set_post_permission(true);
+        echo $output->container($commentmanager->output(), 'commentswrapper');
+    }
+
+    echo $output->footer();
+    exit;
+}
 
 // Maintainer's UI
 if (has_capability('local/amos:commit', get_system_context())) {
@@ -82,7 +295,7 @@ if (has_capability('local/amos:commit', get_system_context())) {
             $sql .= " WHERE c.lang $langsql";
         }
 
-        $sql .= " ORDER BY c.status, COALESCE (s.timemodified,s.timecreated) DESC";
+        $sql .= " ORDER BY c.status, COALESCE (c.timemodified, c.timecreated) DESC";
 
         $contributions = $DB->get_records_sql($sql, $params);
     }

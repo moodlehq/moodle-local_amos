@@ -869,7 +869,35 @@ class mlang_stage {
         }
     }
 
+    /**
+     * Returns the number of strings and the list of languages and components in the stage
+     *
+     * Languages and components lists are returned as strings, slash is used as a delimiter
+     * and there is heading and trailing slash, too.
+     *
+     * @return array of (int)strings, (string)languages, (string)components
+     */
+    public static function analyze(mlang_stage $stage) {
+        $strings = 0;
+        $languages = array();
+        $components = array();
 
+        foreach ($stage->get_iterator() as $component) {
+            if ($s = $component->get_number_of_strings()) {
+                $strings += $s;
+                if (!isset($components[$component->name])) {
+                    $components[$component->name] = true;
+                }
+                if (!isset($languages[$component->lang])) {
+                    $languages[$component->lang] = true;
+                }
+            }
+        }
+        $languages = '/'.implode('/', array_keys($languages)).'/';
+        $components = '/'.implode('/', array_keys($components)).'/';
+
+        return array($strings, $languages, $components);
+    }
 }
 
 /**
@@ -1066,7 +1094,7 @@ class mlang_stash {
         }
         $this->save_into_file();
 
-        list($strings, $languages, $components) = $this->analyze_stage();
+        list($strings, $languages, $components) = mlang_stage::analyze($this->stage);
 
         if (is_null($this->id)) {
             $record                 = new stdclass();
@@ -1130,33 +1158,6 @@ class mlang_stash {
             @rmdir(dirname($filename));
             @rmdir(dirname(dirname($filename)));
         }
-    }
-
-    /**
-     * Returns the number of strings and the list of languages and components in the stashed stage
-     *
-     * @return array
-     */
-    public function analyze_stage() {
-        $strings = 0;
-        $languages = array();
-        $components = array();
-
-        foreach ($this->stage->get_iterator() as $component) {
-            if ($s = $component->get_number_of_strings()) {
-                $strings += $s;
-                if (!isset($components[$component->name])) {
-                    $components[$component->name] = true;
-                }
-                if (!isset($languages[$component->lang])) {
-                    $languages[$component->lang] = true;
-                }
-            }
-        }
-        $languages = '/'.implode('/', array_keys($languages)).'/';
-        $components = '/'.implode('/', array_keys($components)).'/';
-
-        return array($strings, $languages, $components);
     }
 
     /**

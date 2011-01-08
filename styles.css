@@ -173,9 +173,12 @@
     background-color: #f7f7f7;
 }
 
-.path-local-amos #amostranslator .translation.committable.missing,
-.path-local-amos #amosstage .translation.uncommittable {
+.path-local-amos #amostranslator .translation.committable.missing {
     background-color: #ffd3d9;
+}
+
+.path-local-amos #amosstage .translation.uncommittable {
+    background-color: #d2ebff;
 }
 
 .path-local-amos #amostranslator .translation.committable,
@@ -321,11 +324,88 @@
 }
 
 .path-local-amos .contributionlist .userpicture {
-    margin-right:10px;
+    margin-right:5px;
     vertical-align: middle;
 }
 
 .path-local-amos .contributionlist .status0 .id,
-.path-local-amos .contributionlist .status0 .status {
+.path-local-amos .contributionlist .status0 .status,
+.path-local-amos .contributionwrapper .details .status0 td {
     background-color: #d2ebff;
 }
+
+.path-local-amos .contributionlist .status10 .id,
+.path-local-amos .contributionlist .status10 .status,
+.path-local-amos .contributionwrapper .details .status10 td {
+    background-color: #f3f2aa;
+}
+
+.path-local-amos .contributionwrapper .source {
+    padding-left: 60px;
+    position: relative;
+}
+
+.path-local-amos .contributionwrapper .source {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-local-amos .contributionwrapper .details {
+    max-width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.path-local-amos .contributionwrapper .source h3,
+.path-local-amos .contributionwrapper .source div {
+    margin: 0px 0px 0.3em;
+}
+
+.path-local-amos .contributionwrapper .source .timecreated {
+    font-style: italic;
+}
+
+.path-local-amos .contributionwrapper .source .userpicture {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.path-local-amos .contributionwrapper .details .userpicture {
+    margin-right:5px;
+    vertical-align: middle;
+}
+
+.path-local-amos .contribactions {
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+.path-local-amos .contribactions .singlebutton,
+.path-local-amos .contribactions .singlebutton form,
+.path-local-amos .contribactions .singlebutton form div {
+    display: inline;
+}
+
+.path-local-amos .contribactions .singlebutton {
+    margin: 0px 2px;
+}
+
+.path-local-amos .commentswrapper {
+    width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    border: 1px solid #eee;
+    background-color: white;
+}
+
+.path-local-amos .commentswrapper .comment-link {
+    margin-bottom: 5px;
+}
+
+.path-local-amos .commentswrapper .comment-area {
+    margin: 0px auto;
+}
+

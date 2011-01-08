@@ -729,4 +729,69 @@ print_footer();
 
         return $output;
     }
+
+    /**
+     * Render single contribution record
+     *
+     * @param local_amos_contribution $contribution
+     * @return string
+     */
+    protected function render_local_amos_contribution(local_amos_contribution $contrib) {
+        global $USER;
+
+        $output = '';
+        $output .= $this->output->heading('#'.$contrib->info->id.' '.s($contrib->info->subject), 3, 'subject');
+        $output .= $this->output->container($this->output->user_picture($contrib->author) . fullname($contrib->author), 'author');
+        $output .= $this->output->container(userdate($contrib->info->timecreated, get_string('strftimedaydatetime', 'langconfig')), 'timecreated');
+        $output .= $this->output->container(format_text($contrib->info->message), 'message');
+        $output = $this->box($output, 'generalbox source');
+
+        $table = new html_table();
+        $table->attributes['class'] = 'generaltable details';
+
+        $row = new html_table_row(array(
+            get_string('contribstatus', 'local_amos'),
+            get_string('contribstatus'.$contrib->info->status, 'local_amos')));
+        $row->attributes['class'] = 'status'.$contrib->info->status;
+        $table->data[] = $row;
+
+        if ($contrib->assignee) {
+            $assignee = $this->output->user_picture($contrib->assignee, array('size' => 16)) . fullname($contrib->assignee);
+        } else {
+            $assignee = get_string('contribassigneenone', 'local_amos');
+        }
+        $row = new html_table_row(array(get_string('contribassignee', 'local_amos'), $assignee));
+        if ($contrib->assignee) {
+            if ($contrib->assignee->id == $USER->id) {
+                $row->attributes['class'] = 'assignment self';
+            } else {
+                $row->attributes['class'] = 'assignment';
+            }
+        } else {
+            $row->attributes['class'] = 'assignment none';
+        }
+        $table->data[] = $row;
+
+        $row = new html_table_row(array(get_string('contriblanguage', 'local_amos'), $contrib->language));
+        $table->data[] = $row;
+
+        $row = new html_table_row(array(get_string('contribcomponents', 'local_amos'), $contrib->components));
+        $table->data[] = $row;
+
+        $a = array('orig'=>$contrib->strings, 'new'=>$contrib->stringsreb, 'same'=>($contrib->strings - $contrib->stringsreb));
+        if ($contrib->stringsreb == 0) {
+            $s = get_string('contribstringsnone', 'local_amos', $a);
+        } else if ($contrib->strings == $contrib->stringreb) {
+            $s = get_string('contribstringseq', 'local_amos', $a);
+        } else {
+            $s = get_string('contribstringssome', 'local_amos', $a);
+        }
+        $row = new html_table_row(array(get_string('contribstrings', 'local_amos'), $s));
+        $table->data[] = $row;
+
+        $output .= html_writer::table($table);
+        $output = $this->output->container($output, 'contributionwrapper');
+
+        return $output;
+    }
 }
