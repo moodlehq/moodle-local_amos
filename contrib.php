@@ -325,7 +325,7 @@ if ($id) {
     exit;
 }
 
-// Maintainer's UI
+// Incoming contributions
 if (has_capability('local/amos:commit', get_system_context())) {
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
@@ -421,15 +421,78 @@ if (has_capability('local/amos:commit', get_system_context())) {
 
         echo $output->heading(get_string('contribincomingsome', 'local_amos', count($contributions)));
         echo html_writer::table($table);
-
-        if ($closed) {
-            echo $output->single_button(new moodle_url($PAGE->url, array('closed' => false)),
-                get_string('contribclosedno', 'local_amos'), 'get');
-        } else {
-            echo $output->single_button(new moodle_url($PAGE->url, array('closed' => true)),
-                get_string('contribclosedyes', 'local_amos'), 'get');
-        }
     }
+}
+
+// Submitted contributions
+$sql = "SELECT c.id, c.lang, c.subject, c.message, c.stashid, c.status, c.timecreated, c.timemodified,
+               s.components, s.strings,
+               ".user_picture::fields('m', null, 'assigneeid', 'assignee')."
+          FROM {amos_contributions} c
+          JOIN {amos_stashes} s ON (c.stashid = s.id)
+     LEFT JOIN {user} m ON c.assignee = m.id
+         WHERE c.authorid = ?";
+
+if (!$closed) {
+    $sql .= " AND c.status < 20"; // do not show resolved contributions
+}
+
+$sql .= " ORDER BY c.status, COALESCE (c.timemodified, c.timecreated) DESC";
+
+$contributions = $DB->get_records_sql($sql, array($USER->id));
+
+if (empty($contributions)) {
+    echo $output->heading(get_string('contribsubmittednone', 'local_amos'));
+
+} else {
+    $table = new html_table();
+    $table->attributes['class'] = 'generaltable contributionlist submitted';
+    $table->head = array(
+        get_string('contribid', 'local_amos'),
+        get_string('contribstatus', 'local_amos'),
+        get_string('contribsubject', 'local_amos'),
+        get_string('contribtimemodified', 'local_amos'),
+        get_string('contribassignee', 'local_amos'),
+        get_string('language', 'local_amos'),
+        get_string('strings', 'local_amos')
+    );
+    $table->colclasses = array('id', 'status', 'subject', 'timemodified', 'assignee', 'language', 'strings');
+
+    foreach ($contributions as $contribution) {
+        $url = new moodle_url($PAGE->url, array('id' => $contribution->id));
+        $cells   = array();
+        $cells[] = new html_table_cell(html_writer::link($url, '#'.$contribution->id));
+        $status  = get_string('contribstatus'.$contribution->status, 'local_amos');
+        $cells[] = new html_table_cell(html_writer::link($url, $status));
+        $cells[] = new html_table_cell(html_writer::link($url, s($contribution->subject)));
+        $time    = is_null($contribution->timemodified) ? $contribution->timecreated : $contribution->timemodified;
+        $cells[] = new html_table_cell(userdate($time, get_string('strftimedaydatetime', 'langconfig')));
+        if (is_null($contribution->assigneeid)) {
+            $assignee = get_string('contribassigneenone', 'local_amos');
+        } else {
+            $assignee = new user_picture(user_picture::unalias($contribution, null, 'assigneeid', 'assignee'));
+            $assignee->size = 16;
+            $assignee = $output->render($assignee) . s(fullname($assignee->user));
+        }
+        $cells[] = new html_table_cell($assignee);
+        $cells[] = new html_table_cell(s($contribution->lang));
+        $cells[] = new html_table_cell(s($contribution->strings));
+        $row = new html_table_row($cells);
+        $row->attributes['class'] = 'status'.$contribution->status;
+        $table->data[] = $row;
+    }
+
+    echo $output->heading(get_string('contribsubmittedsome', 'local_amos', count($contributions)));
+    echo html_writer::table($table);
+
+}
+
+if ($closed) {
+    echo $output->single_button(new moodle_url($PAGE->url, array('closed' => false)),
+        get_string('contribclosedno', 'local_amos'), 'get');
+} else {
+    echo $output->single_button(new moodle_url($PAGE->url, array('closed' => true)),
+        get_string('contribclosedyes', 'local_amos'), 'get');
 }
 
 echo $output->footer();
