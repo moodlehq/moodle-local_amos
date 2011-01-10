@@ -737,7 +737,11 @@ class local_amos_stage implements renderable {
             if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
-            $string->original = $needed[$string->branch]['en'][$string->component]->get_string($string->stringid)->text;
+            if (!$needed[$string->branch]['en'][$string->component]->has_string($string->stringid)) {
+                $string->original = '*DELETED*';
+            } else {
+                $string->original = $needed[$string->branch]['en'][$string->component]->get_string($string->stringid)->text;
+            }
             if ($needed[$string->branch][$string->language][$string->component] instanceof mlang_component) {
                 $string->current = $needed[$string->branch][$string->language][$string->component]->get_string($string->stringid);
                 if ($string->current instanceof mlang_string) {

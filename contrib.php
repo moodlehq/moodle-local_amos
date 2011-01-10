@@ -489,10 +489,10 @@ if (empty($contributions)) {
 
 if ($closed) {
     echo $output->single_button(new moodle_url($PAGE->url, array('closed' => false)),
-        get_string('contribclosedno', 'local_amos'), 'get');
+        get_string('contribclosedno', 'local_amos'), 'get', array('class' => 'singlebutton showclosed'));
 } else {
     echo $output->single_button(new moodle_url($PAGE->url, array('closed' => true)),
-        get_string('contribclosedyes', 'local_amos'), 'get');
+        get_string('contribclosedyes', 'local_amos'), 'get', array('class' => 'singlebutton showclosed'));
 }
 
 echo $output->footer();

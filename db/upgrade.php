@@ -49,5 +49,79 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2011010600, 'local', 'amos');
     }
 
+    if ($oldversion < 2011011000) {
+        require_once(dirname(dirname(__FILE__)).'/mlanglib.php');
+
+        // convert legacy stashes that were pull-requested
+        $stashids = $DB->get_records('amos_stashes', array('pullrequest' => 1), 'timemodified ASC', 'id');
+
+        foreach ($stashids as $stashrecord) {
+            $stash = mlang_stash::instance_from_id($stashrecord->id);
+
+            // split the stashed components into separate packages by their language
+            $stage = new mlang_stage();
+            $langstages = array();  // (string)langcode => (mlang_stage)
+            $stash->apply($stage);
+            foreach ($stage->get_iterator() as $component) {
+                $lang = $component->lang;
+                if (!isset($langstages[$lang])) {
+                    $langstages[$lang] = new mlang_stage();
+                }
+                $langstages[$lang]->add($component);
+            }
+            $stage->clear();
+            unset($stage);
+
+            // create new contribution record for every language and attach a new stash to it
+            foreach ($langstages as $lang => $stage) {
+                if (!$stage->has_component()) {
+                    // this should not happen, but...
+                    continue;
+                }
+                $copy = new mlang_stage();
+                foreach ($stage->get_iterator() as $component) {
+                    $copy->add($component);
+                }
+                $copy->rebase();
+                if ($copy->has_component()) {
+                    $tostatus = 0;  // new
+                } else {
+                    $tostatus = 30; // nothing left after rebase - consider it accepted
+                }
+
+                $langstash = mlang_stash::instance_from_stage($stage, 0, $stash->name);
+                $langstash->message = $stash->message;
+                $langstash->push();
+
+                $contribution               = new stdClass();
+                $contribution->authorid     = $stash->ownerid;
+                $contribution->lang         = $lang;
+                $contribution->assignee     = null;
+                $contribution->subject      = $stash->name;
+                $contribution->message      = $stash->message;
+                $contribution->stashid      = $langstash->id;
+                $contribution->status       = $tostatus;
+                $contribution->timecreated  = $stash->timemodified;
+                $contribution->timemodified = null;
+
+                $contribution->id = $DB->insert_record('amos_contributions', $contribution);
+
+                // add a comment there
+                $comment = new stdClass();
+                $comment->contextid = SITEID;
+                $comment->commentarea = 'amos_contribution';
+                $comment->itemid = $contribution->id;
+                $comment->content = 'This contribution was automatically created during the conversion of legacy pull-requested stashes.';
+                $comment->format = 0;
+                $comment->userid = 2;
+                $comment->timecreated = time();
+                $DB->insert_record('comments', $comment);
+            }
+            $stash->drop();
+        }
+
+        upgrade_plugin_savepoint(true, 2011011000, 'local', 'amos');
+    }
+
     return $result;
 }

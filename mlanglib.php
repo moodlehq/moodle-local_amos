@@ -1048,6 +1048,7 @@ class mlang_stash {
         $instance->id           = $record->id;
         $instance->hash         = $record->hash;
         $instance->timecreated  = $record->timecreated;
+        $instance->timemodified = $record->timemodified;
         $instance->name         = $record->name;
         $instance->message      = $record->message;
 

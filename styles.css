@@ -76,7 +76,7 @@
     margin: 1em auto;
 }
 
-.path-local-amos .stagewrapper .3ommitformwrapper {
+.path-local-amos .stagewrapper .commitformwrapper {
     margin: 0em auto;
     text-align: center;
     padding: 10px;
@@ -268,9 +268,9 @@
     text-align: center;
 }
 
-.path-local-amos .singlebutton {
+.path-local-amos .singlebutton.showclosed {
     text-align: center;
-    margin: 5px auto;
+    margin: 20px auto;
 }
 
 .path-local-amos .stashwrapper {
