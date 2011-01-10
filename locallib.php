@@ -672,6 +672,9 @@ class local_amos_stage implements renderable {
     /** @var local_amos_merge_form to merge strings form another branch */
     public $mergeform;
 
+    /** @var pre-set commit message */
+    public $presetmessage;
+
     /**
      * @param stdclass $user the owner of the stage
      */

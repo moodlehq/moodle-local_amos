@@ -61,6 +61,7 @@ $string['contribstrings'] = 'Strings';
 $string['contribstringsnone'] = '{$a->orig} (all of them are already present in the lang pack)';
 $string['contribstringseq'] = '{$a->orig} new';
 $string['contribstringssome'] = '{$a->orig} ({$a->same} of them are already included in the lang pack)';
+$string['presetcommitmessage'] = 'Contributed translation by {$a}';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';

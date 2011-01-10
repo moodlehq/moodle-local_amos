@@ -34,6 +34,8 @@ $assign = optional_param('assign', null, PARAM_INT);
 $resign = optional_param('resign', null, PARAM_INT);
 $apply  = optional_param('apply', null, PARAM_INT);
 $review = optional_param('review', null, PARAM_INT);
+$accept = optional_param('accept', null, PARAM_INT);
+$reject = optional_param('reject', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
@@ -72,7 +74,6 @@ if ($assign) {
     $contribution->timemodified = time();
     $DB->update_record('amos_contributions', $contribution);
     redirect(new moodle_url($PAGE->url, array('id' => $assign)));
-    exit;
 }
 
 if ($resign) {
@@ -85,7 +86,6 @@ if ($resign) {
     $contribution->timemodified = time();
     $DB->update_record('amos_contributions', $contribution);
     redirect(new moodle_url($PAGE->url, array('id' => $resign)));
-    exit;
 }
 
 if ($apply) {
@@ -95,6 +95,7 @@ if ($apply) {
     $contribution = $DB->get_record('amos_contributions', array('id' => $apply), '*', MUST_EXIST);
 
     if ($contribution->authorid !== $USER->id) {
+        $author       = $DB->get_record('user', array('id' => $contribution->authorid));
         $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
         $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
         foreach ($maintenances as $maintained) {
@@ -110,6 +111,8 @@ if ($apply) {
                 print_error('contributionaccessdenied', 'local_amos');
             }
         }
+    } else {
+        $author = $USER;
     }
 
     $stash = mlang_stash::instance_from_id($contribution->stashid);
@@ -117,8 +120,9 @@ if ($apply) {
     $stash->apply($stage);
     $stage->store();
 
-    redirect(new moodle_url('/local/amos/stage.php'));
-    exit;
+    redirect(new moodle_url('/local/amos/stage.php', array(
+        'sesskey' => sesskey(),
+        'preset' => get_string('presetcommitmessage', 'local_amos', fullname($author)))));
 }
 
 if ($review) {
@@ -136,6 +140,7 @@ if ($review) {
     }
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $review), '*', MUST_EXIST);
+    $author       = $DB->get_record('user', array('id' => $contribution->authorid));
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
@@ -153,9 +158,67 @@ if ($review) {
     $stash->apply($stage);
     $stage->store();
 
-    redirect(new moodle_url('/local/amos/stage.php'));
-    exit;
+    redirect(new moodle_url('/local/amos/stage.php', array(
+        'sesskey' => sesskey(),
+        'preset' => get_string('presetcommitmessage', 'local_amos', fullname($author)))));
 }
+
+if ($accept) {
+    require_capability('local/amos:commit', get_system_context());
+    require_sesskey();
+
+    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+    foreach ($maintenances as $maintained) {
+        if ($maintained->lang === 'X') {
+            $maintainerof = 'all';
+            break;
+        }
+        $maintainerof[] = $maintained->lang;
+    }
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $accept, 'assignee' => $USER->id), '*', MUST_EXIST);
+
+    if ($maintainerof !== 'all') {
+        if (!in_array($contribution->lang, $maintainerof)) {
+            print_error('contributionaccessdenied', 'local_amos');
+        }
+    }
+
+    $contribution->timemodified = time();
+    $contribution->status = local_amos_contribution::STATE_ACCEPTED;
+    $DB->update_record('amos_contributions', $contribution);
+    redirect(new moodle_url($PAGE->url, array('id' => $accept)));
+}
+
+if ($reject) {
+    require_capability('local/amos:commit', get_system_context());
+    require_sesskey();
+
+    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
+    foreach ($maintenances as $maintained) {
+        if ($maintained->lang === 'X') {
+            $maintainerof = 'all';
+            break;
+        }
+        $maintainerof[] = $maintained->lang;
+    }
+
+    $contribution = $DB->get_record('amos_contributions', array('id' => $reject, 'assignee' => $USER->id), '*', MUST_EXIST);
+
+    if ($maintainerof !== 'all') {
+        if (!in_array($contribution->lang, $maintainerof)) {
+            print_error('contributionaccessdenied', 'local_amos');
+        }
+    }
+
+    $contribution->timemodified = time();
+    $contribution->status = local_amos_contribution::STATE_REJECTED;
+    $DB->update_record('amos_contributions', $contribution);
+    redirect(new moodle_url($PAGE->url, array('id' => $reject)));
+}
+
 
 $output = $PAGE->get_renderer('local_amos');
 comment::init();
@@ -232,11 +295,15 @@ if ($id) {
     }
     echo $output->single_button(new moodle_url($PAGE->url, array('apply' => $id)), get_string('contribapply', 'local_amos'),
             'post', array('class' => 'singlebutton apply'));
-    if ($contribution->assignee == $USER->id) {
-        echo $output->single_button(new moodle_url($PAGE->url, array('accept' => $id)), get_string('contribaccept', 'local_amos'),
-                'post', array('class' => 'singlebutton accept'));
-        echo $output->single_button(new moodle_url($PAGE->url, array('reject' => $id)), get_string('contribreject', 'local_amos'),
-                'post', array('class' => 'singlebutton reject'));
+    if ($contribution->assignee == $USER->id and $contribution->status > local_amos_contribution::STATE_NEW) {
+        if ($contribution->status != local_amos_contribution::STATE_ACCEPTED) {
+            echo $output->single_button(new moodle_url($PAGE->url, array('accept' => $id)), get_string('contribaccept', 'local_amos'),
+                    'post', array('class' => 'singlebutton accept'));
+        }
+        if ($contribution->status != local_amos_contribution::STATE_REJECTED) {
+            echo $output->single_button(new moodle_url($PAGE->url, array('reject' => $id)), get_string('contribreject', 'local_amos'),
+                    'post', array('class' => 'singlebutton reject'));
+        }
     }
     echo html_writer::end_tag('div');
 

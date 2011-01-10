@@ -76,7 +76,7 @@
     margin: 1em auto;
 }
 
-.path-local-amos .stagewrapper .commitformwrapper {
+.path-local-amos .stagewrapper .3ommitformwrapper {
     margin: 0em auto;
     text-align: center;
     padding: 10px;
@@ -93,6 +93,10 @@
 .path-local-amos .stagewrapper .actionbuttons .singlebutton form,
 .path-local-amos .stagewrapper .actionbuttons .singlebutton form div {
     display: inline;
+}
+
+.path-local-amos .stagewrapper .actionbuttons .singlebutton {
+    margin: 0px 2px;
 }
 
 .path-local-amos .stagewrapper .actionbuttons .singlebutton.submit {
@@ -336,8 +340,23 @@
 
 .path-local-amos .contributionlist .status10 .id,
 .path-local-amos .contributionlist .status10 .status,
-.path-local-amos .contributionwrapper .details .status10 td {
+.path-local-amos .contributionwrapper .details .status10 td,
+.path-local-amos .contribactions .singlebutton.review input[type="submit"] {
     background-color: #f3f2aa;
+}
+
+.path-local-amos .contributionlist .status20 .id,
+.path-local-amos .contributionlist .status20 .status,
+.path-local-amos .contributionwrapper .details .status20 td,
+.path-local-amos .contribactions .singlebutton.reject input[type="submit"] {
+    background-color: #ffd3d9;
+}
+
+.path-local-amos .contributionlist .status30 .id,
+.path-local-amos .contributionlist .status30 .status,
+.path-local-amos .contributionwrapper .details .status30 td,
+.path-local-amos .contribactions .singlebutton.accept input[type="submit"] {
+    background-color: #e7f1c3;
 }
 
 .path-local-amos .contributionwrapper .source {
@@ -353,6 +372,7 @@
 
 .path-local-amos .contributionwrapper .details {
     max-width: 60%;
+    min-width: 300px;
     margin-left: auto;
     margin-right: auto;
 }

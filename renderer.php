@@ -417,7 +417,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $commitform  = html_writer::label('Commit message', 'commitmessage', false);
         $commitform .= html_writer::empty_tag('img', array('src' => $this->pix_url('req'), 'title' => 'Required', 'alt' => 'Required', 'class' => 'req'));
         $commitform .= html_writer::empty_tag('br');
-        $commitform .= html_writer::tag('textarea', '', array('id' => 'commitmessage', 'name' => 'message'));
+        $commitform .= html_writer::tag('textarea', s($stage->presetmessage), array('id' => 'commitmessage', 'name' => 'message'));
         $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
         $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
         $button = html_writer::tag('div', $button);
@@ -781,7 +781,7 @@ print_footer();
         $a = array('orig'=>$contrib->strings, 'new'=>$contrib->stringsreb, 'same'=>($contrib->strings - $contrib->stringsreb));
         if ($contrib->stringsreb == 0) {
             $s = get_string('contribstringsnone', 'local_amos', $a);
-        } else if ($contrib->strings == $contrib->stringreb) {
+        } else if ($contrib->strings == $contrib->stringsreb) {
             $s = get_string('contribstringseq', 'local_amos', $a);
         } else {
             $s = get_string('contribstringssome', 'local_amos', $a);
