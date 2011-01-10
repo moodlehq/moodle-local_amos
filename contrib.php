@@ -36,12 +36,13 @@ $apply  = optional_param('apply', null, PARAM_INT);
 $review = optional_param('review', null, PARAM_INT);
 $accept = optional_param('accept', null, PARAM_INT);
 $reject = optional_param('reject', null, PARAM_INT);
+$closed = optional_param('closed', false, PARAM_BOOL);  // show resolved contributions, too
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
 
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/amos/contrib.php');
+$PAGE->set_url('/local/amos/contrib.php', array('closed' => $closed));
 navigation_node::override_active_url(new moodle_url('/local/amos/contrib.php'));
 $PAGE->set_title(get_string('contributions', 'local_amos'));
 $PAGE->set_heading(get_string('contributions', 'local_amos'));
@@ -358,8 +359,14 @@ if (has_capability('local/amos:commit', get_system_context())) {
                   JOIN {user} a ON c.authorid = a.id
              LEFT JOIN {user} m ON c.assignee = m.id";
 
+        if ($closed) {
+            $sql .= " WHERE c.status >= 0"; // true
+        }  else {
+            $sql .= " WHERE c.status < 20"; // do not show resolved contributions
+        }
+
         if ($langsql) {
-            $sql .= " WHERE c.lang $langsql";
+            $sql .= " AND c.lang $langsql";
         }
 
         $sql .= " ORDER BY c.status, COALESCE (c.timemodified, c.timecreated) DESC";
@@ -414,6 +421,14 @@ if (has_capability('local/amos:commit', get_system_context())) {
 
         echo $output->heading(get_string('contribincomingsome', 'local_amos', count($contributions)));
         echo html_writer::table($table);
+
+        if ($closed) {
+            echo $output->single_button(new moodle_url($PAGE->url, array('closed' => false)),
+                get_string('contribclosedno', 'local_amos'), 'get');
+        } else {
+            echo $output->single_button(new moodle_url($PAGE->url, array('closed' => true)),
+                get_string('contribclosedyes', 'local_amos'), 'get');
+        }
     }
 }
 

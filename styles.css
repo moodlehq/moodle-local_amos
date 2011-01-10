@@ -268,8 +268,9 @@
     text-align: center;
 }
 
-.path-local-amos .singlebutton.togglehidden {
+.path-local-amos .singlebutton {
     text-align: center;
+    margin: 5px auto;
 }
 
 .path-local-amos .stashwrapper {
