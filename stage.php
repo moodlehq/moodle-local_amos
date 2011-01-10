@@ -33,6 +33,7 @@ $message    = optional_param('message', null, PARAM_RAW); // commit message
 $unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
 $prune      = optional_param('prune', null, PARAM_INT);
 $rebase     = optional_param('rebase', null, PARAM_INT);
+$submit     = optional_param('submit', null, PARAM_INT);
 $unstageall = optional_param('unstageall', null, PARAM_INT);
 
 require_login(SITEID, false);
@@ -90,6 +91,13 @@ if (!empty($unstageall)) {
     $stage->clear();
     $stage->store();
     redirect($PAGE->url);
+}
+if (!empty($submit)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash = mlang_stash::instance_from_stage($stage, $stage->userid);
+    $stash->push();
+    redirect(new moodle_url('/local/amos/stash.php', array('sesskey' => sesskey(), 'submit' => $stash->id)));
 }
 
 $output = $PAGE->get_renderer('local_amos');
