@@ -34,7 +34,6 @@ $apply  = optional_param('apply', null, PARAM_INT);
 $pop    = optional_param('pop', null, PARAM_INT);
 $drop   = optional_param('drop', null, PARAM_INT);
 $submit = optional_param('submit', null, PARAM_INT);
-$hide   = optional_param('hide', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
@@ -93,17 +92,6 @@ if ($drop) {
         die();
     }
     $stash->drop();
-    redirect($PAGE->url);
-}
-
-if ($hide) {
-    require_sesskey();
-    if (!$DB->count_records('amos_hidden_requests', array('userid' => $USER->id, 'stashid' => $hide))) {
-        $record = new stdclass();
-        $record->userid = $USER->id;
-        $record->stashid = $hide;
-        $DB->insert_record('amos_hidden_requests', $record);
-    }
     redirect($PAGE->url);
 }
 

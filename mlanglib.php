@@ -1150,7 +1150,6 @@ class mlang_stash {
             throw new coding_exception('Attempt to delete non-existing stash (file)');
         }
 
-        $DB->delete_records('amos_hidden_requests', array('stashid' => $this->id));
         $DB->delete_records('amos_stashes', array('id' => $this->id, 'hash' => $this->hash, 'ownerid' => $this->ownerid));
         // if the stash file is not referenced any more, delete it
         if (!$DB->record_exists('amos_stashes', array('hash' => $this->hash))) {

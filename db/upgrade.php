@@ -123,5 +123,27 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2011011000, 'local', 'amos');
     }
 
+    if ($oldversion < 2011011001) {
+
+        $table = new xmldb_table('amos_stashes');
+
+        $field = new xmldb_field('shared');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $field = new xmldb_field('pullrequest');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        $table = new xmldb_table('amos_hidden_requests');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2011011001, 'local', 'amos');
+    }
+
     return $result;
 }
