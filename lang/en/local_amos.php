@@ -36,6 +36,17 @@ $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['confirmaction'] = 'This can not be undone. Are you sure?';
 $string['contribaccept'] = 'Accept';
+$string['contribactions'] = 'Contributed translation actions';
+$string['contribactions_help'] = 'Depending on your rights and the contribution workflow, you can have some of the following actions available:
+
+* Apply - copy the contributed translation into your stage, does not modify the contribution record
+* Assign to me - set yourself as the contribution assignee, that is the person resposible for the contribution review and integration
+* Resign - set nobody as the contribution assignee
+* Start review - assign the new contribution to yourself, set its status to \'In review\' and copy the submitted translation into your stage
+* Accept - mark the contribution as accepted
+* Reject - mark the contribution as rejected, please describe the reasons in a comment.
+
+The contributor is informed by email whenever the status of his contribution changes.';
 $string['contribapply'] = 'Apply';
 $string['contribassignee'] = 'Assignee';
 $string['contribassigneenone'] = '-';
@@ -52,6 +63,12 @@ $string['contribreject'] = 'Reject';
 $string['contribresign'] = 'Resign';
 $string['contribstartreview'] = 'Start review';
 $string['contribstatus'] = 'Status';
+$string['contribstatus_help'] = 'Workflow of a contributed translation consists of following states:
+
+* New - the contribution has been submitted but it was not reviewed yet
+* In review - the contribution has been assigned to a language pack maintainer and was staged for review
+* Rejected - the language pack maintainer has rejected the contribution and probably left an explanation in a comment
+* Accepted - the contribution has been accepted by the language pack maintainer';
 $string['contribstatus0'] = 'New';
 $string['contribstatus10'] = 'In review';
 $string['contribstatus20'] = 'Rejected';

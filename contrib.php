@@ -351,6 +351,7 @@ if ($id) {
                     'post', array('class' => 'singlebutton reject'));
         }
     }
+    echo $output->help_icon('contribactions', 'local_amos');
     echo html_writer::end_tag('div');
 
     if (!empty($CFG->usecomments)) {

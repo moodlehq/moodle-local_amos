@@ -751,7 +751,7 @@ print_footer();
 
         $row = new html_table_row(array(
             get_string('contribstatus', 'local_amos'),
-            get_string('contribstatus'.$contrib->info->status, 'local_amos')));
+            get_string('contribstatus'.$contrib->info->status, 'local_amos') . $this->output->help_icon('contribstatus', 'local_amos')));
         $row->attributes['class'] = 'status'.$contrib->info->status;
         $table->data[] = $row;
 
