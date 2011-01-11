@@ -42,7 +42,13 @@ require_login(SITEID, false);
 require_capability('local/amos:stash', get_system_context());
 
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url('/local/amos/contrib.php', array('closed' => $closed));
+$PAGE->set_url('/local/amos/contrib.php');
+if ($closed) {
+    $PAGE->url->param('closed', $closed);
+}
+if (!is_null($id)) {
+    $PAGE->url->param('id', $id);
+}
 navigation_node::override_active_url(new moodle_url('/local/amos/contrib.php'));
 $PAGE->set_title(get_string('contributions', 'local_amos'));
 $PAGE->set_heading(get_string('contributions', 'local_amos'));
@@ -142,6 +148,7 @@ if ($review) {
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $review), '*', MUST_EXIST);
     $author       = $DB->get_record('user', array('id' => $contribution->authorid));
+    $amosbot      = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
@@ -158,6 +165,17 @@ if ($review) {
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash->apply($stage);
     $stage->store();
+
+    // inform the contributor
+    $a              = new stdClass();
+    $a->assignee    = fullname($USER);
+    $a->id          = $contribution->id;
+    $a->subject     = $contribution->subject;
+    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
+    $a->url         = $url->out();
+    $emailsubject   = get_string('emailreviewsubject', 'local_amos');
+    $emailbody      = get_string('emailreviewbody', 'local_amos', $a);
+    email_to_user($author, $amosbot, $emailsubject, $emailbody);
 
     redirect(new moodle_url('/local/amos/stage.php', array(
         'sesskey' => sesskey(),
@@ -179,6 +197,8 @@ if ($accept) {
     }
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $accept, 'assignee' => $USER->id), '*', MUST_EXIST);
+    $author       = $DB->get_record('user', array('id' => $contribution->authorid));
+    $amosbot      = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
@@ -189,6 +209,18 @@ if ($accept) {
     $contribution->timemodified = time();
     $contribution->status = local_amos_contribution::STATE_ACCEPTED;
     $DB->update_record('amos_contributions', $contribution);
+
+    // inform the contributor
+    $a              = new stdClass();
+    $a->assignee    = fullname($USER);
+    $a->id          = $contribution->id;
+    $a->subject     = $contribution->subject;
+    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
+    $a->url         = $url->out();
+    $emailsubject   = get_string('emailacceptsubject', 'local_amos');
+    $emailbody      = get_string('emailacceptbody', 'local_amos', $a);
+    email_to_user($author, $amosbot, $emailsubject, $emailbody);
+
     redirect(new moodle_url($PAGE->url, array('id' => $accept)));
 }
 
@@ -207,6 +239,8 @@ if ($reject) {
     }
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $reject, 'assignee' => $USER->id), '*', MUST_EXIST);
+    $author       = $DB->get_record('user', array('id' => $contribution->authorid));
+    $amosbot      = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
@@ -217,9 +251,20 @@ if ($reject) {
     $contribution->timemodified = time();
     $contribution->status = local_amos_contribution::STATE_REJECTED;
     $DB->update_record('amos_contributions', $contribution);
+
+    // inform the contributor
+    $a              = new stdClass();
+    $a->assignee    = fullname($USER);
+    $a->id          = $contribution->id;
+    $a->subject     = $contribution->subject;
+    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
+    $a->url         = $url->out();
+    $emailsubject   = get_string('emailrejectsubject', 'local_amos');
+    $emailbody      = get_string('emailrejectbody', 'local_amos', $a);
+    email_to_user($author, $amosbot, $emailsubject, $emailbody);
+
     redirect(new moodle_url($PAGE->url, array('id' => $reject)));
 }
-
 
 $output = $PAGE->get_renderer('local_amos');
 comment::init();
@@ -316,8 +361,6 @@ if ($id) {
         $options->showcount = true;
         $options->component = 'local_amos';
         $commentmanager = new comment($options);
-        $commentmanager->set_view_permission(true);
-        $commentmanager->set_post_permission(true);
         echo $output->container($commentmanager->output(), 'commentswrapper');
     }
 

@@ -65,6 +65,22 @@ $string['contribsubmittednone'] = 'No submitted contributions';
 $string['contribsubmittedsome'] = 'Your contributions ({$a})';
 $string['contribtimemodified'] = 'Modified';
 $string['contributions'] = 'Contributions';
+$string['emailacceptbody'] = 'Language pack maintainer {$a->assignee} has accepted your contributed translation #{$a->id} {$a->subject}.
+
+Visit {$a->url} for more details.';
+$string['emailacceptsubject'] = '[AMOS contribution] Accepted';
+$string['emailcontributionbody'] = 'User {$a->author} submitted new translation #{$a->id} {$a->subject}.
+
+Visit {$a->url} for more details.';
+$string['emailcontributionsubject'] = '[AMOS contribution] New translation submitted';
+$string['emailrejectbody'] = 'Language pack maintainer {$a->assignee} has rejected your contributed translation #{$a->id} {$a->subject}.
+
+Visit {$a->url} for more details.';
+$string['emailrejectsubject'] = '[AMOS contribution] Rejected';
+$string['emailreviewbody'] = 'Language pack maintainer {$a->assignee} started a review of your contributed translation #{$a->id} {$a->subject}.
+
+Visit {$a->url} for more details.';
+$string['emailreviewsubject'] = '[AMOS contribution] Review started';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid error code';
 $string['err_parser'] = 'Parsing error: {$a}';

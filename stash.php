@@ -133,6 +133,8 @@ if ($submitform->is_cancelled()) {
     $stage->clear();
     unset($stage);
 
+    $amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
+
     // create new contribution record for every language and attach a new stash to it
     foreach ($langstages as $lang => $stage) {
         $langstash = mlang_stash::instance_from_stage($stage, 0, $submitdata->name);
@@ -150,7 +152,27 @@ if ($submitform->is_cancelled()) {
         $contribution->timecreated  = $langstash->timecreated;
         $contribution->timemodified = null;
 
-        $DB->insert_record('amos_contributions', $contribution);
+        $contribution->id = $DB->insert_record('amos_contributions', $contribution);
+
+        // inform the language pack maintainers
+        $sql = "SELECT u.*
+                  FROM {amos_translators} t
+                  JOIN {user} u ON t.userid = u.id
+                 WHERE t.lang = ?";
+        $maintainers = $DB->get_records_sql($sql, array($lang));
+
+        $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
+        $a              = new stdClass();
+        $a->author      = fullname($USER);
+        $a->id          = $contribution->id;
+        $a->subject     = $contribution->subject;
+        $a->url         = $url->out();
+        $emailsubject   = get_string('emailcontributionsubject', 'local_amos');
+        $emailbody      = get_string('emailcontributionbody', 'local_amos', $a);
+
+        foreach ($maintainers as $maintainer) {
+            email_to_user($maintainer, $amosbot, $emailsubject, $emailbody);
+        }
     }
 
     // stash has been submited so it is dropped
