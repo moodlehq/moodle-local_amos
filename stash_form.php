@@ -27,24 +27,24 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/formslib.php');
 
-class local_amos_pullrequest_form extends moodleform {
+class local_amos_submit_form extends moodleform {
 
     function definition() {
         $mform = $this->_form;
 
-        $mform->addElement('header', 'general', 'Pull request details');
+        $mform->addElement('header', 'general', get_string('stashsubmitdetails', 'local_amos'));
 
-        $mform->addElement('text', 'name', 'Stash title', array('size'=>50, 'maxlength'=>255));
+        $mform->addElement('text', 'name', get_string('stashsubmitsubject', 'local_amos'), array('size'=>50, 'maxlength'=>255));
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->setType('name', PARAM_RAW);
 
-        $mform->addElement('textarea', 'message', 'Pull request message', array('cols'=>80, 'rows'=>10));
+        $mform->addElement('textarea', 'message', get_string('stashsubmitmessage', 'local_amos'), array('cols'=>80, 'rows'=>10));
         $mform->setType('message', PARAM_RAW);
 
         $mform->addElement('hidden', 'stashid');
         $mform->setType('stashid', PARAM_INT);
 
-        $mform->addElement('submit', 'submit', 'Share stash with lang pack maintainers');
+        $mform->addElement('submit', 'submit', get_string('stashsubmit', 'local_amos'));
         $mform->addElement('cancel', 'cancel', get_string('cancel'));
     }
 }

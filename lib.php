@@ -33,16 +33,17 @@ defined('MOODLE_INTERNAL') || die();
 function amos_extends_navigation(global_navigation $navigation) {
     $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'));
     if (has_capability('local/amos:stage', get_system_context())) {
-        $amos->add('Translator', new moodle_url('/local/amos/view.php'));
-        $amos->add('Stage', new moodle_url('/local/amos/stage.php'));
+        $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'));
+        $amos->add(get_string('stage', 'local_amos'), new moodle_url('/local/amos/stage.php'));
     }
     if (has_capability('local/amos:stash', get_system_context())) {
-        $amos->add('Stashes', new moodle_url('/local/amos/stash.php'));
+        $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'));
+        $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'));
     }
     $amos->add('Log', new moodle_url('/local/amos/log.php'));
     if (has_capability('local/amos:manage', get_system_context())) {
-        $admin = $amos->add('Admin');
-        $admin->add('Translators', new moodle_url('/local/amos/admin/translators.php'));
-        $admin->add('New language', new moodle_url('/local/amos/admin/newlanguage.php'));
+        $admin = $amos->add(get_string('administration'));
+        $admin->add(get_string('maintainers', 'local_amos'), new moodle_url('/local/amos/admin/translators.php'));
+        $admin->add(get_string('newlanguage', 'local_amos'), new moodle_url('/local/amos/admin/newlanguage.php'));
     }
 }

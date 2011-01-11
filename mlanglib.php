@@ -869,7 +869,35 @@ class mlang_stage {
         }
     }
 
+    /**
+     * Returns the number of strings and the list of languages and components in the stage
+     *
+     * Languages and components lists are returned as strings, slash is used as a delimiter
+     * and there is heading and trailing slash, too.
+     *
+     * @return array of (int)strings, (string)languages, (string)components
+     */
+    public static function analyze(mlang_stage $stage) {
+        $strings = 0;
+        $languages = array();
+        $components = array();
 
+        foreach ($stage->get_iterator() as $component) {
+            if ($s = $component->get_number_of_strings()) {
+                $strings += $s;
+                if (!isset($components[$component->name])) {
+                    $components[$component->name] = true;
+                }
+                if (!isset($languages[$component->lang])) {
+                    $languages[$component->lang] = true;
+                }
+            }
+        }
+        $languages = '/'.implode('/', array_keys($languages)).'/';
+        $components = '/'.implode('/', array_keys($components)).'/';
+
+        return array($strings, $languages, $components);
+    }
 }
 
 /**
@@ -953,20 +981,20 @@ class mlang_persistent_stage extends mlang_stage {
 }
 
 /**
- * Shareable persistant stage
+ * A stash is a snapshot of a stage
  */
 class mlang_stash {
 
     /** @var int identifier of the record in the database table amos_stashes */
     public $id;
 
-    /** @var object user who created the stash */
+    /** @var int id of the user who owns the stash or 0 if the stash is attached to a contribution */
     public $ownerid;
 
     /** @var int the timestamp of when the stash was created */
     public $timecreated;
 
-    /** @var int|null the timestamp of when the stash was modified, eg shared */
+    /** @var int|null the timestamp of when the stash was modified */
     public $timemodified;
 
     /** @var string unique identification of the stage */
@@ -978,9 +1006,6 @@ class mlang_stash {
     /** @var string message describing the stash */
     public $message;
 
-    /** @var bool is there a pull requested */
-    public $pullrequest;
-
     /** @var mlang_stage stored in the stash */
     protected $stage;
 
@@ -990,14 +1015,15 @@ class mlang_stash {
     // PUBLIC API
 
     /**
-     * Factory method returning new instance of the stash from the passed persistent stage
+     * Factory method returning new instance of the stash from the passed stage
      *
-     * @param mlang_persistent_stage $stage the stage to be stashed
+     * @param mlang_stage $stage the stage to be stashed
+     * @param int $ownerid the user id of the stash owner or 0 for a stash without owner
      * @param string $name optional stash name
      * @return mlang_stash instance
      */
-    public static function instance_from_stage(mlang_persistent_stage $stage, $name='') {
-        $instance = new mlang_stash($stage->userid);
+    public static function instance_from_stage(mlang_stage $stage, $ownerid=0, $name='') {
+        $instance = new mlang_stash($ownerid);
         $instance->name = $name;
         $instance->set_stage($stage);
         return $instance;
@@ -1013,7 +1039,7 @@ class mlang_stash {
         global $DB;
 
         if (empty($id)) {
-            throw new coding_exception('Invalid stahs identifier');
+            throw new coding_exception('Invalid stash identifier');
         }
 
         $record = $DB->get_record('amos_stashes', array('id' => $id), '*', MUST_EXIST);
@@ -1022,9 +1048,11 @@ class mlang_stash {
         $instance->id           = $record->id;
         $instance->hash         = $record->hash;
         $instance->timecreated  = $record->timecreated;
+        $instance->timemodified = $record->timemodified;
         $instance->name         = $record->name;
         $instance->message      = $record->message;
-        $instance->pullrequest  = $record->pullrequest;
+
+        $instance->load_from_file();
 
         return $instance;
     }
@@ -1067,7 +1095,7 @@ class mlang_stash {
         }
         $this->save_into_file();
 
-        list($strings, $languages, $components) = $this->analyze_stage();
+        list($strings, $languages, $components) = mlang_stage::analyze($this->stage);
 
         if (is_null($this->id)) {
             $record                 = new stdclass();
@@ -1076,8 +1104,6 @@ class mlang_stash {
             $record->languages      = $languages;
             $record->components     = $components;
             $record->strings        = $strings;
-            $record->shared         = 0;
-            $record->pullrequest    = 0;
             $record->timecreated    = $this->timecreated;
             $record->timemodified   = null;
             $record->name           = $this->name;
@@ -1092,10 +1118,6 @@ class mlang_stash {
             $record->components     = $components;
             $record->strings        = $strings;
             $record->timemodified   = time();
-            if ($this->name === 'AUTOSAVE') {
-                $record->shared         = 0;
-                $record->pullrequest    = 0;
-            }
 
             $DB->update_record('amos_stashes', $record);
         }
@@ -1110,7 +1132,6 @@ class mlang_stash {
      */
     public function apply(mlang_stage $stage) {
 
-        $this->load_from_file();
         foreach ($this->stage->get_iterator() as $component) {
             $stage->add($component, true);
         }
@@ -1131,29 +1152,35 @@ class mlang_stash {
 
         $DB->delete_records('amos_hidden_requests', array('stashid' => $this->id));
         $DB->delete_records('amos_stashes', array('id' => $this->id, 'hash' => $this->hash, 'ownerid' => $this->ownerid));
-        $filename = $this->get_storage_filename();
-        unlink($filename);
-        @rmdir(dirname($filename));
-        @rmdir(dirname(dirname($filename)));
+        // if the stash file is not referenced any more, delete it
+        if (!$DB->record_exists('amos_stashes', array('hash' => $this->hash))) {
+            $filename = $this->get_storage_filename();
+            unlink($filename);
+            @rmdir(dirname($filename));
+            @rmdir(dirname(dirname($filename)));
+        }
     }
 
     /**
-     * Makes the stash available for language translators
+     * Reads the stashed strings from the file, sets $this->stage
      *
-     * @param mixed $name stash title to set
-     * @param mixed $message pullrequest message
+     * This should be called exclusively by {@link self::instance_from_id()}
+     *
+     * @see self::save_into_file()
      */
-    public function send_pull_request($name, $message) {
-        global $DB;
+    public function load_from_file() {
 
-        $record = new stdclass();
-        $record->id = $this->id;
-        $record->name = $name;
-        $record->message = $message;
-        $record->pullrequest = 1;
-        $record->timemodified = time();
+        if (!is_null($this->stageserialized) or !is_null($this->stage)) {
+            throw new coding_exception('Already loaded stash can not be overwritten');
+        }
 
-        $DB->update_record('amos_stashes', $record);
+        $filename = $this->get_storage_filename();
+
+        if (!is_readable($filename)) {
+            throw new coding_exception('Unable to read stash storage '.$filename);
+        }
+
+        $this->stage = unserialize(file_get_contents($filename));
     }
 
     // INTERNAL API
@@ -1191,33 +1218,6 @@ class mlang_stash {
     }
 
     /**
-     * Returns the number of strings and the list of languages and components in the stashed stage
-     *
-     * @return array
-     */
-    protected function analyze_stage() {
-        $strings = 0;
-        $languages = array();
-        $components = array();
-
-        foreach ($this->stage->get_iterator() as $component) {
-            if ($s = $component->get_number_of_strings()) {
-                $strings += $s;
-                if (!isset($components[$component->name])) {
-                    $components[$component->name] = true;
-                }
-                if (!isset($languages[$component->lang])) {
-                    $languages[$component->lang] = true;
-                }
-            }
-        }
-        $languages = '/'.implode('/', array_keys($languages)).'/';
-        $components = '/'.implode('/', array_keys($components)).'/';
-
-        return array($strings, $languages, $components);
-    }
-
-    /**
      * Dumps the stash contents into a file in moodledata/amos/stashes/
      *
      * @see self::load_from_file()
@@ -1235,26 +1235,6 @@ class mlang_stash {
         }
 
         file_put_contents($filename, $this->stageserialized);
-    }
-
-    /**
-     * Reads the stashed strings from the file, sets $this->stage
-     *
-     * @see self::save_into_file()
-     */
-    protected function load_from_file() {
-
-        if (!is_null($this->stageserialized) or !is_null($this->stage)) {
-            throw new coding_exception('Already loaded stash can not be overwritten');
-        }
-
-        $filename = $this->get_storage_filename();
-
-        if (!is_readable($filename)) {
-            throw new coding_exception('Unable to read stash storage');
-        }
-
-        $this->stage = unserialize(file_get_contents($filename));
     }
 
     /**

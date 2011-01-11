@@ -417,13 +417,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $commitform  = html_writer::label('Commit message', 'commitmessage', false);
         $commitform .= html_writer::empty_tag('img', array('src' => $this->pix_url('req'), 'title' => 'Required', 'alt' => 'Required', 'class' => 'req'));
         $commitform .= html_writer::empty_tag('br');
-        $commitform .= html_writer::tag('textarea', '', array('id' => 'commitmessage', 'name' => 'message'));
+        $commitform .= html_writer::tag('textarea', s($stage->presetmessage), array('id' => 'commitmessage', 'name' => 'message'));
         $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
         $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
         $button = html_writer::tag('div', $button);
         $commitform = html_writer::tag('div', $commitform . $button);
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $commitform = html_writer::tag('div', $commitform, array('class' => 'commitformwrapper protected'));
+        $commitform .= html_writer::tag('legend', get_string('commitstage', 'local_amos') . $this->help_icon('commitstage', 'local_amos'));
+        $commitform = html_writer::tag('fieldset', $commitform, array('class' => 'commitformwrapper protected'));
 
         $stashform  = html_writer::label('Stash title', 'stashtitle', true);
         $stashform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
@@ -439,14 +440,17 @@ class local_amos_renderer extends plugin_renderer_base {
         $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
         $stashform  = html_writer::tag('div', $stashform, array('class' => 'stashformwrapper'));
 
+        $submiturl = new moodle_url('/local/amos/stage.php', array('submit' => 1));
+        $submitbutton = $this->single_button($submiturl, get_string('stagesubmit', 'local_amos'), 'post', array('class'=>'singlebutton submit'));
+
         $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1));
-        $prunebutton = $this->single_button($pruneurl, 'Prune non-committable', 'post', array('class'=>'singlebutton protected'));
+        $prunebutton = $this->single_button($pruneurl, get_string('stageprune', 'local_amos'), 'post', array('class'=>'singlebutton protected prune'));
 
         $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1));
-        $rebasebutton = $this->single_button($rebaseurl, 'Rebase', 'post', array('class'=>'singlebutton protected'));
+        $rebasebutton = $this->single_button($rebaseurl, get_string('stagerebase', 'local_amos'), 'post', array('class'=>'singlebutton protected rebase'));
 
         $unstageallurl = new moodle_url('/local/amos/stage.php', array('unstageall' => 1));
-        $unstageallbutton = $this->single_button($unstageallurl, 'Unstage all', 'post', array('class'=>'singlebutton protected unstageall'));
+        $unstageallbutton = $this->single_button($unstageallurl, get_string('stageunstageall', 'local_amos'), 'post', array('class'=>'singlebutton protected unstageall'));
 
         $i = 0;
         foreach ($stage->filterfields->fver as $fver) {
@@ -466,7 +470,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $params['fstg'] = 1;
         $params['__lazyform_amosfilter'] = 1;
         $editurl = new moodle_url('/local/amos/view.php', $params);
-        $editbutton = $this->single_button($editurl, 'Edit staged strings');
+        $editbutton = $this->single_button($editurl, get_string('stageedit', 'local_amos'), 'post', array('class'=>'singlebutton edit'));
 
         if (empty($stage->strings)) {
             $output = $this->heading(get_string('stagestringsnone', 'local_amos'));
@@ -491,7 +495,11 @@ class local_amos_renderer extends plugin_renderer_base {
 
         } else {
             $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
-            $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+            if ($committable) {
+                $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+            } else {
+                $output = $this->heading(get_string('stagestringsnocommit', 'local_amos', $a));
+            }
             unset($a);
 
             if ($committable) {
@@ -499,7 +507,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
+            $output .= html_writer::tag('fieldset', $legend.$submitbutton.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
                                         array('class' => 'actionbuttons'));
 
             $legend = html_writer::tag('legend', get_string('stashactions', 'local_amos') . $this->help_icon('stashactions', 'local_amos'));
@@ -676,6 +684,113 @@ print_simple_box_start("center", "100%", "#FFFFFF", 20);
 print_simple_box_end();
 print_footer();
 ';
+
+        return $output;
+    }
+
+    /**
+     * Render stash information
+     *
+     * @param local_amos_stash $stash
+     * @return string to be echo'ed
+     */
+    protected function render_local_amos_stash(local_amos_stash $stash) {
+
+        $output  = html_writer::start_tag('div', array('class' => 'stash'));
+        if ($stash->isautosave) {
+            $output .= html_writer::tag('h3', get_string('stashautosave', 'local_amos'));
+            $extraclasses = ' autosave';
+        } else {
+            $output .= html_writer::tag('h3', s($stash->name));
+            $extraclasses = '';
+        }
+        $output .= html_writer::tag('div', fullname($stash->owner), array('class' => 'owner'));
+        $output .= $this->output->user_picture($stash->owner);
+        $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
+                                    array('class' => 'timecreated'));
+        $output .= html_writer::tag('div', get_string('stashstrings', 'local_amos', $stash->strings),
+                                    array('class' => 'strings'));
+        $output .= html_writer::tag('div', get_string('stashlanguages', 'local_amos', s(implode(', ', $stash->languages))),
+                                    array('class' => 'languages'));
+        $output .= html_writer::tag('div', get_string('stashcomponents', 'local_amos', s(implode(', ', $stash->components))),
+                                    array('class' => 'components'));
+
+        $output .= html_writer::end_tag('div');
+
+        $actions = '';
+        foreach ($stash->get_actions() as $action) {
+            $actions .= $this->output->single_button($action->url, $action->label, 'post', array('class'=>'singlebutton '.$action->id));
+        }
+        if ($actions) {
+            $actions .= $this->output->help_icon('ownstashactions', 'local_amos');
+            $actions = html_writer::tag('div', $actions, array('class' => 'actions'));
+        }
+        $output = $this->output->box($output . $actions, 'generalbox stashwrapper'.$extraclasses);
+
+        return $output;
+    }
+
+    /**
+     * Render single contribution record
+     *
+     * @param local_amos_contribution $contribution
+     * @return string
+     */
+    protected function render_local_amos_contribution(local_amos_contribution $contrib) {
+        global $USER;
+
+        $output = '';
+        $output .= $this->output->heading('#'.$contrib->info->id.' '.s($contrib->info->subject), 3, 'subject');
+        $output .= $this->output->container($this->output->user_picture($contrib->author) . fullname($contrib->author), 'author');
+        $output .= $this->output->container(userdate($contrib->info->timecreated, get_string('strftimedaydatetime', 'langconfig')), 'timecreated');
+        $output .= $this->output->container(format_text($contrib->info->message), 'message');
+        $output = $this->box($output, 'generalbox source');
+
+        $table = new html_table();
+        $table->attributes['class'] = 'generaltable details';
+
+        $row = new html_table_row(array(
+            get_string('contribstatus', 'local_amos'),
+            get_string('contribstatus'.$contrib->info->status, 'local_amos') . $this->output->help_icon('contribstatus', 'local_amos')));
+        $row->attributes['class'] = 'status'.$contrib->info->status;
+        $table->data[] = $row;
+
+        if ($contrib->assignee) {
+            $assignee = $this->output->user_picture($contrib->assignee, array('size' => 16)) . fullname($contrib->assignee);
+        } else {
+            $assignee = get_string('contribassigneenone', 'local_amos');
+        }
+        $row = new html_table_row(array(get_string('contribassignee', 'local_amos'), $assignee));
+        if ($contrib->assignee) {
+            if ($contrib->assignee->id == $USER->id) {
+                $row->attributes['class'] = 'assignment self';
+            } else {
+                $row->attributes['class'] = 'assignment';
+            }
+        } else {
+            $row->attributes['class'] = 'assignment none';
+        }
+        $table->data[] = $row;
+
+        $row = new html_table_row(array(get_string('contriblanguage', 'local_amos'), $contrib->language));
+        $table->data[] = $row;
+
+        $row = new html_table_row(array(get_string('contribcomponents', 'local_amos'), $contrib->components));
+        $table->data[] = $row;
+
+        $a = array('orig'=>$contrib->strings, 'new'=>$contrib->stringsreb, 'same'=>($contrib->strings - $contrib->stringsreb));
+        if ($contrib->stringsreb == 0) {
+            $s = get_string('contribstringsnone', 'local_amos', $a);
+        } else if ($contrib->strings == $contrib->stringsreb) {
+            $s = get_string('contribstringseq', 'local_amos', $a);
+        } else {
+            $s = get_string('contribstringssome', 'local_amos', $a);
+        }
+        $row = new html_table_row(array(get_string('contribstrings', 'local_amos'), $s));
+        $table->data[] = $row;
+
+        $output .= html_writer::table($table);
+        $output = $this->output->container($output, 'contributionwrapper');
 
         return $output;
     }

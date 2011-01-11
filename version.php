@@ -18,13 +18,14 @@
 /**
  * Defines the version of mlang
  *
- * @package   mlang
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local
+ * @subpackage amos
+ * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2010110400;
-$plugin->requires = 2010092100;  // Requires this Moodle version
+$plugin->version  = 2011011000;
+$plugin->requires = 2010122900;  // Requires this Moodle version
 //$module->cron     = 60;
