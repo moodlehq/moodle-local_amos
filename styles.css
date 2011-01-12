@@ -325,7 +325,7 @@
 }
 
 .path-local-amos .contributionlist {
-    margin: 0px auto;
+    margin: 1em auto;
 }
 
 .path-local-amos .contributionlist .userpicture {
@@ -374,6 +374,7 @@
 .path-local-amos .contributionwrapper .details {
     max-width: 60%;
     min-width: 300px;
+    margin-top: 1em;
     margin-left: auto;
     margin-right: auto;
 }
