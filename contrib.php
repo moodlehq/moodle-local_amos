@@ -413,7 +413,12 @@ if (has_capability('local/amos:commit', get_system_context())) {
             $sql .= " AND c.lang $langsql";
         }
 
-        $sql .= " ORDER BY CASE WHEN c.status < 20 THEN c.status ELSE 100 END, COALESCE (c.timemodified, c.timecreated) DESC";
+        // In review first, then New and then Accepted and Rejected together, then order by date
+        $sql .= " ORDER BY CASE WHEN c.status = 10 THEN 1
+                                WHEN c.status = 0  THEN 2
+                                ELSE 3
+                           END,
+                           COALESCE (c.timemodified, c.timecreated) DESC";
 
         $contributions = $DB->get_records_sql($sql, $params);
     }
@@ -481,7 +486,12 @@ if (!$closed) {
     $sql .= " AND c.status < 20"; // do not show resolved contributions
 }
 
-$sql .= " ORDER BY c.status, COALESCE (c.timemodified, c.timecreated) DESC";
+// In review first, then New and then Accepted and Rejected together, then order by date
+$sql .= " ORDER BY CASE WHEN c.status = 10 THEN 1
+                        WHEN c.status = 0  THEN 2
+                        ELSE 3
+                   END,
+                   COALESCE (c.timemodified, c.timecreated) DESC";
 
 $contributions = $DB->get_records_sql($sql, array($USER->id));
 
