@@ -413,7 +413,7 @@ if (has_capability('local/amos:commit', get_system_context())) {
             $sql .= " AND c.lang $langsql";
         }
 
-        $sql .= " ORDER BY c.status, COALESCE (c.timemodified, c.timecreated) DESC";
+        $sql .= " ORDER BY CASE WHEN c.status < 20 THEN c.status ELSE 100 END, COALESCE (c.timemodified, c.timecreated) DESC";
 
         $contributions = $DB->get_records_sql($sql, $params);
     }
