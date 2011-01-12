@@ -288,6 +288,7 @@
 .path-local-amos .stash {
     position: relative; // to reset coordinate system for nested elements
     border: 1px solid black;
+    margin: 10px;
 }
 
 .path-local-amos .stash h3 {
