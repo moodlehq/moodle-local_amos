@@ -190,6 +190,10 @@
     background-color: #e7f1c3;
 }
 
+.path-local-amos #amosstage .translation.committable .current del {
+    color: red;
+}
+
 .path-local-amos #amostranslator .translation.committable.outdated {
     background-color: #f3f2aa;
 }
