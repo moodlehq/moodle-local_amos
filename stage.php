@@ -30,13 +30,11 @@ require_once(dirname(__FILE__).'/importfile_form.php');
 require_once(dirname(__FILE__).'/merge_form.php');
 
 $message    = optional_param('message', null, PARAM_RAW); // commit message
-$preset     = optional_param('preset', null, PARAM_RAW); // pre-set commit message
 $unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
 $prune      = optional_param('prune', null, PARAM_INT);
 $rebase     = optional_param('rebase', null, PARAM_INT);
 $submit     = optional_param('submit', null, PARAM_INT);
 $unstageall = optional_param('unstageall', null, PARAM_INT);
-$sesskeysub = optional_param('sesskey', null, PARAM_RAW);   // submitted sesskey
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', get_system_context());
@@ -57,6 +55,7 @@ if (!empty($message)) {
     $stage->prune($allowed);
     $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'));
     $stage->store();
+    unset($SESSION->local_amos->presetcommitmessage);
     redirect($PAGE->url);
 }
 if (!empty($unstage)) {
@@ -92,6 +91,7 @@ if (!empty($unstageall)) {
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->clear();
     $stage->store();
+    unset($SESSION->local_amos->presetcommitmessage);
     redirect($PAGE->url);
 }
 if (!empty($submit)) {
@@ -108,8 +108,8 @@ $output = $PAGE->get_renderer('local_amos');
 $sesskey = sesskey();
 // create a renderable object that represents the stage
 $stage = new local_amos_stage($USER);
-if ($sesskeysub and confirm_sesskey($sesskeysub)) {
-    $stage->presetmessage = $preset;
+if (!empty($SESSION->local_amos->presetcommitmessage)) {
+    $stage->presetmessage = $SESSION->local_amos->presetcommitmessage;
 }
 
 /// Output starts here

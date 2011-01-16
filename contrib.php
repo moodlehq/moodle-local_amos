@@ -127,9 +127,15 @@ if ($apply) {
     $stash->apply($stage);
     $stage->store();
 
-    redirect(new moodle_url('/local/amos/stage.php', array(
-        'sesskey' => sesskey(),
-        'preset' => get_string('presetcommitmessage', 'local_amos', fullname($author)))));
+    $a = new stdClass();
+    $a->id = $contribution->id;
+    $a->author = fullname($author);
+    if (!isset($SESSION->local_amos)) {
+        $SESSION->local_amos = new stdClass();
+    }
+    $SESSION->local_amos->presetcommitmessage = get_string('presetcommitmessage', 'local_amos', $a);
+
+    redirect(new moodle_url('/local/amos/stage.php'));
 }
 
 if ($review) {
@@ -177,9 +183,15 @@ if ($review) {
     $emailbody      = get_string('emailreviewbody', 'local_amos', $a);
     email_to_user($author, $amosbot, $emailsubject, $emailbody);
 
-    redirect(new moodle_url('/local/amos/stage.php', array(
-        'sesskey' => sesskey(),
-        'preset' => get_string('presetcommitmessage', 'local_amos', fullname($author)))));
+    $a = new stdClass();
+    $a->id = $contribution->id;
+    $a->author = fullname($author);
+    if (!isset($SESSION->local_amos)) {
+        $SESSION->local_amos = new stdClass();
+    }
+    $SESSION->local_amos->presetcommitmessage = get_string('presetcommitmessage', 'local_amos', $a);
+
+    redirect(new moodle_url('/local/amos/stage.php'));
 }
 
 if ($accept) {
