@@ -273,8 +273,18 @@ class local_amos_renderer extends plugin_renderer_base {
             if ($string->greylisted) {
                 $cells[1]->attributes['class'] .= ' greylisted';
             }
-            // the language in which the original is displayed
-            $cells[2] = new html_table_cell($string->language);
+            // the language in which the original is displayed and the timeline link
+            $url = new moodle_url('/local/amos/timeline.php', array(
+                'component' => $string->component,
+                'lang'      => $string->language,
+                'branch'    => $string->branchcode,
+                'stringid'  => $string->stringid));
+            $text  = html_writer::tag('span', '+', array('class'=>'plus'));
+            $text .= html_writer::tag('span', '-', array('class'=>'minus'));
+            $cells[2] = new html_table_cell(
+                html_writer::tag('div', $string->language, array('class' => 'langcode')).
+                html_writer::tag('div', html_writer::tag('a', $text, array('href' => $url, 'target' => '_blank')),
+                    array('class' => 'timelinelink')));
             // Translation
             if (empty($string->translation) and $string->translation !== '0') {
                 $missing++;

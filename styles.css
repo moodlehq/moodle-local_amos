@@ -169,6 +169,19 @@
     width: 1px;
 }
 
+.path-local-amos #amostranslator .lang .timelinelink {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.path-local-amos #amostranslator .lang .timelinelink span.plus {
+    color: green;
+}
+
+.path-local-amos #amostranslator .lang .timelinelink span.minus {
+    color: red;
+}
+
 .path-local-amos #amosstage .translation del {
     color: #999;
 }
@@ -436,3 +449,37 @@
     margin: 0px auto;
 }
 
+.path-local-amos .timelinetable {
+    margin: 0px auto;
+    width: 100%;
+}
+
+.path-local-amos .timelinetable .timemodified,
+.path-local-amos .timelinetable .usermessage {
+    font-size: 80%;
+}
+
+.path-local-amos .timelinetable .usermessage .commitmsg {
+    font-style: italic;
+}
+
+.path-local-amos .timelinetable .text {
+    padding: 5px;
+    margin-top: 0.5em;
+    background-color: white;
+}
+
+.path-local-amos .timelinetable .c1 {
+    width: 50%;
+}
+
+.path-local-amos .yui3-overlay-loading,
+.path-local-amos .yui3-overlay-content {
+    padding: 5px;
+    border: 1px solid #666;
+    background-color: #eee;
+}
+
+.path-local-amos .yui3-widget-hd {
+    text-align: right;
+}

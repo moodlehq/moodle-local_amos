@@ -43,6 +43,7 @@ if (empty($CFG->googleapikey)) {
     $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi', array('key'=>$CFG->googleapikey)));
 }
 $PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);
+$PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_timeline');
 
 $output = $PAGE->get_renderer('local_amos');
 
