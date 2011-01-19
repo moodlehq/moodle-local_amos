@@ -48,8 +48,8 @@ if ($ajax) {
     echo $OUTPUT->header();
 }
 
-$sql = "SELECT s.id,s.lang,s.text,s.timemodified,
-               c.userinfo, c.commitmsg
+$sql = "SELECT s.id, s.lang, s.text, s.timemodified, s.deleted,
+               c.userinfo, c.commitmsg, c.commithash
           FROM {amos_repository} s
           JOIN {amos_commits} c ON c.id = s.commitid
          WHERE branch = ? AND (lang = 'en' OR lang = ?) AND component = ? AND stringid = ?
@@ -81,9 +81,19 @@ foreach ($results as $result) {
     $date = html_writer::tag('div', local_amos_renderer::commit_datetime($result->timemodified), array('class' => 'timemodified'));
     $userinfo = html_writer::tag('span', s($result->userinfo), array('class' => 'userinfo'));
     $commitmsg = html_writer::tag('span', s($result->commitmsg), array('class' => 'commitmsg'));
-    $text = html_writer::tag('div', s($result->text), array('class' => 'text preformatted'));
+    if ($result->deleted) {
+        $text = html_writer::tag('del', s($result->text));
+    } else {
+        $text = s($result->text);
+    }
+    if ($result->commithash) {
+        $commithash = html_writer::tag('div', $result->commithash, array('class' => 'commithash'));
+    } else {
+        $commithash = '';
+    }
+    $text = html_writer::tag('div', $text, array('class' => 'text preformatted'));
 
-    $cell->text = $date . html_writer::tag('div', $userinfo . ' ' . $commitmsg, array('class' => 'usermessage')) . $text;
+    $cell->text = $date . html_writer::tag('div', $userinfo . ' ' . $commitmsg . $commithash, array('class' => 'usermessage')) . $text;
     $none->text = '&nbsp;';
 
     $row = new html_table_row(array($encell, $langcell));
