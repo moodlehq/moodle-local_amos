@@ -58,8 +58,8 @@ function amos_parse_lang_commit() {
     file_put_contents($startatlock, $commithash);
 }
 
-$tmp = make_upload_directory('amos/temp', false);
-$var = make_upload_directory('amos/var', false);
+$tmp = make_upload_directory('amos/temp');
+$var = make_upload_directory('amos/var');
 $mem = memory_get_usage();
 $eng = array();
 

@@ -210,7 +210,7 @@ string';
 \$string['percents'] = '%%Y-%%m-%%d-%%H-%%M';
 
 EOF;
-        $tmp = make_upload_directory('temp/amos', false);
+        $tmp = make_upload_directory('temp/amos');
         $filepath = $tmp . '/mlangunittest.php';
         file_put_contents($filepath, $filecontents);
 
