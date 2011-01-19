@@ -695,7 +695,7 @@ class mlang_stage {
      *
      * @param int|null $basetimestamp the timestamp to rebase against, null for the most recent
      * @param bool $deletemissing if true, then all strings that are in repository but not in stage will be marked as to be deleted
-     * @param int $deletetimestamp if $deletemissing is tru, what timestamp to use when removing strings (defaults to current)
+     * @param int $deletetimestamp if $deletemissing is true, what timestamp to use when removing strings (defaults to current)
      */
     public function rebase($basetimestamp=null, $deletemissing=false, $deletetimestamp=null) {
         if(!is_bool($deletemissing)) {

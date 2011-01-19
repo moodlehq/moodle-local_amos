@@ -132,7 +132,7 @@ if (file_exists($startatlock)) {
 }
 $gitout = array();
 $gitstatus = 0;
-$gitcmd = AMOS_PATH_GIT . " whatchanged --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
+$gitcmd = AMOS_PATH_GIT . " whatchanged --topo-order --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
 echo "RUN {$gitcmd}\n";
 exec($gitcmd, $gitout, $gitstatus);
 

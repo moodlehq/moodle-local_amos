@@ -34,6 +34,7 @@ $starttime = microtime();
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 /**
  * This is a hacky way how to populate a forum at lang.moodle.org with commits into the core
@@ -111,7 +112,7 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
  * than a real function.
  */
 function amos_parse_core_commit() {
-    global $stage, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $version, $fullcommitmsg, $startatlock;
+    global $stage, $realmodified, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $version, $fullcommitmsg, $startatlock;
 
     $stage->rebase($timemodified, true, $timemodified);
     amos_core_commit_notify($stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg);
@@ -258,7 +259,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     chdir(AMOS_REPO_MOODLE);
     $gitout = array();
     $gitstatus = 0;
-    $gitcmd = AMOS_PATH_GIT . " whatchanged --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
+    $gitcmd = AMOS_PATH_GIT . " whatchanged --topo-order --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
     echo "RUN {$gitcmd}\n";
     exec($gitcmd, $gitout, $gitstatus);
 
@@ -270,6 +271,8 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
 
     $commithash = '';
     $committime = '';
+    $prevtimemodified = 0;
+    $timemodified     = time(); // will be re-set later
     foreach ($gitout as $line) {
         $line = trim($line);
         if (empty($line)) {
@@ -282,6 +285,11 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             }
             $commithash = substr($line, 7, 40);
             $committime = substr($line, 58);
+            if ($timemodified == $prevtimemodified) {
+                usleep(1100000); // makes sure that every commit has different timestamp
+            }
+            $prevtimemodified = $timemodified;
+            $timemodified = time(); // when the commit was processed by AMOS
             continue;
         }
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
@@ -351,8 +359,9 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         exec($gitcmd, $commitinfo);
         $committer      = $commitinfo[0];
         $committeremail = $commitinfo[1];
-        $timemodified   = $commitinfo[2];
+        $realmodified   = $commitinfo[2]; // the real timestamp of the commit - should be the same as $committime
         $commitmsg      = iconv('UTF-8', 'UTF-8//IGNORE', $commitinfo[3]);
+        $commitmsg     .= "\n\nCommitted into Git: " . local_amos_renderer::commit_datetime($realmodified);
         $fullcommitmsg  = implode("\n", array_slice($commitinfo, 3));  // AMOS script is looked up here later
 
         if ($changetype == 'D') {
