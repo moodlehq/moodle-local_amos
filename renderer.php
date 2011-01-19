@@ -283,7 +283,8 @@ class local_amos_renderer extends plugin_renderer_base {
             $text .= html_writer::tag('span', '-', array('class'=>'minus'));
             $cells[2] = new html_table_cell(
                 html_writer::tag('div', $string->language, array('class' => 'langcode')).
-                html_writer::tag('div', html_writer::tag('a', $text, array('href' => $url, 'target' => '_blank')),
+                html_writer::tag('div', html_writer::tag('a', $text, array('href' => $url, 'target' => '_blank',
+                        'title' => get_string('stringhistory', 'local_amos'))),
                     array('class' => 'timelinelink')));
             // Translation
             if (empty($string->translation) and $string->translation !== '0') {
