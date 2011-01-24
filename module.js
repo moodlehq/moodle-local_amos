@@ -403,7 +403,7 @@ M.local_amos.translatable = M.local_amos.translatable || []
 M.local_amos.init_google_icon = function(container, index, iconcontainers) {
     var Y = M.local_amos.Y;
     var iconhtml = '<img src="' + M.util.image_url('google', 'local_amos') + '" />';
-    var lang = container.get('parentNode').get('parentNode').one('td.lang').get('innerHTML');
+    var lang = container.get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
     lang = M.local_amos.google_language_code(lang);
     if (Y.Lang.isUndefined(M.local_amos.translatable[lang])) {
         M.local_amos.translatable[lang] = google.language.isTranslatable(lang);
@@ -419,7 +419,7 @@ M.local_amos.init_google_icon = function(container, index, iconcontainers) {
 M.local_amos.google_translate = function(e) {
     var Y = M.local_amos.Y;
     var english = e.currentTarget.get('parentNode').get('parentNode').one('.english').get('innerHTML');
-    var lang = e.currentTarget.get('parentNode').get('parentNode').get('parentNode').one('td.lang').get('innerHTML');
+    var lang = e.currentTarget.get('parentNode').get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
     lang = M.local_amos.google_language_code(lang);
     e.currentTarget.set('src', M.cfg.loadingicon);
     google.language.translate(english, 'en', lang, function(result) {
