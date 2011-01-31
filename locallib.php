@@ -461,7 +461,7 @@ class local_amos_translator implements renderable {
         } else {
             $params = array();
         }
-        $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch";
+        $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch, r.id DESC";
 
         $params = array_merge($params,
             $inner_paramsbranches, $inner_paramslanguages, $inner_paramcomponents,

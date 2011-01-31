@@ -53,7 +53,7 @@ $sql = "SELECT s.id, s.lang, s.text, s.timemodified, s.deleted,
           FROM {amos_repository} s
           JOIN {amos_commits} c ON c.id = s.commitid
          WHERE branch = ? AND (lang = 'en' OR lang = ?) AND component = ? AND stringid = ?
-      ORDER BY s.timemodified DESC";
+      ORDER BY s.timemodified DESC, s.id DESC";
 
 $params = array($branch, $lang, $component, $stringid);
 

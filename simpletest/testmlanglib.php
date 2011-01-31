@@ -199,6 +199,76 @@ class mlang_test extends UnitTestCase {
         unset($component);
     }
 
+    public function test_more_recently_inserted_wins() {
+        $now = time();
+        $stage = new mlang_stage();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('welcome', 'Welcome', $now));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('First string in AMOS', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('welcome', 'Welcome!', $now));
+        $stage->add($component);
+        $stage->commit('Making a modification of the string with the same timestamp', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual($component->get_string('welcome')->text, 'Welcome!');
+        $component->clear();
+        unset($component);
+    }
+
+    public function test_component_from_phpfile_same_timestamp() {
+        $now = time();
+        // get the initial strings from a file
+        $filecontents = <<<EOF
+<?php
+\$string['welcome'] = 'Welcome';
+
+EOF;
+        $tmp = make_upload_directory('temp/amos');
+        $filepath = $tmp . '/mlangunittest.php';
+        file_put_contents($filepath, $filecontents);
+
+        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'), $now, 'test', 2);
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('First string in AMOS', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unlink($filepath);
+
+        $filecontents = <<<EOF
+<?php
+\$string['welcome'] = 'Welcome!';
+
+EOF;
+        file_put_contents($filepath, $filecontents);
+
+        // commit modified file with the same timestamp
+        $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'), $now, 'test', 2);
+        $stage->add($component);
+        $stage->commit('The string modified in the same timestamp', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+        unlink($filepath);
+
+        // now make sure that the more recently committed string wins
+        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEqual($component->get_string('welcome')->text, 'Welcome!');
+        $component->clear();
+        unset($component);
+    }
+
     public function test_component_from_phpfile_legacy_format() {
         $filecontents = <<<EOF
 <?php

@@ -271,8 +271,6 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
 
     $commithash = '';
     $committime = '';
-    $prevtimemodified = 0;
-    $timemodified     = time(); // will be re-set later
     foreach ($gitout as $line) {
         $line = trim($line);
         if (empty($line)) {
@@ -283,13 +281,9 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
                 // new commit is here - if we have something to push into AMOS repository, do it now
                 amos_parse_core_commit();
             }
-            $commithash = substr($line, 7, 40);
-            $committime = substr($line, 58);
-            if ($timemodified == $prevtimemodified) {
-                usleep(1100000); // makes sure that every commit has different timestamp
-            }
-            $prevtimemodified = $timemodified;
-            $timemodified = time(); // when the commit was processed by AMOS
+            $commithash   = substr($line, 7, 40);
+            $committime   = substr($line, 58);      // the original git commit's timestamp
+            $timemodified = time();                 // when the commit was processed by AMOS
             continue;
         }
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
