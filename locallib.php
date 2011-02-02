@@ -845,7 +845,7 @@ class local_amos_log implements renderable {
             $sql .= " WHERE $where";
         }
 
-        $ordersql = " ORDER BY timecommitted DESC";
+        $ordersql = " ORDER BY timecommitted DESC, id DESC";
 
         $this->numofcommits = $DB->count_records_sql($countsql.$sql, $params);
 
@@ -906,7 +906,7 @@ class local_amos_log implements renderable {
             $params[] = $filter['stringid'];
         }
 
-        $ordersql = " ORDER BY c.timecommitted DESC, r.branch DESC, r.lang, r.component, r.stringid";
+        $ordersql = " ORDER BY c.timecommitted DESC, c.id DESC, r.branch DESC, r.lang, r.component, r.stringid";
 
         $this->numofstrings = $DB->count_records_sql($countsql.$sql, $params);
 
