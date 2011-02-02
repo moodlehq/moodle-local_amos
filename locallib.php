@@ -433,7 +433,7 @@ class local_amos_translator implements renderable {
         $rs->close();
 
         // get all the strings for the translator
-        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated
+        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated, r.deleted
                   FROM {amos_repository} r
                   JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
                           FROM {amos_repository}
@@ -448,8 +448,7 @@ class local_amos_translator implements renderable {
                        AND r.timemodified = j.timemodified)
                  WHERE r.branch {$outer_sqlbranches}
                        AND r.lang {$outer_sqllanguages}
-                       AND r.component {$outer_sqlcomponents}
-                       AND r.deleted = 0";
+                       AND r.component {$outer_sqlcomponents}";
         if ($helps) {
             $sql .= "      AND r.stringid LIKE '%\\\\_help'";
         } else {
@@ -469,9 +468,22 @@ class local_amos_translator implements renderable {
         );
 
         $rs = $DB->get_recordset_sql($sql, $params);
-        $s = array();
+        $s = array(); // tree of strings grouped by lang, component, stringid and branch
+        $d = array(); // same tree - but containing deleted strings only
+
         foreach($rs as $r) {
+            // if the most recent record is a deletion record, do not add the string to $s tree
+            // this filtering can not be done in SQL because there can be two records with
+            // the same timemodified, one changing the string and one removing it
+            if ($r->deleted) {
+                $d[$r->lang][$r->component][$r->stringid][$r->branch] = true;
+            }
+            if (isset($d[$r->lang][$r->component][$r->stringid][$r->branch])) {
+                // the more recent record of this string removes it
+                continue;
+            }
             if (!isset($s[$r->lang][$r->component][$r->stringid][$r->branch])) {
+                // store the most recent record in the $s tree
                 $string = new stdclass();
                 $string->amosid = $r->id;
                 $string->text = $r->text;
@@ -480,6 +492,7 @@ class local_amos_translator implements renderable {
                 $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
             }
         }
+        unset($d);
         $rs->close();
 
         // replace the loaded values with those already staged

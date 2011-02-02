@@ -224,6 +224,20 @@ class mlang_test extends UnitTestCase {
         $this->assertEqual($component->get_string('welcome')->text, 'Welcome!');
         $component->clear();
         unset($component);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('welcome', 'Welcome!', $now, 1));
+        $stage->add($component);
+        $stage->commit('Deleting the string with the same timestamp', array('source' => 'unittest'), true);
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string('welcome'));
+        $component->clear();
+        unset($component);
     }
 
     public function test_component_from_phpfile_same_timestamp() {
