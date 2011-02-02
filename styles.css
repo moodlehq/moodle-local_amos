@@ -454,6 +454,12 @@
     width: 100%;
 }
 
+.path-local-amos .timelinetable,
+.path-local-amos .timelinetable .r0,
+.path-local-amos .timelinetable .r1 {
+    background-color: transparent;
+}
+
 .path-local-amos .timelinetable .timemodified,
 .path-local-amos .timelinetable .usermessage {
     font-size: 80%;
