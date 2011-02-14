@@ -164,6 +164,7 @@ M.local_amos.editor_on = function(cell, focus) {
     var Y           = M.local_amos.Y;
     var current     = cell.one('.translation-view');    // <div> with the current translation
     var stext       = current.get('text');
+    stext           = stext.replace(/\u200b/g, '');     // remove U+200B zero-width space
     var editor      = Y.Node.create('<textarea class="translation-edit">' + stext + '</textarea>');
     editor.on('blur', M.local_amos.editor_blur);
     cell.append(editor);

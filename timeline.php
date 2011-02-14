@@ -86,6 +86,7 @@ foreach ($results as $result) {
     } else {
         $text = s($result->text);
     }
+    $text = local_amos_renderer::add_breaks($text);
     if ($result->commithash) {
         $commithash = html_writer::tag('div', $result->commithash, array('class' => 'commithash'));
     } else {

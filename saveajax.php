@@ -28,6 +28,7 @@ define('AJAX_SCRIPT', true);
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 require_login(SITEID, false);
 if (!has_capability('local/amos:stage', get_system_context())) {
@@ -40,7 +41,11 @@ if (!confirm_sesskey()) {
 }
 
 $stringid = optional_param('stringid', null, PARAM_ALPHANUMEXT);
-$text   = optional_param('text', null, PARAM_RAW);
+$text     = optional_param('text', null, PARAM_RAW);
+
+// remove all zero-width space characters from the text
+// {@link http://www.fileformat.info/info/unicode/char/200b/index.htm}
+$text = preg_replace('|\xe2\x80\x8b|', '', $text);
 
 if (is_null($stringid) or is_null($text)) {
     header('HTTP/1.1 400 Bad Request');
@@ -61,6 +66,6 @@ mlang_stash::autosave($stage);
 
 header('Content-Type: application/json; charset: utf-8');
 $response = new stdclass();
-$response->text = s($string->text);
+$response->text = local_amos_renderer::add_breaks(s($string->text));
 
 echo json_encode($response);

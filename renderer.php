@@ -257,7 +257,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 html_writer::tag('span', $componentname, array('class'=>'component')).']';
             $cells[0] = new html_table_cell($stringinfo);
             // original of the string
-            $o = html_writer::tag('div', s($string->original), array('class' => 'preformatted english'));
+            $o = html_writer::tag('div', self::add_breaks(s($string->original)), array('class' => 'preformatted english'));
             $g = html_writer::tag('div', '', array('class' => 'googleicon'));
             $p = '';
             if (preg_match('/\{\$a(->.+)?\}/', $string->original)) {
@@ -290,7 +290,7 @@ class local_amos_renderer extends plugin_renderer_base {
             if (empty($string->translation) and $string->translation !== '0') {
                 $missing++;
             }
-            $t = s($string->translation);
+            $t = self::add_breaks(s($string->translation));
             $sid = local_amos_translator::encode_identifier($string->language, $string->originalid, $string->translationid);
             $t = html_writer::tag('div', $t, array('class' => 'preformatted translation-view'));
             $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
@@ -397,14 +397,14 @@ class local_amos_renderer extends plugin_renderer_base {
                 html_writer::tag('span', $componentname, array('class'=>'component')).']';
             $cells[0] = new html_table_cell($stringinfo);
             // original of the string
-            $cells[1] = new html_table_cell(html_writer::tag('div', s($string->original), array('class' => 'preformatted')));
+            $cells[1] = new html_table_cell(html_writer::tag('div', self::add_breaks(s($string->original)), array('class' => 'preformatted')));
             // the language in which the original is displayed
             $cells[2] = new html_table_cell($string->language);
             // the current and the new translation
-            $t1 = s($string->current);
+            $t1 = self::add_breaks(s($string->current));
             $t1 = html_writer::tag('del', $t1, array());
             $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
-            $t2 = s($string->new);
+            $t2 = self::add_breaks(s($string->new));
             $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
             $unstageurl = new moodle_url('/local/amos/stage.php', array(
                     'unstage'   => $string->stringid,
@@ -804,5 +804,20 @@ print_footer();
         $output = $this->output->container($output, 'contributionwrapper');
 
         return $output;
+    }
+
+    /**
+     * Makes sure there is a zero-width space after non-word characters in the given string
+     *
+     * This is used to wrap long strings like 'A,B,C,D,...,x,y,z' in the translator
+     *
+     * @link http://www.w3.org/TR/html4/struct/text.html#h-9.1
+     * @link http://www.fileformat.info/info/unicode/char/200b/index.htm
+     *
+     * @param string $text plain text
+     * @return string
+     */
+    public static function add_breaks($text) {
+        return preg_replace('/([,])(\S)/', '$1'."\xe2\x80\x8b".'$2', $text);
     }
 }
