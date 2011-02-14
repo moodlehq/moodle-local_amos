@@ -68,7 +68,7 @@ foreach ($available as $userid => $user) {
 
 /// Output starts here
 echo $OUTPUT->header();
-$languages = array_merge(array('X' => '(All languages)'), mlang_tools::list_languages());
+$languages = array_merge(array('X' => '(All languages)'), mlang_tools::list_languages(true, true, false));
 foreach ($languages as $langcode => $langname) {
     $list[$langcode] = (object)array('langname' => $langname, 'translators' => array());
 }

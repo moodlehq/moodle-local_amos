@@ -725,7 +725,7 @@ EOF;
 
         $stage->commit('Registering two languages', array('source' => 'unittest'));
 
-        $langs = mlang_tools::list_languages();
+        $langs = mlang_tools::list_languages(true, true, false);
         $this->assertIsA($langs, 'array');
         $this->assertEqual(count($langs), 2);
         $this->assertTrue(array_key_exists('cs', $langs));

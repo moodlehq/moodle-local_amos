@@ -66,7 +66,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'element'));
         $options = mlang_tools::list_languages();
         foreach ($options as $langcode => $langname) {
-            $options[$langcode] = $langname . ' (' . $langcode . ')';
+            $options[$langcode] = $langname;
         }
         unset($options['en']); // English is not translatable via AMOS
         $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',

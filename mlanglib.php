@@ -1422,9 +1422,10 @@ class mlang_tools {
      *
      * @param bool $english shall the English be included?
      * @param bool $usecache can the internal cache be used?
+     * @param bool $showcode append language code to the name
      * @return array (string)langcode => (string)langname
      */
-    public static function list_languages($english=true, $usecache=true) {
+    public static function list_languages($english=true, $usecache=true, $showcode=true) {
         global $DB;
         static $cache = null;
 
@@ -1440,7 +1441,11 @@ class mlang_tools {
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
                     // use the first returned value, all others are historical records
-                    $cache[$lang->code] = $lang->name;
+                    $value = $lang->name;
+                    if ($showcode) {
+                        $value .= ' (' . $lang->code . ')';
+                    }
+                    $cache[$lang->code] = $value;
                 }
             }
             $rs->close();
