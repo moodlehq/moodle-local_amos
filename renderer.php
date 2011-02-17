@@ -43,8 +43,8 @@ class local_amos_renderer extends plugin_renderer_base {
         // version checkboxes
         $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
         $output .= html_writer::start_tag('div', array('class' => 'label first'));
-        $output .= html_writer::tag('label', 'Version', array('for' => 'amosfilter_fver'));
-        $output .= html_writer::tag('div', 'Show strings from these Moodle versions', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filterver', 'local_amos'), array('for' => 'amosfilter_fver'));
+        $output .= html_writer::tag('div', get_string('filterver_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
         $fver = '';
@@ -60,8 +60,8 @@ class local_amos_renderer extends plugin_renderer_base {
         // language selector
         $output .= html_writer::start_tag('div', array('class' => 'item select'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', 'Languages', array('for' => 'amosfilter_flng'));
-        $output .= html_writer::tag('div', 'Display translations in these languages', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filterlng', 'local_amos'), array('for' => 'amosfilter_flng'));
+        $output .= html_writer::tag('div', get_string('filterlng_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
         $options = mlang_tools::list_languages();
@@ -78,8 +78,8 @@ class local_amos_renderer extends plugin_renderer_base {
         // component selector
         $output .= html_writer::start_tag('div', array('class' => 'item select'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', 'Component', array('for' => 'amosfilter_fcmp'));
-        $output .= html_writer::tag('div', 'Show strings of these components', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
+        $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
         $optionscore = array();
@@ -99,7 +99,10 @@ class local_amos_renderer extends plugin_renderer_base {
         asort($optionscore);
         asort($optionsstandard);
         ksort($optionscontrib);
-        $options = array(array('Core subsystems' => $optionscore), array('Standard plugins' => $optionsstandard), array('Non-standard' => $optionscontrib));
+        $options = array(
+            array(get_string('typecore', 'local_amos') => $optionscore),
+            array(get_string('typestandard', 'local_amos') => $optionsstandard),
+            array(get_string('typecontrib', 'local_amos') => $optionscontrib));
         $output .= html_writer::select($options, 'fcmp[]', $filter->get_data()->component, '',
                     array('id' => 'amosfilter_fcmp', 'multiple' => 'multiple', 'size' => 5));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
@@ -109,27 +112,27 @@ class local_amos_renderer extends plugin_renderer_base {
         // other filter settings
         $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', 'Miscellaneous', array('for' => 'amosfilter_fmis'));
-        $output .= html_writer::tag('div', 'Additional conditions on strings to display', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filtermis', 'local_amos'), array('for' => 'amosfilter_fmis'));
+        $output .= html_writer::tag('div', get_string('filtermis_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
 
-        $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, 'missing and outdated strings only');
+        $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, get_string('filtermisfmis', 'local_amos'));
         $fmis    = html_writer::tag('div', $fmis, array('class' => 'labelled_checkbox'));
 
-        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, 'help strings only');
+        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, get_string('filtermisfhlp', 'local_amos'));
         $fhlp    = html_writer::tag('div', $fhlp, array('class' => 'labelled_checkbox'));
 
-        $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, 'staged strings only');
+        $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, get_string('filtermisfstg', 'local_amos'));
         $fstg    = html_writer::tag('div', $fstg, array('class' => 'labelled_checkbox'));
 
         $fgrey   = html_writer::start_tag('div', array('id' => 'amosfilter_fgrey', 'class' => 'checkboxgroup'));
         $fgrey  .= html_writer::tag('div',
-                        html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, 'greylisted strings only',
+                        html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, get_string('filtermisfglo', 'local_amos'),
                                                 array('id' => 'amosfilter_fglo')),
                         array('class' => 'labelled_checkbox'));
         $fgrey  .= html_writer::tag('div',
-                        html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, 'without greylisted strings',
+                        html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, get_string('filtermisfwog', 'local_amos'),
                                                 array('id' => 'amosfilter_fwog')),
                         array('class' => 'labelled_checkbox'));
         $fgrey  .= html_writer::end_tag('div');
@@ -142,15 +145,15 @@ class local_amos_renderer extends plugin_renderer_base {
         // must contain string
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', 'Substring', array('for' => 'amosfilter_ftxt'));
-        $output .= html_writer::tag('div', 'String must contain given text', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filtertxt', 'local_amos'), array('for' => 'amosfilter_ftxt'));
+        $output .= html_writer::tag('div', get_string('filtertxt_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
-        $output .= html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex, get_string('regex', 'local_amos'),
+        $output .= html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex, get_string('filtertxtregex', 'local_amos'),
                     array('class' => 'inputmodifier'));
-        $output .= html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs, get_string('casesensitive', 'local_amos'),
+        $output .= html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs, get_string('filtertxtcasesensitive', 'local_amos'),
                     array('class' => 'inputmodifier'));
 
         $output .= html_writer::end_tag('div');
@@ -159,8 +162,8 @@ class local_amos_renderer extends plugin_renderer_base {
         // string identifier
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', 'String identifier', array('for' => 'amosfilter_ftxt'));
-        $output .= html_writer::tag('div', 'The key in the array of strings', array('class' => 'description'));
+        $output .= html_writer::tag('label', get_string('filtersid', 'local_amos'), array('for' => 'amosfilter_fsid'));
+        $output .= html_writer::tag('div', get_string('filtersid_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
 
@@ -223,20 +226,23 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amostranslator';
-        $table->head = array('String', 'Original', 'Lang',
+        $table->head = array(
+                get_string('translatorstring', 'local_amos') . $this->help_icon('translatorstring', 'local_amos'),
+                get_string('translatororiginal', 'local_amos') . $this->help_icon('translatororiginal', 'local_amos'),
+                get_string('translatorlang', 'local_amos') . $this->help_icon('translatorlang', 'local_amos'),
                 get_string('translatortranslation', 'local_amos') . $this->help_icon('translatortranslation', 'local_amos'));
         $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
 
         if (empty($translator->strings)) {
             if ($translator->currentpage > 1) {
-                $output  = $this->heading('No strings found on page '.$translator->currentpage);
+                $output  = $this->heading(get_string('nostringsfoundonpage', 'local_amos', $translator->currentpage));
                 $output .= html_writer::tag('div',
-                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), '&lt;&lt; go to the first page') . ' | '.
-                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), '&lt; go to the previous page'),
+                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), get_string('gotofirst', 'local_amos')) . ' | '.
+                        html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), get_string('gotoprevious', 'local_amos')),
                         array('style' => 'text-align:center'));
                 $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
             } else {
-                $output = $this->heading('No strings found');
+                $output = $this->heading(get_string('nostringsfound', 'local_amos'));
                 $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
             }
             return $output;
@@ -322,7 +328,11 @@ class local_amos_renderer extends plugin_renderer_base {
             $table->data[] = $row;
         }
 
-        $heading = 'Found: '.$translator->numofrows.' &nbsp;&nbsp;&nbsp; Missing: '.$translator->numofmissing.' ('.$missing.')';
+        $a                  = new stdClass();
+        $a->found           = $translator->numofrows;
+        $a->missing         = $translator->numofmissing;
+        $a->missingonpage   = $missing;
+        $heading = get_string('found', 'local_amos', $a);
         $output = $this->heading_with_help($heading, 'foundinfo', 'local_amos');
         $pages = ceil($translator->numofrows / local_amos_translator::PERPAGE);
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
@@ -378,7 +388,10 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $table = new html_table();
         $table->id = 'amosstage';
-        $table->head = array('String', 'Original', 'Lang',
+        $table->head = array(
+                get_string('stagestring', 'local_amos'),
+                get_string('stageoriginal', 'local_amos'),
+                get_string('stagelang', 'local_amos'),
                 get_string('stagetranslation', 'local_amos') . $this->help_icon('stagetranslation', 'local_amos'));
         $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
 
@@ -437,16 +450,20 @@ class local_amos_renderer extends plugin_renderer_base {
         $commitform .= html_writer::tag('legend', get_string('commitstage', 'local_amos') . $this->help_icon('commitstage', 'local_amos'));
         $commitform = html_writer::tag('fieldset', $commitform, array('class' => 'commitformwrapper protected'));
 
-        $stashform  = html_writer::label('Stash title', 'stashtitle', true);
+        $a = new stdClass();
+        $a->time = userdate(time(), get_string('strftimedaydatetime', 'langconfig'));
+        $stashtitle = get_string('stashtitledefault', 'local_amos', $a);
+
+        $stashform  = html_writer::label(get_string('stashtitle', 'local_amos'), 'stashtitle', true);
         $stashform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
         $stashform .= html_writer::empty_tag('input', array('name' => 'new', 'value' => 1, 'type' => 'hidden'));
         $stashform .= html_writer::empty_tag('input', array('name' => 'name',
-                                                            'value' => 'WIP - '.userdate(time(), get_string('strftimedaydatetime', 'langconfig')),
+                                                            'value' => $stashtitle,
                                                             'type' => 'text',
                                                             'size' => 50,
                                                             'id' => 'stashtitle',
                                                             'maxlength' => 255));
-        $stashform .= html_writer::empty_tag('input', array('value' => 'Push all staged strings into a new stash', 'type' => 'submit'));
+        $stashform .= html_writer::empty_tag('input', array('value' => get_string('stashpush', 'local_amos'), 'type' => 'submit'));
         $stashform  = html_writer::tag('div', $stashform);
         $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
         $stashform  = html_writer::tag('div', $stashform, array('class' => 'stashformwrapper'));
@@ -558,7 +575,7 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_log(local_amos_log $log) {
 
         if ($log->numofcommits == 0) {
-            return $this->heading(get_string('nostringsfound', 'local_amos'));
+            return $this->heading(get_string('nologsfound', 'local_amos'));
         }
 
         $a = (object)array('found' => $log->numofcommits, 'limit' => local_amos_log::LIMITCOMMITS);

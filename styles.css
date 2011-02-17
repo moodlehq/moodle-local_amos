@@ -76,6 +76,10 @@
     margin: 1em auto;
 }
 
+.path-local-amos #amostranslator th.header .helplink {
+    display: block;
+}
+
 .path-local-amos .stagewrapper .commitformwrapper {
     margin: 0em auto;
     text-align: center;

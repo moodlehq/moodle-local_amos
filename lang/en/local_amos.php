@@ -26,14 +26,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['about'] = '<p>AMOS stands for Automated Manipulation Of Strings. AMOS is a central repository of Moodle strings and their history. It tracks the addition of English strings into Moodle code, gathers translations, handles common translation tasks and generates language packages to be deployed on Moodle servers.</p>
+<p>See <a href="http://docs.moodle.org/en/AMOS">AMOS documentation</a> for more information.</p>';
+$string['amos'] = 'AMOS - Moodle translation tool';
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
 $string['amos:importfile'] = 'Import strings from uploaded file';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
-$string['casesensitive'] = 'case-sensitive';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
+$string['committableall'] = 'all languages';
+$string['committablenone'] = 'no languages allowed - please contact AMOS manager';
 $string['confirmaction'] = 'This can not be undone. Are you sure?';
 $string['contribaccept'] = 'Accept';
 $string['contribactions'] = 'Contributed translation actions';
@@ -99,10 +103,32 @@ $string['emailreviewbody'] = 'Language pack maintainer {$a->assignee} started a 
 Visit {$a->url} for more details.';
 $string['emailreviewsubject'] = '[AMOS contribution] Review started';
 $string['err_exception'] = 'Error: {$a}';
-$string['err_invalidlangcode'] = 'Invalid error code';
+$string['err_invalidlangcode'] = 'Invalid language code';
 $string['err_parser'] = 'Parsing error: {$a}';
+$string['filtercmp'] = 'Components';
+$string['filtercmp_desc'] = 'Show strings of these components';
+$string['filterlng'] = 'Languages';
+$string['filterlng_desc'] = 'Display translations in these languages';
+$string['filtermis'] = 'Miscellaneous';
+$string['filtermis_desc'] = 'Additional conditions on strings to display';
+$string['filtermisfglo'] = 'greylisted strings only';
+$string['filtermisfhlp'] = 'help strings only';
+$string['filtermisfmis'] = 'missing and outdated strings only';
+$string['filtermisfstg'] = 'staged strings only';
+$string['filtermisfwog'] = 'without greylisted strings';
+$string['filtersid'] = 'String identifier';
+$string['filtersid_desc'] = 'The key in the array of strings';
+$string['filtertxt'] = 'Substring';
+$string['filtertxt_desc'] = 'String must contain given text';
+$string['filtertxtcasesensitive'] = 'case-sensitive';
+$string['filtertxtregex'] = 'regex';
+$string['filterver'] = 'Versions';
+$string['filterver_desc'] = 'Show strings from these Moodle versions';
+$string['found'] = 'Found: {$a->found} &nbsp;&nbsp;&nbsp; Missing: {$a->missing} ({$a->missingonpage})';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
+$string['gotofirst'] = 'go to the first page';
+$string['gotoprevious'] = 'go to the previous page';
 $string['greylisted'] = 'Greylisted strings';
 $string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\'. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
 
@@ -146,7 +172,9 @@ $string['mergestrings_help'] = 'This will pick and stage all strings from the so
 $string['mergestrings_link'] = 'local/amos/merge';
 $string['newlanguage'] = 'New language';
 $string['nofiletoimport'] = 'Please provide a file to import from.';
-$string['nostringsfound'] = 'No strings found, please modify the filter';
+$string['nologsfound'] = 'No strings found, please modify filters';
+$string['nostringsfound'] = 'No strings found';
+$string['nostringsfoundonpage'] = 'No strings found on page {$a}';
 $string['nostringtoimport'] = 'No valid string found in the file. Make sure the file has correct filename and is properly formatted.';
 $string['nothingtomerge'] = 'The source branch does not contain any new strings that would be missing at the target branch. Nothing to merge.';
 $string['numofcommitsabovelimit'] = 'Found {$a->found} commits matching the commit filter, using {$a->limit} most recent';
@@ -174,7 +202,8 @@ $string['pluginclassnonstandard'] = 'Non-standard plugins';
 $string['pluginclassstandard'] = 'Standard plugins';
 $string['pluginname'] = 'AMOS';
 $string['presetcommitmessage'] = 'Contributed translation #{$a->id} by {$a->author}';
-$string['regex'] = 'regex';
+$string['privileges'] = 'Your privileges';
+$string['privilegesnone'] = 'You have read-only access to public information.';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';
@@ -186,8 +215,11 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Rebase - unstage all translations that either do not modify the current translation or are older than the most recent translation in the repository. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
 $string['stageedit'] = 'Edit staged strings';
+$string['stagelang'] = 'Lang';
+$string['stageoriginal'] = 'Original';
 $string['stageprune'] = 'Prune non-committable';
 $string['stagerebase'] = 'Rebase';
+$string['stagestring'] = 'String';
 $string['stagestringsnocommit'] = 'There are {$a->staged} staged strings';
 $string['stagestringsnone'] = 'There are no staged strings';
 $string['stagestringssome'] = 'There are {$a->staged} staged strings, {$a->committable} of them can be committed';
@@ -209,17 +241,26 @@ $string['stashdrop'] = 'Drop';
 $string['stashes'] = 'Stashes';
 $string['stashlanguages'] = '<span>Languages:</span> {$a}';
 $string['stashpop'] = 'Pop';
+$string['stashpush'] = 'Push all staged strings into a new stash';
 $string['stashstrings'] = '<span>Number of strings:</span> {$a}';
 $string['stashsubmit'] = 'Submit to maintainers';
 $string['stashsubmitdetails'] = 'Submitting details';
 $string['stashsubmitmessage'] = 'Message';
 $string['stashsubmitsubject'] = 'Subject';
+$string['stashtitle'] = 'Stash title';
+$string['stashtitledefault'] = 'WIP - {$a->time}';
 $string['stringhistory'] = 'History';
 $string['strings'] = 'Strings';
 $string['submitting'] = 'Submitting a contribution';
 $string['submitting_help'] = 'This will send translated strings to official language maintainers. They will be able to apply your work into their stage, review it and eventually commit. Please provide a message for them describing your work and why you would like to see your contribution included.';
 $string['targetversion'] = 'Target version';
 $string['translatortool'] = 'Translator';
+$string['translatorstring'] = 'String';
+$string['translatorstring_help'] = 'Displays Moodle branch (version), the string identifier and the component this string belongs to.';
+$string['translatororiginal'] = 'Original';
+$string['translatororiginal_help'] = 'Displays the English original of the string. Below it, you can see a link to translate the string automatically via Google Translator (if the language is supported and your browser has Javascript enabled). Also, you may find some additional information attached, such as if the string contains a placeholder.';
+$string['translatorlang'] = 'Lang';
+$string['translatorlang_help'] = 'Displays the code of the language to translate the string to. Click the <strong>+-</strong> link to display the timeline history of the string.';
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 
@@ -228,4 +269,7 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Red - the string is not translated and you are allowed to translate it and commit the translation.
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
+$string['typecontrib'] = 'Non-standard plugins';
+$string['typecore'] = 'Core subsystems';
+$string['typestandard'] = 'Standard plugins';
 $string['version'] = 'Version';
