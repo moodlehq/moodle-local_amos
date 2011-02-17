@@ -32,8 +32,8 @@ require_login(SITEID);
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/log.php');
-$PAGE->set_title('AMOS Log');
-$PAGE->set_heading('AMOS Log');
+$PAGE->set_title('AMOS ' . get_string('log', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('log', 'local_amos'));
 
 $output = $PAGE->get_renderer('local_amos');
 

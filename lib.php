@@ -40,7 +40,7 @@ function amos_extends_navigation(global_navigation $navigation) {
         $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'));
         $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'));
     }
-    $amos->add('Log', new moodle_url('/local/amos/log.php'));
+    $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'));
     if (has_capability('local/amos:manage', get_system_context())) {
         $admin = $amos->add(get_string('administration'));
         $admin->add(get_string('maintainers', 'local_amos'), new moodle_url('/local/amos/admin/translators.php'));

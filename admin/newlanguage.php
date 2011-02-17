@@ -32,8 +32,8 @@ require_capability('local/amos:manage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/newlanguage.php');
-$PAGE->set_title('AMOS ADMIN New language pack');
-$PAGE->set_heading('Add new language');
+$PAGE->set_title('AMOS ' . get_string('newlanguage', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('newlanguage', 'local_amos'));
 
 $form = new local_amos_newlanguage_form();
 

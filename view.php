@@ -35,8 +35,8 @@ require_capability('local/amos:stage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
-$PAGE->set_title('AMOS');
-$PAGE->set_heading('AMOS');
+$PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 if (empty($CFG->googleapikey)) {
     $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi'));
 } else {

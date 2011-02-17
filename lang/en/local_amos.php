@@ -144,6 +144,7 @@ All strings found in the file will be staged for the selected version and langua
 $string['importfile_link'] = 'local/amos/importfile';
 $string['language'] = 'Language';
 $string['languages'] = 'Languages';
+$string['log'] = 'Log';
 $string['logfilterbranch'] = 'Versions';
 $string['logfiltercommithash'] = 'git hash';
 $string['logfiltercommitmsg'] = 'Commit message contains';

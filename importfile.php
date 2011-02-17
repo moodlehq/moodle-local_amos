@@ -36,8 +36,8 @@ require_capability('local/amos:importfile', get_system_context());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/importfile.php');
 navigation_node::override_active_url(new moodle_url('/local/amos/stage.php'));
-$PAGE->set_title('AMOS');
-$PAGE->set_heading('AMOS');
+$PAGE->set_title('AMOS ' . get_string('importfile', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('importfile', 'local_amos'));
 
 $importform = new local_amos_importfile_form(null, local_amos_importfile_options());
 

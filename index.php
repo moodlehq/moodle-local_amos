@@ -30,8 +30,8 @@ require_login(SITEID, false);
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/index.php');
-$PAGE->set_title('AMOS Home page');
-$PAGE->set_heading('AMOS Home page');
+$PAGE->set_title('AMOS');
+$PAGE->set_heading('AMOS');
 
 $output = $PAGE->get_renderer('local_amos');
 

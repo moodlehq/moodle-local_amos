@@ -41,8 +41,8 @@ require_capability('local/amos:stage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
-$PAGE->set_title('AMOS stage');
-$PAGE->set_heading('AMOS stage');
+$PAGE->set_title('AMOS ' . get_string('stage', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->requires->js_init_call('M.local_amos.init_stage');
 $PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 

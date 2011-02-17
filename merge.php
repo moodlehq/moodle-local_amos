@@ -35,8 +35,8 @@ require_capability('local/amos:commit', get_system_context()); // for langpack m
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/merge.php');
 navigation_node::override_active_url(new moodle_url('/local/amos/stage.php'));
-$PAGE->set_title('AMOS');
-$PAGE->set_heading('AMOS');
+$PAGE->set_title('AMOS ' . get_string('merge', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('merge', 'local_amos'));
 
 $mergeform = new local_amos_merge_form(null, local_amos_merge_options());
 

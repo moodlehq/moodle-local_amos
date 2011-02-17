@@ -41,8 +41,8 @@ require_capability('local/amos:stash', get_system_context());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stash.php');
 navigation_node::override_active_url(new moodle_url('/local/amos/stash.php'));
-$PAGE->set_title('AMOS stashes');
-$PAGE->set_heading('AMOS stashes');
+$PAGE->set_title('AMOS ' . get_string('stashes', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('stashes', 'local_amos'));
 $PAGE->requires->yui_module('moodle-local_amos-stash', 'M.local_amos.init_stash');
 $PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 

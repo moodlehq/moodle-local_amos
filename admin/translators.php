@@ -34,8 +34,8 @@ require_capability('local/amos:manage', get_system_context());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/translators.php');
-$PAGE->set_title('AMOS ADMIN Translators');
-$PAGE->set_heading('Translators');
+$PAGE->set_title('AMOS ' . get_string('maintainers', 'local_amos'));
+$PAGE->set_heading('AMOS ' . get_string('maintainers', 'local_amos'));
 
 // available translators
 $available = get_users_by_capability(get_system_context(), 'local/amos:commit',
