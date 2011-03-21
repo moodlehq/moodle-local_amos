@@ -71,11 +71,29 @@ $component = mlang_component::from_phpfile($filepath, $options['lang'], $version
 
 $stage = new mlang_stage();
 $stage->add($component);
-$stage->rebase();
+$stage->rebase(null, true, $options['timemodified']);
 
 if (!$stage->has_component()) {
     echo 'No strings found (after rebase)' . PHP_EOL;
     exit(4);
+}
+
+foreach ($stage->get_iterator() as $component) {
+    foreach ($component->get_iterator() as $string) {
+        if ($string->deleted) {
+            $sign = '-';
+        } else {
+            $sign = '+';
+        }
+        echo $sign . ' ' . $string->id . PHP_EOL;
+    }
+}
+
+echo PHP_EOL;
+$continue = cli_input('Continue? [y/n]', 'n', array('y', 'n'));
+if ($continue !== 'y') {
+    echo 'Import aborted' . PHP_EOL;
+    exit(5);
 }
 
 $meta = array('source' => 'import', 'userinfo' => $options['userinfo']);
