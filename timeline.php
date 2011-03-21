@@ -33,7 +33,7 @@ require_login(SITEID, false);
 require_capability('local/amos:stage', get_system_context());
 
 $component  = required_param('component', PARAM_ALPHANUMEXT);
-$lang       = required_param('lang', PARAM_ALPHANUMEXT);
+$language   = required_param('language', PARAM_ALPHANUMEXT);
 $branch     = required_param('branch', PARAM_INT);
 $stringid   = required_param('stringid', PARAM_STRINGID);
 $ajax       = optional_param('ajax', 0, PARAM_BOOL);
@@ -55,7 +55,7 @@ $sql = "SELECT s.id, s.lang, s.text, s.timemodified, s.deleted,
          WHERE branch = ? AND (lang = 'en' OR lang = ?) AND component = ? AND stringid = ?
       ORDER BY s.timemodified DESC, s.id DESC";
 
-$params = array($branch, $lang, $component, $stringid);
+$params = array($branch, $language, $component, $stringid);
 
 $results = $DB->get_records_sql($sql, $params);
 

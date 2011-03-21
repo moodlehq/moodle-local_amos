@@ -282,7 +282,7 @@ class local_amos_renderer extends plugin_renderer_base {
             // the language in which the original is displayed and the timeline link
             $url = new moodle_url('/local/amos/timeline.php', array(
                 'component' => $string->component,
-                'lang'      => $string->language,
+                'language'  => $string->language,
                 'branch'    => $string->branchcode,
                 'stringid'  => $string->stringid));
             $text  = html_writer::tag('span', '+', array('class'=>'plus'));
