@@ -1352,14 +1352,14 @@ class mlang_version {
      */
     protected static function versions_info() {
         return array(
-//            array(
-//                'code'          => self::MOODLE_21,
-//                'label'         => '2.1',
-//                'branch'        => 'MOODLE_21_STABLE',
-//                'dir'           => '2.1',
-//                'translatable'  => false,
-//                'current'       => false,
-//            ),
+            array(
+                'code'          => self::MOODLE_21,
+                'label'         => '2.1dev',
+                'branch'        => 'MOODLE_21_STABLE',
+                'dir'           => '2.1',
+                'translatable'  => true,
+                'current'       => false,
+            ),
             array(
                 'code'          => self::MOODLE_20,
                 'label'         => '2.0',

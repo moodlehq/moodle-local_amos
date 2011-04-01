@@ -234,7 +234,7 @@ $stage = new mlang_stage();
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
     echo "*****************************************\n";
     echo "BRANCH {$branch}\n";
-    if ($branch == 'MOODLE_20_STABLE') {
+    if ($branch == 'MOODLE_21_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
