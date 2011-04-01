@@ -65,9 +65,14 @@ M.local_amos.init_translator = function(Y) {
     // add select All / None links to the filter components selector field
     var fcmp        = filter.one('#amosfilter_fcmp');
     var fcmpactions = filter.one('#amosfilter_fcmp_actions');
-    var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_all">All</a>' +
+    var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_allstandard">Standard</a>' +
+                      ' / <a href="#" id="amosfilter_fcmp_actions_all">All</a>' +
                       ' / <a href="#" id="amosfilter_fcmp_actions_none">None</a>';
     fcmpactions.set('innerHTML', fcmphtml);
+    var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
+    fcmpselectallstandard.on('click', function(e) {
+        fcmp.all('optgroup:first-child option, optgroup:first-child + optgroup option').set('selected', true);
+    });
     var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
     fcmpselectall.on('click', function(e) { fcmp.all('option').set('selected', true); });
     var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
