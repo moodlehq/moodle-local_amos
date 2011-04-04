@@ -76,7 +76,7 @@ foreach ($tree as $vercode => $languages) {
                         $current = $other->get_string($string->id);
                         if (!$current->deleted) {
                             $current->deleted = true;
-                            $current->timestamp = null;
+                            $current->timemodified = null;
                             $stage->add($other);
                         }
                     }
