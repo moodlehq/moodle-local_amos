@@ -203,6 +203,7 @@ $string['pluginclassnonstandard'] = 'Non-standard plugins';
 $string['pluginclassstandard'] = 'Standard plugins';
 $string['pluginname'] = 'AMOS';
 $string['presetcommitmessage'] = 'Contributed translation #{$a->id} by {$a->author}';
+$string['presetcommitmessage2'] = 'Merged missing strings from {$a->source} to {$a->target} branch';
 $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
 $string['requestactions'] = 'Action';

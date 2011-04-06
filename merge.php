@@ -82,4 +82,14 @@ if (!$stage->has_component()) {
     notice(get_string('nothingtomerge', 'local_amos'), new moodle_url('/local/amos/stage.php'));
 }
 
+if (!empty($sourceversion) and !empty($targetversion)) {
+    if (!isset($SESSION->local_amos)) {
+        $SESSION->local_amos = new stdClass();
+    }
+    $a          = new stdClass();
+    $a->source  = $sourceversion->label;
+    $a->target  = $targetversion->label;
+    $SESSION->local_amos->presetcommitmessage = get_string('presetcommitmessage2', 'local_amos', $a);
+}
+
 redirect(new moodle_url('/local/amos/stage.php'));
