@@ -226,6 +226,7 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_18_STABLE',
     'MOODLE_19_STABLE',
     'MOODLE_20_STABLE',
+    'MOODLE_21_STABLE',
 );
 
 $plugintypes = get_plugin_types(false);
