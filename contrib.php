@@ -373,6 +373,7 @@ if ($id) {
         $options->itemid  = $contribution->id;
         $options->showcount = true;
         $options->component = 'local_amos';
+        $options->autostart = true;
         $commentmanager = new comment($options);
         echo $output->container($commentmanager->output(), 'commentswrapper');
     }
