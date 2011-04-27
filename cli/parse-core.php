@@ -112,9 +112,19 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
  * than a real function.
  */
 function amos_parse_core_commit() {
-    global $stage, $realmodified, $timemodified, $commitmsg, $committer, $committeremail, $commithash, $version, $fullcommitmsg, $startatlock;
+    global $stage, $realmodified, $timemodified, $commitmsg, $committer, $committeremail, $commithash,
+           $version, $fullcommitmsg, $startatlock, $affected;
 
     $stage->rebase($timemodified, true, $timemodified);
+    // make sure that the strings to be removed are really affected by the commit
+    foreach ($stage->get_iterator() as $component) {
+        foreach ($component->get_iterator() as $string) {
+            if (!isset($affected[$component->name][$string->id])) {
+                $component->unlink_string($string->id);
+            }
+        }
+    }
+
     amos_core_commit_notify($stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg);
     $stage->commit($commitmsg, array(
         'source' => 'git',
@@ -249,6 +259,8 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         if (!empty($startat)) {
             $startat = '^' . $startat . '^';
         }
+    } else {
+        $startat = '^' . AMOS_REPO_MOODLE_ROOT . '^';
     }
 
     // XXX if the reply of all AMOS scripts is needed (for example during the initial fetch of the strings),
@@ -272,6 +284,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
 
     $commithash = '';
     $committime = '';
+    $affected   = array();
     foreach ($gitout as $line) {
         $line = trim($line);
         if (empty($line)) {
@@ -285,6 +298,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             $commithash   = substr($line, 7, 40);
             $committime   = substr($line, 58);      // the original git commit's timestamp
             $timemodified = time();                 // when the commit was processed by AMOS
+            $affected     = array();                // explicit list of strings affected by the commit
             continue;
         }
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
@@ -294,6 +308,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $parts = explode("\t", $line);
         $changetype = substr($parts[0], -1);    // A (added new file), M (modified), D (deleted)
         $file = $parts[1];
+        $componentname = mlang_component::name_from_filename($file);
         // series of checks that the file is proper language pack
         if (($version->code >= mlang_version::MOODLE_20) and ($committime >= 1270884296)) {
             // since Petr's commit 3a915b066765efc3cc166ae8186405f67c04ec2c
@@ -325,7 +340,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
         if (substr($file, 0, strlen("lang/$enfolder/")) !== "lang/$enfolder/") {
             // this is to avoid things like lang files inside simpletest, wrong langpack filenames etc.
-            list($plugintype, $pluginname) = normalize_component(mlang_component::name_from_filename($file));
+            list($plugintype, $pluginname) = normalize_component($componentname);
             if (!isset($plugintypes[$plugintype])) {
                 // unknown plugin type - skip the lang file
                 echo "SKIP invalid plugintype: $file\n";
@@ -361,7 +376,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
 
         if ($changetype == 'D') {
             // whole file removal
-            $component = mlang_component::from_snapshot(mlang_component::name_from_filename($file), 'en', $version, $timemodified);
+            $component = mlang_component::from_snapshot($componentname, 'en', $version, $timemodified);
             foreach ($component->get_iterator() as $string) {
                 $string->deleted = true;
                 $string->timemodified = $timemodified;
@@ -370,6 +385,14 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             $component->clear();
             unset($component);
             continue;
+        }
+
+        // get the list of strings affected by the commit
+        $gitcmd = AMOS_PATH_GIT . " log -1 -p --format=format: " . $commithash . ' ' . $file;
+        $diff = array();
+        exec($gitcmd, $diff);
+        foreach (mlang_tools::get_affected_strings($diff) as $stringid) {
+            $affected[$componentname][$stringid] = true;
         }
 
         // dump the given revision of the file to a temporary area
@@ -393,8 +416,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         } else {
             $checkoutformat = 1;
         }
-        $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified,
-                                                   mlang_component::name_from_filename($file), $checkoutformat);
+        $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified, $componentname, $checkoutformat);
         $stage->add($component);
         $component->clear();
         unset($component);

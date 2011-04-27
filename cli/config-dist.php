@@ -31,6 +31,11 @@ defined('MOODLE_INTERNAL') or die();
 define('AMOS_REPO_MOODLE', $CFG->dataroot . '/amos/repos/moodle');
 
 /**
+ * Default start-at commit used mainly during the development
+ */
+define('AMOS_REPO_MOODLE_ROOT', '2e35f0aa005d07298b575f77f7cde56149103fe0');
+
+/**
  * Full path to the git clone of legacy language translation files.
  * User by parse-lang.php to get the history of strings into database.
  */

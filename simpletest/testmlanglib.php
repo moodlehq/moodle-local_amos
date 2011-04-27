@@ -924,6 +924,16 @@ AMOS END';
         $this->assertEqual('First {$a}', $component20->get_string('first')->text);
     }
 
+    public function test_get_affected_strings() {
+        $diff = file(dirname(__FILE__) . '/parserdata002.txt');
+        $affected = mlang_tools::get_affected_strings($diff);
+        $this->assertEqual(count($affected), 4);
+        $this->assertTrue(in_array('configdefaultuserroleid', $affected));
+        $this->assertTrue(in_array('confignodefaultuserrolelists', $affected));
+        $this->assertTrue(in_array('nodefaultuserrolelists', $affected));
+        $this->assertTrue(in_array('nolangupdateneeded', $affected));
+    }
+
     public function test_stash_push() {
 
     }

@@ -1706,6 +1706,25 @@ class mlang_tools {
         }
     }
 
+    /**
+     * Given an array of lines of git-diff output, get the list of affected strings
+     *
+     * @param array $diff array of lines as obtained from exec() call
+     * @return array list of string identifiers affected by that diff
+     */
+    public static function get_affected_strings(array $diff) {
+
+        $affected = array();
+        $pattern  = '/^[+-]\$string\[\'(\w+)\'\]\s*=/';
+        foreach ($diff as $line) {
+            if (preg_match($pattern, $line, $matches)) {
+                $affected[$matches[1]] = true;
+            }
+        }
+
+        return array_keys($affected);
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Internal implementation
     ////////////////////////////////////////////////////////////////////////////
