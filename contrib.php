@@ -279,7 +279,9 @@ if ($reject) {
 }
 
 $output = $PAGE->get_renderer('local_amos');
-comment::init();
+if (!empty($CFG->usecomments)) {
+    comment::init();
+}
 
 // Output starts here
 echo $output->header();

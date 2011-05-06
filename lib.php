@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/// Navigation API /////////////////////////////////////////////////////////////
+
 /**
  * Puts AMOS into the global navigation tree.
  *
@@ -46,4 +48,57 @@ function amos_extends_navigation(global_navigation $navigation) {
         $admin->add(get_string('maintainers', 'local_amos'), new moodle_url('/local/amos/admin/translators.php'));
         $admin->add(get_string('newlanguage', 'local_amos'), new moodle_url('/local/amos/admin/newlanguage.php'));
     }
+}
+
+/// Comments API ///////////////////////////////////////////////////////////////
+
+/**
+ * Running addtional permission check on plugin, for example, plugins
+ * may have switch to turn on/off comments option, this callback will
+ * affect UI display, not like pluginname_comment_validate only throw
+ * exceptions.
+ * Capability check has been done in comment->check_permissions(), we
+ * don't need to do it again here.
+ *
+ * @param stdClass $commentparams the comment parameters
+ * @return array
+ */
+function amos_comment_permissions($commentparams) {
+    return array('post' => true, 'view' => true);
+}
+
+/**
+ * Validates comment parameters before performing other comments actions
+ *
+ * The passed params object contains properties:
+ * - context: context the context object
+ * - courseid: int course id
+ * - cm: stdClass course module object
+ * - commentarea: string comment area
+ * - itemid: int itemid
+ *
+ * @param stdClass $commentparams the comment parameters
+ * @return boolean
+ */
+function amos_comment_validate($commentparams) {
+    global $DB;
+
+    if ($commentparams->commentarea != 'amos_contribution') {
+        throw new comment_exception('invalidcommentarea');
+    }
+
+    $syscontext = get_system_context();
+    if ($syscontext->id != $commentparams->context->id) {
+        throw new comment_exception('invalidcontext');
+    }
+
+    if (!$DB->record_exists('amos_contributions', array('id' => $commentparams->itemid))) {
+        throw new comment_exception('invalidcommentitemid');
+    }
+
+    if (SITEID != $commentparams->courseid) {
+        throw new comment_exception('invalidcourseid');
+    }
+
+    return true;
 }
