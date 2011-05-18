@@ -54,8 +54,10 @@ M.local_amos.init_translator = function(Y) {
     // add select All / None links to the filter languages selector field
     var flng        = filter.one('#amosfilter_flng');
     var flngactions = filter.one('#amosfilter_flng_actions');
-    var flnghtml    = '<a href="#" id="amosfilter_flng_actions_all">All</a>' +
-                      ' / <a href="#" id="amosfilter_flng_actions_none">None</a>';
+    var flnghtml    = '<a href="#" id="amosfilter_flng_actions_all">' +
+                      M.util.get_string('languagesall', 'local_amos') + '</a>' +
+                      ' / <a href="#" id="amosfilter_flng_actions_none">' +
+                      M.util.get_string('languagesnone', 'local_amos') + '</a>';
     flngactions.set('innerHTML', flnghtml);
     var flngselectall = filter.one('#amosfilter_flng_actions_all');
     flngselectall.on('click', function(e) { flng.all('option').set('selected', true); });
@@ -65,9 +67,12 @@ M.local_amos.init_translator = function(Y) {
     // add select All / None links to the filter components selector field
     var fcmp        = filter.one('#amosfilter_fcmp');
     var fcmpactions = filter.one('#amosfilter_fcmp_actions');
-    var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_allstandard">Standard</a>' +
-                      ' / <a href="#" id="amosfilter_fcmp_actions_all">All</a>' +
-                      ' / <a href="#" id="amosfilter_fcmp_actions_none">None</a>';
+    var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_allstandard">' +
+                      M.util.get_string('componentsstandard', 'local_amos') + '</a>' +
+                      ' / <a href="#" id="amosfilter_fcmp_actions_all">' +
+                      M.util.get_string('componentsall', 'local_amos') + '</a>' +
+                      ' / <a href="#" id="amosfilter_fcmp_actions_none">' +
+                      M.util.get_string('componentsnone', 'local_amos') + '</a>';
     fcmpactions.set('innerHTML', fcmphtml);
     var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
     fcmpselectallstandard.on('click', function(e) {
