@@ -86,9 +86,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $optionsstandard = array();
         $optionscontrib = array();
         $installed = local_amos_installed_components();
+        $installed['plugin'] = 'core_plugin'; // hack
         foreach (mlang_tools::list_components() as $componentname => $undefined) {
             list($ctype, $cname) = normalize_component($componentname);
-            if ($ctype == 'core') {
+            if ($ctype == 'core' or $cname == 'plugin') {
                 $optionscore[$componentname] = $installed[$componentname];
             } elseif (isset($installed[$componentname])) {
                 $optionsstandard[$componentname] = $installed[$componentname];
@@ -255,6 +256,8 @@ class local_amos_renderer extends plugin_renderer_base {
             list($type, $plugin) = normalize_component($string->component);
             if ($type == 'core' and is_null($plugin)) {
                 $componentname = 'core';
+            } else if ($string->component == 'plugin') {
+                $componentname = 'core_plugin';
             } else {
                 $componentname = $type . '_' . $plugin;
             }
