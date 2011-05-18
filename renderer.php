@@ -184,7 +184,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => 'Save filter settings', 'class' => 'submit'));
+        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('savefilter', 'local_amos'), 'class' => 'submit'));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
@@ -438,12 +438,12 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         $table = html_writer::table($table);
 
-        $commitform  = html_writer::label('Commit message', 'commitmessage', false);
+        $commitform  = html_writer::label(get_string('commitmessage', 'local_amos'), 'commitmessage', false);
         $commitform .= html_writer::empty_tag('img', array('src' => $this->pix_url('req'), 'title' => 'Required', 'alt' => 'Required', 'class' => 'req'));
         $commitform .= html_writer::empty_tag('br');
         $commitform .= html_writer::tag('textarea', s($stage->presetmessage), array('id' => 'commitmessage', 'name' => 'message'));
         $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $button = html_writer::empty_tag('input', array('value' => 'Commit', 'type' => 'submit'));
+        $button = html_writer::empty_tag('input', array('value' => get_string('commitbutton', 'local_amos'), 'type' => 'submit'));
         $button = html_writer::tag('div', $button);
         $commitform = html_writer::tag('div', $commitform . $button);
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));

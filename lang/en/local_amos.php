@@ -34,6 +34,8 @@ $string['amos:importfile'] = 'Import strings from uploaded file';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
+$string['commitbutton'] = 'Commit';
+$string['commitmessage'] = 'Commit message';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['committableall'] = 'all languages';
@@ -214,6 +216,7 @@ $string['privilegesnone'] = 'You have read-only access to public information.';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';
+$string['savefilter'] = 'Save filter settings';
 $string['sourceversion'] = 'Source version';
 $string['stage'] = 'Stage';
 $string['stageactions'] = 'Stage actions';
