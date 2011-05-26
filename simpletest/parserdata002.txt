@@ -30,3 +30,4 @@ index 7c67ea9..6271297 100644
  $string['nochanges'] = 'No changes';
 +$string['nolangupdateneeded'] = 'All your language packs are up to date, no update is needed';
  $string['nomissingstrings'] = 'No missing strings';
++$string['mod/something:really_nasty-like0098187.this']      ='Valid';

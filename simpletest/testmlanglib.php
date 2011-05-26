@@ -927,11 +927,12 @@ AMOS END';
     public function test_get_affected_strings() {
         $diff = file(dirname(__FILE__) . '/parserdata002.txt');
         $affected = mlang_tools::get_affected_strings($diff);
-        $this->assertEqual(count($affected), 4);
+        $this->assertEqual(count($affected), 5);
         $this->assertTrue(in_array('configdefaultuserroleid', $affected));
         $this->assertTrue(in_array('confignodefaultuserrolelists', $affected));
         $this->assertTrue(in_array('nodefaultuserrolelists', $affected));
         $this->assertTrue(in_array('nolangupdateneeded', $affected));
+        $this->assertTrue(in_array('mod/something:really_nasty-like0098187.this', $affected));
     }
 
     public function test_stash_push() {
