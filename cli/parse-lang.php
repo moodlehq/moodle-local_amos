@@ -204,7 +204,7 @@ foreach ($gitout as $line) {
     $committer      = $commitinfo[0];
     $committeremail = $commitinfo[1];
     $timemodified   = $commitinfo[2];
-    $commitmsg      = iconv('UTF-8', 'UTF-8//IGNORE', $commitinfo[3]);
+    $commitmsg      = @iconv('UTF-8', 'UTF-8//IGNORE', $commitinfo[3]);
 
     if ($changetype == 'D') {
         // whole file removal - xxx what can be done? :-/
