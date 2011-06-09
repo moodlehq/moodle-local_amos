@@ -388,7 +388,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
 
         // get the list of strings affected by the commit
-        $gitcmd = AMOS_PATH_GIT . " log -1 -p --format=format: " . $commithash . ' ' . $file;
+        $gitcmd = AMOS_PATH_GIT . " log -1 -p --format=format: " . $commithash . ' -- ' . $file;
         $diff = array();
         exec($gitcmd, $diff);
         foreach (mlang_tools::get_affected_strings($diff) as $stringid) {
