@@ -34,6 +34,7 @@ $starttime = microtime();
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 /**
@@ -77,6 +78,8 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
     $discussion->message .= 'http://git.moodle.org/gw?p=moodle.git;a=commit;h='.$commithash . "\n";
     $discussion->message .= 'http://github.com/moodle/moodle/commit/'.$commithash . "\n\n";
 
+    $standardplugins = local_amos_standard_plugins();
+
     foreach ($stage->get_iterator() as $component) {
         foreach ($component->get_iterator() as $string) {
             if ($string->deleted) {
@@ -85,11 +88,10 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
                 $sign = '+  ';
             }
 
-            list($type, $plugin) = normalize_component($component->name);
-            if ($type == 'core' and is_null($plugin)) {
-                $name = 'core';
+            if (isset($standardplugins[$component->version->label][$component->name])) {
+                $name = $standardplugins[$component->version->label][$component->name];
             } else {
-                $name = $type . '_' . $plugin;
+                $name = $component->name;
             }
 
             $discussion->message .= $sign . $component->version->label . ' en [' . $string->id . ',' . $name . "]\n";
@@ -239,6 +241,7 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_21_STABLE',
 );
 
+$standardplugins = local_amos_standard_plugins();
 $plugintypes = get_plugin_types(false);
 $stage = new mlang_stage();
 
@@ -338,24 +341,14 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             echo "SKIP installer bootstrap strings\n";
             continue;
         }
-        if (substr($file, 0, strlen("lang/$enfolder/")) !== "lang/$enfolder/") {
-            // this is to avoid things like lang files inside simpletest, wrong langpack filenames etc.
-            list($plugintype, $pluginname) = normalize_component($componentname);
-            if (!isset($plugintypes[$plugintype])) {
-                // unknown plugin type - skip the lang file
-                echo "SKIP invalid plugintype: $file\n";
-                continue;
-            }
-            if ($plugintype == 'mod') {
-                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . "/lang/$enfolder/" . $pluginname . '.php';
-            } else {
-                $validpath = $plugintypes[$plugintype] . '/' . $pluginname . "/lang/$enfolder/" . $plugintype . '_' . $pluginname . '.php';
-            }
-            if ($file !== $validpath) {
-                echo "SKIP unsupported string file location: $file\n";
+        if (isset($standardplugins[$version->label])) {
+            // for 2.0 and higher we can make sure that we parse only standard component
+            if (!isset($standardplugins[$version->label][$componentname])) {
+                echo "SKIP non-standard component on this branch ($componentname)\n";
                 continue;
             }
         }
+
         $memprev = $mem;
         $mem = memory_get_usage();
         $memdiff = $memprev < $mem ? '+' : '-';

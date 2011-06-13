@@ -85,21 +85,24 @@ class local_amos_renderer extends plugin_renderer_base {
         $optionscore = array();
         $optionsstandard = array();
         $optionscontrib = array();
-        $installed = local_amos_installed_components();
-        $installed['plugin'] = 'core_plugin'; // hack
+        $standard = array();
+        foreach (local_amos_standard_plugins() as $plugins) {
+            $standard = array_merge($standard, $plugins);
+        }
         foreach (mlang_tools::list_components() as $componentname => $undefined) {
-            list($ctype, $cname) = normalize_component($componentname);
-            if ($ctype == 'core' or $cname == 'plugin') {
-                $optionscore[$componentname] = $installed[$componentname];
-            } elseif (isset($installed[$componentname])) {
-                $optionsstandard[$componentname] = $installed[$componentname];
+            if (isset($standard[$componentname])) {
+                if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
+                    $optionscore[$componentname] = $standard[$componentname];
+                } else {
+                    $optionsstandard[$componentname] = $standard[$componentname];
+                }
             } else {
                 $optionscontrib[$componentname] = $componentname;
             }
         }
         asort($optionscore);
         asort($optionsstandard);
-        ksort($optionscontrib);
+        asort($optionscontrib);
         $options = array(
             array(get_string('typecore', 'local_amos') => $optionscore),
             array(get_string('typestandard', 'local_amos') => $optionsstandard),
@@ -250,16 +253,17 @@ class local_amos_renderer extends plugin_renderer_base {
         }
 
         $missing = 0;
+        $standard = array();
+        foreach (local_amos_standard_plugins() as $plugins) {
+            $standard = array_merge($standard, $plugins);
+        }
         foreach ($translator->strings as $string) {
             $cells = array();
             // string identification
-            list($type, $plugin) = normalize_component($string->component);
-            if ($type == 'core' and is_null($plugin)) {
-                $componentname = 'core';
-            } else if ($string->component == 'plugin') {
-                $componentname = 'core_plugin';
+            if (isset($standard[$string->component])) {
+                $componentname = $standard[$string->component];
             } else {
-                $componentname = $type . '_' . $plugin;
+                $componentname = $string->component;
             }
             $stringinfo = html_writer::tag('span', $string->branch, array('class'=>'version'));
             $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
@@ -398,15 +402,18 @@ class local_amos_renderer extends plugin_renderer_base {
                 get_string('stagetranslation', 'local_amos') . $this->help_icon('stagetranslation', 'local_amos'));
         $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
 
+        $standard = array();
+        foreach (local_amos_standard_plugins() as $plugins) {
+            $standard = array_merge($standard, $plugins);
+        }
         $committable = 0;
         foreach ($stage->strings as $string) {
             $cells = array();
             // string identification
-            list($type, $plugin) = normalize_component($string->component);
-            if ($type == 'core' and is_null($plugin)) {
-                $componentname = 'core';
+            if (isset($standard[$string->component])) {
+                $componentname = $standard[$string->component];
             } else {
-                $componentname = $type . '_' . $plugin;
+                $componentname = $string->component;
             }
             $stringinfo = html_writer::tag('span', $string->version, array('class'=>'version'));
             $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
@@ -591,6 +598,11 @@ class local_amos_renderer extends plugin_renderer_base {
         $a = (object)array('strings' => $log->numofstrings, 'commits' => count($log->commits));
         $output .= $this->heading(get_string('numofmatchingstrings', 'local_amos', $a));
 
+        $standard = array();
+        foreach (local_amos_standard_plugins() as $plugins) {
+            $standard = array_merge($standard, $plugins);
+        }
+
         foreach ($log->commits as $commit) {
             $o  = '';
             $o .= "Date:      " . self::commit_datetime($commit->timecommitted) . "\n";
@@ -609,11 +621,10 @@ class local_amos_renderer extends plugin_renderer_base {
                 } else {
                     $o .= "+ ";
                 }
-                list($type, $plugin) = normalize_component($string->component);
-                if ($type == 'core' and is_null($plugin)) {
-                    $component = 'core';
+                if (isset($standard[$string->component])) {
+                    $component = $standard[$string->component];
                 } else {
-                    $component = $type . '_' . $plugin;
+                    $component = $string->component;
                 }
                 $o .= sprintf('%4s', $string->branch) . ' ';
                 $o .= sprintf('%-8s', $string->lang) . ' ';

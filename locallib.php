@@ -982,14 +982,13 @@ class local_amos_index_page implements renderable {
         $this->packinfo = fullclone($packinfo);
         $this->timemodified = time();
         $this->percents = array('0' => 0, '40' => 0, '60' => 0, '80' => 0); // percents => number of langpacks
-        // get the number of strings for installed plugins
-        // only the installed plugins are taken into statistics calculation
-        $installed = local_amos_installed_components(); // todo pass $version here and the function will
-                                                        // get the list via MNet system RPC call to a remote host
+        // get the number of strings for standard plugins
+        // only the standard plugins are taken into statistics calculation
+        $standard = local_amos_standard_plugins();
         $english = array(); // holds the number of English strings per component
         $nontranslatable = array(); // holds the number of strings per component that can not be translated via AMOS
                                     // and therefore we should consider them as translated when calculating the ratio
-        foreach ($installed as $componentname => $unused) {
+        foreach ($standard[$this->version->label] as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
             $english[$componentname] = $component->get_number_of_strings();
             $this->totalenglish += $english[$componentname];
@@ -1025,7 +1024,7 @@ class local_amos_index_page implements renderable {
                     if (!empty($nontranslatable[$component])) {
                         $translated += $nontranslatable[$component];
                     }
-                    if (isset($installed[$component])) {
+                    if (isset($standard[$this->version->label][$component])) {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
                 }
@@ -1227,35 +1226,30 @@ class local_amos_contribution implements renderable {
 }
 
 /**
- * Returns a list of all components installed on the server
+ * Returns the list of standard components
  *
- * All returned items can be used for get_string() calls. The components installed
- * at the AMOS server are considered as "standard" for the purpose of translation
- * statistics calculation.
- *
- * @return array (string)legacyname => (string)frankenstylename
+ * @return array (string)version => (string)legacyname => (string)frankenstylename
  */
-function local_amos_installed_components() {
+function local_amos_standard_plugins() {
+    global $CFG;
+    static $list = null;
 
-    $list['moodle'] = 'core';
-
-    $coresubsystems = get_core_subsystems();
-    ksort($coresubsystems); // should be but just in case
-    foreach ($coresubsystems as $name => $location) {
-        $list[$name] = 'core_'.$name;
-    }
-
-    $plugintypes = get_plugin_types();
-    foreach ($plugintypes as $type => $location) {
-        $pluginlist = get_plugin_list($type);
-        foreach ($pluginlist as $name => $ununsed) {
-            if ($type == 'mod') {
-                if (array_key_exists($name, $list)) {
-                    throw new Exception('Activity module and core subsystem name collision');
+    if (is_null($list)) {
+        $xml  = simplexml_load_file($CFG->dirroot.'/local/amos/plugins.xml');
+        foreach ($xml->moodle as $moodle) {
+            $version = (string)$moodle['version'];
+            $list[$version] = array();
+            $list[$version]['moodle'] = 'core';
+            foreach ($moodle->plugins as $plugins) {
+                $type = (string)$plugins['type'];
+                foreach ($plugins as $plugin) {
+                    $name = (string)$plugin;
+                    if ($type == 'core' or $type == 'mod') {
+                        $list[$version][$name] = "{$type}_{$name}";
+                    } else {
+                        $list[$version]["{$type}_{$name}"] = "{$type}_{$name}";
+                    }
                 }
-                $list[$name] = $type.'_'.$name;
-            } else {
-                $list[$type.'_'.$name] = $type.'_'.$name;
             }
         }
     }

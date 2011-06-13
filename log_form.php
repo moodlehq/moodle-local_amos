@@ -109,20 +109,24 @@ class local_amos_log_form extends moodleform {
         $optionscore = array();
         $optionsstandard = array();
         $optionscontrib = array();
-        $installed = local_amos_installed_components();
+        $standard = array();
+        foreach (local_amos_standard_plugins() as $plugins) {
+            $standard = array_merge($standard, $plugins);
+        }
         foreach (mlang_tools::list_components() as $componentname => $undefined) {
-            list($ctype, $cname) = normalize_component($componentname);
-            if ($ctype == 'core') {
-                $optionscore[$componentname] = $installed[$componentname];
-            } elseif (isset($installed[$componentname])) {
-                $optionsstandard[$componentname] = $installed[$componentname];
+            if (isset($standard[$componentname])) {
+                if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
+                    $optionscore[$componentname] = $standard[$componentname];
+                } else {
+                    $optionsstandard[$componentname] = $standard[$componentname];
+                }
             } else {
                 $optionscontrib[$componentname] = $componentname;
             }
         }
         asort($optionscore);
         asort($optionsstandard);
-        ksort($optionscontrib);
+        asort($optionscontrib);
         $options = array(
                 get_string('pluginclasscore', 'local_amos') => $optionscore,
                 get_string('pluginclassstandard', 'local_amos') => $optionsstandard,

@@ -462,6 +462,10 @@ EOF
         } else {
             // Moodle 2.x
             if ($treeish) {
+                debugging('The method get_phpfile_location() may produce wrong results as
+                    it is unable to differentiate core plugins from activity modules.
+                    Using normalize_component() is not reliable much because it depends
+                    on the site version and may be wrong for older/newer versions');
                 list($type, $plugin) = normalize_component($this->name);
                 if ($type === 'core') {
                     return 'lang/' . $this->lang . '/' . $this->name . '.php';
@@ -1354,7 +1358,7 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_21,
-                'label'         => '2.1dev',
+                'label'         => '2.1',
                 'branch'        => 'MOODLE_21_STABLE',
                 'dir'           => '2.1',
                 'translatable'  => true,

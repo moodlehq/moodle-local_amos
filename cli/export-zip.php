@@ -33,12 +33,13 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 // Let us get an information about existing components
+list($branchsql, $params) = $DB->get_in_or_equal(array(mlang_version::MOODLE_20, mlang_version::MOODLE_21));
 $sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
           FROM {amos_repository}
-         WHERE deleted=0 and branch=?
+         WHERE deleted=0 and branch $branchsql
       GROUP BY branch,lang,component
       ORDER BY branch,lang,component";
-$rs = $DB->get_recordset_sql($sql, array(mlang_version::MOODLE_20));
+$rs = $DB->get_recordset_sql($sql, $params);
 $tree = array();    // [branch][language][component] => numofstrings
 foreach ($rs as $record) {
     $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
@@ -53,7 +54,9 @@ umask(0022);
 
 // prepare the final directory to be rsynced with download.moodle.org
 if (!is_dir(AMOS_EXPORT_ZIP_DIR)) {
-    mkdir(AMOS_EXPORT_ZIP_DIR, 0755);
+    if (!mkdir(AMOS_EXPORT_ZIP_DIR, 0755)) {
+        throw new moodle_exception('unable_to_create_export_directory');
+    }
 }
 
 // cleanup a temporary area where new ZIP files will be generated and their MD5 calculated
@@ -62,13 +65,14 @@ fulldelete($CFG->dataroot.'/amos/temp/export-zip');
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     $packinfo = array(); // holds MD5 and timestamps of newly generated ZIP packs
-    $numoftranslated = 0; // the number of lang packs with at least 20% translated strings
     foreach ($languages as $langcode => $components) {
         /*if ($langcode == 'en') {
             // do not export English strings
             continue;
         }*/
-        mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true);
+        if (!mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true)) {
+            throw new moodle_exception('unable_to_create_export_version_directory');
+        }
         $zipfiles = array();
         $packinfo[$langcode]['modified'] = 0; // timestamp of the most recently modified component in the pack
         $packinfo[$langcode]['numofstrings'] = array(); // number of translated strings, per-component
