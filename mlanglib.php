@@ -1284,6 +1284,9 @@ class mlang_version {
     /** @var string the name of the corresponding CVS/git branch */
     public $branch;
 
+    /** @var string the name of the directory under http://download.moodle.org/langpack/ */
+    public $dir;
+
     /** @var bool allow translations of strings on this branch? */
     public $translatable;
 
