@@ -462,17 +462,17 @@ EOF
         } else {
             // Moodle 2.x
             if ($treeish) {
-                debugging('The method get_phpfile_location() may produce wrong results as
-                    it is unable to differentiate core plugins from activity modules.
-                    Using normalize_component() is not reliable much because it depends
-                    on the site version and may be wrong for older/newer versions');
+                debugging('The method get_phpfile_location() may produce wrong results as '.
+                    'it is unable to differentiate core plugins from activity modules. '.
+                    'Using normalize_component() is not reliable much because it depends '.
+                    'on the site version and may be wrong for older/newer versions');
                 list($type, $plugin) = normalize_component($this->name);
                 if ($type === 'core') {
                     return 'lang/' . $this->lang . '/' . $this->name . '.php';
                 } else {
                     $abspath = get_plugin_directory($type, $plugin);
                     if (substr($abspath, 0, strlen($CFG->dirroot)) !== $CFG->dirroot) {
-                        throw new coding_exception('Plugin directory outside dirroot');
+                        throw new coding_exception('Plugin directory outside dirroot', $abspath);
                     }
                     $relpath = substr($abspath, strlen($CFG->dirroot) + 1);
                     return $relpath . '/lang/' . $this->lang . '/' . $this->name . '.php';
@@ -1317,6 +1317,21 @@ class mlang_version {
     public static function by_branch($branch) {
         foreach (self::versions_info() as $ver) {
             if ($ver['branch'] == $branch) {
+                return new mlang_version($ver);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Factory method
+     *
+     * @param string $dir like '2.1'
+     * @return mlang_version|null
+     */
+    public static function by_dir($dir) {
+        foreach (self::versions_info() as $ver) {
+            if ($ver['dir'] == $dir) {
                 return new mlang_version($ver);
             }
         }
