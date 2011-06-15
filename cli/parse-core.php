@@ -88,13 +88,13 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
                 $sign = '+  ';
             }
 
-            if (isset($standardplugins[$component->version->label][$component->name])) {
-                $name = $standardplugins[$component->version->label][$component->name];
+            if (isset($standardplugins[$component->version->dir][$component->name])) {
+                $name = $standardplugins[$component->version->dir][$component->name];
             } else {
                 $name = $component->name;
             }
 
-            $discussion->message .= $sign . $component->version->label . ' en [' . $string->id . ',' . $name . "]\n";
+            $discussion->message .= $sign . $component->version->dir . ' en [' . $string->id . ',' . $name . "]\n";
         }
     }
 
@@ -341,9 +341,9 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             echo "SKIP installer bootstrap strings\n";
             continue;
         }
-        if (isset($standardplugins[$version->label])) {
+        if (isset($standardplugins[$version->dir])) {
             // for 2.0 and higher we can make sure that we parse only standard component
-            if (!isset($standardplugins[$version->label][$componentname])) {
+            if (!isset($standardplugins[$version->dir][$componentname])) {
                 echo "SKIP non-standard component on this branch ($componentname)\n";
                 continue;
             }
