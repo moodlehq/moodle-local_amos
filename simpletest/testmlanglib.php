@@ -877,6 +877,8 @@ AMOS END';
         $this->assertEqual(testable_mlang_tools::legacy_component_name('core_grades'), 'grades');
         $this->assertEqual(testable_mlang_tools::legacy_component_name('block_foobar'), 'block_foobar');
         $this->assertEqual(testable_mlang_tools::legacy_component_name('mod_foobar'), 'foobar');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('moodle'), 'moodle');
+        $this->assertEqual(testable_mlang_tools::legacy_component_name('admin'), 'admin');
         $this->assertEqual(testable_mlang_tools::legacy_component_name(' mod_whitespace  '), 'whitespace');
         $this->assertEqual(testable_mlang_tools::legacy_component_name('[syntaxerr'), false);
         $this->assertEqual(testable_mlang_tools::legacy_component_name('syntaxerr,'), false);
