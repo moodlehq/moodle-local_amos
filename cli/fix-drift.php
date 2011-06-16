@@ -30,8 +30,13 @@ require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->libdir.'/clilib.php');
+
+list($options, $unrecognized) = cli_get_params(array('execute' => false));
 
 $plugins = local_amos_standard_plugins();
+
+$stage = new mlang_stage();
 
 foreach ($plugins as $versionnumber => $plugintypes) {
     $version = mlang_version::by_dir($versionnumber);
@@ -43,6 +48,9 @@ foreach ($plugins as $versionnumber => $plugintypes) {
     }
 
     foreach ($plugintypes as $legacyname => $frankenstylename) {
+
+        // prepare an empty component containing the fixes
+        $fixcomponent = new mlang_component($legacyname, 'en', $version);
 
         // get the most recent snapshot from the AMOS repository
         $amoscomponent = mlang_component::from_snapshot($legacyname, 'en', $version);
@@ -121,13 +129,23 @@ foreach ($plugins as $versionnumber => $plugintypes) {
         $dumpfile = $tmp.'/'.$legacyname.'.php';
         file_put_contents($dumpfile, implode("\n", $gitout));
 
-        $gitcomponent = mlang_component::from_phpfile($dumpfile, 'en', $version);
+        $gitcomponent = mlang_component::from_phpfile($dumpfile, 'en', $version, time());
 
         foreach ($amoscomponent->get_iterator() as $amosstring) {
             $gitstring = $gitcomponent->get_string($amosstring->id);
 
             if (is_null($gitstring)) {
                 fputs(STDOUT, "<< AMOS ONLY: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
+                $fixstring = clone($amosstring);
+                $fixstring->deleted = true;
+                $fixcomponent->add_string($fixstring);
+                continue;
+            }
+
+            if ($gitstring->text !== $amosstring->text) {
+                fputs(STDOUT, "!= AMOS GIT DIFF: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
+                $fixcomponent->add_string($gitstring);
+                continue;
             }
         }
 
@@ -136,8 +154,21 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
             if (is_null($amosstring)) {
                 fputs(STDOUT, ">> GIT ONLY: {$version->dir} [{$gitstring->id},{$frankenstylename}]\n");
+                $fixcomponent->add_string($gitstring);
+                continue;
             }
         }
 
+        if ($fixcomponent->has_string()) {
+            $stage->add($fixcomponent);
+        }
+
+        $fixcomponent->clear();
+        $amoscomponent->clear();
+        $gitcomponent->clear();
     }
+}
+
+if ($options['execute']) {
+    $stage->commit('Fixing the drift between Git and AMOS repository', array('source' => 'fixdrift', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
 }
