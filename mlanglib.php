@@ -1478,7 +1478,7 @@ class mlang_tools {
         if ($english) {
             return $cache;
         } else {
-            return array_diff($cache, array('en' => 'English'));
+            return array_diff_key($cache, array('en' => 'English'));
         }
     }
 
