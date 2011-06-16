@@ -68,6 +68,7 @@ class local_amos_log_form extends moodleform {
             'amos'          => get_string('logfiltersourceamos', 'local_amos'),
             'revclean'      => get_string('logfiltersourcerevclean', 'local_amos'),
             'commitscript'  => get_string('logfiltersourcecommitscript', 'local_amos'),
+            'fixdrift'      => get_string('logfiltersourcefixdrift', 'local_amos'),
         );
         $mform->addElement('select', 'source', get_string('logfiltersource', 'local_amos'), $sources);
         $mform->setAdvanced('source');

@@ -164,6 +164,7 @@ $string['logfiltershow'] = 'Show filtered commits and strings';
 $string['logfiltersource'] = 'Source';
 $string['logfiltersourceamos'] = 'amos (web based translator)';
 $string['logfiltersourcecommitscript'] = 'commitscript (AMOScript in the commit message)';
+$string['logfiltersourcefixdrift'] = 'fixdrift (fixed AMOS-git drift)';
 $string['logfiltersourcegit'] = 'git (git mirror of Moodle source code and 1.x packs)';
 $string['logfiltersourcerevclean'] = 'revclean (reverse clean-up process)';
 $string['logfilterstringid'] = 'String identifier';
