@@ -697,7 +697,8 @@ class local_amos_stage implements renderable {
     public function __construct(stdclass $user) {
         global $DB;
 
-        $this->strings = array();
+        $stringstree = array(); // tree of strings to simulate ORDER BY component, stringid, lang, branch
+        $this->strings = array(); // final list populated from the stringstree
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         $needed = array();  // describes all strings that we will have to load to displaye the stage
 
@@ -732,9 +733,30 @@ class local_amos_stage implements renderable {
                 $string->current = null; // dtto
                 $string->new = $staged->text;
                 $string->committable = false;
-                $this->strings[] = $string;
+                $stringstree[$string->component][$string->stringid][$string->language][$string->branch] = $string;
             }
         }
+
+        // order by component
+        ksort($stringstree);
+        foreach ($stringstree as $subtree) {
+            // order by stringid
+            ksort($subtree);
+            foreach ($subtree as $subsubtree) {
+                // order by language
+                ksort($subsubtree);
+                foreach ($subsubtree as $subsubsubtree) {
+                    // order by branch
+                    ksort($subsubsubtree);
+                    foreach ($subsubsubtree as $string) {
+                        $this->strings[] = $string;
+                    }
+                }
+            }
+        }
+
+        unset($stringstree);
+
         $fver = array();
         $flng = array();
         $fcmp = array();
