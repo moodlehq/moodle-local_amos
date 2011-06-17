@@ -531,6 +531,15 @@ class local_amos_renderer extends plugin_renderer_base {
                 $output .= html_writer::tag('fieldset', $legend.$mergeform, array('class' => 'wrappedmform mergeform'));
             }
 
+            if ($stage->diffform) {
+                $legend = html_writer::tag('legend', get_string('diffstrings', 'local_amos') . $this->help_icon('diffstrings', 'local_amos'));
+                ob_start();
+                $stage->diffform->display();
+                $diffform = ob_get_contents();
+                ob_end_clean();
+                $output .= html_writer::tag('fieldset', $legend.$diffform, array('class' => 'wrappedmform diffform'));
+            }
+
         } else {
             $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
             if ($committable) {

@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/mlanglib.php');
 require_once(dirname(__FILE__).'/importfile_form.php');
 require_once(dirname(__FILE__).'/merge_form.php');
+require_once(dirname(__FILE__).'/diff_form.php');
 
 $message    = optional_param('message', null, PARAM_RAW); // commit message
 $unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty

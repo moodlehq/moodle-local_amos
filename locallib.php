@@ -685,6 +685,9 @@ class local_amos_stage implements renderable {
     /** @var local_amos_merge_form to merge strings form another branch */
     public $mergeform;
 
+    /** @var local_amos_diff_form to stage differences between two branches */
+    public $difform;
+
     /** @var pre-set commit message */
     public $presetmessage;
 
@@ -704,6 +707,10 @@ class local_amos_stage implements renderable {
 
         if (has_capability('local/amos:commit', get_system_context(), $user)) {
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
+        }
+
+        if (has_capability('local/amos:stage', get_system_context(), $user)) {
+            $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }
 
         foreach($stage->get_iterator() as $component) {
@@ -1316,6 +1323,32 @@ function local_amos_merge_options() {
     } else {
         $options['languages'] = array_merge(array('' => get_string('choosedots')), array_intersect_key($langsall, $langsallowed));
     }
+    $options['languagecurrent'] = current_language();
+
+    return $options;
+}
+
+/**
+ * Returns the options used by {@link diff_form.php}
+ *
+ * @return array
+ */
+function local_amos_diff_options() {
+    global $USER;
+
+    $options = array();
+
+    $options['versions'] = array();
+    $options['defaultversion'] = null;
+    foreach (mlang_version::list_all() as $version) {
+        $options['versions'][$version->code] = $version->label;
+        if ($version->current) {
+            $options['defaultversion'] = $version->code;
+        }
+    }
+
+    $langsall = mlang_tools::list_languages(false);
+    $options['languages'] = array_merge(array('' => get_string('choosedots')), $langsall);
     $options['languagecurrent'] = current_language();
 
     return $options;
