@@ -186,8 +186,14 @@
     color: red;
 }
 
-.path-local-amos #amosstage .translation del {
-    color: #999;
+.path-local-amos #amosstage .translation.diff del {
+    color: red;
+}
+
+.path-local-amos #amosstage .translation.diff ins {
+    color: green;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .path-local-amos #amostranslator .original.greylisted {
@@ -208,12 +214,12 @@
 }
 
 .path-local-amos #amostranslator .translation.committable,
-.path-local-amos #amosstage .translation.committable {
+.path-local-amos #amosstage .translation.committable.new {
     background-color: #e7f1c3;
 }
 
-.path-local-amos #amosstage .translation.committable .current del {
-    color: red;
+.path-local-amos #amosstage .translation.committable.diff {
+    background-color: #f3f2aa;
 }
 
 .path-local-amos #amostranslator .translation.committable.outdated {

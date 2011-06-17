@@ -1375,3 +1375,44 @@ function local_amos_diff_options() {
 
     return $options;
 }
+
+/**
+ * Returns an array of the changes from $old text to the $new one
+ *
+ * This is just slightly customized version of Paul's Simple Diff Algorithm.
+ * Given two arrays of chunks (words), the function returns an array of the changes
+ * leading from $old to $new.
+ *
+ * @author Paul Butler
+ * @copyright (C) Paul Butler 2007 <http://www.paulbutler.org/>
+ * @license May be used and distributed under the zlib/libpng license
+ * @link https://github.com/paulgb/simplediff
+ * @version 26f97a48598d7b306ae9
+ * @param array $old array of words
+ * @param array $new array of words
+ * @return array
+ */
+function local_amos_simplediff(array $old, array $new) {
+
+    $maxlen = 0;
+
+    foreach ($old as $oindex => $ovalue) {
+        $nkeys = array_keys($new, $ovalue);
+        foreach ($nkeys as $nindex){
+            $matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
+                $matrix[$oindex - 1][$nindex - 1] + 1 : 1;
+            if ($matrix[$oindex][$nindex] > $maxlen) {
+                $maxlen = $matrix[$oindex][$nindex];
+                $omax   = $oindex + 1 - $maxlen;
+                $nmax   = $nindex + 1 - $maxlen;
+            }
+        }
+    }
+    if ($maxlen == 0) {
+        return array(array('d' => $old, 'i' => $new));
+    }
+    return array_merge(
+        local_amos_simplediff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
+        array_slice($new, $nmax, $maxlen),
+        local_amos_simplediff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+}

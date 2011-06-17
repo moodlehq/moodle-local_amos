@@ -440,20 +440,43 @@ class local_amos_renderer extends plugin_renderer_base {
                 $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
                 $cells[3] = new html_table_cell($t . $unstagebutton);
                 $cells[3]->attributes['class'] .= ' uncommittable nodiff';
-            } else {
-                // there is a difference
-                $t1 = self::add_breaks(s($string->current));
-                $t1 = html_writer::tag('del', $t1, array());
-                $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
-                $t2 = self::add_breaks(s($string->new));
-                $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
-                $cells[3] = new html_table_cell($t2 . $t1 . $unstagebutton);
+            } else if (is_null($string->current)) {
+                // new translation
+                $t = $t = self::add_breaks(s($string->new));
+                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
+                $cells[3] = new html_table_cell($t . $unstagebutton);
                 if ($string->committable) {
-                    $cells[3]->attributes['class'] .= ' committable';
+                    $cells[3]->attributes['class'] .= ' committable new';
                     $committable++;
                 }
                 if (!$string->committable) {
-                    $cells[3]->attributes['class'] .= ' uncommittable';
+                    $cells[3]->attributes['class'] .= ' uncommittable new';
+                }
+            } else {
+                // there is a difference
+                $x1 = explode(' ', s($string->current));
+                $x2 = explode(' ', s($string->new));
+
+                $t = '';
+                $diff = local_amos_simplediff($x1, $x2);
+                foreach ($diff as $k) {
+                    if (is_array($k)) {
+                        $t .= (!empty($k['d']) ? '<del>'.implode(' ', $k['d']).'</del> ' : '').
+                              (!empty($k['i']) ? '<ins>'.implode(' ', $k['i']).'</ins> ' : '');
+                    } else {
+                        $t .= $k . ' ';
+                    }
+                }
+
+                $t = self::add_breaks($t);
+                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
+                $cells[3] = new html_table_cell($t . $unstagebutton);
+                if ($string->committable) {
+                    $cells[3]->attributes['class'] .= ' committable diff';
+                    $committable++;
+                }
+                if (!$string->committable) {
+                    $cells[3]->attributes['class'] .= ' uncommittable diff';
                 }
             }
 

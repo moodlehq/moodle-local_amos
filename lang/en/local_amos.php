@@ -251,7 +251,8 @@ $string['stagesubmit'] = 'Submit to maintainers';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
-* Green - you have modified a string or added a missing translation and you are allowed to commit the translation.
+* Green - you have added a missing translation and you are allowed to commit it.
+* Yellow - you have modified a string and you are allowed to commit the change.
 * Blue - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['stageunstageall'] = 'Unstage all';
