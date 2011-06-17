@@ -187,7 +187,7 @@
 }
 
 .path-local-amos #amosstage .translation.diff del {
-    color: red;
+    color: #999;
 }
 
 .path-local-amos #amosstage .translation.diff ins {
