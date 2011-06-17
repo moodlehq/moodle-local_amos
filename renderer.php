@@ -409,6 +409,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $committable = 0;
         foreach ($stage->strings as $string) {
             $cells = array();
+
             // string identification
             if (isset($standard[$string->component])) {
                 $componentname = $standard[$string->component];
@@ -419,30 +420,43 @@ class local_amos_renderer extends plugin_renderer_base {
             $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
                 html_writer::tag('span', $componentname, array('class'=>'component')).']';
             $cells[0] = new html_table_cell($stringinfo);
+
             // original of the string
             $cells[1] = new html_table_cell(html_writer::tag('div', self::add_breaks(s($string->original)), array('class' => 'preformatted')));
+
             // the language in which the original is displayed
             $cells[2] = new html_table_cell($string->language);
+
             // the current and the new translation
-            $t1 = self::add_breaks(s($string->current));
-            $t1 = html_writer::tag('del', $t1, array());
-            $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
-            $t2 = self::add_breaks(s($string->new));
-            $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
             $unstageurl = new moodle_url('/local/amos/stage.php', array(
                     'unstage'   => $string->stringid,
                     'component' => $string->component,
                     'branch'    => $string->branch,
                     'lang'      => $string->language));
             $unstagebutton = $this->single_button($unstageurl, 'Unstage', 'post', array('class' => 'singlebutton protected'));
-            $cells[3] = new html_table_cell($t2 . $t1 . $unstagebutton);
-            if ($string->committable and !(trim($string->current) === trim($string->new))) {
-                $cells[3]->attributes['class'] .= ' committable';
-                $committable++;
+            if (trim($string->current) === trim($string->new)) {
+                // no difference
+                $t = self::add_breaks(s($string->current));
+                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
+                $cells[3] = new html_table_cell($t . $unstagebutton);
+                $cells[3]->attributes['class'] .= ' uncommittable nodiff';
+            } else {
+                // there is a difference
+                $t1 = self::add_breaks(s($string->current));
+                $t1 = html_writer::tag('del', $t1, array());
+                $t1 = html_writer::tag('div', $t1, array('class' => 'current preformatted'));
+                $t2 = self::add_breaks(s($string->new));
+                $t2 = html_writer::tag('div', $t2, array('class' => 'new preformatted'));
+                $cells[3] = new html_table_cell($t2 . $t1 . $unstagebutton);
+                if ($string->committable) {
+                    $cells[3]->attributes['class'] .= ' committable';
+                    $committable++;
+                }
+                if (!$string->committable) {
+                    $cells[3]->attributes['class'] .= ' uncommittable';
+                }
             }
-            if (!$string->committable) {
-                $cells[3]->attributes['class'] .= ' uncommittable';
-            }
+
             $row = new html_table_row($cells);
             $table->data[] = $row;
         }

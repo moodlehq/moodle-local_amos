@@ -202,6 +202,11 @@
     background-color: #d2ebff;
 }
 
+.path-local-amos #amosstage .translation.uncommittable.nodiff {
+    background-color: white;
+    color: #999;
+}
+
 .path-local-amos #amostranslator .translation.committable,
 .path-local-amos #amosstage .translation.committable {
     background-color: #e7f1c3;
