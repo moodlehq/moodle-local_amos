@@ -75,14 +75,12 @@ if ($data = $mergeform->get_data()) {
     $stage->rebase();
     // and store the persistant stage
     $stage->store();
-}
 
-// if no new strings are merged, inform the user
-if (!$stage->has_component()) {
-    notice(get_string('nothingtomerge', 'local_amos'), new moodle_url('/local/amos/stage.php'));
-}
+    // if no new strings are merged, inform the user
+    if (!$stage->has_component()) {
+        notice(get_string('nothingtomerge', 'local_amos'), new moodle_url('/local/amos/stage.php'));
+    }
 
-if (!empty($sourceversion) and !empty($targetversion)) {
     if (!isset($SESSION->local_amos)) {
         $SESSION->local_amos = new stdClass();
     }
