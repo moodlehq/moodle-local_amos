@@ -1536,14 +1536,21 @@ class mlang_tools {
         global $DB;
 
         $where = array();
+        $params = array();
         if (!empty($conditions['branch'])) {
-            $where[] = 'branch = :branch';
+            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['branch']);
+            $where[] = 'branch '.$subsql;
+            $params  = array_merge($params, $subparams);
         }
         if (!empty($conditions['lang'])) {
-            $where[] = 'lang = :lang';
+            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['lang']);
+            $where[] = 'lang '.$subsql;
+            $params  = array_merge($params, $subparams);
         }
         if (!empty($conditions['component'])) {
-            $where[] = 'component = :component';
+            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['component']);
+            $where[] = 'component '.$subsql;
+            $params  = array_merge($params, $subparams);
         }
         if (!empty($where)) {
             $where = "WHERE " . implode(" AND ", $where) . "\n";
@@ -1555,7 +1562,7 @@ class mlang_tools {
         }
         $sql .= "GROUP BY branch,lang,component
                  ORDER BY branch,lang,component";
-        $rs = $DB->get_recordset_sql($sql, $conditions);
+        $rs = $DB->get_recordset_sql($sql, $params);
         $tree = array();
         foreach ($rs as $record) {
             if (!isset($tree[$record->branch])) {

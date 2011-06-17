@@ -937,6 +937,75 @@ AMOS END';
         $this->assertTrue(in_array('mod/something:really_nasty-like0098187.this', $affected));
     }
 
+    public function test_components_tree() {
+        // prepare a tree
+        $stage = new mlang_stage();
+        $components = array();
+        foreach (array('MOODLE_19_STABLE', 'MOODLE_20_STABLE', 'MOODLE_21_STABLE') as $branch) {
+            foreach (array('en', 'cs', 'es') as $language) {
+                foreach (array('moodle', 'auth_mnet', 'workshop') as $componentname) {
+                    $component = new mlang_component($componentname, $language, mlang_version::by_branch($branch));
+                    $component->add_string(new mlang_string('foo', 'Bar'));
+                    $stage->add($component);
+                    $component->clear();
+                }
+            }
+        }
+        $stage->commit('Committing test strings');
+
+        // full tree
+        $tree = mlang_tools::components_tree();
+        $this->assertIsA($tree, 'array');
+        $this->assertEqual(3, count($tree)); // 3 versions
+        $this->assertEqual(3, count($tree[1900])); // 3 languages
+        $this->assertEqual(3, count($tree[2000])); // 3 languages
+        $this->assertEqual(3, count($tree[2100])); // 3 languages
+        $this->assertEqual(3, count($tree[1900]['cs'])); // 3 components
+        $this->assertEqual(3, count($tree[2000]['en'])); // 3 components
+        $this->assertEqual(3, count($tree[2100]['es'])); // 3 components
+        $this->assertEqual(1, $tree[2100]['es']['moodle']); // 1 string
+
+        // empty trees
+        $tree = mlang_tools::components_tree(array('branch' => 1800));
+        $this->assertIsA($tree, 'array');
+        $this->assertTrue(empty($tree));
+
+        $tree = mlang_tools::components_tree(array('component' => 'book'));
+        $this->assertIsA($tree, 'array');
+        $this->assertTrue(empty($tree));
+
+        // single value filter
+        $tree = mlang_tools::components_tree(array('branch' => 2000, 'lang' => 'cs'));
+        $this->assertIsA($tree, 'array');
+        $this->assertEqual(1, count($tree));
+        $this->assertEqual(1, count($tree[2000]));
+        $this->assertEqual(3, count($tree[2000]['cs']));
+        $this->assertEqual(1, $tree[2000]['cs']['workshop']);
+
+        // yet another single value filter
+        $tree = mlang_tools::components_tree(array('component' => 'auth_mnet'));
+        $this->assertEqual(3, count($tree));
+        $this->assertEqual(3, count($tree[1900]));
+        $this->assertEqual(3, count($tree[2000]));
+        $this->assertEqual(3, count($tree[2100]));
+        $this->assertEqual(1, count($tree[1900]['cs']));
+        $this->assertEqual(1, count($tree[2000]['en']));
+        $this->assertEqual(1, count($tree[2100]['es']));
+        $this->assertEqual(1, $tree[2100]['en']['auth_mnet']);
+
+        // multivalues filter
+        $tree = mlang_tools::components_tree(array('branch' => array(2000, 2100), 'lang' => array('en'), 'component' => array('moodle', 'workshop')));
+        $this->assertEqual(2, count($tree));
+        $this->assertEqual(1, count($tree[2000]));
+        $this->assertEqual(1, count($tree[2100]));
+        $this->assertEqual(2, count($tree[2000]['en']));
+        $this->assertEqual(2, count($tree[2100]['en']));
+        $this->assertEqual(1, $tree[2000]['en']['moodle']);
+        $this->assertEqual(1, $tree[2000]['en']['workshop']);
+        $this->assertEqual(1, $tree[2100]['en']['moodle']);
+        $this->assertEqual(1, $tree[2100]['en']['workshop']);
+    }
+
     public function test_stash_push() {
 
     }
