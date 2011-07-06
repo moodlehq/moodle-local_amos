@@ -6,7 +6,7 @@ LMS Moodle 2.x to facilitate community translation of this project. The plugin
 is installed at <http://lang.moodle.org> portal. It has been written and is
 currently maintained by David Mudrak <david@moodle.com>.
 
-For more information see <http://docs.moodle.org/en/Development:Languages/AMOS>
+For more information see <http://docs.moodle.org/dev/Languages/AMOS>
 
 To discuss the features please join at <http://lang.moodle.org> forums
 

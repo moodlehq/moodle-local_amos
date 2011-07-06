@@ -1581,7 +1581,7 @@ class mlang_tools {
     /**
      * Given a text, extracts AMOS script lines from it as array of commands
      *
-     * See {@link http://docs.moodle.org/en/Development:Languages/AMOS} for the specification
+     * See {@link http://docs.moodle.org/dev/Languages/AMOS} for the specification
      * of the script. Basically it is a block of lines starting with "AMOS BEGIN" line and
      * ending with "AMOS END" line. "AMOS START" is an alias for "AMOS BEGIN". Each instruction
      * in the script must be on a separate line.
