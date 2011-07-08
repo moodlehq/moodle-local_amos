@@ -49,6 +49,9 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'element'));
         $fver = '';
         foreach (mlang_version::list_all() as $version) {
+            if ($version->code < 1900) {
+                continue;
+            }
             $checkbox = html_writer::checkbox('fver[]', $version->code, in_array($version->code, $filter->get_data()->version),
                     $version->label);
             $fver .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));

@@ -223,7 +223,7 @@ foreach ($gitout as $line) {
     // push the string on all branches where the English original is currently (or has ever been) defined
     // note that all English strings history must already be registered in AMOS repository
     // pushing into Moodle 1.x branches only to prevent conflicts with translations done via web
-    foreach (array('MOODLE_19_STABLE', 'MOODLE_18_STABLE', 'MOODLE_17_STABLE', 'MOODLE_16_STABLE') as $branch) {
+    foreach (array('MOODLE_19_STABLE') as $branch) {
         $version = mlang_version::by_branch($branch);
         // get the translated strings from PHP file - the lang repository in in 1.x format
         $component = mlang_component::from_phpfile($checkout, $langcode, $version, $timemodified,
