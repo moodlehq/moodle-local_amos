@@ -1375,12 +1375,20 @@ class mlang_version {
     protected static function versions_info() {
         return array(
             array(
+                'code'          => self::MOODLE_22,
+                'label'         => '2.2dev',
+                'branch'        => 'MOODLE_22_STABLE',
+                'dir'           => '2.2',
+                'translatable'  => true,
+                'current'       => false,
+            ),
+            array(
                 'code'          => self::MOODLE_21,
                 'label'         => '2.1',
                 'branch'        => 'MOODLE_21_STABLE',
                 'dir'           => '2.1',
                 'translatable'  => true,
-                'current'       => false,
+                'current'       => true,
             ),
             array(
                 'code'          => self::MOODLE_20,
@@ -1388,7 +1396,7 @@ class mlang_version {
                 'branch'        => 'MOODLE_20_STABLE',
                 'dir'           => '2.0',
                 'translatable'  => true,
-                'current'       => true,
+                'current'       => false,
             ),
             array(
                 'code'          => self::MOODLE_19,
