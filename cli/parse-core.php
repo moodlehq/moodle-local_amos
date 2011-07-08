@@ -139,7 +139,7 @@ function amos_parse_core_commit() {
         $instructions = mlang_tools::extract_script_from_text($fullcommitmsg);
         if (!empty($instructions)) {
             foreach ($instructions as $instruction) {
-                echo "EXEC $instruction\n";
+                fputs(STDOUT, "EXEC $instruction\n");
                 $changes = mlang_tools::execute($instruction, $version, $timemodified);
                 if ($changes instanceof mlang_stage) {
                     $changes->rebase($timemodified);
@@ -149,7 +149,7 @@ function amos_parse_core_commit() {
                         'commithash' => $commithash
                     ), true, $timemodified);
                 } elseif ($changes < 0) {
-                    echo "EXIT STATUS $changes\n";
+                    fputs(STDERR, "EXEC STATUS $changes\n");
                 }
                 unset($changes);
             }
@@ -243,9 +243,13 @@ $standardplugins = local_amos_standard_plugins();
 $plugintypes = get_plugin_types(false);
 $stage = new mlang_stage();
 
+fputs(STDOUT, "*****************************************\n");
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " PARSE CORE JOB STARTED\n");
+
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
-    echo "*****************************************\n";
-    echo "BRANCH {$branch}\n";
+    fputs(STDOUT, "=========================================\n");
+    fputs(STDOUT, "BRANCH {$branch}\n");
     if ($branch == 'MOODLE_22_STABLE') {
         $gitbranch = 'origin/master';
     } else {
@@ -274,12 +278,12 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     $gitout = array();
     $gitstatus = 0;
     $gitcmd = AMOS_PATH_GIT . " whatchanged --topo-order --reverse --format='format:COMMIT:%H TIMESTAMP:%at' {$gitbranch} {$startat}";
-    echo "RUN {$gitcmd}\n";
+    fputs(STDOUT, "RUN {$gitcmd}\n");
     exec($gitcmd, $gitout, $gitstatus);
 
     if ($gitstatus <> 0) {
         // error occured
-        echo "ERROR\n";
+        fputs(STDERR, "RUN ERROR {$gitstatus}\n");
         exit(1);
     }
 
@@ -303,7 +307,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             continue;
         }
         if (in_array($commithash, $MLANG_IGNORE_COMMITS)) {
-            echo "IGNORED {$commithash}\n";
+            fputs(STDOUT, "IGNORED {$commithash}\n");
             continue;
         }
         $parts = explode("\t", $line);
@@ -336,13 +340,13 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         }
         if (substr($file, 0, 13) == 'install/lang/') {
             // ignore these auto generated files
-            echo "SKIP installer bootstrap strings\n";
+            fputs(STDOUT, "SKIP installer bootstrap strings\n");
             continue;
         }
         if (isset($standardplugins[$version->dir])) {
             // for 2.0 and higher we can make sure that we parse only standard component
             if (!isset($standardplugins[$version->dir][$componentname])) {
-                echo "SKIP non-standard component on this branch ($componentname)\n";
+                fputs(STDOUT, "SKIP non-standard component on this branch ($componentname)\n");
                 continue;
             }
         }
@@ -351,7 +355,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $mem = memory_get_usage();
         $memdiff = $memprev < $mem ? '+' : '-';
         $memdiff = $memdiff . abs($mem - $memprev);
-        echo "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n";
+        fputs(STDOUT, "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n");
 
         // get some additional information of the commit
         $format = implode('%n', array('%an', '%ae', '%at', '%s', '%b')); // name, email, timestamp, subject, body
@@ -389,7 +393,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         // dump the given revision of the file to a temporary area
         $checkout = $commithash . '_' . str_replace('/', '_', $file);
         if (in_array($checkout, $MLANG_BROKEN_CHECKOUTS)) {
-            echo "BROKEN $checkout\n";
+            fputs(STDOUT, "BROKEN $checkout\n");
             continue;
         }
         $checkout = $tmp . '/' . $checkout;
@@ -417,4 +421,6 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
     // we just parsed the last git commit at this branch - let us commit what we have
     amos_parse_core_commit();
 }
-echo "DONE\n";
+
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " PARSE CORE JOB DONE\n");

@@ -44,10 +44,12 @@ require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(array('full'=>false), array('f'=>'full'));
 
+fputs(STDOUT, "*****************************************\n");
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " REVERSE CLEANUP JOB STARTED\n");
+
 $mem = memory_get_usage();
-echo "LOADING COMPONENTS TREE... ";
 $tree = mlang_tools::components_tree();
-echo "DONE\n";
 foreach ($tree as $vercode => $languages) {
     $version = mlang_version::by_code($vercode);
     foreach ($languages['en'] as $componentname => $unused) {
@@ -58,7 +60,6 @@ foreach ($tree as $vercode => $languages) {
         $mem = memory_get_usage();
         $memdiff = $memprev < $mem ? '+' : '-';
         $memdiff = $memdiff . abs($mem - $memprev);
-        echo "{$version->label} {$componentname} [{$mem} {$memdiff}]\n";
         $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
         foreach ($english->get_iterator() as $string) {
             if (empty($options['full']) and $string->timemodified < time() - DAYSECS) {
@@ -94,7 +95,7 @@ The string '{$string->id}' was removed from the English language pack by
 {$string->extra->commitmsg}
 {$string->extra->commithash}
 EOF;
-                    echo "COMMIT removal of '{$string->id}' from '{$english->name}'\n";
+                    fputs(STDOUT, "COMMIT removal of '{$string->id}' from '{$english->name}'\n");
                     $stage->commit($msg, array('source' => 'revclean', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
                 }
                 $stage->clear();
@@ -103,4 +104,6 @@ EOF;
         }
     }
 }
-echo "DONE\n";
+
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " REVERSE CLEANUP JOB DONE\n");
