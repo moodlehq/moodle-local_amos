@@ -265,7 +265,8 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             $startat = '^' . $startat . '^';
         }
     } else {
-        $startat = '^' . AMOS_REPO_MOODLE_ROOT . '^';
+        fputs(STDERR, "Missing {$branch} branch startat point\n");
+        continue;
     }
 
     // XXX if the reply of all AMOS scripts is needed (for example during the initial fetch of the strings),
