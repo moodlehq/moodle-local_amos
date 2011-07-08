@@ -50,7 +50,7 @@ function amos_parse_lang_commit() {
             'commithash' => $commithash
         ), true, $timemodified);
     } catch (dml_write_exception $e) {
-        echo "FAILED COMMIT $checkout\n";
+        fputs(STDERR, "FAILED COMMIT $checkout\n");
         $stage->clear();
     }
 
@@ -120,11 +120,15 @@ chdir(AMOS_REPO_LANGS);
 //$rootcommit = $gitout[0];
 $rootcommit = '1a3e88ac5edec427cb3f1154edab665b8af160e3';
 
+fputs(STDOUT, "*****************************************\n");
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " PARSE LANG JOB STARTED\n");
+
 // find all commits that touched the repository since the last save point
 $startatlock = "{$var}/LANG.startat";
 $startat = '';
 if (file_exists($startatlock)) {
-    echo "STARTAT {$startatlock}\n";
+    fputs(STDOUT, "STARTAT {$startatlock}\n");
     $startat = trim(file_get_contents($startatlock));
     if (!empty($startat) and ($startat != $rootcommit)) {
         $startat = '^' . $startat . '^';
@@ -133,12 +137,12 @@ if (file_exists($startatlock)) {
 $gitout = array();
 $gitstatus = 0;
 $gitcmd = AMOS_PATH_GIT . " whatchanged --topo-order --reverse --format=format:COMMIT:%H origin/cvshead {$startat} " . AMOS_REPO_LANGS;
-echo "RUN {$gitcmd}\n";
+fputs(STDOUT, "RUN {$gitcmd}\n");
 exec($gitcmd, $gitout, $gitstatus);
 
 if ($gitstatus <> 0) {
     // error occured
-    echo "ERROR\n";
+    fputs(STDERR, "RUN ERROR {$gitstatus}\n");
     exit(1);
 }
 
@@ -169,16 +173,16 @@ foreach ($gitout as $line) {
     $mem = memory_get_usage();
     $memdiff = $memprev < $mem ? '+' : '-';
     $memdiff = $memdiff . abs($mem - $memprev);
-    echo "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n";
+    fputs(STDOUT, "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n");
 
     if ($commithash == '4d0f400a58cbbe2bfd30c5f62aa59bc9d043a699') {
         // wrong UTF-8 encoding in all commits, fixed immediately
-        echo "SKIP\n";
+        fputs(STDOUT, "SKIP\n");
         continue;
     }
     if ($file == 'sr_lt_utf8/~$admin.php') {
         // wrong commit 3c270b5d9d6ae860e61b678a36f3490a7568f6ab
-        echo "SKIP\n";
+        fputs(STDOUT, "SKIP\n");
         continue;
     }
 
@@ -214,7 +218,7 @@ foreach ($gitout as $line) {
     // dump the given revision of the file to a temporary area
     $checkout = $commithash . '_' . str_replace('/', '_', $file);
     if (in_array($checkout, $MLANG_BROKEN_CHECKOUTS)) {
-        echo "BROKEN $checkout\n";
+        fputs(STDERR, "BROKEN $checkout\n");
         continue;
     }
     $checkout = $tmp . '/' . $checkout;
@@ -249,4 +253,6 @@ foreach ($gitout as $line) {
 }
 // we just parsed the last git commit - let us commit what we have
 amos_parse_lang_commit();
-echo "DONE\n";
+
+fputs(STDOUT, date('Y-m-d H:i', time()));
+fputs(STDOUT, " PARSE LANG JOB DONE\n");
