@@ -239,6 +239,7 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_19_STABLE',
     'MOODLE_20_STABLE',
     'MOODLE_21_STABLE',
+    'MOODLE_22_STABLE',
 );
 
 $standardplugins = local_amos_standard_plugins();
@@ -248,7 +249,7 @@ $stage = new mlang_stage();
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
     echo "*****************************************\n";
     echo "BRANCH {$branch}\n";
-    if ($branch == 'MOODLE_21_STABLE') {
+    if ($branch == 'MOODLE_22_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
