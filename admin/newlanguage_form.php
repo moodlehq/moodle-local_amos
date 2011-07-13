@@ -51,6 +51,13 @@ class local_amos_newlanguage_form extends moodleform {
         global $CFG, $DB;
 
         $errors = parent::validation($data, $files);
+
+        $tempcode = clean_param($data['langcode'], PARAM_SAFEDIR);
+        $tempcode = strtolower($tempcode);
+        if ($tempcode !== $data['langcode']) {
+            $errors['langcode'] = 'Invalid language code format';
+        }
+
         if ($DB->record_exists('amos_repository', array('lang' => $data['langcode']))) {
             $errors['langcode'] = 'Already exists';
         }
