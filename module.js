@@ -461,6 +461,9 @@ M.local_amos.google_language_code = function(moodlecode) {
         case 'zh_tw':
             return 'zh-TW';
             break;
+        case 'pt_br':
+            return 'pt';
+            break;
         default:
             return moodlecode;
     }
