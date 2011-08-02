@@ -450,9 +450,9 @@ class local_amos_translator implements renderable {
                        AND r.lang {$outer_sqllanguages}
                        AND r.component {$outer_sqlcomponents}";
         if ($helps) {
-            $sql .= "      AND r.stringid LIKE '%\\\\_help'";
+            $sql .= "      AND r.stringid LIKE E'%\\\\_help'";
         } else {
-            $sql .= "      AND r.stringid NOT LIKE '%\\\\_link'";
+            $sql .= "      AND r.stringid NOT LIKE E'%\\\\_link'";
         }
         if ($stringid) {
             $sql .= "      AND r.stringid = :stringid";
