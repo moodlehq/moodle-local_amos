@@ -907,9 +907,11 @@ class mlang_stage {
      * Propagates staged changes to other branches
      *
      * @param array $versions the list of {@link mlang_version} instances
-     * @return void
+     * @return int number of propagated changes
      */
     public function propagate(array $versions) {
+
+        $numofpropagated = 0;
 
         // make sure the list of target branches is unique and indexed by version code
         $xversions = array();
@@ -917,6 +919,10 @@ class mlang_stage {
             $xversions[$version->code] = $version;
         }
         $versions = $xversions;
+
+        if (empty($versions)) {
+            return 0;
+        }
 
         // iterate over all currently staged components
         foreach ($this->components as $sourceidx => $source) {
@@ -975,9 +981,12 @@ class mlang_stage {
                     $temp->add_string(new mlang_string($string->id, $string->text));
                     $this->add($temp);
                     $temp->clear();
+                    $numofpropagated++;
                 }
             }
         }
+
+        return $numofpropagated;
     }
 }
 

@@ -1049,7 +1049,7 @@ AMOS END';
         $stage->add($component21cs);
         $component21cs->clear();
 
-        $stage->propagate(array($version22));
+        $this->assertEqual($stage->propagate(array($version22)), 1);
 
         $propagatedcomponent = $stage->get_component('admin', 'cs', $version22);
         $this->assertNotNull($propagatedcomponent, 'The component "admin" must exist on '.$version22->label);
@@ -1070,7 +1070,7 @@ AMOS END';
         $component20cs->clear();
         $component21cs->clear();
 
-        $stage->propagate(array($version20, $version21, $version22));
+        $this->assertEqual($stage->propagate(array($version20, $version21, $version22)), 0);
 
         $this->assertEqual($stage->get_component('admin', 'cs', $version20)->get_string('foo2')->text, 'TranslatedOldBar2');
         $this->assertEqual($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
@@ -1089,7 +1089,7 @@ AMOS END';
         $component20cs->clear();
         $component21cs->clear();
 
-        $stage->propagate(array($version20, $version21, $version22));
+        $this->assertEqual($stage->propagate(array($version20, $version21, $version22)), 1);
 
         $this->assertEqual($stage->get_component('admin', 'cs', $version22)->get_string('foo2')->text, 'TranslatedBar2');
         $this->assertEqual($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
@@ -1105,7 +1105,7 @@ AMOS END';
         $stage->add($component21cs);
         $component21cs->clear();
 
-        $stage->propagate(array($version20, $version21, $version22));
+        $this->assertEqual($stage->propagate(array($version20, $version21, $version22)), 0);
 
         $this->assertNull($stage->get_component('admin', 'cs', $version20));
         $this->assertNull($stage->get_component('admin', 'cs', $version22));
