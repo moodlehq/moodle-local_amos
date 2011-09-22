@@ -67,7 +67,9 @@ if (is_null($version)) {
 }
 
 $component = mlang_component::from_phpfile($filepath, $options['lang'], $version,
-        $options['timemodified'], $options['name'], $options['format']);
+        $options['timemodified'], $options['name'], (int)$options['format']);
+
+fputs(STDOUT, "{$component->name} {$component->version->label} {$component->lang}" . PHP_EOL);
 
 $stage = new mlang_stage();
 $stage->add($component);
