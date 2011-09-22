@@ -233,7 +233,7 @@ $string['propagate_help'] = 'Staged translations can be propagated to selected b
 * the English originals of the string are different on the source and target branches,
 * the string is staged several times with different translation';
 $string['propagatednone'] = 'No translations propagated';
-$string['propagatedsome'] = '{$a} staged translation propagated';
+$string['propagatedsome'] = '{$a} staged translations propagated';
 $string['propagaterun'] = 'Propagate';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
