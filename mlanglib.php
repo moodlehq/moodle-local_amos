@@ -902,6 +902,83 @@ class mlang_stage {
 
         return array($strings, $languages, $components);
     }
+
+    /**
+     * Propagates staged changes to other branches
+     *
+     * @param array $versions the list of {@link mlang_version} instances
+     * @return void
+     */
+    public function propagate(array $versions) {
+
+        // make sure the list of target branches is unique and indexed by version code
+        $xversions = array();
+        foreach ($versions as $version) {
+            $xversions[$version->code] = $version;
+        }
+        $versions = $xversions;
+
+        // iterate over all currently staged components
+        foreach ($this->components as $sourceidx => $source) {
+            $sourcecommittedenglish = mlang_component::from_snapshot($source->name, 'en', $source->version);
+
+            // propagate the source component into all other target branches
+            foreach ($versions as $version) {
+                if ($version->code == $source->version->code) {
+                    // does not make sense to propagate to itself
+                    continue;
+                }
+
+                $targetcommittedenglish = mlang_component::from_snapshot($source->name, 'en', $version);
+
+                // check if the target component is staged, too
+                $current = $this->get_component($source->name, $source->lang, $version);
+
+                // iterate over all strings in the source component
+                foreach ($source->get_iterator() as $string) {
+                    // if the string is already staged on the target branch, do not do anything
+                    if (!is_null($current) and $current->has_string($string->id)) {
+                        continue;
+                    }
+                    if ($string->deleted) {
+                        // should not happen via www but just in case
+                        continue;
+                    }
+
+                    // make sure there is no different translation of this string staged
+                    foreach ($this->components as $tempidx => $temp) {
+                        if ($tempidx == $sourceidx) {
+                            continue;
+                        }
+                        if ($temp->has_string($string->id)) {
+                            if (mlang_string::differ($temp->get_string($string->id), $string)) {
+                                continue 2;
+                            }
+                        }
+                    }
+
+                    // make sure that the English originals match on both versions
+                    if (is_null($sourcecommittedenglish->get_string($string->id))) {
+                        debugging('Staged translation without the English string - this should not happed');
+                        continue;
+                    }
+                    if (is_null($targetcommittedenglish->get_string($string->id))) {
+                        // the English string does not exist on the target branch, do not propagate
+                        continue;
+                    }
+                    if (mlang_string::differ($targetcommittedenglish->get_string($string->id), $sourcecommittedenglish->get_string($string->id))) {
+                        continue;
+                    }
+
+                    // ok, now it should be safe to stage the source string onto the target branch
+                    $temp = new mlang_component($source->name, $source->lang, $version);
+                    $temp->add_string(new mlang_string($string->id, $string->text));
+                    $this->add($temp);
+                    $temp->clear();
+                }
+            }
+        }
+    }
 }
 
 /**

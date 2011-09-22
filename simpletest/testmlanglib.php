@@ -615,6 +615,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('See &#36;CFG->foo', 2, 1), 'See $CFG->foo');
     }
 
+    /*
     public function test_get_phpfile_location() {
         $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $this->assertEqual('lang/en_utf8/moodle.php', $component->get_phpfile_location());
@@ -640,6 +641,7 @@ EOF;
         $this->assertEqual('grade/export/xml/lang/es/gradeexport_xml.php', $component->get_phpfile_location());
         $this->assertEqual('lang/es/gradeexport_xml.php', $component->get_phpfile_location(false));
     }
+     */
 
     public function test_get_string_keys() {
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -1004,6 +1006,110 @@ AMOS END';
         $this->assertEqual(1, $tree[2000]['en']['workshop']);
         $this->assertEqual(1, $tree[2100]['en']['moodle']);
         $this->assertEqual(1, $tree[2100]['en']['workshop']);
+    }
+
+    public function test_stage_propagate() {
+
+        $version20 = mlang_version::by_branch('MOODLE_20_STABLE');
+        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
+        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
+
+        $component20en = new mlang_component('admin', 'en', $version20);
+        $component20en->add_string(new mlang_string('foo1', 'Bar1'));
+        $component20en->add_string(new mlang_string('foo2', 'Bar2'));
+
+        $component20cs = new mlang_component('admin', 'cs', $version20);
+        $component20cs->add_string(new mlang_string('foo1', 'TranslatedOldBar1'));
+
+        $component21en = new mlang_component('admin', 'en', $version21);
+        $component21en->add_string(new mlang_string('foo1', 'Bar1'));
+        $component21en->add_string(new mlang_string('foo2', 'Bar2'));
+        $component21en->add_string(new mlang_string('foo3', 'Bar3'));
+
+        $component22en = new mlang_component('admin', 'en', $version22);
+        $component22en->add_string(new mlang_string('foo1', 'Bar1'));
+        $component22en->add_string(new mlang_string('foo2', 'Bar2'));
+        $component22en->add_string(new mlang_string('foo3', 'NewBar3'));
+
+        $stage = new mlang_stage();
+        $stage->add($component20en);
+        $stage->add($component20cs);
+        $stage->add($component21en);
+        $stage->add($component22en);
+        $stage->commit('Initial strings', array('source' => 'unittest'), true);
+        $component20en->clear();
+        $component21en->clear();
+        $component22en->clear();
+        unset($stage);
+
+        // simple usage - the user translated a string on 2.1 and want it being applied to 2.2, too
+        $stage = new mlang_stage();
+        $component21cs = new mlang_component('admin', 'cs', $version21);
+        $component21cs->add_string(new mlang_string('foo1', 'TranslatedBar1'));
+        $stage->add($component21cs);
+        $component21cs->clear();
+
+        $stage->propagate(array($version22));
+
+        $propagatedcomponent = $stage->get_component('admin', 'cs', $version22);
+        $this->assertNotNull($propagatedcomponent, 'The component "admin" must exist on '.$version22->label);
+        $this->assertTrue($propagatedcomponent->has_string('foo1'));
+        $propagatedstring = $propagatedcomponent->get_string('foo1');
+        $this->assertTrue($propagatedstring->text, 'TranslatedBar1');
+        $stage->clear();
+
+        // the change is not propagated if the changed string is staged several times and the values
+        // are different
+        $stage = new mlang_stage();
+        $component20cs = new mlang_component('admin', 'cs', $version20);
+        $component20cs->add_string(new mlang_string('foo2', 'TranslatedOldBar2'));
+        $component21cs = new mlang_component('admin', 'cs', $version21);
+        $component21cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
+        $stage->add($component20cs);
+        $stage->add($component21cs);
+        $component20cs->clear();
+        $component21cs->clear();
+
+        $stage->propagate(array($version20, $version21, $version22));
+
+        $this->assertEqual($stage->get_component('admin', 'cs', $version20)->get_string('foo2')->text, 'TranslatedOldBar2');
+        $this->assertEqual($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
+        $this->assertNull($stage->get_component('admin', 'cs', $version22));
+        $stage->clear();
+
+        // but the change is propagated if the changed string is staged several times and the values
+        // are the same
+        $stage = new mlang_stage();
+        $component20cs = new mlang_component('admin', 'cs', $version20);
+        $component20cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
+        $component21cs = new mlang_component('admin', 'cs', $version21);
+        $component21cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
+        $stage->add($component20cs);
+        $stage->add($component21cs);
+        $component20cs->clear();
+        $component21cs->clear();
+
+        $stage->propagate(array($version20, $version21, $version22));
+
+        $this->assertEqual($stage->get_component('admin', 'cs', $version22)->get_string('foo2')->text, 'TranslatedBar2');
+        $this->assertEqual($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
+        $this->assertEqual($stage->get_component('admin', 'cs', $version20)->get_string('foo2')->text, 'TranslatedBar2');
+        $stage->clear();
+
+        // the staged string is propagated to another branch only if the English originals match
+        // in the following test, the 2.1 translation of foo3 should not propagate to neither 2.0
+        // (because the string does not exist there) not 2.2 (because the English originals differ)
+        $stage = new mlang_stage();
+        $component21cs = new mlang_component('admin', 'cs', $version21);
+        $component21cs->add_string(new mlang_string('foo3', 'TranslatedBar3'));
+        $stage->add($component21cs);
+        $component21cs->clear();
+
+        $stage->propagate(array($version20, $version21, $version22));
+
+        $this->assertNull($stage->get_component('admin', 'cs', $version20));
+        $this->assertNull($stage->get_component('admin', 'cs', $version22));
+        $stage->clear();
     }
 
     public function test_stash_push() {
