@@ -36,6 +36,7 @@ $prune      = optional_param('prune', null, PARAM_INT);
 $rebase     = optional_param('rebase', null, PARAM_INT);
 $submit     = optional_param('submit', null, PARAM_INT);
 $unstageall = optional_param('unstageall', null, PARAM_INT);
+$propagate  = optional_param('propagate', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', get_system_context());
@@ -101,6 +102,27 @@ if (!empty($submit)) {
     $stash = mlang_stash::instance_from_stage($stage, $stage->userid);
     $stash->push();
     redirect(new moodle_url('/local/amos/stash.php', array('sesskey' => sesskey(), 'submit' => $stash->id)));
+}
+if (!empty($propagate)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $ver = optional_param('ver', array(), PARAM_INT);
+    $num = null;
+    if (!empty($ver) and is_array($ver)) {
+        $versions = array();
+        foreach ($ver as $versioncode) {
+            $versions[] = mlang_version::by_code($versioncode);
+        }
+        if ($versions) {
+            $num = $stage->propagate($versions);
+            $stage->store();
+        }
+    }
+    if (is_null($num)) {
+        redirect($PAGE->url);
+    } else {
+        redirect(new moodle_url($PAGE->url, array('justpropagated' => $num)));
+    }
 }
 
 $output = $PAGE->get_renderer('local_amos');

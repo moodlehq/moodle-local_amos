@@ -227,6 +227,14 @@ $string['presetcommitmessage2'] = 'Merged missing strings from {$a->source} to {
 $string['presetcommitmessage3'] = 'Fixing differences between {$a->versiona} and {$a->versionb}';
 $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
+$string['propagate'] = 'Propagate translations';
+$string['propagate_help'] = 'Staged translations can be propagated to selected branches. AMOS iterates over the list of staged translations and tries to apply them to each selected target branche. Propagation is not possible if:
+
+* the English originals of the string are different on the source and target branches,
+* the string is staged several times with different translation';
+$string['propagatednone'] = 'No translations propagated';
+$string['propagatedsome'] = '{$a} staged translation propagated';
+$string['propagaterun'] = 'Propagate';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';

@@ -126,12 +126,17 @@
     background-color: #d2ebff;
 }
 
+.path-local-amos .stagewrapper .propagateformwrapper,
 .path-local-amos .stagewrapper .actionbuttons {
     text-align: center;
     margin: 1em auto;
     padding: 10px;
     width: 80%;
     border: 1px solid #ddd;
+}
+
+.path-local-amos .stagewrapper .propagateformwrapper form div {
+    display: inline;
 }
 
 .path-local-amos .stagewrapper fieldset.wrappedmform {
