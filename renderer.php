@@ -606,13 +606,13 @@ class local_amos_renderer extends plugin_renderer_base {
             unset($a);
 
             if ($committable) {
-                $justpropagated = optional_param('justpropagated', null, PARAM_BOOL);
+                $justpropagated = optional_param('justpropagated', null, PARAM_INT);
                 if (is_null($justpropagated)) {
                     $output .= $propagateform;
                 } else if ($justpropagated == 0) {
-                    $output .= $this->heading(get_string('propagatednone', 'local_amos'), 3);
+                    $output .= $this->heading(get_string('propagatednone', 'local_amos'));
                 } else {
-                    $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated), 3);
+                    $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
                 }
                 $output .= $commitform;
             }
