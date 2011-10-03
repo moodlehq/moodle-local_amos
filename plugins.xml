@@ -1136,6 +1136,9 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
+    <plugins type="scormreport">
+      <plugin>basic</plugin>
+    </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
