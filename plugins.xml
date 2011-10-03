@@ -776,7 +776,6 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
-      <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>dock</plugin>
       <plugin>editor</plugin>
@@ -816,7 +815,6 @@
       <plugin>repository</plugin>
       <plugin>rss</plugin>
       <plugin>role</plugin>
-      <plugin>simpletest</plugin>
       <plugin>search</plugin>
       <plugin>table</plugin>
       <plugin>tag</plugin>
@@ -824,7 +822,6 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
-      <plugin>xmldb</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -975,18 +972,12 @@
     </plugins>
     <plugins type="report">
       <plugin>backups</plugin>
-      <plugin>capability</plugin>
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
-      <plugin>customlang</plugin>
       <plugin>log</plugin>
-      <plugin>profiling</plugin>
       <plugin>questioninstances</plugin>
       <plugin>security</plugin>
-      <plugin>spamcleaner</plugin>
       <plugin>stats</plugin>
-      <plugin>unittest</plugin>
-      <plugin>unsuproles</plugin>
     </plugins>
     <plugins type="coursereport">
       <plugin>completion</plugin>
@@ -1079,6 +1070,26 @@
     </plugins>
     <plugins type="plagiarism">
     </plugins>
+    <plugins type="tool">
+      <plugin>bloglevelupgrade</plugin>
+      <plugin>capability</plugin>
+      <plugin>customlang</plugin>
+      <plugin>dbtransfer</plugin>
+      <plugin>generator</plugin>
+      <plugin>health</plugin>
+      <plugin>innodb</plugin>
+      <plugin>langimport</plugin>
+      <plugin>multilangupgrade</plugin>
+      <plugin>profiling</plugin>
+      <plugin>qeupgradehelper</plugin>
+      <plugin>replace</plugin>
+      <plugin>spamcleaner</plugin>
+      <plugin>timezoneimport</plugin>
+      <plugin>unittest</plugin>
+      <plugin>unsuproles</plugin>
+      <plugin>uploaduser</plugin>
+      <plugin>xmldb</plugin>
+    </plugins>
     <plugins type="theme">
       <plugin>afterburner</plugin>
       <plugin>anomaly</plugin>
@@ -1145,7 +1156,6 @@
       <plugin>best</plugin>
     </plugins>
     <plugins type="local">
-      <plugin>qeupgradehelper</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
