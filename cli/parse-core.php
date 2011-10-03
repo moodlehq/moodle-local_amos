@@ -347,8 +347,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         if (isset($standardplugins[$version->dir])) {
             // for 2.0 and higher we can make sure that we parse only standard component
             if (!isset($standardplugins[$version->dir][$componentname])) {
-                fputs(STDOUT, "SKIP non-standard component on this branch ($componentname)\n");
-                continue;
+                fputs(STDERR, "WARNING non-standard component on this branch ($componentname)\n");
             }
         }
 
