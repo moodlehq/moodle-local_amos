@@ -375,6 +375,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             foreach ($component->get_iterator() as $string) {
                 $string->deleted = true;
                 $string->timemodified = $timemodified;
+                $affected[$componentname][$string->id] = true;
             }
             $stage->add($component);
             $component->clear();
