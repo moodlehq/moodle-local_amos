@@ -46,7 +46,27 @@ list($options, $unrecognized) = cli_get_params(array(
 
     ), array('h' => 'help'));
 
-$usage = 'Usage: '.basename(__FILE__).' --message=\'Commit message\' [--other-options] /path/to/file.php';
+$usage = <<<EOF
+Imports strings from a file into the AMOS repository.
+
+Usage:
+    php import-strings.php --message='Commit message' [--other-options] /path/to/file.php
+
+Options:
+    --message       Commit message
+    --lang          Language code, defaults to 'en',
+    --version       Branch to commit to, defaults to 'MOODLE_20_STABLE'
+    --timemodified  Timestamp of the commit, defaults to the file last modification time
+    --name          Name of the component, defaults to the filename
+    --format        Format of the file, defaults to 2 (Moodle 2.x)
+    --userinfo      Committer information, defaults to 'David Mudrak <david@moodle.com>'
+    --commithash    Allows to specify the git commit hash
+    --help          Show this usage
+
+The file is directly included into the PHP processor. Make sure to review the file
+for a malicious contents before you import it via this script.
+
+EOF;
 
 if ($options['help'] or empty($options['message']) or empty($unrecognized)) {
     echo $usage . PHP_EOL;
