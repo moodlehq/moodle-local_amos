@@ -2,7 +2,8 @@
     margin-bottom: 0em;
 }
 
-.path-local-amos form input[type="submit"] {
+.path-local-amos form input[type="submit"],
+.path-local-amos button[type="button"] {
     background-color: #eee;
     padding: 1px;
 }
@@ -117,6 +118,7 @@
 }
 
 .path-local-amos .stagewrapper .actionbuttons .singlebutton.unstageall input[type="submit"],
+.path-local-amos .stagewrapper .unstagebutton button[type="button"].tobeconfirmed,
 .path-local-amos .stashwrapper .actions .singlebutton.drop input[type="submit"] {
     background-color: #ffd3d9;
 }

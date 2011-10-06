@@ -436,7 +436,8 @@ class local_amos_renderer extends plugin_renderer_base {
                     'component' => $string->component,
                     'branch'    => $string->branch,
                     'lang'      => $string->language));
-            $unstagebutton = $this->single_button($unstageurl, 'Unstage', 'post', array('class' => 'singlebutton protected'));
+            $unstagebutton = $this->single_button($unstageurl, get_string('unstage', 'local_amos'), 'post',
+                array('class' => 'singlebutton protected unstagebutton'));
             if (trim($string->current) === trim($string->new)) {
                 // no difference
                 $t = self::add_breaks(s($string->current));

@@ -182,6 +182,11 @@ if ($submit) {
     }
     echo $output->heading_with_help(get_string('submitting', 'local_amos'), 'submitting', 'local_amos');
     $stashinfo = local_amos_stash::instance_from_mlang_stash($stash, $USER);
+    if (empty($stashinfo->strings)) {
+        echo $output->heading(get_string('stagestringsnone', 'local_amos'));
+        echo $output->footer();
+        die();
+    }
     echo $output->render($stashinfo);
     $submitform->set_data(array(
         'name'    => s($stash->name),

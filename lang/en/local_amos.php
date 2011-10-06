@@ -305,4 +305,7 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 $string['typecontrib'] = 'Non-standard plugins';
 $string['typecore'] = 'Core subsystems';
 $string['typestandard'] = 'Standard plugins';
+$string['unstage'] = 'Unstage';
+$string['unstageconfirm'] = 'Really?';
+$string['unstaging'] = 'Unstaging';
 $string['version'] = 'Version';
