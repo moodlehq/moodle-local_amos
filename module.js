@@ -468,22 +468,3 @@ M.local_amos.google_language_code = function(moodlecode) {
             return moodlecode;
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// STAGE ///////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Initialize JS support for the stage page, called from stage.php
- *
- * @param {Object} Y YUI instance
- */
-M.local_amos.init_stage = function(Y) {
-    M.local_amos.Y  = Y;
-    // protect from accidental submissions
-    Y.all('.stagewrapper .protected form').on('submit', function(e) {
-        if (!confirm(M.util.get_string('confirmaction', 'local_amos'))) {
-            e.halt();
-        }
-    });
-}

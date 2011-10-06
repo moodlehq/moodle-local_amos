@@ -45,8 +45,8 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('stage', 'local_amos'));
-$PAGE->requires->js_init_call('M.local_amos.init_stage');
 $PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
+$PAGE->requires->yui_module('moodle-local_amos-stage', 'M.local_amos.init_stage');
 
 if (!empty($message)) {
     // committing the stage
