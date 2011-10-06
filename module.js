@@ -267,7 +267,7 @@ M.local_amos.submit = function(cell, editor) {
             success : M.local_amos.submit_success,
             failure : M.local_amos.submit_failure,
         },
-        arguments: {
+        'arguments': {
             cell: cell,
         }
     };
@@ -333,7 +333,7 @@ M.local_amos.uptodate = function(amosid) {
             success : M.local_amos.uptodate_success,
             failure : M.local_amos.uptodate_failure,
         },
-        arguments: {
+        'arguments': {
             amosid: amosid,
         }
     };
