@@ -262,7 +262,7 @@ M.local_amos.submit = function(cell, editor) {
     var uri = M.cfg.wwwroot + '/local/amos/saveajax.php';
     var cfg = {
         method: 'POST',
-        data: 'stringid=' + cellid + '&text=' + encodeURIComponent(editor.get('value')) + '&sesskey=' + M.cfg.sesskey,
+        data: build_querystring({stringid: cellid, text: editor.get('value'), sesskey: M.cfg.sesskey}),
         on: {
             success : M.local_amos.submit_success,
             failure : M.local_amos.submit_failure,
@@ -328,7 +328,7 @@ M.local_amos.uptodate = function(amosid) {
     var uri = M.cfg.wwwroot + '/local/amos/uptodate.ajax.php';
     var cfg = {
         method: 'POST',
-        data: 'amosid=' + amosid + '&sesskey=' + M.cfg.sesskey,
+        data: build_querystring({amosid: amosid, sesskey: M.cfg.sesskey}),
         on: {
             success : M.local_amos.uptodate_success,
             failure : M.local_amos.uptodate_failure,
