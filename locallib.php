@@ -1017,7 +1017,7 @@ class local_amos_index_page implements renderable {
         $english = array(); // holds the number of English strings per component
         $nontranslatable = array(); // holds the number of strings per component that can not be translated via AMOS
                                     // and therefore we should consider them as translated when calculating the ratio
-        foreach ($standard[$this->version->label] as $componentname => $unused) {
+        foreach ($standard[$this->version->dir] as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
             $english[$componentname] = $component->get_number_of_strings();
             $this->totalenglish += $english[$componentname];
@@ -1053,7 +1053,7 @@ class local_amos_index_page implements renderable {
                     if (!empty($nontranslatable[$component])) {
                         $translated += $nontranslatable[$component];
                     }
-                    if (isset($standard[$this->version->label][$component])) {
+                    if (isset($standard[$this->version->dir][$component])) {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
                 }
