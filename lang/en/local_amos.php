@@ -99,6 +99,7 @@ $string['diffmode3'] = 'Either English or translated strings have changed (but n
 $string['diffmode4'] = 'Both English and translated strings have changed';
 $string['diffprogress'] = 'Comparing selected branches';
 $string['diffprogressdone'] = 'Total of {$a} differences found';
+$string['diffstaged'] = 'diff';
 $string['diffstrings'] = 'Compare strings at two branches';
 $string['diffstrings_help'] = 'This will compare all strings at the two selected branches. If there is difference in strings on the branches, both versions are staged. You can then use "Edit staged strings" feature to review and fix the changes as needed.';
 $string['diffversions'] = 'Versions';

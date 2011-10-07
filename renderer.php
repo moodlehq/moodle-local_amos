@@ -458,23 +458,52 @@ class local_amos_renderer extends plugin_renderer_base {
                 }
             } else {
                 // there is a difference
-                $x1 = explode(' ', s($string->current));
-                $x2 = explode(' ', s($string->new));
+                $c = s($string->current);
+                $n = s($string->new);
+                $x1 = explode(' ', $c);
+                $x2 = explode(' ', $n);
 
                 $t = '';
                 $diff = local_amos_simplediff($x1, $x2);
-                foreach ($diff as $k) {
+                $numd = 0;
+                $numi = 0;
+                foreach ($diff as $k) { // $diff is a sequence of chunks (words) $k
                     if (is_array($k)) {
-                        $t .= (!empty($k['d']) ? '<del>'.implode(' ', $k['d']).'</del> ' : '').
-                              (!empty($k['i']) ? '<ins>'.implode(' ', $k['i']).'</ins> ' : '');
+                        if (!empty($k['d'])) {
+                            $kd = implode(' ', $k['d']);
+                            if (!empty($kd)) {
+                                $t .= '<del>'.$kd.'</del> ';
+                                $numd += count($k['d']);
+                            }
+                        }
+                        if (!empty($k['i'])) {
+                            $ki = implode(' ', $k['i']);
+                            if (!empty($ki)) {
+                                $t .= '<ins>'.$ki.'</ins> ';
+                                $numi += count($k['i']);
+                            }
+                        }
                     } else {
                         $t .= $k . ' ';
                     }
                 }
 
-                $t = self::add_breaks($t);
-                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
-                $cells[3] = new html_table_cell($t . $unstagebutton);
+                if ($numi == 0 or $numd == 0 or ($numd == 1 and $numi == 1)) {
+                    $cstyle = 'display:none;';
+                    $nstyle = 'display:none;';
+                    $tstyle = 'display:block;';
+                } else {
+                    $cstyle = 'display:block;';
+                    $nstyle = 'display:block;';
+                    $tstyle = 'display:none;';
+                }
+                $n = html_writer::tag('ins', $n);
+                $n = html_writer::tag('div', self::add_breaks($n), array('class' => 'preformatted stringtext new', 'style' => $nstyle));
+                $c = html_writer::tag('del', $c);
+                $c = html_writer::tag('div', self::add_breaks($c), array('class' => 'preformatted stringtext current', 'style' => $cstyle));
+                $t = html_writer::tag('div', self::add_breaks($t), array('class' => 'preformatted stringtext diff', 'style' => $tstyle));
+                $difflink = html_writer::tag('div', '', array('class' => 'diffmode'));
+                $cells[3] = new html_table_cell($difflink . $n . $c . $t . $unstagebutton);
                 if ($string->committable) {
                     $cells[3]->attributes['class'] .= ' committable diff';
                     $committable++;

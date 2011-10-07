@@ -229,6 +229,13 @@
     background-color: #f3f2aa;
 }
 
+.path-local-amos #amosstage .translation .diffmode {
+    float: right;
+    color: #0C67D7;
+    cursor: pointer;
+    font-size: 80%;
+}
+
 .path-local-amos #amostranslator .translation.committable.outdated {
     background-color: #f3f2aa;
 }
