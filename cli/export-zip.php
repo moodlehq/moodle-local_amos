@@ -33,7 +33,11 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 // Let us get an information about existing components
-list($branchsql, $params) = $DB->get_in_or_equal(array(mlang_version::MOODLE_20, mlang_version::MOODLE_21));
+list($branchsql, $params) = $DB->get_in_or_equal(array(
+    mlang_version::MOODLE_20,
+    mlang_version::MOODLE_21,
+    mlang_version::MOODLE_22,
+));
 $sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
           FROM {amos_repository}
          WHERE deleted=0 and branch $branchsql
