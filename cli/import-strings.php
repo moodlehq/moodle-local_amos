@@ -35,7 +35,7 @@ require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(array(
     'lang'          => 'en',
-    'version'       => 'MOODLE_20_STABLE',
+    'version'       => 'MOODLE_21_STABLE',
     'timemodified'  => null,
     'name'          => null,
     'format'        => 2,
@@ -55,7 +55,7 @@ Usage:
 Options:
     --message       Commit message
     --lang          Language code, defaults to 'en',
-    --version       Branch to commit to, defaults to 'MOODLE_20_STABLE'
+    --version       Branch to commit to, defaults to 'MOODLE_21_STABLE'
     --timemodified  Timestamp of the commit, defaults to the file last modification time
     --name          Name of the component, defaults to the filename
     --format        Format of the file, defaults to 2 (Moodle 2.x)
