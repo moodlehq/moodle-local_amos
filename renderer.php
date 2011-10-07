@@ -568,7 +568,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $editbutton = $this->single_button($editurl, get_string('stageedit', 'local_amos'), 'post', array('class'=>'singlebutton edit'));
 
         if (empty($stage->strings)) {
-            $output = $this->heading(get_string('stagestringsnone', 'local_amos'));
+            $output = $this->heading(get_string('stagestringsnone', 'local_amos'), 2, 'main', 'numberofstagedstrings');
 
             if ($stage->importform) {
                 $legend = html_writer::tag('legend', get_string('importfile', 'local_amos') . $this->help_icon('importfile', 'local_amos'));
@@ -600,9 +600,9 @@ class local_amos_renderer extends plugin_renderer_base {
         } else {
             $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
             if ($committable) {
-                $output = $this->heading(get_string('stagestringssome', 'local_amos', $a));
+                $output = $this->heading(get_string('stagestringssome', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
             } else {
-                $output = $this->heading(get_string('stagestringsnocommit', 'local_amos', $a));
+                $output = $this->heading(get_string('stagestringsnocommit', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
             }
             unset($a);
 

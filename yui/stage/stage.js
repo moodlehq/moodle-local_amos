@@ -81,6 +81,10 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                                     args.button.destroy(true);
                                     wrapper.setContent('');
                                     var row = wrapper.ancestor('tr');
+                                    // update the page heading - the number of staged strings
+                                    var numofstrings = {staged: row.ancestor('table').all('tr').size() - 2}; // one for header, one to be removed
+                                    Y.one('#numberofstagedstrings').setContent(M.util.get_string('stagestringsnocommit', 'local_amos', numofstrings));
+                                    // remove the row from the table
                                     var anim = new Y.Anim({
                                         node: row,
                                         duration: 0.25,
@@ -92,6 +96,10 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                                         var row = this.get('node'); // this === anim
                                         row.get('parentNode').removeChild(row);
                                     });
+                                    // if all strings unstaged, reload the stage screen
+                                    if (numofstrings.staged <= 0) {
+                                        location.href = M.cfg.wwwroot + '/local/amos/stage.php';
+                                    }
                                 } else {
                                     args.button.get('parentNode').setContent('Error: ' + result.error);
                                     args.button.get('parentNode').addClass('error');
