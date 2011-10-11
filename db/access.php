@@ -43,6 +43,13 @@ $capabilities = array(
         )
     ),
 
+    // Ability to execute a given AMOScript and get the result in the stage
+    'local/amos:execute' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
+    ),
+
     // Ability to commit the stage into AMOS repository
     'local/amos:commit' => array(
         'captype' => 'write',

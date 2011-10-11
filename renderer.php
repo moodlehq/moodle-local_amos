@@ -438,7 +438,17 @@ class local_amos_renderer extends plugin_renderer_base {
                     'lang'      => $string->language));
             $unstagebutton = $this->single_button($unstageurl, get_string('unstage', 'local_amos'), 'post',
                 array('class' => 'singlebutton protected unstagebutton'));
-            if (trim($string->current) === trim($string->new)) {
+            if ($string->deleted) {
+                // removal of the string
+                $t = self::add_breaks(s($string->current));
+                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
+                $cells[3] = new html_table_cell($t . $unstagebutton);
+                if ($string->committable) {
+                    $cells[3]->attributes['class'] .= 'committable removal';
+                } else {
+                    $cells[3]->attributes['class'] .= 'uncommittable removal';
+                }
+            } else if (trim($string->current) === trim($string->new)) {
                 // no difference
                 $t = self::add_breaks(s($string->current));
                 $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
@@ -624,6 +634,15 @@ class local_amos_renderer extends plugin_renderer_base {
                 $diffform = ob_get_contents();
                 ob_end_clean();
                 $output .= html_writer::tag('fieldset', $legend.$diffform, array('class' => 'wrappedmform diffform'));
+            }
+
+            if ($stage->executeform) {
+                $legend = html_writer::tag('legend', get_string('script', 'local_amos') . $this->help_icon('script', 'local_amos'));
+                ob_start();
+                $stage->executeform->display();
+                $executeform = ob_get_contents();
+                ob_end_clean();
+                $output .= html_writer::tag('fieldset', $legend.$executeform, array('class' => 'wrappedmform executeform'));
             }
 
         } else {

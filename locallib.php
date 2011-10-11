@@ -688,6 +688,9 @@ class local_amos_stage implements renderable {
     /** @var local_amos_diff_form to stage differences between two branches */
     public $difform;
 
+    /** @var local_amos_execute_form to execute a given AMOScript */
+    public $executeform;
+
     /** @var pre-set commit message */
     public $presetmessage;
 
@@ -714,6 +717,10 @@ class local_amos_stage implements renderable {
             $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }
 
+        if (has_all_capabilities(array('local/amos:execute', 'local/amos:stage'), get_system_context(), $user)) {
+            $this->executeform = new local_amos_execute_form(new moodle_url('/local/amos/execute.php'), local_amos_execute_options());
+        }
+
         foreach($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {
                 if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
@@ -729,6 +736,7 @@ class local_amos_stage implements renderable {
                 $string->stringid = $staged->id;
                 $string->text = $staged->text;
                 $string->timemodified = $staged->timemodified;
+                $string->deleted = $staged->deleted;
                 $string->original = null; // is populated in the next step
                 $string->current = null; // dtto
                 $string->new = $staged->text;
@@ -1372,6 +1380,29 @@ function local_amos_diff_options() {
     $langsall = mlang_tools::list_languages(false);
     $options['languages'] = array_merge(array('' => get_string('choosedots')), $langsall);
     $options['languagecurrent'] = current_language();
+
+    return $options;
+}
+
+/**
+ * Returns the options used for {@link execute_form.php}
+ *
+ * @return array
+ */
+function local_amos_execute_options() {
+
+    $options = array();
+
+    $options['versions'] = array();
+    $options['versioncurrent'] = null;
+    foreach (mlang_version::list_all() as $version) {
+        if ($version->translatable) {
+            $options['versions'][$version->code] = $version->label;
+            if ($version->current) {
+                $options['versioncurrent'] = $version->code;
+            }
+        }
+    }
 
     return $options;
 }

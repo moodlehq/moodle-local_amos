@@ -225,6 +225,10 @@
     background-color: #e7f1c3;
 }
 
+.path-local-amos #amosstage .translation.committable.removal {
+    background-color: #ffd3d9;
+}
+
 .path-local-amos #amosstage .translation.committable.diff {
     background-color: #f3f2aa;
 }

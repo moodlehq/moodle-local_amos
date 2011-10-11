@@ -16,15 +16,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of mlang
- *
  * @package    local
  * @subpackage amos
- * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
+ * @copyright  2011 David Mudrak <david@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2011101100;
-$plugin->requires = 2011070102;
+require_once($CFG->libdir.'/formslib.php');
+
+class local_amos_execute_form extends moodleform {
+
+    public function definition() {
+        $mform =& $this->_form;
+
+        $mform->addElement('select', 'version', get_string('version', 'local_amos'), $this->_customdata['versions']);
+        $mform->setDefault('version', $this->_customdata['versioncurrent']);
+        $mform->addRule('version', null, 'required', null, 'client');
+
+        $mform->addElement('textarea', 'script', get_string('script', 'local_amos'), array('cols' => 60, 'rows' => 10));
+        $mform->setDefault('script', "AMOS BEGIN\n \nAMOS END");
+        $mform->setType('script', PARAM_RAW);
+        $this->add_action_buttons(false, get_string('scriptexecute', 'local_amos'));
+    }
+}
