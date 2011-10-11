@@ -444,6 +444,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
                 $cells[3] = new html_table_cell($t . $unstagebutton);
                 if ($string->committable) {
+                    $committable++;
                     $cells[3]->attributes['class'] .= 'committable removal';
                 } else {
                     $cells[3]->attributes['class'] .= 'uncommittable removal';
