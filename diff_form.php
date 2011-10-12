@@ -55,6 +55,8 @@ class local_amos_diff_form extends moodleform {
             2 => get_string('diffaction2', 'local_amos')
         );
         $mform->addElement('select', 'action', get_string('diffaction', 'local_amos'), $options);
+        $mform->setDefault('action', 1);
+        $mform->disabledIf('action', 'mode', 'eq', 1);
 
         $this->add_action_buttons(false, get_string('diff', 'local_amos'));
     }
