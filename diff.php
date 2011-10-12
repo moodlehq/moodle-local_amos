@@ -93,6 +93,13 @@ if ($data = $diffform->get_data()) {
                 continue;
             }
 
+            // in case we will need it, decide which of the translations is the more recent
+            if ($strtranslateda->timemodified >= $strtranslatedb->timemodified) {
+                $strtranslatedrecent = $strtranslateda;
+            } else {
+                $strtranslatedrecent = $strtranslatedb;
+            }
+
             $englishchanged = mlang_string::differ($strenglisha, $strenglishb);
             $translatedchanged = mlang_string::differ($strtranslateda, $strtranslatedb);
 
@@ -108,8 +115,13 @@ if ($data = $diffform->get_data()) {
             // English strings have not changed but translated ones have
             if ($data->mode == 2) {
                 if (!$englishchanged and $translatedchanged) {
-                    $worka->add_string($strtranslateda);
-                    $workb->add_string($strtranslatedb);
+                    if ($data->action == 1) {
+                        $worka->add_string($strtranslateda);
+                        $workb->add_string($strtranslatedb);
+                    } else {
+                        $worka->add_string($strtranslatedrecent);
+                        $workb->add_string($strtranslatedrecent);
+                    }
                     $num++;
                 }
             }
@@ -117,8 +129,13 @@ if ($data = $diffform->get_data()) {
             // Either English or translated strings have changed (but not both)
             if ($data->mode == 3) {
                 if (($englishchanged or $translatedchanged) and (!($englishchanged and $translatedchanged))) {
-                    $worka->add_string($strtranslateda);
-                    $workb->add_string($strtranslatedb);
+                    if ($data->action == 1) {
+                        $worka->add_string($strtranslateda);
+                        $workb->add_string($strtranslatedb);
+                    } else {
+                        $worka->add_string($strtranslatedrecent);
+                        $workb->add_string($strtranslatedrecent);
+                    }
                     $num++;
                 }
             }
@@ -126,8 +143,13 @@ if ($data = $diffform->get_data()) {
             // Both English and translated strings have changed
             if ($data->mode == 4) {
                 if ($englishchanged and $translatedchanged) {
-                    $worka->add_string($strtranslateda);
-                    $workb->add_string($strtranslatedb);
+                    if ($data->action == 1) {
+                        $worka->add_string($strtranslateda);
+                        $workb->add_string($strtranslatedb);
+                    } else {
+                        $worka->add_string($strtranslatedrecent);
+                        $workb->add_string($strtranslatedrecent);
+                    }
                     $num++;
                 }
             }
