@@ -471,11 +471,6 @@ class local_amos_translator implements renderable {
                  WHERE r.branch {$outer_sqlbranches}
                        AND r.lang {$outer_sqllanguages}
                        AND r.component {$outer_sqlcomponents}";
-        if ($helps) {
-            $sql .= "      AND r.stringid LIKE E'%\\\\_help'";
-        } else {
-            $sql .= "      AND r.stringid NOT LIKE E'%\\\\_link'";
-        }
         if ($stringid) {
             if ($stringidpartial) {
                 $sql .= " AND ".$DB->sql_like('r.stringid', ':stringid', false);
@@ -486,6 +481,13 @@ class local_amos_translator implements renderable {
             }
         } else {
             $params = array();
+        }
+        if ($helps) {
+            $sql .= "     AND ".$DB->sql_like('r.stringid', ':helpstringid', false);
+            $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
+        } else {
+            $sql .= "     AND ".$DB->sql_like('r.stringid', ':linkstringid', false, true, true);
+            $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
         }
         $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch, r.id DESC";
 
