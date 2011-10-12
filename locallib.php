@@ -53,7 +53,7 @@ class local_amos_filter implements renderable {
 
         $this->fields = array(
             'version', 'language', 'component', 'missing', 'helps', 'substring',
-            'stringid', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
+            'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
             'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
         $this->handler  = $handler;
@@ -139,6 +139,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->substring)) {
             $data->substring = '';
         }
+        if (is_null($data->stringidpartial)) {
+            $data->stringidpartial = false;
+        }
         if (is_null($data->substringregex)) {
             $data->substringregex = false;
         }
@@ -213,7 +216,13 @@ class local_amos_filter implements renderable {
         $data->substring            = optional_param('ftxt', '', PARAM_RAW);
         $data->substringregex       = optional_param('ftxr', false, PARAM_BOOL);
         $data->substringcs          = optional_param('ftxs', false, PARAM_BOOL);
-        $data->stringid             = trim(optional_param('fsid', '', PARAM_STRINGID));
+        $data->stringidpartial      = optional_param('fsix', false, PARAM_BOOL);
+        if ($data->stringidpartial) {
+            // in this case, the stringid can start with a non a-z
+            $data->stringid         = trim(optional_param('fsid', '', PARAM_NOTAGS));
+        } else {
+            $data->stringid         = trim(optional_param('fsid', '', PARAM_STRINGID));
+        }
         $data->stagedonly           = optional_param('fstg', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('fglo', false, PARAM_BOOL);
         $data->withoutgreylisted    = optional_param('fwog', false, PARAM_BOOL);
@@ -291,7 +300,13 @@ class local_amos_filter implements renderable {
         $data->substring            = optional_param('s', '', PARAM_RAW);
         $data->substringregex       = optional_param('r', false, PARAM_BOOL);
         $data->substringcs          = optional_param('i', false, PARAM_BOOL);
-        $data->stringid             = trim(optional_param('d', '', PARAM_STRINGID));
+        $data->stringidpartial      = optional_param('p', false, PARAM_BOOL);
+        if ($data->stringidpartial) {
+            // in this case, the stringid can start with a non a-z
+            $data->stringid         = trim(optional_param('d', '', PARAM_NOTAGS));
+        } else {
+            $data->stringid         = trim(optional_param('d', '', PARAM_STRINGID));
+        }
         $data->stagedonly           = optional_param('g', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('o', false, PARAM_BOOL);
         $data->withoutgreylisted    = optional_param('w', false, PARAM_BOOL);
@@ -347,6 +362,7 @@ class local_amos_filter implements renderable {
         if ($fdata->helps)              $this->permalink->param('h', 1);
         if ($fdata->substringregex)     $this->permalink->param('r', 1);
         if ($fdata->substringcs)        $this->permalink->param('i', 1);
+        if ($fdata->stringidpartial)    $this->permalink->param('p', 1);
         if ($fdata->stagedonly)         $this->permalink->param('g', 1);
         if ($fdata->greylistedonly)     $this->permalink->param('o', 1);
         if ($fdata->withoutgreylisted)  $this->permalink->param('w', 1);
@@ -402,6 +418,7 @@ class local_amos_translator implements renderable {
         $substringregex     = $filter->get_data()->substringregex;
         $substringcs        = $filter->get_data()->substringcs;
         $stringid           = $filter->get_data()->stringid;
+        $stringidpartial    = $filter->get_data()->stringidpartial;
         $stagedonly         = $filter->get_data()->stagedonly;
         $greylistedonly     = $filter->get_data()->greylistedonly;
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
@@ -418,8 +435,13 @@ class local_amos_translator implements renderable {
                  WHERE branch $inner_sqlbranches
                    AND component $inner_sqlcomponents";
         if ($stringid) {
-            $sql .= " AND stringid = :stringid";
-            $params = array('stringid' => $stringid);
+            if ($stringidpartial) {
+                $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
+                $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+            } else {
+                $sql .= " AND stringid = :stringid";
+                $params = array('stringid' => $stringid);
+            }
         } else {
             $params = array();
         }
@@ -455,8 +477,13 @@ class local_amos_translator implements renderable {
             $sql .= "      AND r.stringid NOT LIKE E'%\\\\_link'";
         }
         if ($stringid) {
-            $sql .= "      AND r.stringid = :stringid";
-            $params = array('stringid' => $stringid);
+            if ($stringidpartial) {
+                $sql .= " AND ".$DB->sql_like('r.stringid', ':stringid', false);
+                $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+            } else {
+                $sql .= " AND r.stringid = :stringid";
+                $params = array('stringid' => $stringid);
+            }
         } else {
             $params = array();
         }

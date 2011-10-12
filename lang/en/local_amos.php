@@ -136,6 +136,7 @@ $string['filtermisfstg'] = 'staged strings only';
 $string['filtermisfwog'] = 'without greylisted strings';
 $string['filtersid'] = 'String identifier';
 $string['filtersid_desc'] = 'The key in the array of strings';
+$string['filtersidpartial'] = 'partial match';
 $string['filtertxt'] = 'Substring';
 $string['filtertxt_desc'] = 'String must contain given text';
 $string['filtertxtcasesensitive'] = 'case-sensitive';

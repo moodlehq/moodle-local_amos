@@ -175,6 +175,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'element'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filter->get_data()->stringid));
+        $output .= html_writer::checkbox('fsix', 1, $filter->get_data()->stringidpartial, get_string('filtersidpartial', 'local_amos'),
+                    array('class' => 'inputmodifier'));
 
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
