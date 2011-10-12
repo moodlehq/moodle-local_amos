@@ -657,15 +657,16 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             unset($a);
 
+            $justpropagated = optional_param('justpropagated', null, PARAM_INT); // usability hack to hide the propagator just after it was used
+            if (is_null($justpropagated)) {
+                $output .= $propagateform;
+            } else if ($justpropagated == 0) {
+                $output .= $this->heading(get_string('propagatednone', 'local_amos'));
+            } else {
+                $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
+            }
+
             if ($committable) {
-                $justpropagated = optional_param('justpropagated', null, PARAM_INT);
-                if (is_null($justpropagated)) {
-                    $output .= $propagateform;
-                } else if ($justpropagated == 0) {
-                    $output .= $this->heading(get_string('propagatednone', 'local_amos'));
-                } else {
-                    $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
-                }
                 $output .= $commitform;
             }
 
