@@ -49,6 +49,11 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
     foreach ($plugintypes as $legacyname => $frankenstylename) {
 
+        // moodle.org was replaced with a local plugin and strings were dropped from 2.0 and 2.1
+        if ($legacyname == 'moodle.org') {
+            continue;
+        }
+
         // prepare an empty component containing the fixes
         $fixcomponent = new mlang_component($legacyname, 'en', $version);
 
@@ -92,14 +97,21 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'datafield'             => 'mod/data/field',
             'datapreset'            => 'mod/data/preset',
             'quiz'                  => 'mod/quiz/report',
+            'quizaccess'            => 'mod/quiz/accessrule',
+            'scormreport'           => 'mod/scorm/report',
             'workshopform'          => 'mod/workshop/form',
             'workshopallocation'    => 'mod/workshop/allocation',
             'workshopeval'          => 'mod/workshop/eval',
             'local'                 => 'local',
+            'tool'                  => 'admin/tool',
+            'gradingform'           => 'grade/grading/form',
         );
 
         if ($plugintype == 'core') {
             $filepath = 'lang/en/'.$legacyname.'.php';
+        } else if (!isset($basedirs[$plugintype])) {
+            fputs(STDERR, "!! Unknown plugin type '{$plugintype}'\n");
+            continue;
         } else {
             $filepath = $basedirs[$plugintype].'/'.$pluginname.'/lang/en/'.$legacyname.'.php';
         }
