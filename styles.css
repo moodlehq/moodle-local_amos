@@ -207,6 +207,10 @@
     background-color: #f7f7f7;
 }
 
+.path-local-amos #amostranslator .translation.translatable {
+    cursor: text;
+}
+
 .path-local-amos #amostranslator .translation.committable.missing {
     background-color: #ffd3d9;
 }
