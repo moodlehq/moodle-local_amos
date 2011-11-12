@@ -429,6 +429,7 @@ EOF
         } else {
             fwrite($f, $phpdoc);
         }
+        fwrite($f, "defined('MOODLE_INTERNAL') || die();\n\n");
         foreach ($this->get_iterator() as $string) {
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));
