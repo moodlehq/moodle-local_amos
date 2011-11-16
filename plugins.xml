@@ -789,6 +789,7 @@
       <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
+      <plugin>grading</plugin>
       <plugin>group</plugin>
       <plugin>help</plugin>
       <plugin>hub</plugin>
@@ -851,6 +852,7 @@
       <plugin>imscp</plugin>
       <plugin>label</plugin>
       <plugin>lesson</plugin>
+      <plugin>lti</plugin>
       <plugin>page</plugin>
       <plugin>quiz</plugin>
       <plugin>resource</plugin>
@@ -928,7 +930,6 @@
       <plugin>quiz_results</plugin>
       <plugin>recent_activity</plugin>
       <plugin>rss_client</plugin>
-      <plugin>search</plugin>
       <plugin>search_forums</plugin>
       <plugin>section_links</plugin>
       <plugin>selfcompletion</plugin>
@@ -943,15 +944,15 @@
       <plugin>activitynames</plugin>
       <plugin>algebra</plugin>
       <plugin>censor</plugin>
+      <plugin>data</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
+      <plugin>glossary</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
       <plugin>tidy</plugin>
       <plugin>urltolink</plugin>
-      <plugin>mod_data</plugin>
-      <plugin>mod_glossary</plugin>
     </plugins>
     <plugins type="editor">
       <plugin>textarea</plugin>
@@ -972,20 +973,19 @@
     </plugins>
     <plugins type="report">
       <plugin>backups</plugin>
+      <plugin>completion</plugin>
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
       <plugin>log</plugin>
+      <plugin>loglive</plugin>
+      <plugin>outline</plugin>
+      <plugin>participation</plugin>
+      <plugin>progress</plugin>
       <plugin>questioninstances</plugin>
       <plugin>security</plugin>
       <plugin>stats</plugin>
     </plugins>
     <plugins type="coursereport">
-      <plugin>completion</plugin>
-      <plugin>log</plugin>
-      <plugin>outline</plugin>
-      <plugin>participation</plugin>
-      <plugin>progress</plugin>
-      <plugin>stats</plugin>
     </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
@@ -1063,7 +1063,6 @@
       <plugin>learnwise</plugin>
       <plugin>missingword</plugin>
       <plugin>multianswer</plugin>
-      <plugin>qti_two</plugin>
       <plugin>webct</plugin>
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
@@ -1104,6 +1103,7 @@
       <plugin>fusion</plugin>
       <plugin>leatherbound</plugin>
       <plugin>magazine</plugin>
+      <plugin>mymobile</plugin>
       <plugin>nimble</plugin>
       <plugin>nonzero</plugin>
       <plugin>overlay</plugin>
@@ -1112,6 +1112,9 @@
       <plugin>splash</plugin>
       <plugin>standard</plugin>
       <plugin>standardold</plugin>
+    </plugins>
+    <plugins type="gradingform">
+      <plugin>rubric</plugin>
     </plugins>
     <plugins type="assignment">
       <plugin>offline</plugin>
@@ -1138,12 +1141,23 @@
     </plugins>
     <plugins type="scormreport">
       <plugin>basic</plugin>
+      <plugin>interactions</plugin>
     </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
       <plugin>responses</plugin>
       <plugin>statistics</plugin>
+    </plugins>
+    <plugins type="quizaccess">
+      <plugin>delaybetweenattempts</plugin>
+      <plugin>ipaddress</plugin>
+      <plugin>numattempts</plugin>
+      <plugin>openclosedate</plugin>
+      <plugin>password</plugin>
+      <plugin>safebrowser</plugin>
+      <plugin>securewindow</plugin>
+      <plugin>timelimit</plugin>
     </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
@@ -1159,6 +1173,7 @@
       <plugin>best</plugin>
     </plugins>
     <plugins type="local">
+      <plugin>moodleorg</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
