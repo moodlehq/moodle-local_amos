@@ -15,3 +15,9 @@ So now we must tell AMOS that the master branch in 2.3.
    cli/parse-core.php, cli/export-installer.php and cli/fix-drift.php
 4. Make sure that plugins.xml contains declaration for 2.3
 5. Increase the initial version of new language packs in admin/newlanguage.php
+
+Cloning greylisted strings
+--------------------------
+
+INSERT INTO mdl_amos_greylist (branch, component, stringid)
+SELECT 2300 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = 2200;
