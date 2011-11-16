@@ -182,6 +182,7 @@ $MLANG_BROKEN_CHECKOUTS = array(
     '4416da02db714807a71d8a28c19af3a834d2a266_lang_en_utf8_enrol_mnet.php',
     'fd1d5455fde49baa64a37126f25f3d3fd6b6f3f2_mod_assignment_lang_en_assignment.php',
     '759b81f3dc4c2ce2b0579f8764aabf9e3fa9d0cc_theme_nonzero_lang_en_theme_nonzero.php',
+    '5de15b83cc41c1f03415db00088b0c0d294556a9_mod_lti_lang_en_lti.php',
 );
 
 $MLANG_IGNORE_COMMITS = array(
