@@ -542,6 +542,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("\t  Trim Hunter  \t\t", 1), 'Trim Hunter');
         $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?', 1), 'Delete role \"$a->role\"?');
         $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?', 1), 'Delete role \"$a->role\"?');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 1), 'Delete ASCII NULL control character');
     }
 
     /**
@@ -575,6 +576,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("\t  Trim Hunter  \t\t"), 'Trim Hunter');
         $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?'), 'Delete role "$a->role"?');
         $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?'), 'Delete role "$a->role"?');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\0 NULL control character"), 'Delete ASCII NULL control character');
     }
 
     /**
@@ -618,6 +620,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('Delete role "$a->role"?', 2, 1), 'Delete role "{$a->role}"?');
         $this->assertEqual(mlang_string::fix_syntax('Delete role \"$a->role\"?', 2, 1), 'Delete role "{$a->role}"?');
         $this->assertEqual(mlang_string::fix_syntax('See &#36;CFG->foo', 2, 1), 'See $CFG->foo');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 2, 1), 'Delete ASCII NULL control character');
     }
 
     /*
