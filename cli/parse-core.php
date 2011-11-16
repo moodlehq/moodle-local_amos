@@ -371,16 +371,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $fullcommitmsg  = implode("\n", array_slice($commitinfo, 3));  // AMOS script is looked up here later
 
         if ($changetype == 'D') {
-            // whole file removal
-            $component = mlang_component::from_snapshot($componentname, 'en', $version, $timemodified);
-            foreach ($component->get_iterator() as $string) {
-                $string->deleted = true;
-                $string->timemodified = $timemodified;
-                $affected[$componentname][$string->id] = true;
-            }
-            $stage->add($component);
-            $component->clear();
-            unset($component);
+            // whole file removal - do not do anything, fix-drift job will clear the repository
             continue;
         }
 

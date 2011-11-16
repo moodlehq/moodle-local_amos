@@ -18,6 +18,9 @@
 /**
  * Detects and fixes drifts in the English strings
  *
+ * Parameters:
+ * --execute - execute required steps to make AMOS and Git repo synced
+ *
  * @package    local
  * @subpackage amos
  * @copyright  2011 David Mudrak <david@moodle.com>
@@ -131,7 +134,13 @@ foreach ($plugins as $versionnumber => $plugintypes) {
         if ($gitstatus == 128) {
             // the $filepath does not exist in the $gitbranch
             if ($amoscomponent->has_string()) {
-                fputs(STDERR, "!! '{$filepath}' does not exist in {$gitbranch}\n");
+                fputs(STDERR, "-- '{$filepath}' does not exist in {$gitbranch}\n");
+                foreach ($amoscomponent->get_iterator() as $string) {
+                    $string->deleted = true;
+                    $string->timemodified = time();
+                }
+                $stage->add($amoscomponent);
+                continue;
             }
             // no string file and nothing in AMOS - that is correct
             continue;
@@ -188,4 +197,9 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
 if ($options['execute']) {
     $stage->commit('Fixing the drift between Git and AMOS repository', array('source' => 'fixdrift', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
+} else {
+    list($x, $y, $z) = mlang_stage::analyze($stage);
+    if ($x > 0) {
+        fputs(STDOUT, "There are $x string changes prepared for sync execution\n");
+    }
 }
