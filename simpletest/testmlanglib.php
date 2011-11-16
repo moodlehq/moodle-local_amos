@@ -117,13 +117,6 @@ class mlang_test extends UnitTestCase {
         $this->assertFalse($component->has_string());
         $component->add_string(new mlang_string('welcome', 'Welcome'));
         $component->clear();
-        $this->assertFalse($component->has_string());
-        $component->add_string(new mlang_string('welcome', 'Welcome'));
-        $this->expectException();
-        $component->add_string(new mlang_string('welcome', 'Overwriting existing throws exception'));
-        $this->assertNoErrors();
-        $component->add_string(new mlang_string('welcome', 'Overwriting existing must be forced'), true);
-        $component->clear();
         unset($component);
 
         // commit a single string
@@ -170,6 +163,18 @@ class mlang_test extends UnitTestCase {
         $this->assertEqual(4, $DB->count_records('amos_repository'));
         $this->assertTrue($DB->record_exists('amos_repository', array(
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
+    }
+
+    public function test_add_existing_string() {
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_22_STABLE'));
+        $this->assertFalse($component->has_string());
+        $component->add_string(new mlang_string('welcome', 'Welcome'));
+        $component->add_string(new mlang_string('welcome', 'Overwriting existing must be forced'), true);
+        $this->assertEqual($component->get_string('welcome')->text, 'Overwriting existing must be forced');
+        $this->expectException();
+        $component->add_string(new mlang_string('welcome', 'Overwriting existing throws exception'));
+        $component->clear();
+        unset($component);
     }
 
     public function test_deleted_has_same_timemodified() {

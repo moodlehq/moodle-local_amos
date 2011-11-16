@@ -351,7 +351,7 @@ class mlang_component {
      */
     public function add_string(mlang_string $string, $force=false) {
         if (!$force && isset($this->strings[$string->id])) {
-            throw new coding_exception('You are trying to add a string that already exists. If this is intentional, use the force parameter');
+            throw new coding_exception('You are trying to add a string \''.$string->id.'\' that already exists in this component. If this is intentional, use the \'force\' parameter');
         }
         $this->strings[$string->id] = $string;
         $string->component = $this;
