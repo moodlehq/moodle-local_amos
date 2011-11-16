@@ -79,7 +79,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'editor'                => 'lib/editor',
             'format'                => 'course/format',
             'profilefield'          => 'user/profile/field',
-            'report'                => 'admin/report',
+            'report'                => 'report',
             'coursereport'          => 'course/report',
             'gradeexport'           => 'grade/export',
             'gradeimport'           => 'grade/import',
@@ -106,6 +106,11 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'tool'                  => 'admin/tool',
             'gradingform'           => 'grade/grading/form',
         );
+
+        if ($version->code <= mlang_version::MOODLE_21) {
+            // since 2.2 beta, reports have moved
+            $basedirs['report'] = 'admin/report';
+        }
 
         if ($plugintype == 'core') {
             $filepath = 'lang/en/'.$legacyname.'.php';
