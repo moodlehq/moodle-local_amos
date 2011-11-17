@@ -551,6 +551,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 1), 'Delete ASCII DATA LINK ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 1), 'Delete ASCII DEVICE CONTROL ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 1), 'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 1), 'Delete ASCII DEVICE CONTROL THREE control character');
     }
 
     /**
@@ -593,6 +594,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character"), 'Delete ASCII DATA LINK ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character"), 'Delete ASCII DEVICE CONTROL ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character"), 'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character"), 'Delete ASCII DEVICE CONTROL THREE control character');
     }
 
     /**
@@ -645,6 +647,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character" 2, 1), 'Delete ASCII DATA LINK ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character" 2, 1), 'Delete ASCII DEVICE CONTROL ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 2, 1), 'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 2, 1), 'Delete ASCII DEVICE CONTROL THREE control character');
     }
 
     /*
