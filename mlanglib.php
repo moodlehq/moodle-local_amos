@@ -620,8 +620,11 @@ class mlang_string {
         $clean = trim($text);
         $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
         $search = array(
+            // for remove \r in from \r\n
+            '/\r(?=\n)/S',
         );
         $replace = array(
+            "", // remove \r in from \r\n
         );
 	$clean = preg_replace($search, $replace, $clean);
 	
