@@ -574,6 +574,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 1), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 1), 'Delete ISO 8859 PRIVATE USE ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 1), 'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 1), 'Delete ISO 8859 SET TRANSMIT STATE control character');
     }
 
     /**
@@ -639,6 +640,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character"), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character"), 'Delete ISO 8859 PRIVATE USE ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character"), 'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character"), 'Delete ISO 8859 SET TRANSMIT STATE control character');
     }
 
     /**
@@ -714,6 +716,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 2, 1), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 2, 1), 'Delete ISO 8859 PRIVATE USE ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 2, 1), 'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 2, 1), 'Delete ISO 8859 SET TRANSMIT STATE control character');
     }
 
     /*
