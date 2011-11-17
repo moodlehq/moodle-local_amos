@@ -547,6 +547,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 1), 'Delete ASCII ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 1), 'Delete ASCII BELL control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 1), 'Delete ASCII SHIFT OUT control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 1), 'Delete ASCII SHIFT IN control character');
     }
 
     /**
@@ -585,6 +586,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character"), 'Delete ASCII ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character"), 'Delete ASCII BELL control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character"), 'Delete ASCII SHIFT OUT control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character"), 'Delete ASCII SHIFT IN control character');
     }
 
     /**
@@ -633,6 +635,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 2, 1), 'Delete ASCII ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 2, 1), 'Delete ASCII BELL control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 2, 1), 'Delete ASCII SHIFT OUT control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character" 2, 1), 'Delete ASCII SHIFT IN control character');
     }
 
     /*
