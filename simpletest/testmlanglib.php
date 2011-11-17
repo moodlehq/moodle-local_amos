@@ -578,6 +578,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 1), 'Delete ISO 8859 MESSAGE WAITING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 1), 'Delete ISO 8859 START OF GUARDED AREA control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 1), 'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 1), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
     }
 
     /**
@@ -647,6 +648,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character"), 'Delete ISO 8859 MESSAGE WAITING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character"), 'Delete ISO 8859 START OF GUARDED AREA control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character"), 'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character"), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
     }
 
     /**
@@ -726,6 +728,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 2, 1), 'Delete ISO 8859 MESSAGE WAITING control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 2, 1), 'Delete ISO 8859 START OF GUARDED AREA control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 2, 1), 'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 2, 1), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
     }
 
     /*
