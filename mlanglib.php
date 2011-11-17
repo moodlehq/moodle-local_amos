@@ -615,17 +615,36 @@ class mlang_string {
         if (is_null($from)) {
             $from = $format;
         }
+
+        // common filter
+        $clean = trim($text);
+        $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
+        $search = array(
+            // control characters for remove:
+            // NULL, ENQUIRY, ACKNOWLEDGE, BELL, SHIFT {OUT,IN}, DATA LINK ESCAPE,
+            // DEVICE CONTROL {ONE,TWO,THREE,FOUR}, NEGATIVE ACKNOWLEDGE, SYNCHRONOUS IDLE, ESCAPE,
+            // DELETE, PADDING CHARACTER, HIGH OCTET PRESET, NO BREAK HERE, INDEX,
+            // {START,END} OF SELECTED AREA, CHARACTER TABULATION {SET,WITH JUSTIFICATION},
+            // LINE TABULATION SET, PARTIAL LINE {FORWARD,BACKWARD}, REVERSE LINE FEED,
+            // SINGLE SHIFT {TWO,THREE}, DEVICE CONTROL STRING, PRIVATE USE {ONE,TWO},
+            // SET TRANSMIT STATE, MESSAGE WAITING, {START,END} OF GUARDED AREA,
+            // {SINGLE {GRAPHIC,} CHARACTER,CONTROL SEQUENCE} INTRODUCER, OPERATING SYSTEM COMMAND,
+            // PRIVACY MESSAGE, APPLICATION PROGRAM COMMAND, ZERO WIDTH {,NO-BREAK} SPACE,
+            // REPLACEMENT CHARACTER
+            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
+        );
+        $replace = array(
+            "", // remove control characters
+        );
+	$clean = preg_replace($search, $replace, $clean);
+	
         if (($format === 2) && ($from === 2)) {
             // sanity translations of 2.x strings
-            $clean = trim($text);
-            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
             $clean = str_replace("\\", '', $clean); // delete all slashes
             $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
 
         } elseif (($format === 2) && ($from === 1)) {
             // convert 1.x string into 2.x format
-            $clean = trim($text);
-            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
             $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
             $clean = preg_replace('/%+/', '%', $clean); // collapse % characters
             $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean); // remember for later
@@ -636,8 +655,6 @@ class mlang_string {
 
         } elseif (($format === 1) && ($from === 1)) {
             // sanity legacy 1.x strings
-            $clean = trim($text);
-            $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
             $clean = preg_replace("/\n{3,}/", "\n\n", $clean); // collapse runs of blank lines
             $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean);
             $clean = str_replace("\\", '', $clean); // delete all slashes
