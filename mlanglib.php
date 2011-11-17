@@ -619,6 +619,11 @@ class mlang_string {
         // common filter
         $clean = trim($text);
         $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
+        $search = array(
+        );
+        $replace = array(
+        );
+	$clean = preg_replace($search, $replace, $clean);
 	
         if (($format === 2) && ($from === 2)) {
             // sanity translations of 2.x strings
