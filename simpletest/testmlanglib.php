@@ -556,6 +556,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 1), 'Delete ASCII ESCAPE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 1), 'Delete ASCII DELETE control character');
     }
 
     /**
@@ -603,6 +604,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character"), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character"), 'Delete ASCII SYNCHRONOUS IDLE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character"), 'Delete ASCII ESCAPE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character"), 'Delete ASCII DELETE control character');
     }
 
     /**
@@ -660,6 +662,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 2, 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 2, 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 2, 1), 'Delete ASCII ESCAPE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 2, 1), 'Delete ASCII DELETE control character');
     }
 
     /*
