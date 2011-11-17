@@ -522,6 +522,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('Completed 100%% of work', 1), 'Completed 100%% of work');
         $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks", 1), "Windows\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks", 1), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Mac\rsucks", 1), "Mac\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 1), "Empty\n\nlines");
         $this->assertEqual(mlang_string::fix_syntax('Escape $variable names', 1), 'Escape \$variable names');
         $this->assertEqual(mlang_string::fix_syntax('Escape $alike names', 1), 'Escape \$alike names');
@@ -557,6 +558,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('%%%% HEADER %%%%'), '%%%% HEADER %%%%'); // was not possible before
         $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks"), "Windows\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks"), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Mac\rsucks"), "Mac\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines"), "Empty\n\n\nlines"); // now allows up to two empty lines
         $this->assertEqual(mlang_string::fix_syntax('Do not escape $variable names'), 'Do not escape $variable names');
         $this->assertEqual(mlang_string::fix_syntax('Do not escape $alike names'), 'Do not escape $alike names');
@@ -590,6 +592,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax('Completed 100%% of work', 2, 1), 'Completed 100% of work');
         $this->assertEqual(mlang_string::fix_syntax("Windows\r\nsucks", 2, 1), "Windows\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Linux\nsucks", 2, 1), "Linux\nsucks");
+        $this->assertEqual(mlang_string::fix_syntax("Mac\rsucks", 2, 1), "Mac\nsucks");
         $this->assertEqual(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 2, 1), "Empty\n\n\nlines");
         $this->assertEqual(mlang_string::fix_syntax('Do not escape $variable names', 2, 1), 'Do not escape $variable names');
         $this->assertEqual(mlang_string::fix_syntax('Do not escape \$variable names', 2, 1), 'Do not escape $variable names');
