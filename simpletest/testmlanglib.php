@@ -558,6 +558,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 1), 'Delete ASCII ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 1), 'Delete ASCII DELETE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 1), 'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
     }
 
     /**
@@ -607,6 +608,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character"), 'Delete ASCII ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character"), 'Delete ASCII DELETE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character"), 'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character"), 'Delete ISO 8859 HIGH OCTET PRESET control character');
     }
 
     /**
@@ -666,6 +668,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 2, 1), 'Delete ASCII ESCAPE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 2, 1), 'Delete ASCII DELETE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 2, 1), 'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 2, 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
     }
 
     /*
