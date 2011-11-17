@@ -103,10 +103,8 @@ foreach ($tree as $vercode => $languages) {
         }
         $zipfile = $CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode.'.zip';
         $status = $status and $packer->archive_to_pathname($zipfiles, $zipfile);
-        if ($status) {
-            fulldelete($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode);
-        } else {
-            echo "ERROR Unable to ZIP\n";
+        if (!$status) {
+            fputs(STDERR, "ERROR Unable to ZIP $zipfile\n");
             exit(1);
         }
         $packinfo[$langcode]['md5'] = md5_file($zipfile);
@@ -144,7 +142,7 @@ foreach ($tree as $vercode => $languages) {
         // currently published ZIP file
         $currentzip = AMOS_EXPORT_ZIP_DIR.'/'.$version->dir.'/'.$langcode.'.zip';
         if ($updated) {
-            echo "UPDATE $version->dir/$langcode.zip\n";
+            fputs(STDOUT, "UPDATE $version->dir/$langcode.zip\n");
             // replace the current file with the updated one
             if (!is_dir(dirname($currentzip))) {
                 mkdir(dirname($currentzip), 0755, true);
@@ -155,7 +153,7 @@ foreach ($tree as $vercode => $languages) {
             $md5updated = true;
             $newpackinfo[$langcode] = $info;
         } else {
-            echo "KEEP $version->dir/$langcode.zip\n";
+            fputs(STDOUT, "KEEP $version->dir/$langcode.zip\n");
             // keep the currently published ZIP file
             unlink($newzip);
             // keep the current MD5 record
