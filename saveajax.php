@@ -45,9 +45,7 @@ $text     = optional_param('text', null, PARAM_RAW);
 
 // remove all zero-width space characters from the text
 // {@link http://www.fileformat.info/info/unicode/char/200b/index.htm}
-$text = preg_replace('|\xe2\x80\x8b|', '', $text);
-
-// filtering the input data
+// and filtering the input data
 $text = mlang_string::fix_syntax($text);
 
 if (is_null($stringid) or is_null($text)) {
