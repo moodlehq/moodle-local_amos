@@ -583,6 +583,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 1), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 1), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 1), 'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
     }
 
     /**
@@ -657,6 +658,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character"), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character"), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character"), 'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character"), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
     }
 
     /**
@@ -741,6 +743,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 2, 1), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 2, 1), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 2, 1), 'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 2, 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
     }
 
     /*
