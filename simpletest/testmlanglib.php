@@ -560,6 +560,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 1), 'Delete ISO 8859 PADDING CHARACTER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 1), 'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 1), 'Delete ISO 8859 INDEX control character');
     }
 
     /**
@@ -611,6 +612,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character"), 'Delete ISO 8859 PADDING CHARACTER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character"), 'Delete ISO 8859 HIGH OCTET PRESET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character"), 'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character"), 'Delete ISO 8859 INDEX control character');
     }
 
     /**
@@ -672,6 +674,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 2, 1), 'Delete ISO 8859 PADDING CHARACTER control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 2, 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 2, 1), 'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 2, 1), 'Delete ISO 8859 INDEX control character');
     }
 
     /*
