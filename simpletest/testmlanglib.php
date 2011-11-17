@@ -554,6 +554,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 1), 'Delete ASCII DEVICE CONTROL THREE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 1), 'Delete ASCII DEVICE CONTROL FOUR control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
     }
 
     /**
@@ -599,6 +600,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character"), 'Delete ASCII DEVICE CONTROL THREE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character"), 'Delete ASCII DEVICE CONTROL FOUR control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character"), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character"), 'Delete ASCII SYNCHRONOUS IDLE control character');
     }
 
     /**
@@ -654,6 +656,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 2, 1), 'Delete ASCII DEVICE CONTROL THREE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 2, 1), 'Delete ASCII DEVICE CONTROL FOUR control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 2, 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 2, 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
     }
 
     /*
