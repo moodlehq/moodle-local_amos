@@ -562,6 +562,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 1), 'Delete ISO 8859 NO BREAK HERE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 1), 'Delete ISO 8859 INDEX control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 1), 'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 1), 'Delete ISO 8859 END OF SELECTED AREA control character');
     }
 
     /**
@@ -615,6 +616,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character"), 'Delete ISO 8859 NO BREAK HERE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character"), 'Delete ISO 8859 INDEX control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character"), 'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character"), 'Delete ISO 8859 END OF SELECTED AREA control character');
     }
 
     /**
@@ -678,6 +680,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 2, 1), 'Delete ISO 8859 NO BREAK HERE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 2, 1), 'Delete ISO 8859 INDEX control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 2, 1), 'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 2, 1), 'Delete ISO 8859 END OF SELECTED AREA control character');
     }
 
     /*
