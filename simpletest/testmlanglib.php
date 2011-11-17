@@ -566,6 +566,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 1), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 1), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 1), 'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 1), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
     }
 
     /**
@@ -623,6 +624,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character"), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character"), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character"), 'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character"), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
     }
 
     /**
@@ -690,6 +692,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 2, 1), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 2, 1), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 2, 1), 'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 2, 1), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
     }
 
     /*
