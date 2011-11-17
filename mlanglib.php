@@ -622,9 +622,16 @@ class mlang_string {
         $search = array(
             // for remove \r in from \r\n
             '/\r(?=\n)/S',
+
+            // control characters for replace to \n:
+            // LINE TABULATION, FORM FEED, CARRIAGE RETURN, END OF TRANSMISSION BLOCK,
+            // END OF MEDIUM, SUBSTITUTE, BREAK PERMITTED HERE, NEXT LINE, START OF STRING,
+            // STRING TERMINATOR and Unicode character categorys Zl and Zp
+            '/[\x{0B}-\r\x{17}\x{19}\x{1A}\x{82}\x{85}\x{98}\x{9C}\p{Zl}\p{Zp}]/u',
         );
         $replace = array(
             "", // remove \r in from \r\n
+            "/n" // rplace control characters
         );
 	$clean = preg_replace($search, $replace, $clean);
 	
