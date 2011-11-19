@@ -45,8 +45,9 @@ interface mlang_parser {
      *
      * @param mixed $data data to parse, typically a file content
      * @param mlang_component $component component to add strings to
+     * @param int $format the data format on the input, defaults to the one used since 2.0
      */
-    public function parse($data, mlang_component $component);
+    public function parse($data, mlang_component $component, $format=2);
 }
 
 /**
@@ -128,12 +129,14 @@ class mlang_php_parser implements mlang_parser {
      *
      * @param string $data definition of the associative array
      * @param mlang_component $component component to add strings to
+     * @param int $format the data format on the input, defaults to the one used since 2.0
      * @return void
      */
-    public function parse($data, mlang_component $component) {
+    public function parse($data, mlang_component $component, $format=2) {
 
         $strings = $this->extract_strings($data);
         foreach ($strings as $id => $text) {
+            $text = mlang_string::fix_syntax($text, 2, $format);
             $component->add_string(new mlang_string($id, $text));
         }
     }

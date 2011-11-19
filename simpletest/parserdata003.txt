@@ -1,0 +1,10 @@
+<?php
+
+// Legacy string file in 1.x format
+
+$string['valid1'] = 'This \"is\" $a valid string $a->and should be parsed';
+$string['valid2'] = 'Multiline
+string';
+$string['valid3'] = 'What \$a\'Pe%%\\"be'; // comment
+
+?>

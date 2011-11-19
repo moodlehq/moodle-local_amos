@@ -75,10 +75,19 @@ class mlangparser_test extends UnitTestCase {
         $this->assertEqual($component->get_number_of_strings(), 6);
         $this->assertEqual($component->get_string('valid1')->text, 'This is {$a} valid string {$a->and} should be parsed');
         $this->assertEqual($component->get_string('valid2')->text, "Multiline\nstring");
-        $this->assertEqual($component->get_string('valid3')->text, 'What \$a\'Pe%%\\"be');
+        $this->assertEqual($component->get_string('valid3')->text, 'What $a\'Pe%%"be');
         $this->assertEqual($component->get_string('valid4')->text, "\$string['self'] = 'Eh?';");
         $this->assertEqual($component->get_string('valid5')->text, 'First');
         $this->assertEqual($component->get_string('valid6')->text, 'Second');
+
+        // more complex example (format 1.x)
+        $data = file_get_contents(dirname(__FILE__).'/parserdata003.txt');
+        $component->clear();
+        $parser->parse($data, $component, 1);
+        $this->assertEqual($component->get_number_of_strings(), 3);
+        $this->assertEqual($component->get_string('valid1')->text, 'This "is" {$a} valid string {$a->and} should be parsed');
+        $this->assertEqual($component->get_string('valid2')->text, "Multiline\nstring");
+        $this->assertEqual($component->get_string('valid3')->text, 'What $a\'Pe%"be');
 
         // double quotes are allowed only if they do not contain dollar sign
         $data = '<?php $string["id"] = "No dollar here";';
