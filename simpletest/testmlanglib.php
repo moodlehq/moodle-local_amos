@@ -598,7 +598,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 1), 'Delete Unicode ZERO WIDTH SPACE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 1), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBD REPLACEMENT CHARACTER control character", 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     /**
@@ -688,7 +688,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character"), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character"), 'Delete Unicode ZERO WIDTH SPACE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character"), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBD REPLACEMENT CHARACTER control character"), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character"), 'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     /**
@@ -749,9 +749,9 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 2, 1), 'Delete ASCII ACKNOWLEDGE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 2, 1), 'Delete ASCII BELL control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 2, 1), 'Delete ASCII SHIFT OUT control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character" 2, 1), 'Delete ASCII SHIFT IN control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character" 2, 1), 'Delete ASCII DATA LINK ESCAPE control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character" 2, 1), 'Delete ASCII DEVICE CONTROL ONE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 2, 1), 'Delete ASCII SHIFT IN control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 2, 1), 'Delete ASCII DATA LINK ESCAPE control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 2, 1), 'Delete ASCII DEVICE CONTROL ONE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 2, 1), 'Delete ASCII DEVICE CONTROL TWO control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 2, 1), 'Delete ASCII DEVICE CONTROL THREE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 2, 1), 'Delete ASCII DEVICE CONTROL FOUR control character');
@@ -788,7 +788,7 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 2, 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 2, 1), 'Delete Unicode ZERO WIDTH SPACE control character');
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 2, 1), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBD REPLACEMENT CHARACTER control character", 2, 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 2, 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     /*
