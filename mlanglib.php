@@ -618,23 +618,36 @@ class mlang_string {
 
         // common filter
         $clean = trim($text);
-        $clean = str_replace("\r", '', $clean); // bad newline character caused by Windows
         $search = array(
-            // for remove \r in from \r\n
+            // remove \r if it is part of \r\n
             '/\r(?=\n)/S',
 
-            // control characters for replace to \n:
+            // control characters to be replaced with \n
             // LINE TABULATION, FORM FEED, CARRIAGE RETURN, END OF TRANSMISSION BLOCK,
             // END OF MEDIUM, SUBSTITUTE, BREAK PERMITTED HERE, NEXT LINE, START OF STRING,
             // STRING TERMINATOR and Unicode character categorys Zl and Zp
             '/[\x{0B}-\r\x{17}\x{19}\x{1A}\x{82}\x{85}\x{98}\x{9C}\p{Zl}\p{Zp}]/u',
+
+            // control characters to be removed
+            // NULL, ENQUIRY, ACKNOWLEDGE, BELL, SHIFT {OUT,IN}, DATA LINK ESCAPE,
+            // DEVICE CONTROL {ONE,TWO,THREE,FOUR}, NEGATIVE ACKNOWLEDGE, SYNCHRONOUS IDLE, ESCAPE,
+            // DELETE, PADDING CHARACTER, HIGH OCTET PRESET, NO BREAK HERE, INDEX,
+            // {START,END} OF SELECTED AREA, CHARACTER TABULATION {SET,WITH JUSTIFICATION},
+            // LINE TABULATION SET, PARTIAL LINE {FORWARD,BACKWARD}, REVERSE LINE FEED,
+            // SINGLE SHIFT {TWO,THREE}, DEVICE CONTROL STRING, PRIVATE USE {ONE,TWO},
+            // SET TRANSMIT STATE, MESSAGE WAITING, {START,END} OF GUARDED AREA,
+            // {SINGLE {GRAPHIC,} CHARACTER,CONTROL SEQUENCE} INTRODUCER, OPERATING SYSTEM COMMAND,
+            // PRIVACY MESSAGE, APPLICATION PROGRAM COMMAND, ZERO WIDTH {,NO-BREAK} SPACE,
+            // REPLACEMENT CHARACTER
+            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
         );
         $replace = array(
-            "", // remove \r in from \r\n
-            "/n" // rplace control characters
+            '',
+            "\n",
+            '',
         );
-	$clean = preg_replace($search, $replace, $clean);
-	
+        $clean = preg_replace($search, $replace, $clean);
+
         if (($format === 2) && ($from === 2)) {
             // sanity translations of 2.x strings
             $clean = str_replace("\\", '', $clean); // delete all slashes
