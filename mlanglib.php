@@ -630,7 +630,7 @@ class mlang_string {
         $clean = trim($text);
         $search = array(
             // remove \r if it is part of \r\n
-            '/\r(?=\n)/S',
+            '/\r(?=\n)/',
 
             // control characters to be replaced with \n
             // LINE TABULATION, FORM FEED, CARRIAGE RETURN, END OF TRANSMISSION BLOCK,
