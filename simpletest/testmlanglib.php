@@ -791,6 +791,26 @@ EOF;
         $this->assertEqual(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 2, 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
+    public function test_clean_text() {
+        $component = new mlang_component('doodle', 'xx', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component->add_string(new mlang_string('first', "Line\n\n\n\n\n\n\nline"));
+        $component->add_string(new mlang_string('second', 'This \really \$a sucks'));
+        $component->clean_texts();
+        $this->assertEqual("Line\n\nline", $component->get_string('first')->text); // one blank line allowed in format 1
+        $this->assertEqual('This really \$a sucks', $component->get_string('second')->text);
+        $component->clear();
+        unset($component);
+
+        $component = new mlang_component('doodle', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('first', "Line\n\n\n\n\n\n\nline"));
+        $component->add_string(new mlang_string('second', 'This \really \$a sucks. Yes {$a}, it {$a->does}'));
+        $component->clean_texts();
+        $this->assertEqual("Line\n\n\nline", $component->get_string('first')->text); // two blank lines allowed in format 2
+        $this->assertEqual('This really $a sucks. Yes {$a}, it {$a->does}', $component->get_string('second')->text);
+        $component->clear();
+        unset($component);
+    }
+
     /*
     public function test_get_phpfile_location() {
         $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));

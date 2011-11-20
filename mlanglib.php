@@ -522,6 +522,24 @@ EOF
         }
         return $recent;
     }
+
+    /**
+     * Clean all strings from debris
+     *
+     * @see mlang_string::clean_text()
+     */
+    public function clean_texts() {
+
+        if ($this->version->code < mlang_version::MOODLE_20) {
+            $format = 1;
+        } else {
+            $format = 2;
+        }
+
+        foreach ($this->get_iterator() as $string) {
+            $string->clean_text($format);
+        }
+    }
 }
 
 /**
