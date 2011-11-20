@@ -164,12 +164,14 @@ foreach ($plugins as $versionnumber => $plugintypes) {
                 fputs(STDOUT, "<< AMOS ONLY: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
                 $fixstring = clone($amosstring);
                 $fixstring->deleted = true;
+                $fixstring->clean_text();
                 $fixcomponent->add_string($fixstring);
                 continue;
             }
 
             if ($gitstring->text !== $amosstring->text) {
                 fputs(STDOUT, "!= AMOS GIT DIFF: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
+                $fixstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
             }
@@ -180,6 +182,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
             if (is_null($amosstring)) {
                 fputs(STDOUT, ">> GIT ONLY: {$version->dir} [{$gitstring->id},{$frankenstylename}]\n");
+                $fixstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
             }

@@ -43,11 +43,6 @@ if (!confirm_sesskey()) {
 $stringid = optional_param('stringid', null, PARAM_ALPHANUMEXT);
 $text     = optional_param('text', null, PARAM_RAW);
 
-// remove all zero-width space characters from the text
-// {@link http://www.fileformat.info/info/unicode/char/200b/index.htm}
-// and filtering the input data
-$text = mlang_string::fix_syntax($text);
-
 if (is_null($stringid) or is_null($text)) {
     header('HTTP/1.1 400 Bad Request');
     die();
@@ -55,9 +50,14 @@ if (is_null($stringid) or is_null($text)) {
 
 list($lang, $originalid, $translationid) = local_amos_translator::decode_identifier($stringid);
 $record = $DB->get_record('amos_repository', array('id' => $originalid), 'id,stringid,component,branch', MUST_EXIST);
-
-$component = new mlang_component($record->component, $lang, mlang_version::by_code($record->branch));
+$version = mlang_version::by_code($record->branch);
+$component = new mlang_component($record->component, $lang, $version);
+if ($version->code < mlang_version::MOODLE_20) {
+    header('HTTP/1.1 400 Bad Request');
+    die();
+}
 $string = new mlang_string($record->stringid, $text);
+$string->clean_text();
 $component->add_string($string);
 
 $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());

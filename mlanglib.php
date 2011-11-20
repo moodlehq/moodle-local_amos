@@ -592,6 +592,16 @@ class mlang_string {
     }
 
     /**
+     * Clean the string text from debris and make sure it has an expected format
+     *
+     * @see self::fix_syntax()
+     * @param int $format the string syntax revision (1 for Moodle 1.x, 2 for Moodle 2.x)
+     */
+    public function clean_text($format=2) {
+        $this->text = self::fix_syntax($this->text, $format);
+    }
+
+    /**
      * Given a string text, returns it being formatted properly for storing in AMOS repository
      *
      * We need to know for what branch the string should be prepared due to internal changes in

@@ -39,6 +39,8 @@ $form = new local_amos_newlanguage_form();
 
 if ($data = $form->get_data()) {
     $component = new mlang_component('langconfig', $data->langcode, mlang_version::by_code(mlang_version::MOODLE_21));
+    $data->langname = mlang_string::fix_syntax($data->langname);
+    $data->langnameint = mlang_string::fix_syntax($data->langnameint);
     $component->add_string(new mlang_string('thislanguage', $data->langname));
     $component->add_string(new mlang_string('thislanguageint', $data->langnameint));
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
