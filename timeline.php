@@ -88,7 +88,13 @@ foreach ($results as $result) {
     }
     $text = local_amos_renderer::add_breaks($text);
     if ($result->commithash) {
-        $commithash = html_writer::tag('div', $result->commithash, array('class' => 'commithash'));
+        if ($result->lang == 'en') {
+            $url = 'https://github.com/moodle/moodle/commit/'.$result->commithash;
+        } else {
+            $url = 'https://github.com/mudrd8mz/moodle-lang/commit/'.$result->commithash;
+        }
+        $hashlink = html_writer::link($url, $result->commithash);
+        $commithash = html_writer::tag('div', $hashlink, array('class' => 'commithash'));
     } else {
         $commithash = '';
     }
