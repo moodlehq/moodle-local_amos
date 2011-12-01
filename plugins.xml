@@ -1173,7 +1173,6 @@
       <plugin>best</plugin>
     </plugins>
     <plugins type="local">
-      <plugin>moodleorg</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
