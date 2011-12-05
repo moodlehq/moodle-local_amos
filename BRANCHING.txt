@@ -8,14 +8,20 @@ So now we must tell AMOS that the master branch in 2.3.
 
 1. Make sure that MOODLE_22_STABLE is fetched into the moodle.git clone that
    AMOS tracks.
-2. Create moodledata/amos/var/MOODLE_23_STABLE.startat
-3. Define new mlang_version for MOODLE_23_STABLE in mlanglib.php
-4. Grep for the current usage of MOODLE_22_STABLE and add the new
+2. Disable all AMOS jobs in /etc/crontab
+3. Switch the portal to the maintenance mode and backup AMOS database
+4. Define new mlang_version for MOODLE_23_STABLE in mlanglib.php
+5. Grep for the current usage of MOODLE_22_STABLE and add the new
    MOODLE_23_STABLE record where needed or replace the current reference to
    the 2.2 with the reference to 2.3. Most notably in
    cli/parse-core.php, cli/export-installer.php and cli/fix-drift.php
-5. Make sure that plugins.xml contains declaration for 2.3
-6. Increase the initial version of new language packs in admin/newlanguage.php
+6. Make sure that plugins.xml contains declaration for 2.3
+7. Fork the new branch in the repository
+   cli/make-branch.php --from=MOODLE_22_STABLE --to=MOODLE_23_STABLE
+8. Create moodledata/amos/var/MOODLE_23_STABLE.startat pointing to the release
+   tag.
+9. Increase the initial version of new language packs in admin/newlanguage.php
+10. Create new branches and update shell scripts in ~/bin of the user amosbot
 
 Cloning greylisted strings
 --------------------------
