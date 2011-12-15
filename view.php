@@ -37,11 +37,6 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
-if (empty($CFG->googleapikey)) {
-    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi'));
-} else {
-    $PAGE->requires->js(new moodle_url('http://www.google.com/jsapi', array('key'=>$CFG->googleapikey)));
-}
 $PAGE->requires->strings_for_js(array(
     'languagesall', 'languagesnone', 'componentsall', 'componentsnone', 'componentsstandard'), 'local_amos');
 $PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);

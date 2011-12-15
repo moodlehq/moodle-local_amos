@@ -137,7 +137,7 @@ M.local_amos.init_translator = function(Y) {
         });
     }
 
-    google.load('language', 1, {'callback' : M.local_amos.init_google_translator});
+    //google.load('language', 1, {'callback' : M.local_amos.init_google_translator});
 }
 
 /**
