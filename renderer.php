@@ -784,7 +784,7 @@ require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>';
         $output .= $this->heading('Moodle '.$data->version->label.' language packs');
-        $output .= html_writer::tag('p', 'These zip files are generated hourly from the work of translators in the
+        $output .= html_writer::tag('p', 'These zip files are generated automatically from the work of translators in the
             <a href=" http://lang.moodle.org/">Moodle languages portal</a>. Contact details for language pack maintainers are
             listed in the <a href="http://docs.moodle.org/en/Translation_credits">Translation credits</a>.');
         $output .= html_writer::tag('p', 'Note: All language packs are work-in-progress, as developers continue to add new language strings to Moodle. The most commonly used strings are generally translated first.');
