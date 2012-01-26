@@ -312,6 +312,7 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Yellow - the string is committable but may be out-dated. The English version could be modified after the string had been translated.
 * Red - the string is not translated and you are allowed to translate it and commit the translation.
 * Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
+* Grey - AMOS can\'t be used to translate this string. For example strings for Moodle 1.9 must be edited via the legacy CVS access only.
 * No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
 $string['typecontrib'] = 'Non-standard plugins';
 $string['typecore'] = 'Core subsystems';

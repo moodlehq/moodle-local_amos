@@ -329,7 +329,11 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells[3]->id = $sid;
             $cells[3]->attributes['width'] = '30%';
             $cells[3]->attributes['class'] = $string->class;
-            $cells[3]->attributes['class'] .= ' translatable';
+            if ($string->translatable) {
+                $cells[3]->attributes['class'] .= ' translatable';
+            } else {
+                $cells[3]->attributes['class'] .= ' nontranslatable';
+            }
             if ($string->committable) {
                 $cells[3]->attributes['class'] .= ' committable';
             }
