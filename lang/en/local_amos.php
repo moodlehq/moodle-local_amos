@@ -57,6 +57,7 @@ $string['contribactions_help'] = 'Depending on your rights and the contribution 
 * Reject - mark the contribution as rejected, please describe the reasons in a comment.
 
 The contributor is informed by email whenever the status of his contribution changes.';
+$string['contribactions_link'] = 'AMOS#Contributing_to_a_language_pack';
 $string['contribapply'] = 'Apply';
 $string['contribassignee'] = 'Assignee';
 $string['contribassigneenone'] = '-';
@@ -71,6 +72,10 @@ $string['contribincomingsome'] = 'Incoming contributions ({$a})';
 $string['contriblanguage'] = 'Language';
 $string['contribreject'] = 'Reject';
 $string['contribresign'] = 'Resign';
+$string['contribstaged'] = 'Staged contribution <a href="contrib.php?id={$a->id}">#{$a->id}</a> by {$a->author}';
+$string['contribstagedinfo'] = 'Staged contribution';
+$string['contribstagedinfo_help'] = 'The stage contains strings that were contributed by a community member. The language pack maintainers are supposed to review them and then set their status to either Accepted (if there were committed) or Rejected (if they can\'t be included in the official language pack for some reason).';
+$string['contribstagedinfo_link'] = 'AMOS#Contributing_to_a_language_pack';
 $string['contribstartreview'] = 'Start review';
 $string['contribstatus'] = 'Status';
 $string['contribstatus_help'] = 'Workflow of a contributed translation consists of following states:
@@ -79,6 +84,7 @@ $string['contribstatus_help'] = 'Workflow of a contributed translation consists 
 * In review - the contribution has been assigned to a language pack maintainer and was staged for review
 * Rejected - the language pack maintainer has rejected the contribution and probably left an explanation in a comment
 * Accepted - the contribution has been accepted by the language pack maintainer';
+$string['contribstatus_link'] = 'AMOS#Contributing_to_a_language_pack';
 $string['contribstatus0'] = 'New';
 $string['contribstatus10'] = 'In review';
 $string['contribstatus20'] = 'Rejected';

@@ -134,6 +134,7 @@ if ($apply) {
         $SESSION->local_amos = new stdClass();
     }
     $SESSION->local_amos->presetcommitmessage = get_string('presetcommitmessage', 'local_amos', $a);
+    $SESSION->local_amos->stagedcontribution = $a;
 
     redirect(new moodle_url('/local/amos/stage.php'));
 }
@@ -190,6 +191,7 @@ if ($review) {
         $SESSION->local_amos = new stdClass();
     }
     $SESSION->local_amos->presetcommitmessage = get_string('presetcommitmessage', 'local_amos', $a);
+    $SESSION->local_amos->stagedcontribution = $a;
 
     redirect(new moodle_url('/local/amos/stage.php'));
 }

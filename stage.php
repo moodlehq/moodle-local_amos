@@ -58,8 +58,14 @@ if (!empty($message)) {
     $stage->prune($allowed);
     $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'));
     $stage->store();
+    if (empty($SESSION->local_amos->stagedcontribution)) {
+        $nexturl = $PAGE->url;
+    } else {
+        $nexturl = new moodle_url('/local/amos/contrib.php', array('id' => $SESSION->local_amos->stagedcontribution->id));
+    }
     unset($SESSION->local_amos->presetcommitmessage);
-    redirect($PAGE->url);
+    unset($SESSION->local_amos->stagedcontribution);
+    redirect($nexturl);
 }
 if (!empty($unstage)) {
     require_sesskey();
@@ -95,6 +101,7 @@ if (!empty($unstageall)) {
     $stage->clear();
     $stage->store();
     unset($SESSION->local_amos->presetcommitmessage);
+    unset($SESSION->local_amos->stagedcontribution);
     redirect($PAGE->url);
 }
 if (!empty($submit)) {
@@ -132,8 +139,16 @@ $output = $PAGE->get_renderer('local_amos');
 $sesskey = sesskey();
 // create a renderable object that represents the stage
 $stage = new local_amos_stage($USER);
-if (!empty($SESSION->local_amos->presetcommitmessage)) {
-    $stage->presetmessage = $SESSION->local_amos->presetcommitmessage;
+if (empty($stage->strings)) {
+    unset($SESSION->local_amos->presetcommitmessage);
+    unset($SESSION->local_amos->stagedcontribution);
+} else {
+    if (!empty($SESSION->local_amos->presetcommitmessage)) {
+        $stage->presetmessage = $SESSION->local_amos->presetcommitmessage;
+    }
+    if (!empty($SESSION->local_amos->stagedcontribution)) {
+        $stage->stagedcontribution = $SESSION->local_amos->stagedcontribution;
+    }
 }
 
 /// Output starts here

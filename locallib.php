@@ -726,6 +726,9 @@ class local_amos_stage implements renderable {
     /** @var pre-set commit message */
     public $presetmessage;
 
+    /** @var stdClass if the stage comes from an applied contribution, this object holds the id and the contributor */
+    public $stagedcontribution;
+
     /**
      * @param stdclass $user the owner of the stage
      */

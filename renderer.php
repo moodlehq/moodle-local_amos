@@ -653,11 +653,16 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
         } else {
+            $output = '';
+            if (!empty($stage->stagedcontribution)) {
+                $output .= $this->heading_with_help(get_string('contribstaged', 'local_amos', $stage->stagedcontribution),
+                    'contribstagedinfo', 'local_amos');
+            }
             $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
             if ($committable) {
-                $output = $this->heading(get_string('stagestringssome', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
+                $output .= $this->heading(get_string('stagestringssome', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
             } else {
-                $output = $this->heading(get_string('stagestringsnocommit', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
+                $output .= $this->heading(get_string('stagestringsnocommit', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
             }
             unset($a);
 
