@@ -675,8 +675,12 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend.$submitbutton.$editbutton.$prunebutton.$rebasebutton.$unstageallbutton,
-                                        array('class' => 'actionbuttons'));
+            $actionbuttons = $legend.$submitbutton.$editbutton;
+            if ($committable) {
+                $actionbuttons .= $prunebutton.$rebasebutton;
+            }
+            $actionbuttons .= $unstageallbutton;
+            $output .= html_writer::tag('fieldset', $actionbuttons, array('class' => 'actionbuttons'));
 
             $legend = html_writer::tag('legend', get_string('stashactions', 'local_amos') . $this->help_icon('stashactions', 'local_amos'));
             $output .= html_writer::tag('fieldset', $legend.$stashform, array('class' => 'actionbuttons'));
