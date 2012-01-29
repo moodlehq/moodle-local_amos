@@ -930,7 +930,12 @@ EOF;
         $this->assertTrue(array_key_exists('en', $langs));
         $this->assertEqual($langs['en'], 'English');
         $this->assertEqual($langs['cs'], 'Czech');
-        // todo test caching
+
+        $langs = mlang_tools::list_languages(false, true, true);
+        $this->assertIsA($langs, 'array');
+        $this->assertEqual(count($langs), 1);
+        $this->assertTrue(array_key_exists('cs', $langs));
+        $this->assertEqual($langs['cs'], 'Czech (cs)');
     }
 
     public function test_list_components() {

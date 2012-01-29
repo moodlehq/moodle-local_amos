@@ -1621,22 +1621,25 @@ class mlang_tools {
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
                     // use the first returned value, all others are historical records
-                    $value = $lang->name;
-                    if ($showcode) {
-                        $value .= ' (' . $lang->code . ')';
-                    }
-                    $cache[$lang->code] = $value;
+                    $cache[$lang->code] = $lang->name;
                 }
             }
             $rs->close();
+            asort($cache);
         }
 
-        asort($cache);
+        $langs = $cache;
+
+        if ($showcode) {
+            foreach (array_keys($langs) as $code) {
+                $langs[$code] .= ' (' . $code . ')';
+            }
+        }
 
         if ($english) {
-            return $cache;
+            return $langs;
         } else {
-            return array_diff_key($cache, array('en' => 'English'));
+            return array_diff_key($langs, array('en' => 'English'));
         }
     }
 
