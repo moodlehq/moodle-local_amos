@@ -1616,7 +1616,7 @@ class mlang_tools {
                      WHERE component = ?
                        AND stringid  = ?
                        AND deleted   = 0
-                  ORDER BY branch DESC, text, timemodified DESC";
+                  ORDER BY branch DESC, timemodified DESC, text";
             $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
