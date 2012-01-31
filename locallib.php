@@ -652,7 +652,6 @@ class local_amos_translator implements renderable {
                 $string->committable = true;
             }
             if (empty(mlang_version::by_code($string->branchcode)->translatable)) {
-                $string->committable = false;
                 $string->translatable = false;
             } else {
                 $string->translatable = true;
