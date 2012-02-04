@@ -63,7 +63,7 @@ if (!empty($del)) {
 
 $options = array();
 foreach ($available as $userid => $user) {
-    $options[$userid] = fullname($user) . ' &lt;' . $user->email . '&gt;';
+    $options[$userid] = sprintf('%s, %s &lt;%s&gt;', $user->lastname, $user->firstname, $user->email);
 }
 
 /// Output starts here
