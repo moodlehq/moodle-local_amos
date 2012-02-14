@@ -249,10 +249,10 @@ class local_amos_renderer extends plugin_renderer_base {
                         html_writer::link(new moodle_url($PAGE->url, array('fpg' => 1)), get_string('gotofirst', 'local_amos')) . ' | '.
                         html_writer::link(new moodle_url($PAGE->url, array('fpg' => $translator->currentpage - 1)), get_string('gotoprevious', 'local_amos')),
                         array('style' => 'text-align:center'));
-                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
+                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
             } else {
                 $output = $this->heading(get_string('nostringsfound', 'local_amos'));
-                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
+                $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
             }
             return $output;
         }
@@ -354,7 +354,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output .= html_writer::table($table);
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
-        $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper'));
+        $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
 
         return $output;
     }
