@@ -171,7 +171,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
             if ($gitstring->text !== $amosstring->text) {
                 fputs(STDOUT, "!= AMOS GIT DIFF: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
-                $fixstring->clean_text();
+                $gitstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
             }
@@ -182,7 +182,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
             if (is_null($amosstring)) {
                 fputs(STDOUT, ">> GIT ONLY: {$version->dir} [{$gitstring->id},{$frankenstylename}]\n");
-                $fixstring->clean_text();
+                $gitstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
             }
