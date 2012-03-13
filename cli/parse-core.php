@@ -126,6 +126,9 @@ function amos_parse_core_commit() {
             }
         }
     }
+    // rebase again to get rid of eventually empty components that were
+    // left after removing unaffected strings
+    $stage->rebase($timemodified, false);
 
     amos_core_commit_notify($stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg);
     $stage->commit($commitmsg, array(
