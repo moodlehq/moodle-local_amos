@@ -114,10 +114,34 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
  * than a real function.
  */
 function amos_parse_core_commit() {
+    global $DB;
     global $stage, $realmodified, $timemodified, $commitmsg, $committer, $committeremail, $commithash,
            $version, $fullcommitmsg, $startatlock, $affected;
 
+    // if there is nothing to do, just store the last hash processed and return
+    // this is typical for git commits that do not touch any lang file
+    if (!$stage->has_component()) {
+        file_put_contents($startatlock, $commithash);
+        return;
+    }
+
+    if (empty($commithash)) {
+        throw new coding_exception('When storing strings from a git commit, the hash must be provided');
+    }
+
+    // this is a hacky check to make sure that the git commit has not been processed already
+    // this helps to prevent situations when a commit is reverted and AMOS is adding
+    // and removing strings in sort of loop
+    if ($DB->record_exists('amos_commits', array('source' => 'git', 'commithash' => $commithash))) {
+        $stage->clear();
+        fputs(STDOUT, "SKIP $commithash has already been processed before\n");
+        file_put_contents($startatlock, $commithash);
+        return;
+    }
+
+    // rebase the stage so that it contains just real modifications of strings
     $stage->rebase($timemodified, true, $timemodified);
+
     // make sure that the strings to be removed are really affected by the commit
     foreach ($stage->get_iterator() as $component) {
         foreach ($component->get_iterator() as $string) {
@@ -126,11 +150,23 @@ function amos_parse_core_commit() {
             }
         }
     }
+
     // rebase again to get rid of eventually empty components that were
     // left after removing unaffected strings
     $stage->rebase($timemodified, false);
 
+    // if there is nothing to do now, just store the last has processed and return.
+    // this is typical for git commits that touch some lang file but they do not actually
+    // modify any string. Note that we do not execute AMOScript in this situation.
+    if (!$stage->has_component()) {
+        fputs(STDOUT, "NOOP $commithash does not introduce any string change\n");
+        file_put_contents($startatlock, $commithash);
+        return;
+    }
+
+    // ok so it seems we finally have something to do here! let's spam the world first
     amos_core_commit_notify($stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg);
+    // actually commit the changes
     $stage->commit($commitmsg, array(
         'source' => 'git',
         'userinfo' => $committer . ' <' . $committeremail . '>',
@@ -360,7 +396,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $mem = memory_get_usage();
         $memdiff = $memprev < $mem ? '+' : '-';
         $memdiff = $memdiff . abs($mem - $memprev);
-        fputs(STDOUT, "{$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n");
+        fputs(STDOUT, "FOUND {$commithash} {$changetype} {$file} [{$mem} {$memdiff}]\n");
 
         // get some additional information of the commit
         $format = implode('%n', array('%an', '%ae', '%at', '%s', '%b')); // name, email, timestamp, subject, body
