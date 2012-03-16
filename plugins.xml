@@ -1557,6 +1557,7 @@
     <plugins type="scormreport">
       <plugin>basic</plugin>
       <plugin>interactions</plugin>
+      <plugin>graphs</plugin>
     </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
