@@ -1494,6 +1494,7 @@
       <plugin>innodb</plugin>
       <plugin>langimport</plugin>
       <plugin>multilangupgrade</plugin>
+      <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
       <plugin>qeupgradehelper</plugin>
       <plugin>replace</plugin>
