@@ -1585,6 +1585,7 @@
     <plugins type="workshopallocation">
       <plugin>manual</plugin>
       <plugin>random</plugin>
+      <plugin>scheduled</plugin>
     </plugins>
     <plugins type="workshopeval">
       <plugin>best</plugin>
