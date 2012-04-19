@@ -108,6 +108,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'local'                 => 'local',
             'tool'                  => 'admin/tool',
             'gradingform'           => 'grade/grading/form',
+            'assignsubmission'      => 'mod/assign/submission',
+            'assignfeedback'        => 'mod/assign/feedback',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
