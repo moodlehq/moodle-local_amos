@@ -1256,6 +1256,7 @@
       <plugin>truefalse</plugin>
     </plugins>
     <plugins type="mod">
+      <plugin>assign</plugin>
       <plugin>assignment</plugin>
       <plugin>chat</plugin>
       <plugin>choice</plugin>
@@ -1485,6 +1486,7 @@
     <plugins type="plagiarism">
     </plugins>
     <plugins type="tool">
+      <plugin>assignmentupgrade</plugin>
       <plugin>bloglevelupgrade</plugin>
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
@@ -1537,6 +1539,15 @@
       <plugin>online</plugin>
       <plugin>upload</plugin>
       <plugin>uploadsingle</plugin>
+    </plugins>
+    <plugins type="assignsubmission">
+      <plugin>comments</plugin>
+      <plugin>file</plugin>
+      <plugin>onlinetext</plugin>
+    </plugins>
+    <plugins type="assignfeedback">
+      <plugin>comments</plugin>
+      <plugin>file</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
