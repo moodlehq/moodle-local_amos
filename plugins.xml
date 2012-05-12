@@ -1213,6 +1213,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>media</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
       <plugin>mnet</plugin>
