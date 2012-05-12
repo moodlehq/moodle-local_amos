@@ -1760,7 +1760,7 @@ class mlang_tools {
         $script = preg_replace('/\s+/', ' ', trim($matches[2]));
 
         // we need explicit list of known commands so that this parser can handle onliners well
-        $cmds = array('MOV', 'CPY', 'HLP', 'REM');
+        $cmds = array('MOV', 'CPY', 'FCP', 'HLP', 'REM');
 
         // put new line character before every known command
         $cmdsfrom = array();
@@ -1807,6 +1807,21 @@ class mlang_tools {
                 $tocomponent = self::legacy_component_name($matches[4]);
                 if ($fromcomponent and $tocomponent) {
                     return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                } else {
+                    return self::STATUS_SYNTAX_ERROR;
+                }
+            } else {
+                return self::STATUS_SYNTAX_ERROR;
+            }
+            break;
+        case 'FCP':
+            // FCP [sourcestring,sourcecomponent],[targetstring,targetcomponent]
+            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                array_map('trim', $matches);
+                $fromcomponent = self::legacy_component_name($matches[2]);
+                $tocomponent = self::legacy_component_name($matches[4]);
+                if ($fromcomponent and $tocomponent) {
+                    return self::forced_copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
@@ -1924,7 +1939,7 @@ class mlang_tools {
      * Copy one string to another at the given version branch for all languages in the repository
      *
      * Deleted strings are not copied. If the target string already exists (and is not deleted), it is
-     * not overwritten.
+     * not overwritten - compare with {@link self::forced_copy_string()}
      *
      * @param mlang_version $version to execute copying on
      * @param string $fromstring source string identifier
@@ -1941,6 +1956,35 @@ class mlang_tools {
             $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
             if ($from->has_string($fromstring) and !$to->has_string($tostring)) {
                 $to->add_string(new mlang_string($tostring, $from->get_string($fromstring)->text, $timestamp));
+                $stage->add($to);
+            }
+            $from->clear();
+            $to->clear();
+        }
+        return $stage;
+    }
+
+    /**
+     * Copy one string to another at the given version branch for all languages in the repository
+     *
+     * Deleted strings are not copied. The target string is always overwritten, even if it already exists
+     * or it is deleted - compare with {@link self::copy_string()}
+     *
+     * @param mlang_version $version to execute copying on
+     * @param string $fromstring source string identifier
+     * @param string $fromcomponent source component name
+     * @param string $tostring target string identifier
+     * @param string $tocomponet target component name
+     * @param int $timestamp effective timestamp of the copy, null for now
+     * @return mlang_stage to be committed
+     */
+    protected static function forced_copy_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+        $stage = new mlang_stage();
+        foreach (array_keys(self::list_languages(false)) as $lang) {
+            $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
+            $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, array($tostring));
+            if ($from->has_string($fromstring)) {
+                $to->add_string(new mlang_string($tostring, $from->get_string($fromstring)->text, $timestamp), true);
                 $stage->add($to);
             }
             $from->clear();

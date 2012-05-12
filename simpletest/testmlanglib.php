@@ -1313,6 +1313,29 @@ AMOS END';
         $stage->clear();
     }
 
+    public function test_execution_forced_copy() {
+        $stage = new mlang_stage();
+        $version = mlang_version::by_branch('MOODLE_22_STABLE');
+        $time = time();
+        $component = new mlang_component('assignment', 'cs', $version);
+        $component->add_string(new mlang_string('pluginname', 'Úkol (2.2)', $time - 60));
+        $component->add_string(new mlang_string('modulename', 'Úkol', $time - 120));
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+        $stage->commit('Adding some testing strings', array('source' => 'unittest'));
+        unset($stage);
+
+        $stage = mlang_tools::execute('FCP [pluginname,assignment],[modulename,assignment]', $version);
+        $stage->commit('Forced copy of a string', array('source' => 'unittest'));
+        unset($stage);
+
+        $component = mlang_component::from_snapshot('assignment', 'cs', $version);
+        $this->assertEqual('Úkol (2.2)', $component->get_string('pluginname')->text);
+        $this->assertEqual('Úkol (2.2)', $component->get_string('modulename')->text);
+        $component->clear();
+    }
+
     public function test_stash_push() {
 
     }
