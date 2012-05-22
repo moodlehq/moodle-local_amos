@@ -668,10 +668,14 @@ class mlang_string {
             // PRIVACY MESSAGE, APPLICATION PROGRAM COMMAND, ZERO WIDTH {,NO-BREAK} SPACE,
             // REPLACEMENT CHARACTER
             '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
+
+            // remove trailing whitespace at the end of lines in a multiline string
+            '/[ \t]+(?=\n)/',
         );
         $replace = array(
             '',
             "\n",
+            '',
             '',
         );
         $clean = preg_replace($search, $replace, $clean);
