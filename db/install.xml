@@ -10,8 +10,8 @@
         <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The commit thatt introduced this change" PREVIOUS="id" NEXT="branch"/>
         <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="commitid" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
-        <FIELD NAME="stringid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="text"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="text"/>
         <FIELD NAME="text" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The localized string text" PREVIOUS="stringid" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The effective timestamp of the change" PREVIOUS="text" NEXT="timeupdated"/>
         <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1139218139" SEQUENCE="false" COMMENT="The timestamp of when this string has been marked as up-to-date." PREVIOUS="timemodified" NEXT="deleted"/>
@@ -79,8 +79,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
         <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Branch code" PREVIOUS="id" NEXT="component"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string" PREVIOUS="branch" NEXT="stringid"/>
-        <FIELD NAME="stringid" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier" PREVIOUS="component"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string" PREVIOUS="branch" NEXT="stringid"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier" PREVIOUS="component"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
