@@ -39,7 +39,10 @@ $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->requires->strings_for_js(array(
     'languagesall', 'languagesnone', 'componentsall', 'componentsnone', 'componentsstandard'), 'local_amos');
-$PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true);
+$PAGE->requires->js_init_call('M.local_amos.init_translator', array(), true, array(
+        'name' => 'local_amos',
+        'fullpath' => '/local/amos/module.js',
+        'requires' => array('node', 'event', 'io-queue', 'json')));
 $PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_timeline');
 
 $output = $PAGE->get_renderer('local_amos');
