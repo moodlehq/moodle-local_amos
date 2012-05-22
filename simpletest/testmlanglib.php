@@ -253,7 +253,7 @@ class mlang_test extends UnitTestCase {
 \$string['welcome'] = 'Welcome';
 
 EOF;
-        $tmp = make_upload_directory('temp/amos');
+        $tmp = make_temp_directory('amos');
         $filepath = $tmp . '/mlangunittest.php';
         file_put_contents($filepath, $filecontents);
 
@@ -299,7 +299,7 @@ string';
 \$string['percents'] = '%%Y-%%m-%%d-%%H-%%M';
 
 EOF;
-        $tmp = make_upload_directory('temp/amos');
+        $tmp = make_temp_directory('amos');
         $filepath = $tmp . '/mlangunittest.php';
         file_put_contents($filepath, $filecontents);
 
