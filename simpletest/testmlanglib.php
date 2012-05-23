@@ -807,9 +807,34 @@ EOF;
         $component = new mlang_component('doodle', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $component->add_string(new mlang_string('first', "Line\n\n\n\n\n\n\nline"));
         $component->add_string(new mlang_string('second', 'This \really \$a sucks. Yes {$a}, it {$a->does}'));
+        $component->add_string(new mlang_string('third', "Multi   line  \n  trailing  "));
         $component->clean_texts();
         $this->assertEqual("Line\n\n\nline", $component->get_string('first')->text); // two blank lines allowed in format 2
         $this->assertEqual('This really $a sucks. Yes {$a}, it {$a->does}', $component->get_string('second')->text);
+        $this->assertEqual("Multi   line\n  trailing", $component->get_string('third')->text);
+        $component->clear();
+        unset($component);
+    }
+
+    public function test_clean_texts_rebase() {
+        $stage = new mlang_stage();
+        $component = new mlang_component('doodle', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('multiline', "Multi   line  \n  trailing  "));
+        $stage->add($component);
+        $stage->commit('Initial commit', array('source' => 'unittest'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('doodle', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('multiline'));
+        $this->assertEqual("Multi   line  \n  trailing  ", $component->get_string('multiline')->text);
+        $component->clean_texts();
+        $stage->add($component);
+        $stage->commit('Cleaned', array('source' => 'unittest'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('doodle', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('multiline'));
+        $this->assertEqual("Multi   line\n  trailing", $component->get_string('multiline')->text);
         $component->clear();
         unset($component);
     }
