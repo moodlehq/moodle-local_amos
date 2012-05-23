@@ -1240,6 +1240,11 @@
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
     </plugins>
+    <plugins type="booktool">
+      <plugin>exportimscp</plugin>
+      <plugin>importhtml</plugin>
+      <plugin>print</plugin>
+    </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
       <plugin>calculatedmulti</plugin>
@@ -1259,6 +1264,7 @@
     <plugins type="mod">
       <plugin>assign</plugin>
       <plugin>assignment</plugin>
+      <plugin>book</plugin>
       <plugin>chat</plugin>
       <plugin>choice</plugin>
       <plugin>data</plugin>
