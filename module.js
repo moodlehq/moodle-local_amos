@@ -116,7 +116,7 @@ M.local_amos.init_translator = function(Y) {
         var translatable = translator.all('.translatable');
         translatable.on('click', M.local_amos.make_editable);
         // in case of missing strings, turn editing mode on by default
-        var missing = translator.all('.committable.missing.translation');
+        var missing = translator.all('.translatable.missing.translation');
         missing.each(function(cell) { M.local_amos.editor_on(cell); });
         // catch all clicks to up-to-date marker
         var updaters = translator.all('.uptodatewrapper input, .uptodatewrapper label');
