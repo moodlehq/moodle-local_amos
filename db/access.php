@@ -75,4 +75,12 @@ $capabilities = array(
         )
     ),
 
+    // Ability to use Google Translate services
+    'local/amos:usegoogle' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'user' => CAP_ALLOW,
+        )
+    ),
 );

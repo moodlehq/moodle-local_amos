@@ -35,6 +35,7 @@ $string['amos:importfile'] = 'Import strings from uploaded file';
 $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
+$string['amos:usegoogle'] = 'Use Google Translate services';
 $string['commitbutton'] = 'Commit';
 $string['commitmessage'] = 'Commit message';
 $string['commitstage'] = 'Commit staged strings';
