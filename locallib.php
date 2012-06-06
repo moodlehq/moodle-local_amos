@@ -184,7 +184,7 @@ class local_amos_filter implements renderable {
         $data = new stdclass();
 
         $data->version = array();
-        $fver = optional_param('fver', null, PARAM_INT);
+        $fver = optional_param_array('fver', null, PARAM_INT);
         if (is_array($fver)) {
             foreach (mlang_version::list_all() as $version) {
                 if (in_array($version->code, $fver)) {
@@ -194,7 +194,7 @@ class local_amos_filter implements renderable {
         }
 
         $data->language = array();
-        $flng = optional_param('flng', null, PARAM_SAFEDIR);
+        $flng = optional_param_array('flng', null, PARAM_SAFEDIR);
         if (is_array($flng)) {
             foreach ($flng as $language) {
                 // todo if valid language code
@@ -203,7 +203,7 @@ class local_amos_filter implements renderable {
         }
 
         $data->component = array();
-        $fcmp = optional_param('fcmp', null, PARAM_FILE);
+        $fcmp = optional_param_array('fcmp', null, PARAM_FILE);
         if (is_array($fcmp)) {
             foreach ($fcmp as $component) {
                 // todo if valid component
