@@ -59,6 +59,9 @@ try {
 
 add_to_log(SITEID, 'amos', 'usegoogle', '', $enid, 0, $USER->id);
 
+$entext = str_replace('{$a}', 'PLACEHOLDERA__', $string->text);
+$entext = preg_replace('/\{\$a->(.+?)\}/', 'PLACEHOLDER__$1__', $entext);
+
 // map Moodle language codes to Google language codes
 switch ($lang) {
 case 'zh_cn':
@@ -78,12 +81,12 @@ case 'he':
 $curl = new curl(array('cache' => false, 'proxy' => true));
 $params = array(
     'key' => $CFG->amosgoogleapi,
-    'format' => 'text',
+    'format' => 'html',
     'prettyprint' => 'false',
     'source' => 'en',
     'target' => $lang,
     'userIp' => getremoteaddr(),
-    'q' => $string->text,
+    'q' => $entext,
 );
 
 $response = $curl->get('https://www.googleapis.com/language/translate/v2', $params);
@@ -102,7 +105,7 @@ if (empty($curlinfo)) {
     if (!empty($response->data->translations) and is_array($response->data->translations)) {
         $first = reset($response->data->translations);
         if (isset($first->translatedText)) {
-            $translation = $first->translatedText;
+            $translation = s($first->translatedText);
         }
     }
 }
@@ -115,6 +118,9 @@ if (is_null($translation)) {
     );
 
 } else {
+    $translation = preg_replace('/PLACEHOLDER__(.+?)__/', '{$a->$1}', $translation);
+    $translation = str_replace('PLACEHOLDERA__', '{$a}', $translation);
+
     $response = array(
         'data' => array(
             'translation' => $translation,
