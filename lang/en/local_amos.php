@@ -315,12 +315,13 @@ $string['translatorlang_help'] = 'Displays the code of the language to translate
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 
-* Green - the string is already translated and you are allowed to modify the translation and commit it.
-* Yellow - the string is committable but may be out-dated. The English version could be modified after the string had been translated.
-* Red - the string is not translated and you are allowed to translate it and commit the translation.
-* Blue - you have modified the translation and it is now staged. Do not forget to commit the staged translation before you log out!
+* Green - the string is already translated, you can eventually modify the translation.
+* Yellow - the string may be out-dated. The English original was probably modified after the string had been translated.
+* Red - the string is not translated yet.
+* Blue - you have modified the translation and it is now staged.
 * Grey - AMOS can\'t be used to translate this string. For example strings for Moodle 1.9 must be edited via the legacy CVS access only.
-* No color - even though you can stage the translation, you are not allowed to commit into this languages. You will be only able to export the stage into a file.';
+
+Language pack maintainers can see a small red symbol in the corner of the cells they are allowed to commit.';
 $string['typecontrib'] = 'Non-standard plugins';
 $string['typecore'] = 'Core subsystems';
 $string['typestandard'] = 'Standard plugins';

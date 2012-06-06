@@ -215,6 +215,10 @@
     background-color: #f7f7f7;
 }
 
+.path-local-amos #amostranslator .translation.committable {
+    background-image:url([[pix:core|i/ne_red_mark]]);background-position:100% 0;background-repeat:no-repeat;
+}
+
 .path-local-amos #amostranslator .translation.translatable.missing,
 .path-local-amos #amostranslator .translation.committable.missing {
     background-color: #ffd3d9;
@@ -229,6 +233,7 @@
     color: #999;
 }
 
+.path-local-amos #amostranslator .translation.translatable,
 .path-local-amos #amostranslator .translation.committable,
 .path-local-amos #amosstage .translation.committable.new {
     background-color: #e7f1c3;
@@ -249,6 +254,7 @@
     font-size: 80%;
 }
 
+.path-local-amos #amostranslator .translation.translatable.outdated,
 .path-local-amos #amostranslator .translation.committable.outdated {
     background-color: #f3f2aa;
 }
