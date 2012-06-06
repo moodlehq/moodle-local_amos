@@ -135,9 +135,9 @@ M.local_amos.init_translator = function(Y) {
                 }
             }
         });
+        // initialize the google translate service support
+        M.local_amos.init_google_translator();
     }
-
-    //google.load('language', 1, {'callback' : M.local_amos.init_google_translator});
 }
 
 /**
@@ -385,7 +385,7 @@ M.local_amos.uptodate_failure = function(tid, outcome, args) {
 }
 
 /**
- * Initialize Google translator features, called immediately after their API is loaded
+ * Initialize Google Translate support
  */
 M.local_amos.init_google_translator = function() {
     var Y = M.local_amos.Y;
@@ -398,13 +398,22 @@ M.local_amos.init_google_translator = function() {
     iconcontainers.each(M.local_amos.init_google_icon);
     icons = translator.all('.googleicon img');
     icons.on('click', M.local_amos.google_translate);
-    google.language.getBranding('googlebranding');
 }
 
 /**
- * Stores the information of whether the given language is translatable via Google
+ * Whitelist of Moodle language codes supported by Google Translator
+ *
+ * Moodle language code can be mapped to a Google one - see the mapping in the
+ * translate.ajax.php file.
+ *
+ * @link https://developers.google.com/translate/v2/using_rest#language-params
  */
-M.local_amos.translatable = M.local_amos.translatable || []
+M.local_amos.translatable = ['af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs',
+    'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr',
+    'ga', 'gl', 'gu', 'hi', 'hr', 'ht', 'hu', 'id', 'is', 'it', 'iw', 'ja',
+    'ka', 'kn', 'ko', 'la', 'lt', 'lv', 'mk', 'ms', 'mt', 'nl', 'no', 'pl',
+    'pt', 'pt_br', 'ro', 'ru', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te',
+    'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yi', 'zh_cn', 'zh_tw'];
 
 /**
  * Prepare an icon for Google translation
@@ -415,11 +424,7 @@ M.local_amos.init_google_icon = function(container, index, iconcontainers) {
     var Y = M.local_amos.Y;
     var iconhtml = '<img src="' + M.util.image_url('google', 'local_amos') + '" />';
     var lang = container.get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
-    lang = M.local_amos.google_language_code(lang);
-    if (Y.Lang.isUndefined(M.local_amos.translatable[lang])) {
-        M.local_amos.translatable[lang] = google.language.isTranslatable(lang);
-    }
-    if (M.local_amos.translatable[lang]) {
+    if (Y.Array.indexOf(M.local_amos.translatable, lang) >= 0) {
         container.set('innerHTML', iconhtml);
     }
 }
@@ -429,42 +434,78 @@ M.local_amos.init_google_icon = function(container, index, iconcontainers) {
  */
 M.local_amos.google_translate = function(e) {
     var Y = M.local_amos.Y;
-    var english = e.currentTarget.get('parentNode').get('parentNode').one('.english').get('innerHTML');
-    var lang = e.currentTarget.get('parentNode').get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
-    lang = M.local_amos.google_language_code(lang);
-    e.currentTarget.set('src', M.cfg.loadingicon);
-    google.language.translate(english, 'en', lang, function(result) {
-        if (!result.error) {
-            container = e.currentTarget.get('parentNode');
-            container.set('innerHTML', result.translation);
-            container.replaceClass('googleicon', 'googletranslation');
-            container.addClass('preformatted');
-        } else {
-            container = e.currentTarget.get('parentNode');
-            container.set('innerHTML', result.error.message);
-            container.replaceClass('googleicon', 'googleerror');
+    var icon = e.currentTarget;
+    var row = icon.ancestor('tr');
+    var rowid = row.one('td.translation').get('id').split('___');
+    var lang = rowid[0];
+    var enid = rowid[1];
+
+    icon.set('src', M.cfg.loadingicon);
+
+    // stop the IO queue so we can add to it
+    Y.io.queue.stop();
+
+    // configure the async request
+    var uri = M.cfg.wwwroot + '/local/amos/translate.ajax.php';
+    var cfg = {
+        method: 'GET',
+        data: build_querystring({enid: enid, lang: lang, sesskey: M.cfg.sesskey}),
+        on: {
+            success : M.local_amos.translate_success,
+            failure : M.local_amos.translate_failure,
+        },
+        'arguments': {
+            icon: icon,
+            enid: enid,
+            lang: lang
         }
-    });
+    };
+
+    // add a new async request into the queue
+    Y.io.queue(uri, cfg);
+
+    // re-start queue processing
+    Y.io.queue.start();
 }
 
 /**
- * Maps Moodle language code to the one used by Google
+ * Callback function for IO transaction
  *
- * @param {String} code Moodle lang code
- * @return {String} Google code
+ * @param {Int} tid transaction identifier
+ * @param {Object} outcome from server
+ * @param {Mixed} args
  */
-M.local_amos.google_language_code = function(moodlecode) {
-    switch(moodlecode) {
-        case 'zh_cn':
-            return 'zh-CN';
-            break;
-        case 'zh_tw':
-            return 'zh-TW';
-            break;
-        case 'pt_br':
-            return 'pt';
-            break;
-        default:
-            return moodlecode;
+M.local_amos.translate_success = function(tid, outcome, args) {
+    var Y = M.local_amos.Y;
+    var icon = args.icon;
+    var enid = args.enid;
+    var lang = args.lang;
+
+    try {
+        result = Y.JSON.parse(outcome.responseText);
+        if (!result.error) {
+            container = icon.get('parentNode');
+            container.set('innerHTML', result.data.translation);
+            container.replaceClass('googleicon', 'googletranslation');
+            container.addClass('preformatted');
+        } else {
+            container = icon.get('parentNode');
+            container.set('innerHTML', result.error.message);
+            container.replaceClass('googleicon', 'googleerror');
+        }
+    } catch(e) {
+        alert('AJAX error - can not parse response');
+        return;
     }
+}
+
+/**
+ * Callback function for IO transaction
+ *
+ * @param {Int} tid transaction identifier
+ * @param {Object} outcome from server
+ * @param {Mixed} args
+ */
+M.local_amos.translate_failure = function(tid, outcome, args) {
+    alert('AJAX request failed: ' + outcome.status + ' ' + outcome.statusText);
 }
