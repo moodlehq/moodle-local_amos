@@ -410,7 +410,7 @@ M.local_amos.init_google_translator = function() {
  */
 M.local_amos.translatable = ['af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs',
     'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr',
-    'ga', 'gl', 'gu', 'hi', 'hr', 'ht', 'hu', 'id', 'is', 'it', 'iw', 'ja',
+    'ga', 'gl', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'id', 'is', 'it', 'iw', 'ja',
     'ka', 'kn', 'ko', 'la', 'lt', 'lv', 'mk', 'ms', 'mt', 'nl', 'no', 'pl',
     'pt', 'pt_br', 'ro', 'ru', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te',
     'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yi', 'zh_cn', 'zh_tw'];

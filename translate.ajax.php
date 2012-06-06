@@ -70,6 +70,9 @@ case 'zh_tw':
 case 'pt_br':
     $lang = 'pt';
     break;
+case 'he':
+    $lang = 'iw';
+    break;
 }
 
 $curl = new curl(array('cache' => false, 'proxy' => true));
