@@ -85,19 +85,16 @@ $params = array(
 
 $response = $curl->get('https://www.googleapis.com/language/translate/v2', $params);
 $curlinfo = $curl->get_info();
+
+$translation = null;
+
 if (empty($curlinfo)) {
     error_log('AMOS Unable to fetch Google translation - empty cURL info');
-    header('HTTP/1.1 500 Internal server error');
-    die();
-}
 
-if ($curlinfo['http_code'] != 200) {
+} else if ($curlinfo['http_code'] != 200) {
     error_log('AMOS Fetching Google translation - got HTTP response '.$curlinfo['http_code']);
-    header('HTTP/1.1 500 Internal server error');
-    die();
-}
 
-if ($response) {
+} else if ($response) {
     $response = json_decode($response);
     if (!empty($response->data->translations) and is_array($response->data->translations)) {
         $first = reset($response->data->translations);
@@ -105,15 +102,12 @@ if ($response) {
             $translation = $first->translatedText;
         }
     }
-
-} else {
-    $translation = null;
 }
 
 if (is_null($translation)) {
     $response = array(
         'error' => array(
-            'message' => 'Unable to translate'
+            'message' => 'Unable to translate this at the moment'
         )
     );
 

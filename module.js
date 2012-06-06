@@ -422,7 +422,7 @@ M.local_amos.translatable = ['af', 'ar', 'az', 'be', 'bg', 'bn', 'ca', 'cs',
  */
 M.local_amos.init_google_icon = function(container, index, iconcontainers) {
     var Y = M.local_amos.Y;
-    var iconhtml = '<img src="' + M.util.image_url('google', 'local_amos') + '" />';
+    var iconhtml = '<img alt="Google Translate" title="Use Google Translate service" src="' + M.util.image_url('google', 'local_amos') + '" />';
     var lang = container.get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
     if (Y.Array.indexOf(M.local_amos.translatable, lang) >= 0) {
         container.set('innerHTML', iconhtml);
