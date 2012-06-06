@@ -16,15 +16,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of mlang
- *
- * @package    local
- * @subpackage amos
- * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_amos
+ * @category  log
+ * @copyright 2012 David Mudrak <david@moodle.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2012060501;
-$plugin->requires = 2011120503.01;
+global $DB;
+
+$logs = array(
+    array(
+        'module' => 'amos',
+        'action' => 'usegoogle',
+        'mtable' => 'amos_repository',
+        'field' => $DB->sql_concat("'['", "stringid", "', '", "component", "']'")
+    ),
+);
