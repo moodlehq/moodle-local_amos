@@ -1440,6 +1440,7 @@
       <plugin>boxnet</plugin>
       <plugin>coursefiles</plugin>
       <plugin>dropbox</plugin>
+      <plugin>equella</plugin>
       <plugin>filesystem</plugin>
       <plugin>flickr</plugin>
       <plugin>flickr_public</plugin>
