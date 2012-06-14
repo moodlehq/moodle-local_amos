@@ -1540,6 +1540,7 @@
       <plugin>standardold</plugin>
     </plugins>
     <plugins type="gradingform">
+      <plugin>guide</plugin>
       <plugin>rubric</plugin>
     </plugins>
     <plugins type="assignment">
