@@ -16,18 +16,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Propagates deletions of English strings into the other lang packs
+ * Removes translation of strings that are not present in the English pack
  *
- * The procedure is known as reverse cleanup. This script takes the most recent
- * snapshot of every component in the English lang pack. If a string removal is
- * part of the snapshot, the script propagates such removal into all other
- * languages. If the string is already removed in the other language, the
- * removing commit is not recorded.
+ * In other words, it calls mlang_component::intersect() against the English
+ * original for all components in the repository.
  *
- * By default, the script checks just for the recent deletions, not older
- * than one day. During the initial import and once per day, for example,
- * run it with --full argument to re-check all the history, so that commits
- * dated into past are propadagated as well (full check takes ~30 mins).
+ * Usage:
+ *
+ *  php rev-clean.php (for dry-run)
+ *  php rev-clean.php --execute (to actually commit the removal)
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -42,66 +39,55 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 require_once($CFG->libdir.'/clilib.php');
 
-list($options, $unrecognized) = cli_get_params(array('full'=>false), array('f'=>'full'));
+list($options, $unrecognized) = cli_get_params(array('execute' => false));
 
 fputs(STDOUT, "*****************************************\n");
 fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " REVERSE CLEANUP JOB STARTED\n");
 
-$mem = memory_get_usage();
 $tree = mlang_tools::components_tree();
 foreach ($tree as $vercode => $languages) {
+    if ($vercode < mlang_version::MOODLE_20) {
+        continue;
+    }
     $version = mlang_version::by_code($vercode);
     foreach ($languages['en'] as $componentname => $unused) {
-        if ($componentname == 'langconfig') {
-            continue;
-        }
-        $memprev = $mem;
-        $mem = memory_get_usage();
-        $memdiff = $memprev < $mem ? '+' : '-';
-        $memdiff = $memdiff . abs($mem - $memprev);
-        $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
-        foreach ($english->get_iterator() as $string) {
-            if (empty($options['full']) and $string->timemodified < time() - DAYSECS) {
+        $english = mlang_component::from_snapshot($componentname, 'en', $version);
+        foreach (array_keys($tree[$vercode]) as $otherlang) {
+            if ($otherlang == 'en') {
                 continue;
             }
-            if ($string->deleted) {
-                // propagate removal of this string to all other languages where it is present
-                $stage = new mlang_stage();
-                foreach (array_keys($tree[$vercode]) as $otherlang) {
-                    if ($otherlang == 'en') {
-                        continue;
-                    }
-                    $other = mlang_component::from_snapshot($componentname, $otherlang, $version, null, true, false, array($string->id));
-                    if ($other->has_string($string->id)) {
-                        $current = $other->get_string($string->id);
-                        if (!$current->deleted) {
-                            $current->deleted = true;
-                            $current->timemodified = time();
-                            $stage->add($other);
-                        }
-                    }
-                    $other->clear();
-                    unset($other);
-                }
-                $stage->rebase();
-                if ($stage->has_component()) {
-                    $string->timemodified = local_amos_renderer::commit_datetime($string->timemodified);
-                    $msg = <<<EOF
-Propagating removal of the string
+            $stage = new mlang_stage();
+            $other = mlang_component::from_snapshot($componentname, $otherlang, $version);
+            $removed = $other->intersect($english);
+            if ($removed) {
+                $stage->add($other);
+            }
+            $other->clear();
+            unset($other);
 
-The string '{$string->id}' was removed from the English language pack by
-{$string->extra->userinfo} at {$string->timemodified}. Their commit message was:
-{$string->extra->commitmsg}
-{$string->extra->commithash}
-EOF;
-                    fputs(STDOUT, "COMMIT removal of '{$string->id}' from '{$english->name}'\n");
-                    $stage->commit($msg, array('source' => 'revclean', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
+            $stage->rebase(null, true);
+
+            if ($options['execute']) {
+                $action = 'removing';
+            } else {
+                $action = 'would remove';
+            }
+
+            foreach ($stage->get_iterator() as $xcomp) {
+                foreach ($xcomp->get_iterator() as $xstr) {
+                    fputs(STDOUT, $action.' '.$xstr->id.' from '.$componentname.' '.$otherlang.' '.$version->label.PHP_EOL);
                 }
+            }
+
+            if ($options['execute']) {
+                $msg = 'Reverse clean-up of strings that do not exist in the English pack';
+                $stage->commit($msg, array('source' => 'revclean', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
+            } else {
                 $stage->clear();
-                unset($stage);
             }
         }
+        $english->clear();
     }
 }
 
