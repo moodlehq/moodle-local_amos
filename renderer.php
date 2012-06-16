@@ -535,21 +535,24 @@ class local_amos_renderer extends plugin_renderer_base {
         }
         $table = html_writer::table($table);
 
-        $propagateform = '';
-        $propagateform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
-        foreach (mlang_version::list_all() as $version) {
-            if ($version->code < 2000) {
-                continue;
+        if ($stage->showpropagateform) {
+            $propagateform  = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+            $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
+            foreach (mlang_version::list_all() as $version) {
+                if ($version->code < 2000) {
+                    continue;
+                }
+                $checkbox = html_writer::checkbox('ver[]', $version->code, true, $version->label);
+                $propagateform .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));
             }
-            $checkbox = html_writer::checkbox('ver[]', $version->code, true, $version->label);
-            $propagateform .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));
+            $propagateform .= html_writer::empty_tag('input', array('value' => get_string('propagaterun', 'local_amos'), 'type' => 'submit'));
+            $propagateform  = html_writer::tag('div', $propagateform);
+            $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+            $propagateform .= html_writer::tag('legend', get_string('propagate', 'local_amos') . $this->help_icon('propagate', 'local_amos'));
+            $propagateform = html_writer::tag('fieldset', $propagateform, array('class' => 'propagateformwrapper protected'));
+        } else {
+            $propagateform = '';
         }
-        $propagateform .= html_writer::empty_tag('input', array('value' => get_string('propagaterun', 'local_amos'), 'type' => 'submit'));
-        $propagateform  = html_writer::tag('div', $propagateform);
-        $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $propagateform .= html_writer::tag('legend', get_string('propagate', 'local_amos') . $this->help_icon('propagate', 'local_amos'));
-        $propagateform = html_writer::tag('fieldset', $propagateform, array('class' => 'propagateformwrapper protected'));
 
         $commitform  = html_writer::label(get_string('commitmessage', 'local_amos'), 'commitmessage', false);
         $commitform .= html_writer::empty_tag('img', array('src' => $this->pix_url('req'), 'title' => 'Required', 'alt' => 'Required', 'class' => 'req'));

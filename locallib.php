@@ -728,6 +728,9 @@ class local_amos_stage implements renderable {
     /** @var stdClass if the stage comes from an applied contribution, this object holds the id and the contributor */
     public $stagedcontribution;
 
+    /** @var bool */
+    public $showpropagateform = false;
+
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -744,6 +747,7 @@ class local_amos_stage implements renderable {
         }
 
         if (has_capability('local/amos:commit', get_system_context(), $user)) {
+            $this->showpropagateform = true;
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
         }
 
