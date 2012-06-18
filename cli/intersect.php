@@ -76,7 +76,7 @@ foreach ($tree as $vercode => $languages) {
 
             foreach ($stage->get_iterator() as $xcomp) {
                 foreach ($xcomp->get_iterator() as $xstr) {
-                    fputs(STDOUT, $action.' '.$xstr->id.' from '.$componentname.' '.$otherlang.' '.$version->label.PHP_EOL);
+                    fputs(STDERR, $action.' '.$xstr->id.' from '.$componentname.' '.$otherlang.' '.$version->label.PHP_EOL);
                 }
             }
 
