@@ -1522,11 +1522,11 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_23,
-                'label'         => '2.3dev',
+                'label'         => '2.3beta',
                 'branch'        => 'MOODLE_23_STABLE',
                 'dir'           => '2.3',
                 'translatable'  => true,
-                'current'       => false,
+                'current'       => true,
             ),
             array(
                 'code'          => self::MOODLE_22,
@@ -1534,7 +1534,7 @@ class mlang_version {
                 'branch'        => 'MOODLE_22_STABLE',
                 'dir'           => '2.2',
                 'translatable'  => true,
-                'current'       => true,
+                'current'       => false,
             ),
             array(
                 'code'          => self::MOODLE_21,
