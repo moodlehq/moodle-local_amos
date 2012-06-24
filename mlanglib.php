@@ -1522,7 +1522,7 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_23,
-                'label'         => '2.3beta',
+                'label'         => '2.3',
                 'branch'        => 'MOODLE_23_STABLE',
                 'dir'           => '2.3',
                 'translatable'  => true,
