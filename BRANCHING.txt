@@ -4,7 +4,7 @@ Registering a new Moodle branch in AMOS
 Whenever the new major Moodle version is released, several steps must be done
 in AMOS. For the purpose of this document, let us expect that Moodle 2.2 was
 just released and the new branch MOODLE_22_STABLE was created in moodle.git.
-So now we must tell AMOS that the master branch in 2.3.
+So now we must tell AMOS that the master branch is 2.3.
 
 1. Make sure that MOODLE_22_STABLE is fetched into the moodle.git clone that
    AMOS tracks.

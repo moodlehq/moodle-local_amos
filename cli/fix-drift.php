@@ -44,7 +44,7 @@ $stage = new mlang_stage();
 foreach ($plugins as $versionnumber => $plugintypes) {
     $version = mlang_version::by_dir($versionnumber);
 
-    if ($version->branch == 'MOODLE_23_STABLE') {
+    if ($version->branch == 'MOODLE_24_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $version->branch;
