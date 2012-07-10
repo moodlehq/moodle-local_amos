@@ -38,6 +38,7 @@ list($branchsql, $params) = $DB->get_in_or_equal(array(
     mlang_version::MOODLE_21,
     mlang_version::MOODLE_22,
     mlang_version::MOODLE_23,
+    mlang_version::MOODLE_24,
 ));
 $sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
           FROM {amos_repository}
