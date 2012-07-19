@@ -817,6 +817,7 @@ class local_amos_stage implements renderable {
                 }
             }
         }
+        $this->filterfields = new stdClass();
         $this->filterfields->fver = array_keys($fver);
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
