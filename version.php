@@ -18,13 +18,15 @@
 /**
  * Defines the version of mlang
  *
- * @package    local
- * @subpackage amos
- * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_amos
+ * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2012060501;
-$plugin->requires = 2011120503.01;
+$plugin->component  = 'local_amos';
+$plugin->release    = '2.3.0';
+$plugin->version    = 2012071900;
+$plugin->maturity   = MATURITY_STABLE;
+$plugin->requires   = 2012062501;
