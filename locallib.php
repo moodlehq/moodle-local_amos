@@ -682,7 +682,7 @@ class local_amos_translator implements renderable {
      * @return array of (string)lang, (int)amosid_original, (int)amosid_translation
      */
     public static function decode_identifier($encoded) {
-        $parts = split('___', $encoded, 3);
+        $parts = explode('___', $encoded, 3);
         if (count($parts) < 2) {
             throw new coding_exception('Invalid encoded identifier supplied');
         }
