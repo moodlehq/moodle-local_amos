@@ -1016,7 +1016,7 @@ class mlang_stage {
                         if ($tempidx == $sourceidx) {
                             continue;
                         }
-                        if ($temp->has_string($string->id)) {
+                        if ($temp->name === $source->name and $temp->has_string($string->id)) {
                             if (mlang_string::differ($temp->get_string($string->id), $string)) {
                                 continue 2;
                             }

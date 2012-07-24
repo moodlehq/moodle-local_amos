@@ -1335,6 +1335,71 @@ AMOS END';
         $stage->clear();
     }
 
+    public function test_stage_propagate_same_stringid_in_two_components() {
+        $this->resetAfterTest();
+
+        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
+        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
+
+        $blogmenu21en = new mlang_component('block_blog_menu', 'en', $version21);
+        $blogmenu21en->add_string(new mlang_string('pluginname', 'Blog menu'));
+
+        $blogmenu22en = new mlang_component('block_blog_menu', 'en', $version22);
+        $blogmenu22en->add_string(new mlang_string('pluginname', 'Blog menu'));
+
+        $blogtags21en = new mlang_component('block_blog_tags', 'en', $version21);
+        $blogtags21en->add_string(new mlang_string('pluginname', 'Blog tags'));
+
+        $blogtags22en = new mlang_component('block_blog_tags', 'en', $version22);
+        $blogtags22en->add_string(new mlang_string('pluginname', 'Blog tags'));
+
+        $blogmenu21cs = new mlang_component('block_blog_menu', 'cs', $version21);
+        $blogmenu21cs->add_string(new mlang_string('pluginname', 'Blog menu CZ'));
+
+        $blogmenu22cs = new mlang_component('block_blog_menu', 'cs', $version22);
+        $blogmenu22cs->add_string(new mlang_string('pluginname', 'Blog menu CZ'));
+
+        $blogtags21cs = new mlang_component('block_blog_tags', 'cs', $version21);
+        $blogtags21cs->add_string(new mlang_string('pluginname', 'Blog tags CZ'));
+
+        $blogtags22cs = new mlang_component('block_blog_tags', 'cs', $version22);
+        $blogtags22cs->add_string(new mlang_string('pluginname', 'Blog tags CZ'));
+
+        $stage = new mlang_stage();
+        $stage->add($blogmenu21en);
+        $stage->add($blogmenu22en);
+        $stage->add($blogtags21en);
+        $stage->add($blogtags22en);
+        $stage->add($blogmenu21cs);
+        $stage->add($blogmenu22cs);
+        $stage->add($blogtags21cs);
+        $stage->add($blogtags22cs);
+        $stage->commit('Initial plugin names equal on both branches', array('source' => 'unittest'), true);
+        $blogmenu21en->clear();
+        $blogmenu22en->clear();
+        $blogtags21en->clear();
+        $blogtags22en->clear();
+        $blogmenu21cs->clear();
+        $blogmenu22cs->clear();
+        $blogtags21cs->clear();
+        $blogtags22cs->clear();
+        unset($stage);
+
+        // modify the plugin names for both blocks at 2.2
+        $blogmenu22cs->add_string(new mlang_string('pluginname', 'Blog menu CZ 2'));
+        $blogtags22cs->add_string(new mlang_string('pluginname', 'Blog tags CZ 2'));
+        $stage = new mlang_stage();
+        $stage->add($blogmenu22cs);
+        $stage->add($blogtags22cs);
+
+        // make sure that the change is propagated to 2.1
+        $this->assertEquals($stage->propagate(array($version21, $version22)), 2);
+        $this->assertEquals($stage->get_component('block_blog_menu', 'cs', $version21)->get_string('pluginname')->text,
+            'Blog menu CZ 2');
+        $this->assertEquals($stage->get_component('block_blog_tags', 'cs', $version21)->get_string('pluginname')->text,
+            'Blog tags CZ 2');
+    }
+
     public function test_execution_forced_copy() {
         $this->resetAfterTest();
         $stage = new mlang_stage();
