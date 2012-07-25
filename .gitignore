@@ -1,1 +1,5 @@
-cli/config.php
+*~
+*.swp
+/.patches/
+/phpunit.xml
+/cli/config.php
