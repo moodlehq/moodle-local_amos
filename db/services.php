@@ -1,7 +1,5 @@
 <?php
 
-// This file is part of Moodle - http://moodle.org/
-//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -16,17 +14,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of mlang
+ * AMOS web services
  *
  * @package   local_amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
+ * @category  webservice
+ * @copyright 2012 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$functions = array(
+        'local_amos_update_strings_file' => array(
+                'classname'   => 'local_amos_external',
+                'methodname'  => 'update_strings_file',
+                'classpath'   => 'local/amos/externallib.php',
+                'description' => 'Imports strings from a string file.',
+                'type'        => 'write',
+        )
+);
 
-$plugin->component  = 'local_amos';
-$plugin->release    = '2.3.0';
-$plugin->version    = 2012072601;
-$plugin->maturity   = MATURITY_STABLE;
-$plugin->requires   = 2012062501;
+$services = array(
+        'AMOS Import web service' => array(
+                'functions' => array(
+                    'local_amos_update_strings_file'
+                ),
+                'restrictedusers' => 1,
+                'enabled' => 1,
+        ),
+);
