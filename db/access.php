@@ -66,13 +66,21 @@ $capabilities = array(
         )
     ),
 
-    // Ability to import strings from uploaded file and stage them
+    // Ability to import translated strings from uploaded file and stage them
     'local/amos:importfile' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array(
             'user' => CAP_ALLOW,
         )
+    ),
+
+    // Ability to import strings (including the English ones) directly into the repository
+    // (this is intended mainly for the web service users)
+    'local/amos:importstrings' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
     ),
 
     // Ability to use Google Translate services
