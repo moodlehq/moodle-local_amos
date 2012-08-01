@@ -193,6 +193,7 @@ $string['logfiltersourcebot'] = 'bot (bulk operations executed by a script)';
 $string['logfiltersourcecommitscript'] = 'commitscript (AMOScript in the commit message)';
 $string['logfiltersourcefixdrift'] = 'fixdrift (fixed AMOS-git drift)';
 $string['logfiltersourcegit'] = 'git (git mirror of Moodle source code and 1.x packs)';
+$string['logfiltersourceimport'] = 'import (imported strings for a contributed plugin)';
 $string['logfiltersourcerevclean'] = 'revclean (reverse clean-up process)';
 $string['logfilterstringid'] = 'String identifier';
 $string['logfilterstrings'] = 'String filter';
