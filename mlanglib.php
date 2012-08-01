@@ -823,8 +823,9 @@ class mlang_stage {
      * @param array $meta optional meta information
      * @param bool $skiprebase if true, do not rebase before committing
      * @param int $timecommitted timestamp of the commit, defaults to now
+     * @param bool $clear clear the stage after it is committed
      */
-    public function commit($message='', array $meta=null, $skiprebase=false, $timecommitted=null) {
+    public function commit($message='', array $meta=null, $skiprebase=false, $timecommitted=null, $clear=true) {
         global $DB;
 
         if (empty($skiprebase)) {
@@ -865,7 +866,9 @@ class mlang_stage {
                 }
             }
             $transaction->allow_commit();
-            $this->clear();
+            if ($clear) {
+                $this->clear();
+            }
         } catch (Exception $e) {
             // this is here in order not to clear the stage, just re-throw the exception
             $transaction->rollback($e);

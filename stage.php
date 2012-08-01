@@ -53,10 +53,16 @@ if (!empty($message)) {
     // committing the stage
     require_sesskey();
     require_capability('local/amos:commit', get_system_context());
+    if (isset($_POST['commit2'])) {
+        $clear = false;
+    } else {
+        $clear = true;
+    }
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $allowed = mlang_tools::list_allowed_languages($USER->id);
     $stage->prune($allowed);
-    $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'));
+    $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'),
+        false, null, $clear);
     $stage->store();
     if (empty($SESSION->local_amos->stagedcontribution)) {
         $nexturl = $PAGE->url;

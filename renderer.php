@@ -559,8 +559,9 @@ class local_amos_renderer extends plugin_renderer_base {
         $commitform .= html_writer::empty_tag('br');
         $commitform .= html_writer::tag('textarea', s($stage->presetmessage), array('id' => 'commitmessage', 'name' => 'message'));
         $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $button = html_writer::empty_tag('input', array('value' => get_string('commitbutton', 'local_amos'), 'type' => 'submit'));
-        $button = html_writer::tag('div', $button);
+        $button1 = html_writer::empty_tag('input', array('name' => 'commit1', 'value' => get_string('commitbutton', 'local_amos'), 'type' => 'submit'));
+        $button2 = html_writer::empty_tag('input', array('name' => 'commit2', 'value' => get_string('commitbutton2', 'local_amos'), 'type' => 'submit'));
+        $button = html_writer::tag('div', $button1.' '.$button2);
         $commitform = html_writer::tag('div', $commitform . $button);
         $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
         $commitform .= html_writer::tag('legend', get_string('commitstage', 'local_amos') . $this->help_icon('commitstage', 'local_amos'));
