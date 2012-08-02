@@ -37,6 +37,7 @@ $services = array(
                 'functions' => array(
                     'local_amos_update_strings_file'
                 ),
+                'requiredcapability' => 'local/amos:importstrings',
                 'restrictedusers' => 1,
                 'enabled' => 1,
         ),
