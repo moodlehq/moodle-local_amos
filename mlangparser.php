@@ -84,7 +84,7 @@ class mlang_parser_exception extends mlang_exception {
      * @param string $debuginfo detailed information how to fix problem
      */
     function __construct($hint, $debuginfo=null) {
-        parent::__construct('err_parser', 'local_amos', '', $hint, $debuginfo);
+        parent::__construct($hint, $debuginfo);
     }
 }
 
