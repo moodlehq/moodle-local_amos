@@ -97,15 +97,11 @@ function local_amos_frontpage_stats() {
          WHERE c.status = 30");
 
     $recent = $DB->get_records_sql("
-        SELECT id, firstname, lastname
-          FROM {user}
-         WHERE id IN (
-               SELECT DISTINCT u.id
-               FROM (
-                   SELECT c.authorid AS id
-                     FROM {amos_contributions} c
-                 ORDER BY c.timecreated DESC
-               ) u LIMIT 4)");
+        SELECT c.authorid AS id, u.lastname, u.firstname, MAX(c.timecreated) AS mostrecent
+          FROM {amos_contributions} c
+          JOIN {user} u ON u.id = c.authorid
+      GROUP BY c.authorid, u.lastname, u.firstname
+      ORDER BY mostrecent DESC", null, 0, 4);
 
     $links = array();
     foreach ($recent as $contributor) {
