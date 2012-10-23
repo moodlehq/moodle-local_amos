@@ -109,7 +109,7 @@ function local_amos_frontpage_stats() {
 
     $links = array();
     foreach ($recent as $contributor) {
-        $links[] = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$contributor->id.'">'.fullname($contributor).'</a>';
+        $links[] = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$contributor->id.'">'.s(fullname($contributor)).'</a>';
     }
 
     $last = array_pop($links);
