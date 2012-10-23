@@ -38,8 +38,8 @@ class local_amos_importfile_form extends moodleform {
         $mform->setDefault('language', $this->_customdata['languagecurrent']);
         $mform->addRule('language', null, 'required', null, 'client');
 
-        $fpoptions = array('accepted_types' => 'php', 'maxbytes' => 500*1024);
-        $mform->addElement('filepicker', 'importfile', get_string('files'), null,  $fpoptions);
+        $fpoptions = array('accepted_types' => array('.php', '.zip'), 'maxbytes' => 2*1024*1024);
+        $mform->addElement('filepicker', 'importfile', get_string('file'), null,  $fpoptions);
         $mform->addRule('importfile', null, 'required', null, 'client');
 
         $this->add_action_buttons(false, get_string('import'));

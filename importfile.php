@@ -50,33 +50,63 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', get
 
     if ($importform->save_file('importfile', $pathname)) {
 
-        if (substr($filenameorig, -4) === '.php') {
-            $name = mlang_component::name_from_filename($filenameorig);
-            $version = mlang_version::by_code($data->version);
-            $component = new mlang_component($name, $data->language, $version);
+        // Prepare the list of files to import.
+        $stringfiles = array();
 
-            $parser = mlang_parser_factory::get_parser('php');
-            try {
-                $parser->parse(file_get_contents($pathname), $component);
-
-            } catch (mlang_parser_exception $e) {
-                notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
+        if (strtolower(substr($filenameorig, -4)) === '.zip') {
+            $tmpzipdir = $pathname . '-content';
+            check_dir_exists($tmpzipdir);
+            $fp = get_file_packer('application/zip');
+            $zipcontents = $fp->extract_to_pathname($pathname, $tmpzipdir);
+            if (!$zipcontents) {
+                notice(get_string('novalidzip', 'local_amos'), new moodle_url('/local/amos/stage.php'));
+                @remove_dir($tmpzipdir);
+            } else {
+                foreach ($zipcontents as $zipfilename => $zipfilestatus) {
+                    // We want PHP files in the root of the ZIP only.
+                    if ($zipfilestatus === true and basename($zipfilename) === $zipfilename and strtolower(substr($zipfilename, -4)) === '.php') {
+                        $stringfiles[$zipfilename] = $tmpzipdir . '/' . $zipfilename;
+                    }
+                }
             }
 
-            $encomponent = mlang_component::from_snapshot($component->name, 'en', $version);
-            $component->intersect($encomponent);
+        } else if (strtolower(substr($filenameorig, -4)) === '.php') {
+            $stringfiles = array($filenameorig => $pathname);
+        }
 
-            if (!$component->has_string()) {
-                notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
-            }
-
-            $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-            $stage->add($component, true);
-            $stage->store();
-            mlang_stash::autosave($stage);
+        if (empty($stringfiles)) {
+            notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
 
         } else {
-            notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
+            $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+            $version = mlang_version::by_code($data->version);
+            $parser = mlang_parser_factory::get_parser('php');
+
+            foreach ($stringfiles as $filenameorig => $pathname) {
+                $name = mlang_component::name_from_filename($filenameorig);
+                $component = new mlang_component($name, $data->language, $version);
+
+                try {
+                    $parser->parse(file_get_contents($pathname), $component);
+
+                } catch (mlang_parser_exception $e) {
+                    notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
+                }
+
+                $encomponent = mlang_component::from_snapshot($component->name, 'en', $version);
+                $component->intersect($encomponent);
+
+                if ($component->has_string()) {
+                    $stage->add($component, true);
+                    $component->clear();
+                    $stage->store();
+                }
+            }
+            mlang_stash::autosave($stage);
+        }
+
+        if (!empty($tmpzipdir)) {
+            @remove_dir($tmpzipdir);
         }
 
     } else {

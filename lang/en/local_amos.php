@@ -171,7 +171,9 @@ $string['importfile_help'] = 'If you have your strings translated offline, you c
 * The file must be valid Moodle PHP strings definition file. Look at `/lang/en/` directory of your Moodle installation for examples.
 * Name of the file must match the one with English strings definitons for the given component (like `moodle.php`, `assignment.php` or `enrol_manual.php`).
 
-All strings found in the file will be staged for the selected version and language.';
+All strings found in the file will be staged for the selected version and language.
+
+Multiple PHP files can be processed at once if you put them into a ZIP file.';
 $string['importfile_link'] = 'local/amos/importfile';
 $string['language'] = 'Language';
 $string['languages'] = 'Languages';
@@ -216,6 +218,7 @@ $string['nostringsfoundonpage'] = 'No strings found on page {$a}';
 $string['nostringtoimport'] = 'No valid string found in the file. Make sure the file has correct filename and is properly formatted.';
 $string['nothingtomerge'] = 'The source branch does not contain any new strings that would be missing at the target branch. Nothing to merge.';
 $string['nothingtostage'] = 'The operation did not return any string that could be staged.';
+$string['novalidzip'] = 'Unable to extract the ZIP file.';
 $string['numofcommitsabovelimit'] = 'Found {$a->found} commits matching the commit filter, using {$a->limit} most recent';
 $string['numofcommitsunderlimit'] = 'Found {$a->found} commits matching the commit filter';
 $string['numofmatchingstrings'] = 'Within that, {$a->strings} modifications in {$a->commits} commits match the string filter';
