@@ -136,6 +136,10 @@ class mlang_php_parser implements mlang_parser {
 
         $strings = $this->extract_strings($data);
         foreach ($strings as $id => $text) {
+            $cleaned = clean_param($id, PARAM_STRINGID);
+            if ($cleaned !== $id) {
+                continue;
+            }
             $text = mlang_string::fix_syntax($text, 2, $format);
             $component->add_string(new mlang_string($id, $text));
         }

@@ -95,6 +95,12 @@ class mlangparser_test extends basic_testcase {
         $component->clear();
         $parser->parse($data, $component);
         $this->assertEquals($component->get_string('id')->text, 'No dollar here');
+
+        // only strings conforming to PARAM_STRINGID are accepted
+        $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata004.txt');
+        $component->clear();
+        $parser->parse($data, $component);
+        $this->assertEquals($component->get_number_of_strings(), 2);
     }
 
     public function test_php_parser_failure_double_quotes() {
