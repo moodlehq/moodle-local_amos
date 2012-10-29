@@ -1,0 +1,6 @@
+<?php
+
+$string['thisisvalid'] = 'This is {$a} valid string {$a->and} should be parsed';
+$string['this is not valid'] = 'No space supported';
+$string['4you'] = 'Must start with a letter';
+$string['ev3n_this:is/valid-string.007'] = 'But it does not mean you should make your identifiers like that';
