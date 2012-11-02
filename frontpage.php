@@ -117,7 +117,7 @@ function local_amos_frontpage_stats() {
             Total of <span style="font-size:x-large">'.$total.'</span> strings translated by community members have been submitted into AMOS so far.
         </div>
         <div style="text-align:center;margin:30px;">
-        <a style="padding:20px;background-color:#88de85;color:white;font-size:xx-large;font-weight:bold;-webkit-border-radius:7px;-moz-border-radius:7px;border:1px solid green;text-decoration:none;" href="http://lang.moodle.org/local/amos/">
+        <a style="padding:20px;background-color:#88de85;color:white;font-size:xx-large;font-weight:bold;border-radius:15px;-webkit-border-radius:15px;-moz-border-radius:15px;border:1px solid green;text-decoration:none;" href="http://lang.moodle.org/local/amos/">
                 Contribute now!
             </a>
         </div>
