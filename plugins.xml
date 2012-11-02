@@ -1622,6 +1622,7 @@
       <plugin>block</plugin>
       <plugin>blog</plugin>
       <plugin>bulkusers</plugin>
+      <plugin>cache</plugin>
       <plugin>calendar</plugin>
       <plugin>cohort</plugin>
       <plugin>condition</plugin>
