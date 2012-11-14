@@ -41,6 +41,8 @@ $plugins = local_amos_standard_plugins();
 
 $stage = new mlang_stage();
 
+$cliresult = 0;
+
 foreach ($plugins as $versionnumber => $plugintypes) {
     $version = mlang_version::by_dir($versionnumber);
 
@@ -122,6 +124,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             $filepath = 'lang/en/'.$legacyname.'.php';
         } else if (!isset($basedirs[$plugintype])) {
             fputs(STDERR, "!! Unknown plugin type '{$plugintype}'\n");
+            $cliresult = 1;
             continue;
         } else {
             $filepath = $basedirs[$plugintype].'/'.$pluginname.'/lang/en/'.$legacyname.'.php';
@@ -201,11 +204,14 @@ foreach ($plugins as $versionnumber => $plugintypes) {
     }
 }
 
-if ($options['execute']) {
-    $stage->commit('Fixing the drift between Git and AMOS repository', array('source' => 'fixdrift', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
-} else {
-    list($x, $y, $z) = mlang_stage::analyze($stage);
-    if ($x > 0) {
-        fputs(STDOUT, "There are $x string changes prepared for sync execution\n");
+list($x, $y, $z) = mlang_stage::analyze($stage);
+if ($x > 0) {
+    fputs(STDOUT, "There are $x string changes prepared for sync execution\n");
+    fputs(STDOUT, "JENKINS:SET-STATUS-UNSTABLE\n");
+    if ($options['execute']) {
+        fputs(STDOUT, "Executing\n");
+        $stage->commit('Fixing the drift between Git and AMOS repository', array('source' => 'fixdrift', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
     }
 }
+
+exit($cliresult);
