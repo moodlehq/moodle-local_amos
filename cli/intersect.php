@@ -45,6 +45,8 @@ fputs(STDOUT, "*****************************************\n");
 fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " INTERSECT JOB STARTED\n");
 
+$cliresult = 0;
+
 $tree = mlang_tools::components_tree();
 foreach ($tree as $vercode => $languages) {
     if ($vercode < mlang_version::MOODLE_20) {
@@ -77,6 +79,9 @@ foreach ($tree as $vercode => $languages) {
             foreach ($stage->get_iterator() as $xcomp) {
                 foreach ($xcomp->get_iterator() as $xstr) {
                     fputs(STDERR, $action.' '.$xstr->id.' from '.$componentname.' '.$otherlang.' '.$version->label.PHP_EOL);
+                    if (!$options['execute']) {
+                        $cliresult = 1;
+                    }
                 }
             }
 
@@ -93,3 +98,5 @@ foreach ($tree as $vercode => $languages) {
 
 fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " INTERSECT CLEANUP JOB DONE\n");
+
+exit($cliresult);
