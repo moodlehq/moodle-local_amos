@@ -76,6 +76,10 @@ foreach ($tree as $vercode => $languages) {
             // do not export English strings
             continue;
         }*/
+        if ($langcode === 'en_fix') {
+            // do not export English fixes
+            continue;
+        }
         if (!mkdir($CFG->dataroot.'/amos/temp/export-zip/'.$version->dir.'/'.$langcode, 0755, true)) {
             throw new moodle_exception('unable_to_create_export_version_directory');
         }

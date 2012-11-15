@@ -101,6 +101,9 @@ EOF;
 
     foreach ($list as $componentname => $stringids) {
         foreach ($langs as $lang) {
+            if ($lang === 'en_fix') {
+                continue;
+            }
             $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false, array_keys($stringids));
             if ($component->has_string()) {
                 $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $version->dir . '/install/lang/' . $lang . '/' . $component->name . '.php';
