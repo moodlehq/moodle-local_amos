@@ -120,7 +120,7 @@ if (!empty($submit)) {
 if (!empty($propagate)) {
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $ver = optional_param('ver', array(), PARAM_INT);
+    $ver = optional_param_array('ver', array(), PARAM_INT);
     $num = null;
     if (!empty($ver) and is_array($ver)) {
         $versions = array();
