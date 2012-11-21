@@ -427,6 +427,11 @@ class amos_export_zip {
         $source = $this->tempdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
         $target = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
 
+        if (!file_exists($source)) {
+            // nothing to do, there was nothing generated for this branch
+            return;
+        }
+
         if (!file_exists(dirname($target))) {
             mkdir(dirname($target), 0755, true);
         }
