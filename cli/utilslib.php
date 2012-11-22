@@ -457,8 +457,10 @@ class amos_export_zip {
                 mkdir(dirname($packinfofile), 0755, true);
             }
         }
-        $packinfo[$langcode] = $this->generate_packinfo($version, $langcode);
-        file_put_contents($packinfofile, serialize($packinfo));
+        if ($info = $this->generate_packinfo($version, $langcode)) {
+            $packinfo[$langcode] = $info;
+            file_put_contents($packinfofile, serialize($packinfo));
+        }
     }
 
     /**
@@ -466,6 +468,7 @@ class amos_export_zip {
      *
      * @param mlang_version $version
      * @param string $langcode
+     * @return array|null
      */
     protected function generate_packinfo(mlang_version $version, $langcode) {
 
@@ -485,7 +488,8 @@ class amos_export_zip {
 
         // Pack modification date
         if (!isset($this->stash['componentrecenttimemodified'][$version->code][$langcode])) {
-            $this->job_failure('Unable to generate packinfo/modified for '.$version->dir.'/'.$langcode);
+            $this->log('Unable to generate packinfo/modified for '.$version->dir.'/'.$langcode, amos_cli_logger::LEVEL_WARNING);
+            return null;
         }
         $packmodified = 0;
         foreach ($this->stash['componentrecenttimemodified'][$version->code][$langcode] as $componentname => $componentmodified) {
