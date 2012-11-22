@@ -269,8 +269,8 @@ class amos_export_zip {
     protected function init_timestamp_last() {
         $lastexportzip = get_config('local_amos', 'lastexportzip');
         if (empty($lastexportzip)) {
-            $lastexportzip = $this->now - DAYSECS; // not really true but better than never
-            $this->log('Previous execution timestamp not found, setting it to '.date('Y-m-d H:i:s', $lastexportzip), amos_cli_logger::LEVEL_DEBUG);
+            $lastexportzip = 0;
+            $this->log('Previous execution timestamp not found, setting it to the beginning of the epoch '.date('Y-m-d H:i:s', $lastexportzip), amos_cli_logger::LEVEL_DEBUG);
         } else {
             $this->log('Previous execution timestamp was '.date('Y-m-d H:i:s', $lastexportzip), amos_cli_logger::LEVEL_DEBUG);
         }
