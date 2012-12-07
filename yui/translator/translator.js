@@ -23,6 +23,13 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          */
         ajaxqueue: [],
 
+        /**
+         * The text currently entered into the search component box
+         *
+         * @property filtersearchneedle
+         */
+        filtersearchneedle: '',
+
         initializer : function(config) {
             this.init_translator();
         },
@@ -55,16 +62,30 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                               ' / <a href="#" id="amosfilter_fcmp_actions_all">' +
                               M.util.get_string('componentsall', 'local_amos') + '</a>' +
                               ' / <a href="#" id="amosfilter_fcmp_actions_none">' +
-                              M.util.get_string('componentsnone', 'local_amos') + '</a>';
+                              M.util.get_string('componentsnone', 'local_amos') + '</a>' +
+                              ' <input type="text" size="8" maxlength="20" placeholder="' + M.util.get_string('search', 'core') +
+                                '" name="amosfilter_fcmp_actions_search" id="amosfilter_fcmp_actions_search" />';
             fcmpactions.set('innerHTML', fcmphtml);
             var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
             fcmpselectallstandard.on('click', function(e) {
                 fcmp.all('optgroup:first-child option, optgroup:first-child + optgroup option').set('selected', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
-            fcmpselectall.on('click', function(e) { fcmp.all('option').set('selected', true); });
+            fcmpselectall.on('click', function(e) {
+                fcmp.all('option').each(function (option, index, options) {
+                    if (!option.hasClass('hidden')) {
+                        option.set('selected', true);
+                    }
+                })
+            });
             var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
             fcmpselectnone.on('click', function(e) { fcmp.all('option').set('selected', false); });
+
+            // search for components
+            var fcmpsearch = filter.one('#amosfilter_fcmp_actions_search');
+            fcmpsearch.on('keypress', this.filter_components, this, fcmpsearch, fcmp); // needed so we catch Enter pressed, too
+            fcmpsearch.on('keyup', this.filter_components, this, fcmpsearch, fcmp);
+            fcmpsearch.on('change', this.filter_components, this, fcmpsearch, fcmp);
 
             // make greylist related checkboxed mutally exclusive
             var fglo = filter.one('#amosfilter_fglo');
@@ -130,6 +151,35 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                 // initialize the google translate service support
                 this.init_google_translator();
             }
+        },
+
+        /**
+         * Filter the list of components
+         *
+         * @method filter_components
+         * @param {Y.Event} e
+         * @param {Y.Node} searchfield
+         * @param {Y.NodeList} componentslist
+         */
+        filter_components: function(e, searchfield, componentslist) {
+            // If enter was pressed, prevent a form submission from happening.
+            if (e.keyCode == 13) {
+                e.halt();
+            }
+            this.filtersearchneedle = searchfield.get('value').toString().replace(/^ +| +$/, '');
+            var options = componentslist.all('option');
+            options.each(function(option, index, options) {
+                if (this.filtersearchneedle == '') {
+                    option.show();
+                    option.removeClass('hidden');
+                } else if (option.get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
+                    option.show();
+                    option.removeClass('hidden');
+                } else {
+                    option.hide();
+                    option.addClass('hidden');
+                }
+            }, this);
         },
 
         /**
