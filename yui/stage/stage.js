@@ -6,11 +6,11 @@
  */
 YUI.add('moodle-local_amos-stage', function(Y) {
 
-    var STAGE = function() {
-        STAGE.superclass.constructor.apply(this, arguments);
+    var Stage = function() {
+        Stage.superclass.constructor.apply(this, arguments);
     }
 
-    Y.extend(STAGE, Y.Base, {
+    Y.extend(Stage, Y.Base, {
         initializer : function(config) {
             this.setup_protector();
             this.replace_unstage_buttons();
@@ -124,8 +124,8 @@ YUI.add('moodle-local_amos-stage', function(Y) {
         setup_diffmode_switcher: function() {
             var links = Y.all('#amosstage .translation .diffmode');
             links.setContent(M.util.get_string('diffstaged', 'local_amos'));
-            links.on('click', function(e) {
-                e.halt();
+            Y.one('#amosstage').delegate('click', function(e) {
+                Y.log(e);
                 var link = e.currentTarget;
                 var cell = link.ancestor('td');
                 cell.all('.stringtext').each(function(stringtext) {
@@ -135,7 +135,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                         stringtext.setStyle('display', 'none');
                     }
                 });
-            });
+            }, '.translation .diffmode');
         }
 
     }, {
@@ -146,7 +146,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
     M.local_amos = M.local_amos || {};
 
     M.local_amos.init_stage = function(config) {
-        M.local_amos.STAGE = new STAGE(config);
+        M.local_amos.Stage = new Stage(config);
     }
 
 }, '@VERSION@', { requires:['base', 'io-base', 'json-parse', 'anim'] });
