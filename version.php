@@ -27,6 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component  = 'local_amos';
 $plugin->release    = '2.4.0';
-$plugin->version    = 2012120700;
+$plugin->version    = 2012120701;
 $plugin->maturity   = MATURITY_STABLE;
 $plugin->requires   = 2012120300; // Moodle 2.4

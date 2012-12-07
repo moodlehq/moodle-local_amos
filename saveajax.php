@@ -69,4 +69,6 @@ header('Content-Type: application/json; charset: utf-8');
 $response = new stdclass();
 $response->text = local_amos_renderer::add_breaks(s($string->text));
 
+add_to_log(SITEID, 'amos', 'stage', '', $lang.' '.$version->label.' ['.$string->id.','.$component->name.']', 0, $USER->id);
+
 echo json_encode($response);

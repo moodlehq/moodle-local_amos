@@ -33,4 +33,12 @@ $logs = array(
         'mtable' => 'amos_repository',
         'field' => $DB->sql_concat("'['", "stringid", "', '", "component", "']'")
     ),
+
+    // A string translation is staged via AJAX call from the translator
+    array(
+        'module' => 'amos',
+        'action' => 'stage',
+        'mtable' => '',
+        'field' => '',
+    ),
 );
