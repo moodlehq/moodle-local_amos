@@ -6,13 +6,13 @@
  */
 YUI.add('moodle-local_amos-timeline', function(Y) {
 
-    var TIMELINE = function() {
-        TIMELINE.superclass.constructor.apply(this, arguments);
+    var Timeline = function() {
+        Timeline.superclass.constructor.apply(this, arguments);
     }
 
-    Y.extend(TIMELINE, Y.Base, {
+    Y.extend(Timeline, Y.Base, {
         initializer : function(config) {
-            Y.all('.timelinelink a').on('click', this.display, this);
+            Y.one('#amostranslator').delegate('click', this.display, '.timelinelink a', this);
         },
 
         display : function(e, args) {
@@ -69,7 +69,7 @@ YUI.add('moodle-local_amos-timeline', function(Y) {
     M.local_amos = M.local_amos || {};
 
     M.local_amos.init_timeline = function(config) {
-        M.local_amos.TIMELINE = new TIMELINE(config);
+        M.local_amos.Timeline = new Timeline(config);
     }
 
 }, '@VERSION@', { requires:['overlay'] });
