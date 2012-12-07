@@ -126,6 +126,8 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                         }
                     } else if (e.target.ancestor('.helplink', true, '.translatable')) {
                         // do nothing, propagate the event
+                    } else if (e.currentTarget.one('textarea.translation-edit')) {
+                        // it is already in the edit mode
                     } else {
                         // clicking on a translatable cell makes it editable
                         this.make_editable(e);
