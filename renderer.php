@@ -315,9 +315,11 @@ class local_amos_renderer extends plugin_renderer_base {
             if ($string->outdated and $string->committable and $string->translation) {
                 if ($string->translationid) {
                     $c = html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'update_' . $string->translationid,
-                            'name' => 'updates[]', 'value' => $string->translationid));
+                        'name' => 'updates[]', 'class' => 'uptodatecheckbox', 'value' => $string->translationid));
                     $help = $this->help_icon('markuptodate', 'local_amos');
-                    $c .= html_writer::tag('label', 'mark as up-to-date' . $help, array('for' => 'update_' . $string->translationid));
+                    $c .= html_writer::tag('label', 'mark as up-to-date', array('class' => 'uptodatelabel',
+                        'for' => 'update_' . $string->translationid));
+                    $c .= $help;
                 } else {
                     $c = $this->help_icon('outdatednotcommitted', 'local_amos', get_string('outdatednotcommittedwarning', 'local_amos'));
                 }
