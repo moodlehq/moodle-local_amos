@@ -124,18 +124,21 @@ YUI.add('moodle-local_amos-stage', function(Y) {
         setup_diffmode_switcher: function() {
             var links = Y.all('#amosstage .translation .diffmode');
             links.setContent(M.util.get_string('diffstaged', 'local_amos'));
-            Y.one('#amosstage').delegate('click', function(e) {
-                Y.log(e);
-                var link = e.currentTarget;
-                var cell = link.ancestor('td');
-                cell.all('.stringtext').each(function(stringtext) {
-                    if (stringtext.getStyle('display') == 'none') {
-                        stringtext.setStyle('display', 'block');
-                    } else if (stringtext.getStyle('display') == 'block') {
-                        stringtext.setStyle('display', 'none');
-                    }
-                });
-            }, '.translation .diffmode');
+            var amosstage = Y.one('#amosstage');
+            if (amosstage) {
+                amosstage.delegate('click', function(e) {
+                    Y.log(e);
+                    var link = e.currentTarget;
+                    var cell = link.ancestor('td');
+                    cell.all('.stringtext').each(function(stringtext) {
+                        if (stringtext.getStyle('display') == 'none') {
+                            stringtext.setStyle('display', 'block');
+                        } else if (stringtext.getStyle('display') == 'block') {
+                            stringtext.setStyle('display', 'none');
+                        }
+                    });
+                }, '.translation .diffmode');
+            }
         }
 
     }, {
