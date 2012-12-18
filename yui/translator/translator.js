@@ -171,15 +171,18 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             this.filtersearchneedle = searchfield.get('value').toString().replace(/^ +| +$/, '');
             var options = componentslist.all('option');
             options.each(function(option, index, options) {
-                if (this.filtersearchneedle == '') {
+                if (this.filtersearchneedle == '' || option.get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
                     option.show();
                     option.removeClass('hidden');
-                } else if (option.get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
-                    option.show();
-                    option.removeClass('hidden');
+                    if (option.get('parentNode').test('span')) {
+                        option.unwrap();
+                    }
                 } else {
                     option.hide();
                     option.addClass('hidden');
+                    if (!option.get('parentNode').test('span')) {
+                        option.wrap('<span style="display: none;"/>');
+                    }
                 }
             }, this);
         },
