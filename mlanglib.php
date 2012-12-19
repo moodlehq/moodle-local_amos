@@ -1424,6 +1424,7 @@ class mlang_version {
     const MOODLE_22 = 2200;
     const MOODLE_23 = 2300;
     const MOODLE_24 = 2400;
+    const MOODLE_25 = 2500;
 
     /** @var int internal code of the version */
     public $code;
@@ -1524,6 +1525,14 @@ class mlang_version {
      */
     protected static function versions_info() {
         return array(
+            array(
+                'code'          => self::MOODLE_25,
+                'label'         => '2.5dev',
+                'branch'        => 'MOODLE_25_STABLE',
+                'dir'           => '2.5',
+                'translatable'  => true,
+                'current'       => false,
+            ),
             array(
                 'code'          => self::MOODLE_24,
                 'label'         => '2.4',
