@@ -2,31 +2,62 @@ Registering a new Moodle branch in AMOS
 =======================================
 
 Whenever the new major Moodle version is released, several steps must be done
-in AMOS. For the purpose of this document, let us expect that Moodle 2.2 was
-just released and the new branch MOODLE_22_STABLE was created in moodle.git.
-So now we must tell AMOS that the master branch is 2.3.
+in AMOS. For the purpose of this document, let us expect that Moodle 2.5 was
+just released and the new branch MOODLE_25_STABLE was created in moodle.git.
+So now we must tell AMOS that the master branch is 2.6.
 
-1. Make sure that MOODLE_22_STABLE is fetched into the moodle.git clone that
+1. Make sure that MOODLE_25_STABLE is fetched into the moodle.git clone that
    AMOS tracks.
-2. Disable all AMOS jobs in /etc/crontab
-3. Switch the portal to the maintenance mode and backup AMOS database
-4. Define new mlang_version for MOODLE_23_STABLE in mlanglib.php
-5. Grep for the current usage of MOODLE_22_STABLE and add the new
-   MOODLE_23_STABLE record where needed or replace the current reference to
-   the 2.2 with the reference to 2.3. Most notably in
+2. Turn Jenkins off.
+3. Switch the portal to the maintenance mode and backup AMOS database.
+4. Define new mlang_version for MOODLE_26_STABLE in mlanglib.php.
+5. Grep for the current usage of MOODLE_25_STABLE and add the new
+   MOODLE_26_STABLE record where needed and/or replace the current reference to
+   the 2.5 with the reference to 2.6. Most notably in
    cli/parse-core.php, cli/export-installer.php and cli/fix-drift.php
-   Grep for MOODLE_22 and check if other places need an update, too
-   (most notably cli/export-zip.php)
-6. Make sure that plugins.xml contains declaration for 2.3
-7. Fork the new branch in the repository
-   cli/make-branch.php --from=MOODLE_22_STABLE --to=MOODLE_23_STABLE
-8. Create moodledata/amos/var/MOODLE_23_STABLE.startat pointing to the release
-   tag.
-9. Increase the initial version of new language packs in admin/newlanguage.php
-10. Create new branches and update shell scripts in ~/bin of the user amosbot
+   Grep for MOODLE_25 and check if other places need an update, too
+   (most notably cli/export-zip.php).
+6. Make sure that plugins.xml contains declaration for 2.6.
+7. Increase the initial version of new language packs in admin/newlanguage.php
+8. Deploy the code at the production site.
+9. Fork the new branch in the repository
 
-Cloning greylisted strings
---------------------------
+        php cli/make-branch.php --from=MOODLE_25_STABLE --to=MOODLE_26_STABLE
 
-INSERT INTO mdl_amos_greylist (branch, component, stringid)
-SELECT 2300 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = 2200;
+10. Copy moodledata/amos/var/MOODLE_25_STABLE.startat to
+    MOODLE_26_STABLE.startat. Fix the content of MOODLE_25_STABLE.startat so
+    that it points to the HEAD of the real MOODLE_25_STABLE (and not the master).
+11. Make moodledata/amos/var/export-zip/2.6/
+12. Force AMOS to regenerate all ZIPs including those for 2.6:
+
+        UPDATE mdl_config_plugins SET value=1 WHERE plugin='local_amos' AND name='lastexportzip';
+
+13. Create new MOODLE_25_STABLE and install_25_STABLE branches at
+    /home/amosbot/git/moodle-install and update publish-moodle-install.sh
+
+        git checkout -b MOODLE_25_STABLE upstream/MOODLE_25_STABLE
+        git checkout -b install_25_STABLE upstream/MOODLE_25_STABLE
+
+14. Create MOODLE_26_STABLE branch at /home/amosbot/git/moodle-langpacks
+
+        git branch MOODLE_26_STABLE
+
+    and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
+
+        cd /home/amosbot/git/moodle-langpacks-clones
+        git clone /home/amosbot/git/moodle-langpacks 2.6
+        cd 2.6
+        git checkout -b MOODLE_26_STABLE origin/MOODLE_26_STABLE
+        git branch -d master
+
+    and finally modify publish-moodle-langpacks.sh
+
+15. Turn Jenkins on and let it re-generate the ZIP packages.
+16. Check http://download.moodle.org/langpack/
+17. Clone greylisted strings
+
+        INSERT INTO mdl_amos_greylist (branch, component, stringid)
+        SELECT 2600 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = 2500;
+
+18. Disable the site maintenance mode.
+19. Have a beer!
