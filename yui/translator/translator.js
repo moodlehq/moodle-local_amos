@@ -57,7 +57,9 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             // add select All / None links to the filter components selector field
             var fcmp        = filter.one('#amosfilter_fcmp');
             var fcmpactions = filter.one('#amosfilter_fcmp_actions');
-            var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_allstandard">' +
+            var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_enlarge">' +
+                              M.util.get_string('componentsenlarge', 'local_amos') + '</a>' +
+                              ' / <a href="#" id="amosfilter_fcmp_actions_allstandard">' +
                               M.util.get_string('componentsstandard', 'local_amos') + '</a>' +
                               ' / <a href="#" id="amosfilter_fcmp_actions_all">' +
                               M.util.get_string('componentsall', 'local_amos') + '</a>' +
@@ -66,6 +68,10 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                               ' <input type="text" size="8" maxlength="20" placeholder="' + M.util.get_string('search', 'core') +
                                 '" name="amosfilter_fcmp_actions_search" id="amosfilter_fcmp_actions_search" />';
             fcmpactions.set('innerHTML', fcmphtml);
+            var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
+            fcmpenlarge.on('click', function(e) {
+                fcmp.setAttribute('size', parseInt(fcmp.getAttribute('size')) + 5);
+            });
             var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
             fcmpselectallstandard.on('click', function(e) {
                 fcmp.all('optgroup:first-child option, optgroup:first-child + optgroup option').set('selected', true);
