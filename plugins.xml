@@ -1996,6 +1996,7 @@
     <plugins type="assignfeedback">
       <plugin>comments</plugin>
       <plugin>file</plugin>
+      <plugin>offline</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
@@ -2435,6 +2436,7 @@
     <plugins type="assignfeedback">
       <plugin>comments</plugin>
       <plugin>file</plugin>
+      <plugin>offline</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
