@@ -849,7 +849,7 @@ class local_amos_stage implements renderable {
  */
 class local_amos_log implements renderable {
 
-    const LIMITCOMMITS = 100;
+    const LIMITCOMMITS = 1000;
 
     /** @var array of commit records to be displayed in the log */
     public $commits = array();
