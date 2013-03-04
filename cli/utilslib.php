@@ -708,3 +708,128 @@ class amos_export_zip {
         file_put_contents($this->outputdirroot.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
     }
 }
+
+
+/**
+ * Helper class to merge one string file into another
+ *
+ * @copyright 2013 David Mudrak <david@moodle.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class amos_merge_string_files {
+
+    /** @var amos_cli_logger */
+    protected $logger;
+
+    /**
+     * Instantiate the merge helper
+     *
+     * @param amos_cli_logger $logger
+     */
+    public function __construct(amos_cli_logger $logger) {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Logs a message
+     *
+     * @param string $message message to log
+     * @param string $level message level
+     */
+    public function log($message, $level = amos_cli_logger::LEVEL_INFO) {
+        $this->logger->log('merge-files', $message, $level);
+    }
+
+    /**
+     * Returns all strings defined in the given file
+     *
+     * This is supposed to be used on trusted sources only, so plain require() is ok here.
+     *
+     * @param string $filename
+     * @return array
+     */
+    public function load_strings_from_file($filename) {
+        $string = array();
+        require($filename);
+        return $string;
+    }
+
+    /**
+     * Replaces strings declaration in the file with changed ones
+     *
+     * If false is returned, the $filecontents may or may not be modified. The
+     * caller should not consider its value valid.
+     *
+     * @param string $filecontents the file contents to be modified
+     * @param array $fromstrings list of strings and their values to be replaced
+     * @param array $tostring list of strings and their new values
+     * @return int|false number of replaced strings, or false on error
+     */
+    public function replace_strings_in_file(&$filecontents, array $fromstrings, array $tostrings) {
+
+        $changes = 0;
+        $realchanges = 0;
+
+        foreach ($tostrings as $changeid => $changetext) {
+            if (!isset($fromstrings[$changeid])) {
+                $this->log('Attempting to merge an orphaned change: '.$changeid, amos_cli_logger::LEVEL_DEBUG);
+                continue;
+            }
+            if ($fromstrings[$changeid] !== $changetext) {
+                $changes++;
+                $pattern = '/(^\s*\$string\s*\[\s*\''.preg_quote($changeid, '/').'\'\s*\]\s*=\s*)(\'|")'.preg_quote($fromstrings[$changeid], '/').'(\\2\s*;[^;]*\s*$)/m';
+                if (!preg_match($pattern, $filecontents)) {
+                    $this->log('String "'.$changeid.'" not found', amos_cli_logger::LEVEL_DEBUG);
+                    continue;
+                }
+                $replacement = '$1$2'.$changetext.'$3';
+                $count = 0;
+                $filecontents = preg_replace($pattern, $replacement, $filecontents, -1, $count);
+                if (!$count) {
+                    $this->log('No change done by preg_replace()', amos_cli_logger::LEVEL_DEBUG);
+                }
+                if (is_null($filecontents)) {
+                    $this->log('Error in preg_replace()', amos_cli_logger::LEVEL_DEBUG);
+                    return false;
+                }
+                $realchanges += $count;
+            } else {
+                $this->log('String '.$changeid.' identical, no update needed', amos_cli_logger::LEVEL_DEBUG);
+            }
+        }
+
+        if ($changes <> $realchanges) {
+            $this->log('Expected changes: '.$changes.', real changes: '.$realchanges, amos_cli_logger::LEVEL_WARNING);
+        }
+
+        return $changes;
+    }
+
+    /**
+     * Executes the merge process
+     *
+     * @return int|bool number of modified strings or false on error
+     */
+    public function merge_changes() {
+
+        if (!$this->is_ready()) {
+            $this->log('Helper not ready to merge changes', amos_cli_logger::LEVEL_ERROR);
+            return false;
+        }
+
+        $this->load_main_file();
+        $this->load_changes_file();
+
+        $merged = $this->replace_main_file_strings();
+
+        if ($merged) {
+            $this->rewrite_main_file();
+        } else if ($merged === 0) {
+            $this->log('No strings changed', amos_cli_logger::LEVEL_DEBUG);
+        } else {
+            $this->log('Error while merging strings', amos_cli_logger::LEVEL_ERROR);
+        }
+
+        return $merged;
+    }
+}
