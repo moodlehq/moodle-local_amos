@@ -777,12 +777,12 @@ class amos_merge_string_files {
             }
             if ($fromstrings[$changeid] !== $changetext) {
                 $changes++;
-                $pattern = '/(^\s*\$string\s*\[\s*\''.preg_quote($changeid, '/').'\'\s*\]\s*=\s*)(\'|")'.preg_quote($fromstrings[$changeid], '/').'(\\2\s*;[^;]*\s*$)/m';
+                $pattern = '/(^\s*\$string\s*\[\s*\''.preg_quote($changeid, '/').'\'\s*\]\s*=\s*)(\'|")'.preg_quote(str_replace("'", "\\'", $fromstrings[$changeid]), '/').'(\\2\s*)(;[^;]*\s*$)/m';
                 if (!preg_match($pattern, $filecontents)) {
                     $this->log('String "'.$changeid.'" not found', amos_cli_logger::LEVEL_DEBUG);
                     continue;
                 }
-                $replacement = '$1$2'.$changetext.'$3';
+                $replacement = '$1'.var_export($changetext, true).'$4';
                 $count = 0;
                 $filecontents = preg_replace($pattern, $replacement, $filecontents, -1, $count);
                 if (!$count) {
@@ -802,7 +802,7 @@ class amos_merge_string_files {
             $this->log('Expected changes: '.$changes.', real changes: '.$realchanges, amos_cli_logger::LEVEL_WARNING);
         }
 
-        return $changes;
+        return $realchanges;
     }
 
     /**

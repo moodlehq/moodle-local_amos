@@ -46,6 +46,8 @@ class mergefiles_test extends basic_testcase {
     }
 
     public function test_replace_strings_in_file() {
+        global $CFG;
+
         $logger = new testable_amos_cli_logger();
         $helper = new testable_amos_merge_string_files($logger);
 
@@ -62,10 +64,10 @@ class mergefiles_test extends basic_testcase {
  * GNU rocks!
  * This is a file full of things like $string[\'foo\'] = \'Blahblah\';
  */
-$string [ \'foo\'  ]=  \'Foo \'man\' oh
- {$a->f} matic \' ; 
+$string [ \'foo\'  ]=  \'Foo \\\'man\\\' oh
+ {$a->f} matic \' ;  // @todo 
 // This is inline comment
-  $string [\'bar\']="Rock\'n\'roll! dude ";  // @deprecated
+  $string [\'bar\']="Rock\'n\'roll! dude ";  // unsupported at the moment
 
 $string[\'baz\'] = \'Baz\';
 ';
@@ -75,11 +77,11 @@ $string[\'baz\'] = \'Baz\';
         );
         $tostrings = array(
             'foo' => "Foo\n{\$a}\nBar",
-            'bar' => 'Hell"yeah!'."\n",    // This will actually lead to syntax error.
+            'bar' => 'Hell"yeah!'."\n",
             'baz' => 'Should not be changed',
         );
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
-        $this->assertEquals(2, $count);
+        $this->assertEquals(1, $count);
         $expected = '<?php
 /**
  * GNU rocks!
@@ -87,10 +89,9 @@ $string[\'baz\'] = \'Baz\';
  */
 $string [ \'foo\'  ]=  \'Foo
 {$a}
-Bar\' ; 
+Bar\';  // @todo 
 // This is inline comment
-  $string [\'bar\']="Hell"yeah!
-";  // @deprecated
+  $string [\'bar\']="Rock\'n\'roll! dude ";  // unsupported at the moment
 
 $string[\'baz\'] = \'Baz\';
 ';
@@ -102,7 +103,16 @@ $string[\'baz\'] = \'Baz\';
         $this->assertEquals(1, count($tostrings));
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
         $this->assertEquals(1, $count);
-
+        $tmpfile = $CFG->phpunit_dataroot.'/amos_test_replace_strings_in_file.php';
+        file_put_contents($tmpfile, $filecontents);
+        $string = array();
+        require($tmpfile);
+        $this->assertEquals(7, count($string));
+        $this->assertEquals(array(
+            'error_authmnetneeded', 'error_localusersonly', 'error_roamcapabilityneeded',
+            'mnet_hosts:addinstance', 'mnet_hosts:myaddinstance', 'pluginname', 'server'
+        ), array_keys($string));
+        $this->assertEquals('Add a new network servers block to My home', $string['mnet_hosts:myaddinstance']);
     }
 }
 
