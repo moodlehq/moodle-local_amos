@@ -55,7 +55,7 @@ $string['contribactions_help'] = 'Depending on your rights and the contribution 
 
 * Apply - copy the contributed translation into your stage, does not modify the contribution record
 * Assign to me - set yourself as the contribution assignee, that is the person resposible for the contribution review and integration
-* Resign - set nobody as the contribution assignee
+* Unassign - set nobody as the contribution assignee
 * Start review - assign the new contribution to yourself, set its status to \'In review\' and copy the submitted translation into your stage
 * Accept - mark the contribution as accepted
 * Reject - mark the contribution as rejected, please describe the reasons in a comment.
@@ -75,7 +75,7 @@ $string['contribincomingnone'] = 'No incoming contributions';
 $string['contribincomingsome'] = 'Incoming contributions ({$a})';
 $string['contriblanguage'] = 'Language';
 $string['contribreject'] = 'Reject';
-$string['contribresign'] = 'Resign';
+$string['contribresign'] = 'Unassign';
 $string['contribstaged'] = 'Staged contribution <a href="contrib.php?id={$a->id}">#{$a->id}</a> by {$a->author}';
 $string['contribstagedinfo'] = 'Staged contribution';
 $string['contribstagedinfo_help'] = 'The stage contains strings that were contributed by a community member. The language pack maintainers are supposed to review them and then set their status to either Accepted (if there were committed) or Rejected (if they can\'t be included in the official language pack for some reason).';
