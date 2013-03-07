@@ -63,7 +63,7 @@ function local_amos_extends_navigation(global_navigation $navigation) {
  * @param stdClass $commentparams the comment parameters
  * @return array
  */
-function amos_comment_permissions($commentparams) {
+function local_amos_comment_permissions($commentparams) {
     return array('post' => true, 'view' => true);
 }
 
@@ -80,7 +80,7 @@ function amos_comment_permissions($commentparams) {
  * @param stdClass $commentparams the comment parameters
  * @return boolean
  */
-function amos_comment_validate($commentparams) {
+function local_amos_comment_validate($commentparams) {
     global $DB;
 
     if ($commentparams->commentarea != 'amos_contribution') {
