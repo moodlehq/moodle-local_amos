@@ -101,23 +101,8 @@ if ($apply) {
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $apply), '*', MUST_EXIST);
 
-    if ($contribution->authorid !== $USER->id) {
-        $author       = $DB->get_record('user', array('id' => $contribution->authorid));
-        $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
-        $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
-        foreach ($maintenances as $maintained) {
-            if ($maintained->lang === 'X') {
-                $maintainerof = 'all';
-                break;
-            }
-            $maintainerof[] = $maintained->lang;
-        }
-
-        if ($maintainerof !== 'all') {
-            if (!in_array($contribution->lang, $maintainerof)) {
-                print_error('contributionaccessdenied', 'local_amos');
-            }
-        }
+    if ($contribution->authorid != $USER->id) {
+        $author = $DB->get_record('user', array('id' => $contribution->authorid));
     } else {
         $author = $USER;
     }
@@ -308,12 +293,6 @@ if ($id) {
     $contribution = $DB->get_record('amos_contributions', array('id' => $id), '*', MUST_EXIST);
 
     if ($contribution->authorid !== $USER->id) {
-        require_capability('local/amos:commit', get_system_context());
-        if ($maintainerof !== 'all') {
-            if (!in_array($contribution->lang, $maintainerof)) {
-                print_error('contributionaccessdenied', 'local_amos');
-            }
-        }
         $author = $DB->get_record('user', array('id' => $contribution->authorid));
     } else {
         $author = $USER;
@@ -326,12 +305,6 @@ if ($id) {
     list($origstrings, $origlanguages, $origcomponents) = mlang_stage::analyze($stage);
     $stage->rebase();
     list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
-
-    if ($stage->has_component()) {
-
-    } else {
-        // nothing left after rebase
-    }
 
     $contribinfo                = new local_amos_contribution($contribution, $author);
     $contribinfo->language      = implode(', ', array_filter(array_map('trim', explode('/', $origlanguages))));
@@ -355,8 +328,10 @@ if ($id) {
                     'post', array('class' => 'singlebutton assign'));
         }
     }
-    echo $output->single_button(new moodle_url($PAGE->url, array('apply' => $id)), get_string('contribapply', 'local_amos'),
-            'post', array('class' => 'singlebutton apply'));
+    if (has_capability('local/amos:stage', get_system_context())) {
+        echo $output->single_button(new moodle_url($PAGE->url, array('apply' => $id)), get_string('contribapply', 'local_amos'),
+                'post', array('class' => 'singlebutton apply'));
+    }
     if ($contribution->assignee == $USER->id and $contribution->status > local_amos_contribution::STATE_NEW) {
         if ($contribution->status != local_amos_contribution::STATE_ACCEPTED) {
             echo $output->single_button(new moodle_url($PAGE->url, array('accept' => $id)), get_string('contribaccept', 'local_amos'),
