@@ -509,6 +509,42 @@ EOF
     }
 
     /**
+     * Prunes all strings that have the same text as in the reference component
+     *
+     * This may be used to get rid of strings that are defined in another component
+     * and have the same text value. Typical usage is the post-merge cleanup of the en_fix
+     * language pack.
+     * Beware - if the string is defined in $reference as deleted, it will be kept in this
+     * regardless its state and value. Our strings that are already deleted are not
+     * affected.
+     *
+     * @param mlang_component $reference master component to compare strings with
+     * @return int number of removed strings
+     */
+    public function complement(mlang_component $reference) {
+        $removed = 0;
+        foreach ($this->strings as $id => $string) {
+            if ($string->deleted) {
+                // Do not affect our strings that are already deleted.
+                continue;
+            }
+            if (!$reference->has_string($id)) {
+                // Do not affect strings not present in $reference.
+                // See {@link self::intersect()} if you want to get rid of such strings.
+                continue;
+            }
+            if (mlang_string::differ($string, $reference->get_string($id))) {
+                // Do not affect strings that are considered as different from the ones
+                // in the $reference.
+                continue;
+            }
+            $this->unlink_string($id);
+            $removed++;
+        }
+        return $removed;
+    }
+
+    /**
      * Returns timemodified stamp of the most recent string in the component
      *
      * @return int timestamp, 0 if the component is empty

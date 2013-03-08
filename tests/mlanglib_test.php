@@ -1424,6 +1424,69 @@ AMOS END';
         $component->clear();
     }
 
+    public function test_enfix_postmerge_cleanup() {
+        $this->resetAfterTest();
+        $now = time();
+        $stage = new mlang_stage();
+        $componentname = 'test';
+        $version = mlang_version::by_branch('MOODLE_24_STABLE');
+
+        // Prepare the initial state of the reference component
+        $component = new mlang_component($componentname, 'en', $version);
+        $component->add_string(new mlang_string('first', 'First $a', $now - 4 * WEEKSECS));
+        $component->add_string(new mlang_string('second', 'Second \"string\"', $now - 4 * WEEKSECS));
+        $component->add_string(new mlang_string('third', 'Third', $now - 4 * WEEKSECS));
+        $component->add_string(new mlang_string('fifth', 'Fifth \"string\"', $now - 4 * WEEKSECS));
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+        $stage->commit('First version of en', array('source' => 'unittest'));
+
+        // Prepare the component that is supposed to contain fixes for the reference component
+        $component = new mlang_component($componentname, 'en_fix', $version);
+        $component->add_string(new mlang_string('second', 'Second', $now - 3 * WEEKSECS)); // Real change
+        $component->add_string(new mlang_string('third', 'Third', $now - 3 * WEEKSECS)); // No real change
+        $component->add_string(new mlang_string('fourth', 'Fourth', $now - 3 * WEEKSECS)); // Only in en_fix (unexpected)
+        $component->add_string(new mlang_string('fifth', 'Modified', $now - 3 * WEEKSECS)); // Real change
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+        $stage->commit('First version of en_fix', array('source' => 'unittest'));
+
+        // Simulate the result of merging en_fix into en
+        $component = new mlang_component($componentname, 'en', $version);
+        $component->add_string(new mlang_string('second', 'Second', $now - 2 * WEEKSECS));
+        $component->add_string(new mlang_string('fifth', 'Modified', $now - 2 * WEEKSECS));
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+        $stage->commit('Merge en_fix into en', array('source' => 'unittest'));
+
+        // Perform more changes at en_fix
+        $component = new mlang_component($componentname, 'en_fix', $version);
+        $component->add_string(new mlang_string('first', 'First', $now - WEEKSECS)); // New real change
+        $component->add_string(new mlang_string('fifth', 'Fifth \"string\"', $now - WEEKSECS)); // Undo the change
+        $stage->add($component);
+        $component->clear();
+        unset($component);
+        $stage->commit('Another version of en_fix', array('source' => 'unittest'));
+
+        // Simulate the enfix-cleanup.php execution
+        $en = mlang_component::from_snapshot($componentname, 'en', $version);
+        $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
+        $enfix->intersect($en);
+        $enfix->complement($en);
+        $stage->add($enfix);
+        $stage->rebase(null, true);
+        $stage->commit('Removing strings merged into the English', null, true);
+
+        // Check the result
+        $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
+        $this->assertEquals(2, $enfix->get_number_of_strings());
+        $this->assertEquals('First', $enfix->get_string('first')->text);
+        $this->assertEquals('Fifth \"string\"', $enfix->get_string('fifth')->text);
+    }
+
     public function test_stash_push() {
 
     }
