@@ -898,7 +898,41 @@ class mlang_stage {
                     $record->timemodified = $string->timemodified;
                     $record->deleted    = $string->deleted;
 
-                    $DB->insert_record('amos_repository', $record);
+                    $repoid = $DB->insert_record('amos_repository', $record);
+
+                    // If the new record is the most recent version of the string,
+                    // register it in the amos_snapshot table. To minimise race
+                    // conditions risk, try to insert first and update on write
+                    // exception (the exception will be thrown due to unique index
+                    // configured for the amos_snapshot table).
+                    try {
+                        $DB->insert_record('amos_snapshot', (object)array(
+                            'branch' => $record->branch,
+                            'lang' => $record->lang,
+                            'component' => $record->component,
+                            'stringid' => $record->stringid,
+                            'repoid' => $repoid,
+                        ));
+                    } catch (dml_write_exception $e) {
+                        $snapshot = $DB->get_record_sql(
+                            "SELECT s.id, s.repoid, r.timemodified
+                               FROM {amos_snapshot} s
+                          LEFT JOIN {amos_repository} r ON s.repoid = r.id
+                              WHERE s.branch = :branch
+                                    AND s.lang = :lang
+                                    AND s.component = :component
+                                    AND s.stringid = :stringid",
+                            array(
+                                'branch' => $record->branch,
+                                'lang' => $record->lang,
+                                'component' => $record->component,
+                                'stringid' => $record->stringid
+                            ), MUST_EXIST);
+                        if (is_null($snapshot->timemodified) or ($record->timemodified >= $snapshot->timemodified)) {
+                            // The newly created record in the repository should be considered the most recent one.
+                            $DB->set_field('amos_snapshot', 'repoid', $repoid, array('id' => $snapshot->id));
+                        }
+                    }
                 }
             }
             $transaction->allow_commit();

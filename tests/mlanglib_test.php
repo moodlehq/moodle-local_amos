@@ -107,7 +107,15 @@ class mlang_test extends advanced_testcase {
         unset($stage);
         $this->assertEquals(1, $DB->count_records('amos_repository'));
         $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now)));
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now)));
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
+        $this->assertTrue($DB->record_exists('amos_snapshot', array(
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome')));
+        $repo = $DB->get_record('amos_repository', array(
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now), '*');
+        $snapshot = $DB->get_record('amos_snapshot', array(
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
+        $this->assertEquals($repo->id, $snapshot->repoid);
 
         // add two other strings
         $now = time();
@@ -125,6 +133,7 @@ class mlang_test extends advanced_testcase {
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'hello', 'timemodified' => $now)));
         $this->assertTrue($DB->record_exists('amos_repository', array(
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'world', 'timemodified' => $now)));
+        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
 
         // delete a string
         $now = time();
@@ -139,6 +148,7 @@ class mlang_test extends advanced_testcase {
         $this->assertEquals(4, $DB->count_records('amos_repository'));
         $this->assertTrue($DB->record_exists('amos_repository', array(
                 'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
+        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
     }
 
     public function test_add_existing_string() {
@@ -155,7 +165,10 @@ class mlang_test extends advanced_testcase {
     }
 
     public function test_deleted_has_same_timemodified() {
+        global $DB;
+
         $this->resetAfterTest();
+
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -180,10 +193,21 @@ class mlang_test extends advanced_testcase {
         $this->assertFalse($component->has_string());
         $component->clear();
         unset($component);
+
+        $this->assertEquals(2, $DB->count_records('amos_repository'));
+        $repo = $DB->get_record('amos_repository', array(
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1), '*');
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
+        $snapshot = $DB->get_record('amos_snapshot', array(
+                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
+        $this->assertEquals($repo->id, $snapshot->repoid);
     }
 
     public function test_more_recently_inserted_wins() {
+        global $DB;
+
         $this->resetAfterTest();
+
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -222,10 +246,18 @@ class mlang_test extends advanced_testcase {
         $this->assertFalse($component->has_string('welcome'));
         $component->clear();
         unset($component);
+
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
+        $snapshot = $DB->get_record('amos_snapshot', array());
+        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid), '*', MUST_EXIST);
+        $this->assertEquals(1, $repo->deleted);
     }
 
     public function test_component_from_phpfile_same_timestamp() {
+        global $DB;
+
         $this->resetAfterTest();
+
         $now = time();
         // get the initial strings from a file
         $filecontents = <<<EOF
@@ -266,6 +298,12 @@ EOF;
         $this->assertEquals($component->get_string('welcome')->text, 'Welcome!');
         $component->clear();
         unset($component);
+
+        $this->assertEquals(2, $DB->count_records('amos_repository'));
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
+        $snapshot = $DB->get_record('amos_snapshot', array());
+        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid));
+        $this->assertEquals('Welcome!', $repo->text);
     }
 
     public function test_component_from_phpfile_legacy_format() {
@@ -1485,6 +1523,87 @@ AMOS END';
         $this->assertEquals(2, $enfix->get_number_of_strings());
         $this->assertEquals('First', $enfix->get_string('first')->text);
         $this->assertEquals('Fifth \"string\"', $enfix->get_string('fifth')->text);
+    }
+
+    /**
+     * Test that delegated transactions are supported and work as expected
+     */
+    public function test_simulate_commit_transaction_rollback() {
+        global $DB;
+
+        $this->preventResetByRollback(); // We test rollback here so we don't want the outer one.
+        $this->resetAfterTest();
+
+        $this->assertEquals(0, $DB->count_records('amos_commits'));
+        $this->assertEquals(0, $DB->count_records('amos_repository'));
+        $this->assertEquals(0, $DB->count_records('amos_snapshot'));
+
+        $snapshot = (object)array(
+            'branch' => 2500,
+            'lang' => 'en',
+            'component' => 'test',
+            'stringid' => 'whatever',
+            'repoid' => 12345,
+        );
+        $DB->insert_record('amos_snapshot', $snapshot);
+
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
+
+        $thrown1 = false;
+        $thrown2 = false;
+        $thrown3 = false;
+        $committed = false;
+
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            $commit = (object)array(
+                'commitmsg' => 'This commit will fail',
+                'timecommitted' => time(),
+            );
+            $commit->id = $DB->insert_record('amos_commits', $commit);
+
+            $repo = (object)array(
+                'commitid' => $commit->id,
+                'branch' => 2500,
+                'lang' => 'en',
+                'component' => 'test',
+                'stringid' => 'whatever',
+                'text' => 'Whatever',
+                'timemodified' => time() - 60,
+                'deleted' => 0,
+            );
+            $repo->id = $DB->insert_record('amos_repository', $repo);
+
+            $snapshot = (object)array(
+                'branch' => 2500,
+                'lang' => 'en',
+                'component' => 'test',
+                'stringid' => 'whatever',
+                'repoid' => $repo->id,
+            );
+            $snapshot->id = $DB->insert_record('amos_snapshot', $snapshot); // This violates unique index
+
+            $transaction->allow_commit();
+            $committed = true;
+
+        } catch (Exception $e) {
+            try {
+                $thrown1 = true;
+                $transaction->rollback($e); // rolls back and rethrows the exception
+                $thrown2 = true;
+            } catch (Exception $e) {
+                $thrown3 = true;
+            }
+        }
+
+        $this->assertFalse($committed);
+        $this->assertTrue($thrown1);
+        $this->assertFalse($thrown2);
+        $this->assertTrue($thrown3);
+        $this->assertEquals(0, $DB->count_records('amos_commits'));
+        $this->assertEquals(0, $DB->count_records('amos_repository'));
+        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
     }
 
     public function test_stash_push() {
