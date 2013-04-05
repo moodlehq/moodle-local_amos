@@ -1706,12 +1706,13 @@ class mlang_tools {
 
         if (empty($usecache) or is_null($cache)) {
             $cache = array();
-            $sql = "SELECT lang AS code, text AS name
-                      FROM {amos_repository}
-                     WHERE component = ?
-                       AND stringid  = ?
-                       AND deleted   = 0
-                  ORDER BY branch DESC, timemodified DESC, text";
+            $sql = "SELECT r.lang AS code, r.text AS name
+                      FROM {amos_repository} r
+                      JOIN {amos_snapshot} s ON s.repoid = r.id
+                     WHERE s.component = ?
+                       AND s.stringid  = ?
+                       AND r.deleted   = 0
+                  ORDER BY s.branch DESC, r.timemodified DESC, text";
             $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
@@ -1752,10 +1753,10 @@ class mlang_tools {
 
         if (empty($usecache) or is_null($cache)) {
             $cache = array();
-            $sql = "SELECT component
-                      FROM {amos_repository}
+            $sql = "SELECT DISTINCT component
+                      FROM {amos_snapshot}
                      WHERE lang = ?
-                  GROUP BY component ORDER BY component";
+                  ORDER BY component";
             $cache = array_flip(array_keys($DB->get_records_sql($sql, array('en'))));
         }
 
@@ -1795,29 +1796,28 @@ class mlang_tools {
         $params = array();
         if (!empty($conditions['branch'])) {
             list($subsql, $subparams) = $DB->get_in_or_equal($conditions['branch']);
-            $where[] = 'branch '.$subsql;
+            $where[] = "branch $subsql";
             $params  = array_merge($params, $subparams);
         }
         if (!empty($conditions['lang'])) {
             list($subsql, $subparams) = $DB->get_in_or_equal($conditions['lang']);
-            $where[] = 'lang '.$subsql;
+            $where[] = "lang $subsql";
             $params  = array_merge($params, $subparams);
         }
         if (!empty($conditions['component'])) {
             list($subsql, $subparams) = $DB->get_in_or_equal($conditions['component']);
-            $where[] = 'component '.$subsql;
+            $where[] = "component $subsql";
             $params  = array_merge($params, $subparams);
         }
         if (!empty($where)) {
-            $where = "WHERE " . implode(" AND ", $where) . "\n";
+            $where = " WHERE " . implode(" AND ", $where);
         }
-        $sql = "SELECT branch,lang,component
-                  FROM {amos_repository}\n";
+        $sql = "SELECT DISTINCT branch,lang,component
+                  FROM {amos_snapshot}";
         if (!empty($where)) {
             $sql .= $where;
         }
-        $sql .= "GROUP BY branch,lang,component
-                 ORDER BY branch,lang,component";
+        $sql .= " ORDER BY branch,lang,component";
         $rs = $DB->get_recordset_sql($sql, $params);
         $tree = array();
         foreach ($rs as $record) {

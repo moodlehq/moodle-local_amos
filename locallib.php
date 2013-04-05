@@ -422,18 +422,16 @@ class local_amos_translator implements renderable {
         $stagedonly         = $filter->get_data()->stagedonly;
         $greylistedonly     = $filter->get_data()->greylistedonly;
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
-        list($inner_sqlbranches, $inner_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'innerbranch00000');
-        list($inner_sqllanguages, $inner_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'innerlang00000');
-        list($inner_sqlcomponents, $inner_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'innercomp00000');
-        list($outer_sqlbranches, $outer_paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'outerbranch00000');
-        list($outer_sqllanguages, $outer_paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'outerlang00000');
-        list($outer_sqlcomponents, $outer_paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'outercomp00000');
+
+        list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'branch00000');
+        list($sqllanguages, $paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'lang00000');
+        list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'comp00000');
 
         // get the greylisted strings first
         $sql = "SELECT branch, component, stringid
                   FROM {amos_greylist}
-                 WHERE branch $inner_sqlbranches
-                   AND component $inner_sqlcomponents";
+                 WHERE branch $sqlbranches
+                   AND component $sqlcomponents";
         if ($stringid) {
             if ($stringidpartial) {
                 $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
@@ -445,8 +443,7 @@ class local_amos_translator implements renderable {
         } else {
             $params = array();
         }
-        $sql .= " ORDER BY branch, component, stringid";
-        $params = array_merge($params, $inner_paramsbranches, $inner_paramcomponents);
+        $params = array_merge($params, $paramsbranches, $paramcomponents);
         $greylist = array();
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $s) {
@@ -456,45 +453,32 @@ class local_amos_translator implements renderable {
 
         // get all the strings for the translator
         $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated, r.deleted
-                  FROM {amos_repository} r
-                  JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
-                          FROM {amos_repository}
-                         WHERE branch $inner_sqlbranches
-                           AND lang $inner_sqllanguages
-                           AND component $inner_sqlcomponents";
-        $sql .= "     GROUP BY branch,lang,component,stringid) j
-                    ON (r.branch = j.branch
-                       AND r.lang = j.lang
-                       AND r.component = j.component
-                       AND r.stringid = j.stringid
-                       AND r.timemodified = j.timemodified)
-                 WHERE r.branch {$outer_sqlbranches}
-                       AND r.lang {$outer_sqllanguages}
-                       AND r.component {$outer_sqlcomponents}";
+                  FROM {amos_snapshot} s
+                  JOIN {amos_repository} r ON s.repoid = r.id
+                 WHERE s.branch {$sqlbranches}
+                       AND s.lang {$sqllanguages}
+                       AND s.component {$sqlcomponents}";
         if ($stringid) {
             if ($stringidpartial) {
-                $sql .= " AND ".$DB->sql_like('r.stringid', ':stringid', false);
+                $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
                 $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
             } else {
-                $sql .= " AND r.stringid = :stringid";
+                $sql .= " AND s.stringid = :stringid";
                 $params = array('stringid' => $stringid);
             }
         } else {
             $params = array();
         }
         if ($helps) {
-            $sql .= "     AND ".$DB->sql_like('r.stringid', ':helpstringid', false);
+            $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
             $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
         } else {
-            $sql .= "     AND ".$DB->sql_like('r.stringid', ':linkstringid', false, true, true);
+            $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
             $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
         }
-        $sql .= " ORDER BY r.component, r.stringid, r.lang, r.branch, r.id DESC";
+        $sql .= " ORDER BY s.component, s.stringid, s.lang, s.branch, r.id DESC";
 
-        $params = array_merge($params,
-            $inner_paramsbranches, $inner_paramslanguages, $inner_paramcomponents,
-            $outer_paramsbranches, $outer_paramslanguages, $outer_paramcomponents
-        );
+        $params = array_merge($params, $paramsbranches, $paramslanguages, $paramcomponents);
 
         $rs = $DB->get_recordset_sql($sql, $params);
         $s = array(); // tree of strings grouped by lang, component, stringid and branch
