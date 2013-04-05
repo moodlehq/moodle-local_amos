@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20110111" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20130404" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history" NEXT="amos_commits">
+    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history" NEXT="amos_snapshot">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="commitid"/>
-        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The commit thatt introduced this change" PREVIOUS="id" NEXT="branch"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="commitid" NEXT="lang"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="commitid"/>
+        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The commit thatt introduced this change" PREVIOUS="id" NEXT="branch"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="commitid" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
         <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
         <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="text"/>
-        <FIELD NAME="text" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="The localized string text" PREVIOUS="stringid" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The effective timestamp of the change" PREVIOUS="text" NEXT="timeupdated"/>
-        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="1139218139" SEQUENCE="false" COMMENT="The timestamp of when this string has been marked as up-to-date." PREVIOUS="timemodified" NEXT="deleted"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs" PREVIOUS="timeupdated"/>
+        <FIELD NAME="text" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The localized string text" PREVIOUS="stringid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The effective timestamp of the change" PREVIOUS="text" NEXT="timeupdated"/>
+        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1139218139" SEQUENCE="false" COMMENT="The timestamp of when this string has been marked as up-to-date." PREVIOUS="timemodified" NEXT="deleted"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs" PREVIOUS="timeupdated"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_commit"/>
@@ -27,14 +27,32 @@
         <INDEX NAME="ix_timemodified" UNIQUE="false" FIELDS="timemodified" COMMENT="This index allows to search for the recent records in the log output" PREVIOUS="ix_lang"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_commits" COMMENT="Keeps all commit related meta-data" PREVIOUS="amos_repository" NEXT="amos_translators">
+    <TABLE NAME="amos_snapshot" COMMENT="Snapshot of most recent string versions" PREVIOUS="amos_repository" NEXT="amos_commits">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="source"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="branch"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es" PREVIOUS="branch" NEXT="component"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative" PREVIOUS="lang" NEXT="stringid"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string" PREVIOUS="component" NEXT="repoid"/>
+        <FIELD NAME="repoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the record in the amos_repository table that represents the most recent version of this string." PREVIOUS="stringid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="ix_repoid"/>
+        <KEY NAME="ix_repoid" TYPE="foreign" FIELDS="repoid" REFTABLE="amos_repository" REFFIELDS="id" PREVIOUS="primary"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_snapshot" UNIQUE="true" FIELDS="component, lang, branch, stringid" NEXT="ix_lang"/>
+        <INDEX NAME="ix_lang" UNIQUE="false" FIELDS="lang" COMMENT="For getting a list of all known components. In some cases, we need to filter English records only" PREVIOUS="ix_snapshot"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_commits" COMMENT="Keeps all commit related meta-data" PREVIOUS="amos_snapshot" NEXT="amos_translators">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="source"/>
         <FIELD NAME="source" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The source of this string - git, email etc." PREVIOUS="id" NEXT="timecommitted"/>
-        <FIELD NAME="timecommitted" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="source" NEXT="commitmsg"/>
-        <FIELD NAME="commitmsg" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Commit message" PREVIOUS="timecommitted" NEXT="commithash"/>
+        <FIELD NAME="timecommitted" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The timestamp of the commit" PREVIOUS="source" NEXT="commitmsg"/>
+        <FIELD NAME="commitmsg" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Commit message" PREVIOUS="timecommitted" NEXT="commithash"/>
         <FIELD NAME="commithash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="The git commit hash that introduced this string" PREVIOUS="commitmsg" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="If the author is known in the local user table, store their id here" PREVIOUS="commithash" NEXT="userinfo"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="If the author is known in the local user table, store their id here" PREVIOUS="commithash" NEXT="userinfo"/>
         <FIELD NAME="userinfo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Helps to identify the author of the change, for example a name from CVS commit" PREVIOUS="userid"/>
       </FIELDS>
       <KEYS>
@@ -44,8 +62,8 @@
     </TABLE>
     <TABLE NAME="amos_translators" COMMENT="Gives the user the right to commit into a given language" PREVIOUS="amos_commits" NEXT="amos_stashes">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The id of the translator's user account" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The id of the translator's user account" PREVIOUS="id" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The language code that the translator is allowed to translate, or asterisk for all languages." PREVIOUS="userid"/>
       </FIELDS>
       <KEYS>
@@ -56,16 +74,16 @@
     </TABLE>
     <TABLE NAME="amos_stashes" COMMENT="Keeps the information about the stashes in the stashpool" PREVIOUS="amos_translators" NEXT="amos_greylist">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="ownerid"/>
-        <FIELD NAME="ownerid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="ID of the user who owns this stash" PREVIOUS="id" NEXT="hash"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="ownerid"/>
+        <FIELD NAME="ownerid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the user who owns this stash" PREVIOUS="id" NEXT="hash"/>
         <FIELD NAME="hash" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Unique hash of the content that servers as the filename" PREVIOUS="ownerid" NEXT="languages"/>
-        <FIELD NAME="languages" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="List of languages that are contained in the stashed stage" PREVIOUS="hash" NEXT="components"/>
-        <FIELD NAME="components" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="List of components that are stored in the stashed stage" PREVIOUS="languages" NEXT="strings"/>
-        <FIELD NAME="strings" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="The number of strings in the stashed stage" PREVIOUS="components" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of then the stash was created" PREVIOUS="strings" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the record was recently modified" PREVIOUS="timecreated" NEXT="name"/>
+        <FIELD NAME="languages" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="List of languages that are contained in the stashed stage" PREVIOUS="hash" NEXT="components"/>
+        <FIELD NAME="components" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="List of components that are stored in the stashed stage" PREVIOUS="languages" NEXT="strings"/>
+        <FIELD NAME="strings" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="The number of strings in the stashed stage" PREVIOUS="components" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of then the stash was created" PREVIOUS="strings" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of when the record was recently modified" PREVIOUS="timecreated" NEXT="name"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="The name or title of the stash" PREVIOUS="timemodified" NEXT="message"/>
-        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="The full message describing the stash. It is used as the default commit message when the stash is pullreguested." PREVIOUS="name"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The full message describing the stash. It is used as the default commit message when the stash is pullreguested." PREVIOUS="name"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_user"/>
@@ -77,8 +95,8 @@
     </TABLE>
     <TABLE NAME="amos_greylist" COMMENT="Defines the strings that were greylisted, that is they were marked as candidates for removal in the next release." PREVIOUS="amos_stashes" NEXT="amos_contributions">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="branch"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Branch code" PREVIOUS="id" NEXT="component"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="branch"/>
+        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Branch code" PREVIOUS="id" NEXT="component"/>
         <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string" PREVIOUS="branch" NEXT="stringid"/>
         <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier" PREVIOUS="component"/>
       </FIELDS>
@@ -91,16 +109,16 @@
     </TABLE>
     <TABLE NAME="amos_contributions" COMMENT="Contributed translations from the community" PREVIOUS="amos_greylist">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="authorid"/>
-        <FIELD NAME="authorid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="User who contributed" PREVIOUS="id" NEXT="lang"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="authorid"/>
+        <FIELD NAME="authorid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who contributed" PREVIOUS="id" NEXT="lang"/>
         <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this contribution belongs to." PREVIOUS="authorid" NEXT="assignee"/>
-        <FIELD NAME="assignee" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="The maintainer who is supposed to merge this or NULL if not assigned" PREVIOUS="lang" NEXT="subject"/>
+        <FIELD NAME="assignee" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The maintainer who is supposed to merge this or NULL if not assigned" PREVIOUS="lang" NEXT="subject"/>
         <FIELD NAME="subject" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Subject of the contributed submission" PREVIOUS="assignee" NEXT="message"/>
-        <FIELD NAME="message" TYPE="text" LENGTH="big" NOTNULL="true" SEQUENCE="false" COMMENT="Initial message describing the submission" PREVIOUS="subject" NEXT="stashid"/>
-        <FIELD NAME="stashid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Attached stash" PREVIOUS="message" NEXT="status"/>
-        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="The workflow status of the contribution" PREVIOUS="stashid" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was created" PREVIOUS="status" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was recently modified" PREVIOUS="timecreated"/>
+        <FIELD NAME="message" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Initial message describing the submission" PREVIOUS="subject" NEXT="stashid"/>
+        <FIELD NAME="stashid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Attached stash" PREVIOUS="message" NEXT="status"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The workflow status of the contribution" PREVIOUS="stashid" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was created" PREVIOUS="status" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of when the contribution record was recently modified" PREVIOUS="timecreated"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="fk_author"/>

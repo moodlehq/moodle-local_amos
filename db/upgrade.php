@@ -145,5 +145,30 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2011011001, 'local', 'amos');
     }
 
+    // Add new table amos_snapshot
+    if ($oldversion < 2013040400) {
+
+        $table = new xmldb_table('amos_snapshot');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('branch', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('lang', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('stringid', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('repoid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('ix_repoid', XMLDB_KEY_FOREIGN, array('repoid'), 'amos_repository', array('id'));
+
+        $table->add_index('ix_snapshot', XMLDB_INDEX_UNIQUE, array('component', 'lang', 'branch', 'stringid'));
+        $table->add_index('ix_lang', XMLDB_INDEX_NOTUNIQUE, array('lang'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2013040400, 'local', 'amos');
+    }
+
     return $result;
 }
