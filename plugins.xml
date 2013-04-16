@@ -1684,6 +1684,17 @@
       <plugin>importhtml</plugin>
       <plugin>print</plugin>
     </plugins>
+    <plugins type="cachelock">
+      <plugin>file</plugin>
+    </plugins>
+    <plugins type="cachestore">
+      <plugin>file</plugin>
+      <plugin>memcache</plugin>
+      <plugin>memcached</plugin>
+      <plugin>mongodb</plugin>
+      <plugin>session</plugin>
+      <plugin>static</plugin>
+    </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
       <plugin>calculatedmulti</plugin>
@@ -2059,6 +2070,7 @@
       <plugin>admin</plugin>
       <plugin>auth</plugin>
       <plugin>backup</plugin>
+      <plugin>badges</plugin>
       <plugin>block</plugin>
       <plugin>blog</plugin>
       <plugin>bulkusers</plugin>
@@ -2123,6 +2135,17 @@
       <plugin>exportimscp</plugin>
       <plugin>importhtml</plugin>
       <plugin>print</plugin>
+    </plugins>
+    <plugins type="cachelock">
+      <plugin>file</plugin>
+    </plugins>
+    <plugins type="cachestore">
+      <plugin>file</plugin>
+      <plugin>memcache</plugin>
+      <plugin>memcached</plugin>
+      <plugin>mongodb</plugin>
+      <plugin>session</plugin>
+      <plugin>static</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -2205,6 +2228,7 @@
     <plugins type="block">
       <plugin>activity_modules</plugin>
       <plugin>admin_bookmarks</plugin>
+      <plugin>badges</plugin>
       <plugin>blog_menu</plugin>
       <plugin>blog_recent</plugin>
       <plugin>blog_tags</plugin>
@@ -2282,6 +2306,7 @@
       <plugin>loglive</plugin>
       <plugin>outline</plugin>
       <plugin>participation</plugin>
+      <plugin>performance</plugin>
       <plugin>progress</plugin>
       <plugin>questioninstances</plugin>
       <plugin>security</plugin>
@@ -2374,6 +2399,7 @@
     </plugins>
     <plugins type="tool">
       <plugin>assignmentupgrade</plugin>
+      <plugin>behat</plugin>
       <plugin>bloglevelupgrade</plugin>
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
@@ -2381,6 +2407,7 @@
       <plugin>generator</plugin>
       <plugin>health</plugin>
       <plugin>innodb</plugin>
+      <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>phpunit</plugin>
@@ -2400,6 +2427,7 @@
       <plugin>arialist</plugin>
       <plugin>base</plugin>
       <plugin>binarius</plugin>
+      <plugin>bootstrap</plugin>
       <plugin>boxxie</plugin>
       <plugin>brick</plugin>
       <plugin>canvas</plugin>
