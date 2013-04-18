@@ -113,6 +113,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'assignsubmission'      => 'mod/assign/submission',
             'assignfeedback'        => 'mod/assign/feedback',
             'booktool'              => 'mod/book/tool',
+            'cachestore'            => 'cache/stores',
+            'cachelock'             => 'cache/locks',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
