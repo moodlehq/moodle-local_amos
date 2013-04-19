@@ -410,6 +410,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>mathslib</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
       <plugin>mnet</plugin>
@@ -689,8 +690,6 @@
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
     </plugins>
-    <plugins type="plagiarism">
-    </plugins>
     <plugins type="theme">
       <plugin>afterburner</plugin>
       <plugin>anomaly</plugin>
@@ -776,6 +775,7 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
+      <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>dock</plugin>
       <plugin>editor</plugin>
@@ -785,7 +785,6 @@
       <plugin>filepicker</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
-      <plugin>flashdetect</plugin>
       <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
@@ -798,6 +797,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>mathslib</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
       <plugin>mnet</plugin>
@@ -944,15 +944,15 @@
       <plugin>activitynames</plugin>
       <plugin>algebra</plugin>
       <plugin>censor</plugin>
-      <plugin>data</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
-      <plugin>glossary</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
       <plugin>tidy</plugin>
       <plugin>urltolink</plugin>
+      <plugin>data</plugin>
+      <plugin>glossary</plugin>
     </plugins>
     <plugins type="editor">
       <plugin>textarea</plugin>
@@ -985,8 +985,6 @@
       <plugin>security</plugin>
       <plugin>stats</plugin>
     </plugins>
-    <plugins type="coursereport">
-    </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
       <plugin>txt</plugin>
@@ -1002,6 +1000,9 @@
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
+    </plugins>
+    <plugins type="gradingform">
+      <plugin>rubric</plugin>
     </plugins>
     <plugins type="mnetservice">
       <plugin>enrol</plugin>
@@ -1067,8 +1068,6 @@
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
     </plugins>
-    <plugins type="plagiarism">
-    </plugins>
     <plugins type="tool">
       <plugin>bloglevelupgrade</plugin>
       <plugin>capability</plugin>
@@ -1085,8 +1084,8 @@
       <plugin>spamcleaner</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
-      <plugin>unsuproles</plugin>
       <plugin>uploaduser</plugin>
+      <plugin>unsuproles</plugin>
       <plugin>xmldb</plugin>
     </plugins>
     <plugins type="theme">
@@ -1113,9 +1112,6 @@
       <plugin>standard</plugin>
       <plugin>standardold</plugin>
     </plugins>
-    <plugins type="gradingform">
-      <plugin>rubric</plugin>
-    </plugins>
     <plugins type="assignment">
       <plugin>offline</plugin>
       <plugin>online</plugin>
@@ -1139,10 +1135,6 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
-    <plugins type="scormreport">
-      <plugin>basic</plugin>
-      <plugin>interactions</plugin>
-    </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
@@ -1159,6 +1151,10 @@
       <plugin>securewindow</plugin>
       <plugin>timelimit</plugin>
     </plugins>
+    <plugins type="scormreport">
+      <plugin>basic</plugin>
+      <plugin>interactions</plugin>
+    </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
       <plugin>comments</plugin>
@@ -1171,8 +1167,6 @@
     </plugins>
     <plugins type="workshopeval">
       <plugin>best</plugin>
-    </plugins>
-    <plugins type="local">
     </plugins>
   </moodle>
   <moodle version="2.3">
@@ -1191,6 +1185,7 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
+      <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>dock</plugin>
       <plugin>editor</plugin>
@@ -1200,7 +1195,6 @@
       <plugin>filepicker</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
-      <plugin>flashdetect</plugin>
       <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
@@ -1213,6 +1207,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>mathslib</plugin>
       <plugin>media</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
@@ -1239,11 +1234,6 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
-    </plugins>
-    <plugins type="booktool">
-      <plugin>exportimscp</plugin>
-      <plugin>importhtml</plugin>
-      <plugin>print</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -1367,15 +1357,15 @@
       <plugin>activitynames</plugin>
       <plugin>algebra</plugin>
       <plugin>censor</plugin>
-      <plugin>data</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
-      <plugin>glossary</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
       <plugin>tidy</plugin>
       <plugin>urltolink</plugin>
+      <plugin>data</plugin>
+      <plugin>glossary</plugin>
     </plugins>
     <plugins type="editor">
       <plugin>textarea</plugin>
@@ -1408,8 +1398,6 @@
       <plugin>security</plugin>
       <plugin>stats</plugin>
     </plugins>
-    <plugins type="coursereport">
-    </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
       <plugin>txt</plugin>
@@ -1425,6 +1413,10 @@
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
+    </plugins>
+    <plugins type="gradingform">
+      <plugin>rubric</plugin>
+      <plugin>guide</plugin>
     </plugins>
     <plugins type="mnetservice">
       <plugin>enrol</plugin>
@@ -1491,8 +1483,6 @@
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
     </plugins>
-    <plugins type="plagiarism">
-    </plugins>
     <plugins type="tool">
       <plugin>assignmentupgrade</plugin>
       <plugin>bloglevelupgrade</plugin>
@@ -1511,8 +1501,8 @@
       <plugin>spamcleaner</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
-      <plugin>unsuproles</plugin>
       <plugin>uploaduser</plugin>
+      <plugin>unsuproles</plugin>
       <plugin>xmldb</plugin>
     </plugins>
     <plugins type="theme">
@@ -1539,16 +1529,6 @@
       <plugin>standard</plugin>
       <plugin>standardold</plugin>
     </plugins>
-    <plugins type="gradingform">
-      <plugin>guide</plugin>
-      <plugin>rubric</plugin>
-    </plugins>
-    <plugins type="assignment">
-      <plugin>offline</plugin>
-      <plugin>online</plugin>
-      <plugin>upload</plugin>
-      <plugin>uploadsingle</plugin>
-    </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
       <plugin>file</plugin>
@@ -1557,6 +1537,17 @@
     <plugins type="assignfeedback">
       <plugin>comments</plugin>
       <plugin>file</plugin>
+    </plugins>
+    <plugins type="assignment">
+      <plugin>offline</plugin>
+      <plugin>online</plugin>
+      <plugin>upload</plugin>
+      <plugin>uploadsingle</plugin>
+    </plugins>
+    <plugins type="booktool">
+      <plugin>exportimscp</plugin>
+      <plugin>importhtml</plugin>
+      <plugin>print</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
@@ -1575,11 +1566,6 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
-    <plugins type="scormreport">
-      <plugin>basic</plugin>
-      <plugin>interactions</plugin>
-      <plugin>graphs</plugin>
-    </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
@@ -1596,6 +1582,11 @@
       <plugin>securewindow</plugin>
       <plugin>timelimit</plugin>
     </plugins>
+    <plugins type="scormreport">
+      <plugin>basic</plugin>
+      <plugin>interactions</plugin>
+      <plugin>graphs</plugin>
+    </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
       <plugin>comments</plugin>
@@ -1609,8 +1600,6 @@
     </plugins>
     <plugins type="workshopeval">
       <plugin>best</plugin>
-    </plugins>
-    <plugins type="local">
     </plugins>
   </moodle>
   <moodle version="2.4">
@@ -1630,6 +1619,7 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
+      <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>dock</plugin>
       <plugin>editor</plugin>
@@ -1639,7 +1629,6 @@
       <plugin>filepicker</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
-      <plugin>flashdetect</plugin>
       <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
@@ -1652,6 +1641,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>mathslib</plugin>
       <plugin>media</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
@@ -1678,22 +1668,6 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
-    </plugins>
-    <plugins type="booktool">
-      <plugin>exportimscp</plugin>
-      <plugin>importhtml</plugin>
-      <plugin>print</plugin>
-    </plugins>
-    <plugins type="cachelock">
-      <plugin>file</plugin>
-    </plugins>
-    <plugins type="cachestore">
-      <plugin>file</plugin>
-      <plugin>memcache</plugin>
-      <plugin>memcached</plugin>
-      <plugin>mongodb</plugin>
-      <plugin>session</plugin>
-      <plugin>static</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -1817,15 +1791,15 @@
       <plugin>activitynames</plugin>
       <plugin>algebra</plugin>
       <plugin>censor</plugin>
-      <plugin>data</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
-      <plugin>glossary</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
       <plugin>tidy</plugin>
       <plugin>urltolink</plugin>
+      <plugin>data</plugin>
+      <plugin>glossary</plugin>
     </plugins>
     <plugins type="editor">
       <plugin>textarea</plugin>
@@ -1858,8 +1832,6 @@
       <plugin>security</plugin>
       <plugin>stats</plugin>
     </plugins>
-    <plugins type="coursereport">
-    </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
       <plugin>txt</plugin>
@@ -1875,6 +1847,10 @@
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
+    </plugins>
+    <plugins type="gradingform">
+      <plugin>rubric</plugin>
+      <plugin>guide</plugin>
     </plugins>
     <plugins type="mnetservice">
       <plugin>enrol</plugin>
@@ -1941,11 +1917,8 @@
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
     </plugins>
-    <plugins type="plagiarism">
-    </plugins>
     <plugins type="tool">
       <plugin>assignmentupgrade</plugin>
-      <plugin>bloglevelupgrade</plugin>
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
       <plugin>dbtransfer</plugin>
@@ -1961,9 +1934,20 @@
       <plugin>spamcleaner</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
-      <plugin>unsuproles</plugin>
       <plugin>uploaduser</plugin>
+      <plugin>unsuproles</plugin>
       <plugin>xmldb</plugin>
+    </plugins>
+    <plugins type="cachestore">
+      <plugin>file</plugin>
+      <plugin>memcache</plugin>
+      <plugin>memcached</plugin>
+      <plugin>mongodb</plugin>
+      <plugin>session</plugin>
+      <plugin>static</plugin>
+    </plugins>
+    <plugins type="cachelock">
+      <plugin>file</plugin>
     </plugins>
     <plugins type="theme">
       <plugin>afterburner</plugin>
@@ -1989,16 +1973,6 @@
       <plugin>standard</plugin>
       <plugin>standardold</plugin>
     </plugins>
-    <plugins type="gradingform">
-      <plugin>guide</plugin>
-      <plugin>rubric</plugin>
-    </plugins>
-    <plugins type="assignment">
-      <plugin>offline</plugin>
-      <plugin>online</plugin>
-      <plugin>upload</plugin>
-      <plugin>uploadsingle</plugin>
-    </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
       <plugin>file</plugin>
@@ -2008,6 +1982,17 @@
       <plugin>comments</plugin>
       <plugin>file</plugin>
       <plugin>offline</plugin>
+    </plugins>
+    <plugins type="assignment">
+      <plugin>offline</plugin>
+      <plugin>online</plugin>
+      <plugin>upload</plugin>
+      <plugin>uploadsingle</plugin>
+    </plugins>
+    <plugins type="booktool">
+      <plugin>exportimscp</plugin>
+      <plugin>importhtml</plugin>
+      <plugin>print</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
@@ -2026,11 +2011,6 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
-    <plugins type="scormreport">
-      <plugin>basic</plugin>
-      <plugin>interactions</plugin>
-      <plugin>graphs</plugin>
-    </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
@@ -2047,6 +2027,11 @@
       <plugin>securewindow</plugin>
       <plugin>timelimit</plugin>
     </plugins>
+    <plugins type="scormreport">
+      <plugin>basic</plugin>
+      <plugin>interactions</plugin>
+      <plugin>graphs</plugin>
+    </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
       <plugin>comments</plugin>
@@ -2061,7 +2046,13 @@
     <plugins type="workshopeval">
       <plugin>best</plugin>
     </plugins>
-    <plugins type="local">
+    <plugins type="tinymce">
+      <plugin>dragmath</plugin>
+      <plugin>moodleemoticon</plugin>
+      <plugin>moodleimage</plugin>
+      <plugin>moodlemedia</plugin>
+      <plugin>moodlenolink</plugin>
+      <plugin>spellchecker</plugin>
     </plugins>
   </moodle>
   <moodle version="2.5">
@@ -2082,6 +2073,7 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
+      <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>dock</plugin>
       <plugin>editor</plugin>
@@ -2091,7 +2083,6 @@
       <plugin>filepicker</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
-      <plugin>flashdetect</plugin>
       <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
@@ -2104,6 +2095,7 @@
       <plugin>iso6392</plugin>
       <plugin>langconfig</plugin>
       <plugin>license</plugin>
+      <plugin>mathslib</plugin>
       <plugin>media</plugin>
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
@@ -2130,22 +2122,6 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
-    </plugins>
-    <plugins type="booktool">
-      <plugin>exportimscp</plugin>
-      <plugin>importhtml</plugin>
-      <plugin>print</plugin>
-    </plugins>
-    <plugins type="cachelock">
-      <plugin>file</plugin>
-    </plugins>
-    <plugins type="cachestore">
-      <plugin>file</plugin>
-      <plugin>memcache</plugin>
-      <plugin>memcached</plugin>
-      <plugin>mongodb</plugin>
-      <plugin>session</plugin>
-      <plugin>static</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -2270,15 +2246,15 @@
       <plugin>activitynames</plugin>
       <plugin>algebra</plugin>
       <plugin>censor</plugin>
-      <plugin>data</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
-      <plugin>glossary</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
       <plugin>tidy</plugin>
       <plugin>urltolink</plugin>
+      <plugin>data</plugin>
+      <plugin>glossary</plugin>
     </plugins>
     <plugins type="editor">
       <plugin>textarea</plugin>
@@ -2306,13 +2282,11 @@
       <plugin>loglive</plugin>
       <plugin>outline</plugin>
       <plugin>participation</plugin>
-      <plugin>performance</plugin>
       <plugin>progress</plugin>
       <plugin>questioninstances</plugin>
       <plugin>security</plugin>
       <plugin>stats</plugin>
-    </plugins>
-    <plugins type="coursereport">
+      <plugin>performance</plugin>
     </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
@@ -2329,6 +2303,10 @@
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
+    </plugins>
+    <plugins type="gradingform">
+      <plugin>rubric</plugin>
+      <plugin>guide</plugin>
     </plugins>
     <plugins type="mnetservice">
       <plugin>enrol</plugin>
@@ -2384,7 +2362,6 @@
     </plugins>
     <plugins type="qformat">
       <plugin>aiken</plugin>
-      <plugin>blackboard</plugin>
       <plugin>blackboard_six</plugin>
       <plugin>examview</plugin>
       <plugin>gift</plugin>
@@ -2395,12 +2372,9 @@
       <plugin>xhtml</plugin>
       <plugin>xml</plugin>
     </plugins>
-    <plugins type="plagiarism">
-    </plugins>
     <plugins type="tool">
       <plugin>assignmentupgrade</plugin>
       <plugin>behat</plugin>
-      <plugin>bloglevelupgrade</plugin>
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
       <plugin>dbtransfer</plugin>
@@ -2417,9 +2391,20 @@
       <plugin>spamcleaner</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
-      <plugin>unsuproles</plugin>
       <plugin>uploaduser</plugin>
+      <plugin>unsuproles</plugin>
       <plugin>xmldb</plugin>
+    </plugins>
+    <plugins type="cachestore">
+      <plugin>file</plugin>
+      <plugin>memcache</plugin>
+      <plugin>memcached</plugin>
+      <plugin>mongodb</plugin>
+      <plugin>session</plugin>
+      <plugin>static</plugin>
+    </plugins>
+    <plugins type="cachelock">
+      <plugin>file</plugin>
     </plugins>
     <plugins type="theme">
       <plugin>afterburner</plugin>
@@ -2441,20 +2426,11 @@
       <plugin>nonzero</plugin>
       <plugin>overlay</plugin>
       <plugin>serenity</plugin>
+      <plugin>simple</plugin>
       <plugin>sky_high</plugin>
       <plugin>splash</plugin>
       <plugin>standard</plugin>
       <plugin>standardold</plugin>
-    </plugins>
-    <plugins type="gradingform">
-      <plugin>guide</plugin>
-      <plugin>rubric</plugin>
-    </plugins>
-    <plugins type="assignment">
-      <plugin>offline</plugin>
-      <plugin>online</plugin>
-      <plugin>upload</plugin>
-      <plugin>uploadsingle</plugin>
     </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
@@ -2465,6 +2441,17 @@
       <plugin>comments</plugin>
       <plugin>file</plugin>
       <plugin>offline</plugin>
+    </plugins>
+    <plugins type="assignment">
+      <plugin>offline</plugin>
+      <plugin>online</plugin>
+      <plugin>upload</plugin>
+      <plugin>uploadsingle</plugin>
+    </plugins>
+    <plugins type="booktool">
+      <plugin>exportimscp</plugin>
+      <plugin>importhtml</plugin>
+      <plugin>print</plugin>
     </plugins>
     <plugins type="datafield">
       <plugin>checkbox</plugin>
@@ -2483,11 +2470,6 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
-    <plugins type="scormreport">
-      <plugin>basic</plugin>
-      <plugin>interactions</plugin>
-      <plugin>graphs</plugin>
-    </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
       <plugin>overview</plugin>
@@ -2504,6 +2486,11 @@
       <plugin>securewindow</plugin>
       <plugin>timelimit</plugin>
     </plugins>
+    <plugins type="scormreport">
+      <plugin>basic</plugin>
+      <plugin>interactions</plugin>
+      <plugin>graphs</plugin>
+    </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
       <plugin>comments</plugin>
@@ -2518,7 +2505,14 @@
     <plugins type="workshopeval">
       <plugin>best</plugin>
     </plugins>
-    <plugins type="local">
+    <plugins type="tinymce">
+      <plugin>ctrlhelp</plugin>
+      <plugin>dragmath</plugin>
+      <plugin>moodleemoticon</plugin>
+      <plugin>moodleimage</plugin>
+      <plugin>moodlemedia</plugin>
+      <plugin>moodlenolink</plugin>
+      <plugin>spellchecker</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
