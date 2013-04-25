@@ -115,6 +115,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'booktool'              => 'mod/book/tool',
             'cachestore'            => 'cache/stores',
             'cachelock'             => 'cache/locks',
+            'tinymce'               => 'lib/editor/tinymce/plugins',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
