@@ -2416,6 +2416,7 @@
       <plugin>boxxie</plugin>
       <plugin>brick</plugin>
       <plugin>canvas</plugin>
+      <plugin>clean</plugin>
       <plugin>formal_white</plugin>
       <plugin>formfactor</plugin>
       <plugin>fusion</plugin>
@@ -2426,7 +2427,6 @@
       <plugin>nonzero</plugin>
       <plugin>overlay</plugin>
       <plugin>serenity</plugin>
-      <plugin>simple</plugin>
       <plugin>sky_high</plugin>
       <plugin>splash</plugin>
       <plugin>standard</plugin>
