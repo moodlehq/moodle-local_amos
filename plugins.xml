@@ -2412,7 +2412,7 @@
       <plugin>arialist</plugin>
       <plugin>base</plugin>
       <plugin>binarius</plugin>
-      <plugin>bootstrap</plugin>
+      <plugin>bootstrapbase</plugin>
       <plugin>boxxie</plugin>
       <plugin>brick</plugin>
       <plugin>canvas</plugin>
