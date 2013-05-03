@@ -64,13 +64,17 @@ if (!empty($message)) {
     $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'),
         false, null, $clear);
     $stage->store();
-    if (empty($SESSION->local_amos->stagedcontribution)) {
-        $nexturl = $PAGE->url;
+    if ($clear) {
+        if (empty($SESSION->local_amos->stagedcontribution)) {
+            $nexturl = $PAGE->url;
+        } else {
+            $nexturl = new moodle_url('/local/amos/contrib.php', array('id' => $SESSION->local_amos->stagedcontribution->id));
+        }
+        unset($SESSION->local_amos->presetcommitmessage);
+        unset($SESSION->local_amos->stagedcontribution);
     } else {
-        $nexturl = new moodle_url('/local/amos/contrib.php', array('id' => $SESSION->local_amos->stagedcontribution->id));
+        $nexturl = $PAGE->url;
     }
-    unset($SESSION->local_amos->presetcommitmessage);
-    unset($SESSION->local_amos->stagedcontribution);
     redirect($nexturl);
 }
 if (!empty($unstage)) {
