@@ -1597,11 +1597,11 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_25,
-                'label'         => '2.5dev',
+                'label'         => '2.5',
                 'branch'        => 'MOODLE_25_STABLE',
                 'dir'           => '2.5',
                 'translatable'  => true,
-                'current'       => false,
+                'current'       => true,
             ),
             array(
                 'code'          => self::MOODLE_24,
@@ -1609,7 +1609,7 @@ class mlang_version {
                 'branch'        => 'MOODLE_24_STABLE',
                 'dir'           => '2.4',
                 'translatable'  => true,
-                'current'       => true,
+                'current'       => false,
             ),
             array(
                 'code'          => self::MOODLE_23,
