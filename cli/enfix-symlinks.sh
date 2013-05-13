@@ -43,4 +43,4 @@ done
 popd
 
 echo "Done! Now you may want to run something like:"
-echo "# php enfix-merge.php --symlinksdir=$SYMLINKSDIR --enfixdir=/home/mudrd8mz/tmp/enfix/2.5"
+echo "# php enfix-merge.php --symlinksdir=/home/mudrd8mz/public_html/moodle25/tmp --enfixdir=/home/mudrd8mz/tmp/enfix/2.5"
