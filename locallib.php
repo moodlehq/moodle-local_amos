@@ -125,7 +125,11 @@ class local_amos_filter implements renderable {
             }
         }
         if (is_null($data->language)) {
-            $data->language = array(current_language());
+            $currentlanguage = current_language();
+            if ($currentlanguage === 'en') {
+                $currentlanguage = 'en_fix';
+            }
+            $data->language = array($currentlanguage);
         }
         if (is_null($data->component)) {
            $data->component = array();
@@ -1337,7 +1341,11 @@ function local_amos_importfile_options() {
         }
     }
     $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
-    $options['languagecurrent'] = current_language();
+    $currentlanguage = current_language();
+    if ($currentlanguage === 'en') {
+        $currentlanguage = 'en_fix';
+    }
+    $options['languagecurrent'] = $currentlanguage;
 
     return $options;
 }
@@ -1376,7 +1384,11 @@ function local_amos_merge_options() {
     } else {
         $options['languages'] = array_merge(array('' => get_string('choosedots')), array_intersect_key($langsall, $langsallowed));
     }
-    $options['languagecurrent'] = current_language();
+    $currentlanguage = current_language();
+    if ($currentlanguage === 'en') {
+        $currentlanguage = 'en_fix';
+    }
+    $options['languagecurrent'] = $currentlanguage;
 
     return $options;
 }
@@ -1402,7 +1414,11 @@ function local_amos_diff_options() {
 
     $langsall = mlang_tools::list_languages(false);
     $options['languages'] = array_merge(array('' => get_string('choosedots')), $langsall);
-    $options['languagecurrent'] = current_language();
+    $currentlanguage = current_language();
+    if ($currentlanguage === 'en') {
+        $currentlanguage = 'en_fix';
+    }
+    $options['languagecurrent'] = $currentlanguage;
 
     return $options;
 }
