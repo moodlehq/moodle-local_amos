@@ -79,7 +79,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div');
 
         // component selector
-        $output .= html_writer::start_tag('div', array('class' => 'item select'));
+        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
         $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
@@ -106,12 +106,23 @@ class local_amos_renderer extends plugin_renderer_base {
         asort($optionscore);
         asort($optionsstandard);
         asort($optionscontrib);
-        $options = array(
-            array(get_string('typecore', 'local_amos') => $optionscore),
-            array(get_string('typestandard', 'local_amos') => $optionsstandard),
-            array(get_string('typecontrib', 'local_amos') => $optionscontrib));
-        $output .= html_writer::select($options, 'fcmp[]', $filter->get_data()->component, '',
-                    array('id' => 'amosfilter_fcmp', 'multiple' => 'multiple', 'size' => 5));
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fcmp', 'class' => 'checkboxgroup'));
+        $output .= html_writer::tag('div', get_string('typecore', 'local_amos'), array('class' => 'checkboxgroup_title'));
+        foreach ($optionscore as $key => $label) {
+            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
+            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_standard componentclass_core'));
+        }
+        $output .= html_writer::tag('div', get_string('typestandard', 'local_amos'), array('class' => 'checkboxgroup_title'));
+        foreach ($optionsstandard as $key => $label) {
+            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
+            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_standard componentclass_plugin'));
+        }
+        $output .= html_writer::tag('div', get_string('typecontrib', 'local_amos'), array('class' => 'checkboxgroup_title'));
+        foreach ($optionscontrib as $key => $label) {
+            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
+            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_contrib componentclass_plugin'));
+        }
+        $output .= html_writer::end_tag('div');
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');

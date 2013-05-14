@@ -70,28 +70,34 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             fcmpactions.set('innerHTML', fcmphtml);
             var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
             fcmpenlarge.on('click', function(e) {
-                fcmp.setAttribute('size', parseInt(fcmp.getAttribute('size')) + 5);
+                // Enlarge the components selection box.
+                fcmp.setStyle('height', parseInt(fcmp.getComputedStyle('height')) + 100 + 'px');
             });
             var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
             fcmpselectallstandard.on('click', function(e) {
-                fcmp.all('optgroup:first-child option, optgroup:first-child + optgroup option').set('selected', true);
+                // Check all displayed standard components.
+                fcmp.all('.labelled_checkbox.componentclass_standard:not(.hidden) input').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
-                fcmp.all('option').each(function (option, index, options) {
-                    if (!option.hasClass('hidden')) {
-                        option.set('selected', true);
-                    }
-                })
+                // Check all displayed components.
+                fcmp.all('.labelled_checkbox:not(.hidden) input').set('checked', true);
             });
             var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
-            fcmpselectnone.on('click', function(e) { fcmp.all('option').set('selected', false); });
+            fcmpselectnone.on('click', function(e) {
+                // Uncheck all components (even those not displayed).
+                fcmp.all('.labelled_checkbox input').set('checked', false);
+            });
 
             // search for components
             var fcmpsearch = filter.one('#amosfilter_fcmp_actions_search');
-            fcmpsearch.on('keypress', this.filter_components, this, fcmpsearch, fcmp); // needed so we catch Enter pressed, too
-            fcmpsearch.on('keyup', this.filter_components, this, fcmpsearch, fcmp);
-            fcmpsearch.on('change', this.filter_components, this, fcmpsearch, fcmp);
+            fcmpsearch.on('keypress', function(e) {
+                if (e.keyCode == 13) {
+                    // Do not submit the form
+                    e.halt();
+                }
+            });
+            fcmpsearch.on('valuechange', this.filter_components, this, fcmpsearch, fcmp);
 
             // make greylist related checkboxed mutally exclusive
             var fglo = filter.one('#amosfilter_fglo');
@@ -170,25 +176,14 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Y.NodeList} componentslist
          */
         filter_components: function(e, searchfield, componentslist) {
-            // If enter was pressed, prevent a form submission from happening.
-            if (e.keyCode == 13) {
-                e.halt();
-            }
             this.filtersearchneedle = searchfield.get('value').toString().replace(/^ +| +$/, '');
-            var options = componentslist.all('option');
-            options.each(function(option, index, options) {
-                if (this.filtersearchneedle == '' || option.get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
-                    option.show();
-                    option.removeClass('hidden');
-                    if (option.get('parentNode').test('span')) {
-                        option.unwrap();
-                    }
+            componentslist.all('.labelled_checkbox').each(function(component, index, componentslist) {
+                if (this.filtersearchneedle == '' || component.one('label').get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
+                    component.show();
+                    component.removeClass('hidden');
                 } else {
-                    option.hide();
-                    option.addClass('hidden');
-                    if (!option.get('parentNode').test('span')) {
-                        option.wrap('<span style="display: none;"/>');
-                    }
+                    component.hide();
+                    component.addClass('hidden');
                 }
             }, this);
         },
@@ -562,4 +557,4 @@ YUI.add('moodle-local_amos-translator', function(Y) {
         M.local_amos.Translator = new Translator(config);
     }
 
-}, '0.0.1', { requires:['base', 'node', 'event', 'io-queue', 'json'] });
+}, '0.0.1', { requires:['base', 'node', 'event', 'io-queue', 'json', 'selector-css3'] });

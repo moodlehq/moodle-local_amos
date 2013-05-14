@@ -37,7 +37,8 @@
     vertical-align: top;
 }
 
-.path-local-amos .lazyform .item.select .actions {
+.path-local-amos .lazyform .item.select .actions,
+.path-local-amos .lazyform .item.elementsgroup .actions {
     margin-left: 0.5em;
 }
 
@@ -60,6 +61,24 @@
 .path-local-amos #amosfilter_fver .labelled_checkbox,
 .path-local-amos #amosfilter_fgrey .labelled_checkbox {
     display: inline;
+}
+
+.path-local-amos #amosfilter_fcmp {
+    border: 1px solid #999;
+    padding: 0px 5px;
+    height: 100px;
+    overflow: auto;
+    overflow-y: scroll;
+    display: inline-block;
+}
+
+.path-local-amos #amosfilter_fcmp .checkboxgroup_title {
+    font-style: italic;
+    font-weight: bold;
+}
+
+.path-local-amos #amosfilter_fcmp .labelled_checkbox input[type=checkbox]:checked + label {
+    font-weight: bold;
 }
 
 .path-local-amos .preformatted {     /* a workaround the lack of pre-wrap support */
