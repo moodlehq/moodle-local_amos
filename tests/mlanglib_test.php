@@ -1000,6 +1000,11 @@ EOF;
         $stage->add($component);
         $component->clear();
 
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('modulename', 'Workshop 2.x'));
+        $stage->add($component);
+        $component->clear();
+
         $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
         $component->add_string(new mlang_string('foo', 'Bar'));
         $stage->add($component);
@@ -1017,6 +1022,8 @@ EOF;
         $this->assertEquals(count($comps), 2);
         $this->assertTrue(array_key_exists('workshop', $comps));
         $this->assertTrue(array_key_exists('auth', $comps));
+        $this->assertSame(array('1900','2000'), $comps['workshop']);
+        $this->assertSame(array('2000'), $comps['auth']);
         // todo test caching
     }
 

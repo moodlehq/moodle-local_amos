@@ -1740,12 +1740,12 @@ class mlang_tools {
     }
 
     /**
-     * Returns the list of all known components
+     * Returns the list of all known components and the branches they are registered at
      *
      * The component must exist in English on at least one branch to be returned.
      *
      * @param bool $usecache can the internal cache be used?
-     * @return array (string)componentname => undefined, the values of the array may change later if needed, do not rely on them
+     * @return array (string)componentname => (array)branches
      */
     public static function list_components($usecache=true) {
         global $DB;
@@ -1753,15 +1753,21 @@ class mlang_tools {
 
         if (empty($usecache) or is_null($cache)) {
             $cache = array();
-            $sql = "SELECT DISTINCT component
+            $sql = "SELECT DISTINCT component,branch
                       FROM {amos_snapshot}
-                     WHERE lang = ?
-                  ORDER BY component";
-            $cache = array_flip(array_keys($DB->get_records_sql($sql, array('en'))));
+                     WHERE lang = 'en'
+                  ORDER BY component,branch";
+            $rs = $DB->get_recordset_sql($sql);
+            foreach ($rs as $record) {
+                if (!isset($cache[$record->component])) {
+                    $cache[$record->component] = array();
+                }
+                $cache[$record->component][] = $record->branch;
+            }
+            $rs->close();
         }
 
         return $cache;
-
     }
 
     /**
