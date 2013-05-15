@@ -92,7 +92,16 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
-        foreach (mlang_tools::list_components() as $componentname => $undefined) {
+        $allversions = mlang_version::list_all();
+        foreach ($allversions as $key => $version) {
+            if ($version->code < 2000) {
+                unset($allversions[$key]);
+            }
+        }
+        $colspan = count($allversions) + 1;
+        $listversions = array();
+        foreach (mlang_tools::list_components() as $componentname => $branches) {
+            // Categorize the component into Core, Standard or Add-ons.
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
                     $optionscore[$componentname] = $standard[$componentname];
@@ -102,26 +111,46 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $optionscontrib[$componentname] = $componentname;
             }
+            // Prepare the list of versions the component strings are available at.
+            $componentversions = array();
+            foreach ($allversions as $version) {
+                if (in_array($version->code, $branches)) {
+                    $componentversions[$version->code] = html_writer::tag('td', html_writer::tag('span', $version->label), array('class' => 'version'));
+                } else {
+                    $componentversions[$version->code] = html_writer::tag('td', '', array('class' => 'version'));
+                }
+            }
+            $listversions[$componentname] = implode('', $componentversions);
         }
+
         asort($optionscore);
         asort($optionsstandard);
         asort($optionscontrib);
         $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fcmp', 'class' => 'checkboxgroup'));
-        $output .= html_writer::tag('div', get_string('typecore', 'local_amos'), array('class' => 'checkboxgroup_title'));
+        $output .= html_writer::start_tag('table', array('border' => '0'));
+
+        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscore as $key => $label) {
             $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_standard componentclass_core'));
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+                array('class' => 'standard core'));
         }
-        $output .= html_writer::tag('div', get_string('typestandard', 'local_amos'), array('class' => 'checkboxgroup_title'));
+
+        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionsstandard as $key => $label) {
             $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_standard componentclass_plugin'));
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+                array('class' => 'standard plugin'));
         }
-        $output .= html_writer::tag('div', get_string('typecontrib', 'local_amos'), array('class' => 'checkboxgroup_title'));
+
+        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscontrib as $key => $label) {
             $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox componentclass_contrib componentclass_plugin'));
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+                array('class' => 'contrib plugin'));
         }
+
+        $output .= html_writer::end_tag('table');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');

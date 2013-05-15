@@ -39,7 +39,8 @@
 
 .path-local-amos .lazyform .item.select .actions,
 .path-local-amos .lazyform .item.elementsgroup .actions {
-    margin-left: 0.5em;
+    display: block;
+    margin-top: 2px;
 }
 
 .path-local-amos .lazyform .item .label .description {
@@ -69,15 +70,30 @@
     height: 100px;
     overflow: auto;
     overflow-y: scroll;
-    display: inline-block;
 }
 
-.path-local-amos #amosfilter_fcmp .checkboxgroup_title {
+.path-local-amos #amosfilter_fcmp table tr th,
+.path-local-amos #amosfilter_fcmp table tr td {
+    border: none;
+    padding: 0px 1px;
+    margin: 0px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.path-local-amos #amosfilter_fcmp table tr th {
     font-style: italic;
     font-weight: bold;
 }
 
-.path-local-amos #amosfilter_fcmp .labelled_checkbox input[type=checkbox]:checked + label {
+.path-local-amos #amosfilter_fcmp table tr td.version span {
+    background-color: #ccc;
+    font-size: 70%;
+    color: white;
+    padding: 2px;
+}
+
+.path-local-amos #amosfilter_fcmp input[type=checkbox]:checked + label {
     font-weight: bold;
 }
 

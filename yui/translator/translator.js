@@ -71,22 +71,22 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
             fcmpenlarge.on('click', function(e) {
                 // Enlarge the components selection box.
-                fcmp.setStyle('height', parseInt(fcmp.getComputedStyle('height')) + 100 + 'px');
+                fcmp.setStyle('height', parseInt(fcmp.getComputedStyle('height')) * 2 + 'px');
             });
             var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
             fcmpselectallstandard.on('click', function(e) {
                 // Check all displayed standard components.
-                fcmp.all('.labelled_checkbox.componentclass_standard:not(.hidden) input').set('checked', true);
+                fcmp.all('tr.standard:not(.hidden) input').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
                 // Check all displayed components.
-                fcmp.all('.labelled_checkbox:not(.hidden) input').set('checked', true);
+                fcmp.all('tr:not(.hidden) input').set('checked', true);
             });
             var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
             fcmpselectnone.on('click', function(e) {
                 // Uncheck all components (even those not displayed).
-                fcmp.all('.labelled_checkbox input').set('checked', false);
+                fcmp.all('tr input').set('checked', false);
             });
 
             // search for components
@@ -173,17 +173,19 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @method filter_components
          * @param {Y.Event} e
          * @param {Y.Node} searchfield
-         * @param {Y.NodeList} componentslist
+         * @param {Y.Node} componentslist the wrapping node of the list of components
          */
         filter_components: function(e, searchfield, componentslist) {
             this.filtersearchneedle = searchfield.get('value').toString().replace(/^ +| +$/, '');
-            componentslist.all('.labelled_checkbox').each(function(component, index, componentslist) {
+            componentslist.all('table tr td.labelled_checkbox').each(function(component, index, componentslist) {
                 if (this.filtersearchneedle == '' || component.one('label').get('text').toString().indexOf(this.filtersearchneedle) !== -1) {
-                    component.show();
-                    component.removeClass('hidden');
+                    row = component.get('parentNode');
+                    row.show();
+                    row.removeClass('hidden');
                 } else {
-                    component.hide();
-                    component.addClass('hidden');
+                    row = component.get('parentNode');
+                    row.hide();
+                    row.addClass('hidden');
                 }
             }, this);
         },
