@@ -366,15 +366,15 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         } else {
             $enfolder = 'en_utf8';
         }
-        if (!strstr($file, "lang/$enfolder/")) {
+        if (strpos($file, "lang/$enfolder/") === false) {
             // this is not a language file
             continue;
         }
-        if (strstr($file, "lang/$enfolder/docs/") or strstr($file, "lang/$enfolder/help/")) {
+        if (strpos($file, "lang/$enfolder/docs/") !== false or strpos($file, "lang/$enfolder/help/") !== false) {
             // ignore
             continue;
         }
-        if (strstr($file, 'portfolio_format_leap2a.php')) {
+        if (strpos($file, 'portfolio_format_leap2a.php') !== false) {
             // MDL-22212
             continue;
         }
