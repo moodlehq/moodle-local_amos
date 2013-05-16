@@ -387,6 +387,11 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             fputs(STDOUT, "SKIP installer bootstrap strings\n");
             continue;
         }
+        if (strpos($file, '/tests/fixtures/') !== false) {
+            // This is a string file that is part of unit tests, ignore it.
+            fputs(STDOUT, "SKIP unit test fixture file\n");
+            continue;
+        }
         if (isset($standardplugins[$version->dir])) {
             // for 2.0 and higher we can make sure that we parse only standard component
             if (!isset($standardplugins[$version->dir][$componentname])) {
