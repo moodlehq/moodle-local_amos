@@ -131,22 +131,28 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscore as $key => $label) {
-            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+            $selected = in_array($key, $filter->get_data()->component);
+            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'standard core'));
         }
 
         $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionsstandard as $key => $label) {
-            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+            $selected = in_array($key, $filter->get_data()->component);
+            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'standard plugin'));
         }
 
         $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscontrib as $key => $label) {
-            $checkbox = html_writer::checkbox('fcmp[]', $key, in_array($key, $filter->get_data()->component), $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => 'labelled_checkbox')) . $listversions[$key],
+            $selected = in_array($key, $filter->get_data()->component);
+            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
+            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'contrib plugin'));
         }
 

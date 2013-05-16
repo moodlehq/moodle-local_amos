@@ -99,6 +99,13 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             });
             fcmpsearch.on('valuechange', this.filter_components, this, fcmpsearch, fcmp);
 
+            // scroll the components selector to the first checked item
+            var firstcheckcomponent = fcmp.one('.labelled_checkbox.preset');
+            if (firstcheckcomponent) {
+                // Align with bottom to prevent the main window from scrolling too.
+                firstcheckcomponent.scrollIntoView(false);
+            }
+
             // make greylist related checkboxed mutally exclusive
             var fglo = filter.one('#amosfilter_fglo');
             var fwog = filter.one('#amosfilter_fwog');
