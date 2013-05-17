@@ -44,6 +44,31 @@ class testable_mlang_tools extends mlang_tools {
 class mlang_test extends advanced_testcase {
 
     /**
+     * Helper method to quickly register a language on the given branch(-es)
+     *
+     * @param string $langcode the code of the language, such as 'en'
+     * @param int|array $branchcodes the code of the branch or a list of them
+     */
+    protected function register_language($langcode, $branchcodes) {
+
+        if (!is_array($branchcodes)) {
+            $branchcodes = array($branchcodes);
+        }
+
+        $stage = new mlang_stage();
+
+        foreach ($branchcodes as $branchcode) {
+            $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($branchcode));
+            $component->add_string(new mlang_string('thislanguage', $langcode));
+            $component->add_string(new mlang_string('thislanguageint', $langcode));
+            $stage->add($component);
+            $component->clear();
+        }
+
+        $stage->commit('Register language '.$langcode, array('source' => 'unittest'));
+    }
+
+    /**
      * Excercise various helper methods
      */
     public function test_helpers() {
@@ -1024,11 +1049,14 @@ EOF;
         $this->assertTrue(array_key_exists('auth', $comps));
         $this->assertSame(array('1900','2000'), $comps['workshop']);
         $this->assertSame(array('2000'), $comps['auth']);
-        // todo test caching
     }
 
     public function test_execution_strings() {
         $this->resetAfterTest();
+
+        $this->register_language('en', mlang_version::MOODLE_20);
+        $this->register_language('cs', mlang_version::MOODLE_20);
+
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
         // this is to prevent situation where a string is added and immediately removed in the same second. Such
@@ -1081,6 +1109,10 @@ EOF;
 
     public function test_execution_strings_move() {
         $this->resetAfterTest();
+
+        $this->register_language('en', mlang_version::MOODLE_20);
+        $this->register_language('cs', mlang_version::MOODLE_20);
+
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
         $now = time();
@@ -1447,6 +1479,10 @@ AMOS END';
 
     public function test_execution_forced_copy() {
         $this->resetAfterTest();
+
+        $this->register_language('en', mlang_version::MOODLE_22);
+        $this->register_language('cs', mlang_version::MOODLE_22);
+
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_22_STABLE');
         $time = time();

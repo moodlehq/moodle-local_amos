@@ -1704,7 +1704,7 @@ class mlang_tools {
         global $DB;
         static $cache = null;
 
-        if (empty($usecache) or is_null($cache)) {
+        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
             $cache = array();
             $sql = "SELECT r.lang AS code, r.text AS name
                       FROM {amos_repository} r
@@ -1751,7 +1751,7 @@ class mlang_tools {
         global $DB;
         static $cache = null;
 
-        if (empty($usecache) or is_null($cache)) {
+        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
             $cache = array();
             $sql = "SELECT DISTINCT component,branch
                       FROM {amos_snapshot}
