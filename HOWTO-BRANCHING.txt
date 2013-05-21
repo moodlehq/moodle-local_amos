@@ -1,0 +1,70 @@
+Registering a new Moodle branch in AMOS
+=======================================
+
+Whenever the new major Moodle version is released, several steps must be done
+in AMOS. For the purpose of this document, let us expect that Moodle 2.6 was
+just released and the new branch MOODLE_26_STABLE was created in moodle.git.
+So now we must tell AMOS that the master branch is 2.7.
+
+1. Make sure that MOODLE_26_STABLE is fetched into the moodle.git clone that
+   AMOS tracks.
+2. Turn Jenkins off.
+3. Switch the portal to the maintenance mode and backup AMOS database.
+4. Define new mlang_version for MOODLE_27_STABLE in mlanglib.php.
+5. Grep for the current usage of MOODLE_26_STABLE and add the new
+   MOODLE_27_STABLE record where needed and/or replace the current reference to
+   the 2.6 with the reference to 2.7. Most notably in
+   cli/parse-core.php, cli/export-installer.php and cli/fix-drift.php
+   Grep for MOODLE_26 and check if other places need an update, too
+   (most notably cli/export-zip.php).
+6. Make sure that plugins.xml contains declaration for 2.7.
+7. Increase the initial version of new language packs in admin/newlanguage.php
+8. Deploy the code at the production site.
+9. Fork the new branch in the repository
+
+        php cli/make-branch.php --from=MOODLE_26_STABLE --to=MOODLE_27_STABLE
+
+10. Copy moodledata/amos/var/MOODLE_26_STABLE.startat to
+    MOODLE_27_STABLE.startat. Fix the content of MOODLE_26_STABLE.startat so
+    that it points to the HEAD of the real MOODLE_26_STABLE (and not the master).
+11. Make moodledata/amos/var/export-zip/2.7/
+12. Force AMOS to regenerate all ZIPs including those for 2.7:
+
+        UPDATE mdl_config_plugins SET value=1 WHERE plugin='local_amos' AND name='lastexportzip';
+
+13. Create new MOODLE_26_STABLE and install_26_STABLE branches at
+    /home/amosbot/git/moodle-install and update publish-moodle-install.sh
+
+        su amosbot
+        cd /home/amosbot/git/moodle-install
+        git checkout -b MOODLE_26_STABLE upstream/MOODLE_26_STABLE
+        git checkout -b install_26_STABLE upstream/MOODLE_26_STABLE
+        vi ~/bin/publish-moodle-install.sh
+
+14. Create MOODLE_27_STABLE branch at /home/amosbot/git/moodle-langpacks
+
+        cd /home/amosbot/git/moodle-langpacks
+        git checkout master
+        git branch MOODLE_27_STABLE
+
+    and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
+
+        cd /home/amosbot/git/moodle-langpacks-clones
+        git clone /home/amosbot/git/moodle-langpacks 2.7
+        cd 2.7
+        git checkout -b MOODLE_27_STABLE origin/MOODLE_27_STABLE
+        git branch -d master
+
+    and finally modify publish-moodle-langpacks.sh
+
+        vi ~/bin/publish-moodle-langpacks.sh
+
+15. Turn Jenkins on and let it re-generate the ZIP packages.
+16. Check http://download.moodle.org/langpack/
+17. Clone greylisted strings
+
+        INSERT INTO mdl_amos_greylist (branch, component, stringid)
+        SELECT 2700 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = 2600;
+
+18. Disable the site maintenance mode.
+19. Have a beer!
