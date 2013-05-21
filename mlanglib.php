@@ -2046,8 +2046,19 @@ class mlang_tools {
             throw new mlang_exception('Unknow component '.$componentname);
         }
 
-        $branchcodesasc = $branchcodesdesc = $tree[$componentname];
+        $branchcodes = $tree[$componentname];
+
+        // Keep only those >= 2.0 (merge not supported for lower versions).
+        foreach ($branchcodes as $index => $branchcode) {
+            if ($branchcode < mlang_version::MOODLE_20) {
+                unset($branchcodes[$index]);
+            }
+        }
+
+        $branchcodesasc = $branchcodes;
         sort($branchcodesasc);
+
+        $branchcodesdesc = $branchcodes;
         rsort($branchcodesdesc);
 
         // Merge strings from top to bottom first (e.g. 2.5 > 2.4 > 2.3)

@@ -1656,12 +1656,19 @@ AMOS END';
         $this->register_language('cs', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
 
         $stage = new mlang_stage();
+        $version19 = mlang_version::by_branch('MOODLE_19_STABLE');
         $version23 = mlang_version::by_branch('MOODLE_23_STABLE');
         $version24 = mlang_version::by_branch('MOODLE_24_STABLE');
         $version25 = mlang_version::by_branch('MOODLE_25_STABLE');
         $time = time();
 
-        // Make some 2.3 and 2.4 strings
+        // Make some 1.9, 2.3 and 2.4 strings
+        $component = new mlang_component('foo', 'en', $version19);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 500 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 1.9 strings', array('source' => 'unittest'));
+
         $component = new mlang_component('foo', 'en', $version23);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 180 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Done', $time - 180 * DAYSECS));
