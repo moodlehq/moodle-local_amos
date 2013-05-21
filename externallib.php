@@ -156,9 +156,20 @@ class local_amos_external extends external_api {
             $results[] = $result;
         }
 
+        // Populate the list of staged components for later auto-merge.
+        $componentnames = array();
+        foreach ($stage->get_iterator() as $component) {
+            $componentnames[] = $component->name;
+        }
+
         // Rebase and eventually commit the stage with string modifications.
         $stage->rebase(null, true);
         $stage->commit($message, array('source' => 'import', 'userinfo' => $userinfo), true); // throws exceptions if commit fails
+
+        // Auto-merge updated components.
+        foreach ($componentnames as $componentname) {
+            mlang_tools::auto_merge($componentname);
+        }
 
         // Done! Thank you for calling this web service.
         return $results;

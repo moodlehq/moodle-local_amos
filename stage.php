@@ -61,9 +61,16 @@ if (!empty($message)) {
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $allowed = mlang_tools::list_allowed_languages($USER->id);
     $stage->prune($allowed);
+    list($numstrings, $listlanguages, $listcomponents) = mlang_stage::analyze($stage);
     $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'),
         false, null, $clear);
     $stage->store();
+    // Execute auto-merge
+    $listlanguages = array_filter(explode('/', $listlanguages));
+    $listcomponents = array_filter(explode('/', $listcomponents));
+    foreach ($listcomponents as $componentname) {
+        mlang_tools::auto_merge($componentname, $listlanguages);
+    }
     if ($clear) {
         if (empty($SESSION->local_amos->stagedcontribution)) {
             $nexturl = $PAGE->url;
