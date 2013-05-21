@@ -1649,6 +1649,107 @@ AMOS END';
         $this->assertEquals(1, $DB->count_records('amos_snapshot'));
     }
 
+    public function test_auto_merge() {
+        $this->resetAfterTest();
+
+        $this->register_language('en', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
+        $this->register_language('cs', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
+
+        $stage = new mlang_stage();
+        $version23 = mlang_version::by_branch('MOODLE_23_STABLE');
+        $version24 = mlang_version::by_branch('MOODLE_24_STABLE');
+        $version25 = mlang_version::by_branch('MOODLE_25_STABLE');
+        $time = time();
+
+        // Make some 2.3 and 2.4 strings
+        $component = new mlang_component('foo', 'en', $version23);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 180 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Done', $time - 180 * DAYSECS));
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 180 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 180 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 2.3 strings', array('source' => 'unittest'));
+
+        $component = new mlang_component('foo', 'cs', $version23);
+        $component->add_string(new mlang_string('modulename', 'Fu', $time - 179 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Hotovo', $time - 179 * DAYSECS));
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 179 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Translate some Foo 2.3 strings into Czech', array('source' => 'unittest'));
+
+        $component = new mlang_component('foo', 'en', $version24);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 90 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Finished', $time - 90 * DAYSECS)); // Changed in 2.4
+        $component->add_string(new mlang_string('end', 'End', $time - 90 * DAYSECS)); // New in 2.4
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 90 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 90 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 2.4 strings', array('source' => 'unittest'));
+
+        $component = new mlang_component('foo', 'cs', $version24);
+        $component->add_string(new mlang_string('modulename', 'Fu', $time - 45 * DAYSECS));
+        $component->add_string(new mlang_string('end', 'Konec', $time - 45 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 45 * DAYSECS));
+        $component->add_string(new mlang_string('orphan', 'Orphan', $time - 45 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Translate some Foo 2.4 strings into Czech', array('source' => 'unittest'));
+
+        testable_mlang_tools::auto_merge('foo');
+
+        $component = mlang_component::from_snapshot('foo', 'cs', $version23);
+        $this->assertTrue($component->has_string('modulename'));
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
+        $this->assertEquals($time - 179 * DAYSECS, $component->get_string('modulename')->timemodified);
+        $this->assertTrue($component->has_string('done'));
+        $this->assertTrue($component->has_string('aaa'));
+        $this->assertTrue($component->has_string('bbb')); // This has been auto-merged from 2.4
+        $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
+        $this->assertFalse($component->has_string('end')); // Because it's 2.4 only
+        $this->assertFalse($component->has_string('orphan')); // Because it's not in 2.3 English
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('foo', 'cs', $version24);
+        $this->assertTrue($component->has_string('modulename'));
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('modulename')->timemodified);
+        $this->assertTrue($component->has_string('aaa')); // This has been auto-merged from 2.3
+        $this->assertTrue($component->get_string('aaa')->timemodified >= $time);
+        $this->assertTrue($component->has_string('bbb'));
+        $this->assertFalse($component->has_string('done')); // Because it has changed in English
+        $component->clear();
+
+        $component = new mlang_component('foo', 'cs', $version24);
+        $component->add_string(new mlang_string('done', 'Ukončeno', $time - 40 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add missing 2.4 string', array('source' => 'unittest'));
+
+        // New version of the Foo is released, strings have not changed.
+
+        $component = new mlang_component('foo', 'en', $version25);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 20 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Finished', $time - 20 * DAYSECS));
+        $component->add_string(new mlang_string('end', 'End', $time - 20 * DAYSECS));
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 20 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 20 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 2.5 strings', array('source' => 'unittest'));
+
+        testable_mlang_tools::auto_merge('foo', array('en', 'cs')); // 'en' is to be ignored.
+
+        $component = mlang_component::from_snapshot('foo', 'cs', $version25);
+        $this->assertTrue($component->has_string('modulename'));
+        $this->assertTrue($component->get_string('modulename')->timemodified >= $time);
+        $this->assertTrue($component->has_string('aaa'));
+        $this->assertTrue($component->has_string('bbb'));
+        $this->assertTrue($component->has_string('done'));
+        $component->clear();
+    }
+
     public function test_stash_push() {
 
     }
