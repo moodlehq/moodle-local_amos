@@ -192,6 +192,7 @@ $string['logfilterlang'] = 'Languages';
 $string['logfiltershow'] = 'Show filtered commits and strings';
 $string['logfiltersource'] = 'Source';
 $string['logfiltersourceamos'] = 'amos (web based translator)';
+$string['logfiltersourceautomerge'] = 'automerge (translation copied from another branch)';
 $string['logfiltersourcebot'] = 'bot (bulk operations executed by a script)';
 $string['logfiltersourcecommitscript'] = 'commitscript (AMOScript in the commit message)';
 $string['logfiltersourcefixdrift'] = 'fixdrift (fixed AMOS-git drift)';
