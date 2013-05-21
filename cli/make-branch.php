@@ -93,7 +93,8 @@ foreach ($rs as $record) {
     $transaction->allow_commit();
 
     echo 'Done' . PHP_EOL;
-    echo 'Done. Do not forget to reinitilize the snapshot table!' . PHP_EOL;
 }
+
+echo '!!! Do not forget to reinitilize the snapshot table !!!' . PHP_EOL;
 
 $rs->close();
