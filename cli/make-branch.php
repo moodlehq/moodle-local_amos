@@ -28,6 +28,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(array('from'=>false, 'to'=>false, 'help'=>false), array('h'=>'help'));
@@ -51,17 +52,30 @@ if ($DB->record_exists('amos_repository', array('branch' => $toversion->code))) 
     exit(3);
 }
 
+// Get the list of standard components on the source branch.
+$components = array();
+foreach (local_amos_standard_plugins() as $moodleversion => $frankenstylenames) {
+    if ($moodleversion === $fromversion->dir) {
+        foreach (array_keys($frankenstylenames) as $componentname) {
+            $components[$componentname] = true;
+        }
+    }
+}
+
+list($subsql, $subparams) = $DB->get_in_or_equal(array_keys($components));
+
 // Let us get the list of commits that change strings on the given branch
 $sql = "SELECT DISTINCT commitid
           FROM {amos_repository}
          WHERE branch = ?
+           AND component $subsql
       ORDER BY commitid";
 
-$rs = $DB->get_recordset_sql($sql, array($fromversion->code));
+$rs = $DB->get_recordset_sql($sql, array_merge(array($fromversion->code), $subparams));
 
 foreach ($rs as $record) {
     $commitid = $record->commitid;
-    echo 'cloning changes introduced by commit ' . $commitid . ' ... ';
+    echo 'Cloning changes introduced by commit ' . $commitid . ' ... ';
 
     // all changes introduced by the commit at the given branch
     $changes = $DB->get_records('amos_repository', array('commitid' => $commitid, 'branch' => $fromversion->code), 'id');
@@ -72,11 +86,14 @@ foreach ($rs as $record) {
         unset($change->id);
         $change->branch = $toversion->code;
 
-        $DB->insert_record('amos_repository', $change);
+        if (isset($components[$change->component])) {
+            $DB->insert_record('amos_repository', $change);
+        }
     }
     $transaction->allow_commit();
 
-    echo 'done' . PHP_EOL;
+    echo 'Done' . PHP_EOL;
+    echo 'Done. Do not forget to reinitilize the snapshot table!' . PHP_EOL;
 }
 
 $rs->close();
