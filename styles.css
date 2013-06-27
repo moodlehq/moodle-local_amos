@@ -355,6 +355,9 @@
     background-color: #f9f9f9;
 }
 
+#page-local-amos-credits .quicklinks a.current {
+    font-weight: bold;
+}
 
 #page-local-amos-credits .language {
     border: 1px solid #eee;

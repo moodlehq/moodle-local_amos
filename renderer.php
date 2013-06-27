@@ -1032,9 +1032,10 @@ print_footer();
      * Renders the AMOS credits page
      *
      * @param array $people as populated in credits.php
+     * @param string $currentlanguage the user's current language
      * @return string
      */
-    public function page_credits(array $people) {
+    public function page_credits(array $people, $currentlanguage) {
 
         $out = $this->output->heading(get_string('creditstitlelong', 'local_amos'));
         $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'thanks');
@@ -1042,8 +1043,14 @@ print_footer();
         $out .= $this->output->container_start('quicklinks');
         $links = array();
         foreach ($people as $langcode => $langdata) {
+            if ($langcode === $currentlanguage) {
+                $attributes = array('class' => 'current');
+            } else {
+                $attributes = null;
+            }
+
             $links[] = html_writer::link(new moodle_url('#credits-language-'.$langcode),
-                str_replace(' ', '&nbsp;', $langdata->langname));
+                str_replace(' ', '&nbsp;', $langdata->langname), $attributes);
         }
         $out .= implode(' | ', $links);
         $out .= $this->output->container_end();

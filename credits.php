@@ -100,5 +100,5 @@ $rs->close();
 echo $OUTPUT->header();
 
 $output = $PAGE->get_renderer('local_amos');
-echo $output->page_credits($list);
+echo $output->page_credits($list, current_language());
 echo $OUTPUT->footer();
