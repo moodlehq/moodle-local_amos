@@ -1029,6 +1029,68 @@ print_footer();
     }
 
     /**
+     * Renders the AMOS credits page
+     *
+     * @param array $people as populated in credits.php
+     * @return string
+     */
+    public function page_credits(array $people) {
+
+        $out = $this->output->heading(get_string('creditstitlelong', 'local_amos'));
+        $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'thanks');
+
+        $out .= $this->output->container_start('quicklinks');
+        $links = array();
+        foreach ($people as $langcode => $langdata) {
+            $links[] = html_writer::link(new moodle_url('#credits-language-'.$langcode),
+                str_replace(' ', '&nbsp;', $langdata->langname));
+        }
+        $out .= implode(' | ', $links);
+        $out .= $this->output->container_end();
+
+        foreach ($people as $langcode => $langdata) {
+            $out .= $this->output->container_start('language', 'credits-language-'.$langcode);
+            $out .= $this->output->heading($langdata->langname, 3, 'langname');
+
+            $out .= $this->output->container_start('maintainers');
+            if (empty($langdata->maintainers)) {
+                $out .= $this->output->container(get_string('creditsnomaintainer', 'local_amos', 'http://docs.moodle.org/en/Translation'));
+            } else {
+                $out .= $this->output->container(get_string('creditsmaintainedby', 'local_amos'), 'maintainers-title');
+                foreach ($langdata->maintainers as $maintainer) {
+                    $out .= $this->output->container_start('maintainer');
+                    $out .= $this->output->user_picture($maintainer, array('size' => 50));
+                    $out .= $this->output->container(fullname($maintainer), 'fullname');
+                    $out .= $this->output->action_icon(
+                        new moodle_url('/message/index.php', array('id' => $maintainer->id)),
+                        new pix_icon('t/message', get_string('creditscontact', 'local_amos')),
+                        null,
+                        array('class' => 'contact')
+                    );
+                    $out .= $this->output->container_end();
+                }
+            }
+            $out .= $this->output->container_end();
+
+            $out .= $this->output->container_start('contributors');
+            if (!empty($langdata->contributors)) {
+                $out .= $this->output->container(get_string('creditscontributors', 'local_amos'), 'contributors-title');
+                foreach ($langdata->contributors as $contributor) {
+                    $out .= $this->output->container_start('contributor');
+                    $out .= $this->output->user_picture($contributor, array('size' => 16));
+                    $out .= $this->output->container(fullname($contributor), 'fullname');
+                    $out .= $this->output->container_end();
+                }
+            }
+            $out .= $this->output->container_end();
+
+            $out .= $this->output->container_end();
+        }
+
+        return $out;
+    }
+
+    /**
      * Makes sure there is a zero-width space after non-word characters in the given string
      *
      * This is used to wrap long strings like 'A,B,C,D,...,x,y,z' in the translator

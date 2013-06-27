@@ -342,6 +342,75 @@
     text-align: left;
 }
 
+#page-local-amos-credits .thanks {
+    text-align:center;
+}
+
+#page-local-amos-credits .quicklinks {
+    width: 80%;
+    text-align: center;
+    margin: 1em auto 2em;
+    padding: 10px;
+    border: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+
+
+#page-local-amos-credits .language {
+    border: 1px solid #eee;
+    background-color: #f9f9f9;
+    margin: 0em 2em 3em;
+    padding: 0.5em;
+}
+
+#page-local-amos-credits .langname {
+    position: relative;
+    left: -1em;
+    border: 1px solid #ddd;
+    background-color: #eee;
+    display: inline-block;
+    padding: 3px;
+}
+
+#page-local-amos-credits .language .maintainers .maintainer {
+    display: inline-block;
+    border: 1px solid #eee;
+    background-color: white;
+    margin: 0.25em;
+    padding: 10px;
+    min-width: 180px;
+}
+
+#page-local-amos-credits .language .maintainers .maintainer .userpicture {
+    float: left;
+}
+
+#page-local-amos-credits .language .maintainers .maintainer .fullname {
+    font-weight: bold;
+    display: block;
+    margin-left: 60px;
+}
+
+#page-local-amos-credits .language .maintainers .maintainer .contact {
+    display: block;
+    margin-left: 60px;
+}
+
+#page-local-amos-credits .language .contributors .contributor {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#page-local-amos-credits .language .contributors .contributor .userpicture {
+    display: inline-block;
+    margin: 3px;
+    vertical-align:text-bottom;
+}
+
+#page-local-amos-credits .language .contributors .contributor .fullname {
+    display: inline-block;
+}
+
 .path-local-amos .logrecord {
     border: 1px solid #ddd;
     padding: 0.5em;
