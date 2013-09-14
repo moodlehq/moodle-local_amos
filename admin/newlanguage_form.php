@@ -39,9 +39,11 @@ class local_amos_newlanguage_form extends moodleform {
         $mform->addRule('langcode', get_string('err_required', 'form'), 'required', null, 'client');
 
         $mform->addElement('text', 'langname', 'Language name in the language itself');
+        $mform->setType('langname', PARAM_RAW);
         $mform->addRule('langname', get_string('err_required', 'form'), 'required', null, 'client');
 
         $mform->addElement('text', 'langnameint', 'International language name in English');
+        $mform->setType('langnameint', PARAM_RAW);
         $mform->addRule('langnameint', get_string('err_required', 'form'), 'required', null, 'client');
 
         $this->add_action_buttons(false, 'Register new language');
