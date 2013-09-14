@@ -1719,10 +1719,10 @@ class mlang_tools {
                       FROM {amos_repository} r
                       JOIN {amos_snapshot} s ON s.repoid = r.id
                      WHERE s.component = ?
-                       AND s.stringid  = ?
+                       AND (s.stringid = ? OR s.stringid = ?)
                        AND r.deleted   = 0
-                  ORDER BY s.branch DESC, r.timemodified DESC, text";
-            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint'));
+                  ORDER BY s.branch DESC, s.stringid DESC, r.timemodified DESC, text";
+            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
                     // use the first returned value, all others are historical records
