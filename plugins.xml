@@ -2535,7 +2535,6 @@
       <plugin>currencies</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
-      <plugin>dock</plugin>
       <plugin>editor</plugin>
       <plugin>edufields</plugin>
       <plugin>enrol</plugin>
@@ -2543,7 +2542,6 @@
       <plugin>filepicker</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
-      <plugin>fonts</plugin>
       <plugin>form</plugin>
       <plugin>grades</plugin>
       <plugin>grading</plugin>
@@ -2560,7 +2558,6 @@
       <plugin>message</plugin>
       <plugin>mimetypes</plugin>
       <plugin>mnet</plugin>
-      <plugin>moodle.org</plugin>
       <plugin>my</plugin>
       <plugin>notes</plugin>
       <plugin>pagetype</plugin>
@@ -2641,8 +2638,10 @@
       <plugin>shibboleth</plugin>
       <plugin>webservice</plugin>
     </plugins>
+    <plugins type="calendartype">
+      <plugin>gregorian</plugin>
+    </plugins>
     <plugins type="enrol">
-      <plugin>authorize</plugin>
       <plugin>category</plugin>
       <plugin>cohort</plugin>
       <plugin>database</plugin>
@@ -2719,9 +2718,10 @@
     <plugins type="editor">
       <plugin>textarea</plugin>
       <plugin>tinymce</plugin>
+      <plugin>atto</plugin>
     </plugins>
     <plugins type="format">
-      <plugin>scorm</plugin>
+      <plugin>singleactivity</plugin>
       <plugin>social</plugin>
       <plugin>topics</plugin>
       <plugin>weeks</plugin>
@@ -2779,6 +2779,7 @@
     </plugins>
     <plugins type="repository">
       <plugin>alfresco</plugin>
+      <plugin>areafiles</plugin>
       <plugin>boxnet</plugin>
       <plugin>coursefiles</plugin>
       <plugin>dropbox</plugin>
@@ -2791,6 +2792,7 @@
       <plugin>merlot</plugin>
       <plugin>picasa</plugin>
       <plugin>recent</plugin>
+      <plugin>skydrive</plugin>
       <plugin>s3</plugin>
       <plugin>upload</plugin>
       <plugin>url</plugin>
@@ -2851,6 +2853,7 @@
       <plugin>spamcleaner</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
+      <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
       <plugin>unsuproles</plugin>
       <plugin>xmldb</plugin>
@@ -2950,6 +2953,7 @@
       <plugin>basic</plugin>
       <plugin>interactions</plugin>
       <plugin>graphs</plugin>
+      <plugin>objectives</plugin>
     </plugins>
     <plugins type="workshopform">
       <plugin>accumulative</plugin>
@@ -2965,14 +2969,34 @@
     <plugins type="workshopeval">
       <plugin>best</plugin>
     </plugins>
+    <plugins type="atto">
+      <plugin>bold</plugin>
+      <plugin>clear</plugin>
+      <plugin>html</plugin>
+      <plugin>image</plugin>
+      <plugin>indent</plugin>
+      <plugin>italic</plugin>
+      <plugin>link</plugin>
+      <plugin>media</plugin>
+      <plugin>orderedlist</plugin>
+      <plugin>outdent</plugin>
+      <plugin>strike</plugin>
+      <plugin>title</plugin>
+      <plugin>underline</plugin>
+      <plugin>unlink</plugin>
+      <plugin>unorderedlist</plugin>
+    </plugins>
     <plugins type="tinymce">
       <plugin>ctrlhelp</plugin>
       <plugin>dragmath</plugin>
+      <plugin>managefiles</plugin>
       <plugin>moodleemoticon</plugin>
       <plugin>moodleimage</plugin>
       <plugin>moodlemedia</plugin>
       <plugin>moodlenolink</plugin>
+      <plugin>pdw</plugin>
       <plugin>spellchecker</plugin>
+      <plugin>wrap</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
