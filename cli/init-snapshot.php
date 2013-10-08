@@ -29,13 +29,36 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->libdir.'/clilib.php');
+
+list($options, $unrecognized) = cli_get_params(array('component'=>null, 'branch'=>null, 'lang'=>null, 'help'=>false), array('h'=>'help'));
+
+if ($options['help']) {
+    fwrite(STDOUT, 'Default usage: '.basename(__FILE__).PHP_EOL);
+    fwrite(STDOUT, 'Another usage: '.basename(__FILE__).' --component=moodle --branch=2500 --lang=fr_ca'.PHP_EOL);
+    exit(1);
+}
+
+$conditions = array();
+if ($options['component']) {
+    $conditions['component'] = $options['component'];
+}
+if ($options['branch']) {
+    $conditions['branch'] = $options['branch'];
+}
+if ($options['lang']) {
+    $conditions['lang'] = $options['lang'];
+}
+if (empty($conditions)) {
+    $conditions = null;
+}
 
 fwrite(STDOUT, "Counting records to process ... ");
-$count = $DB->count_records('amos_repository');
+$count = $DB->count_records('amos_repository', $conditions);
 fwrite(STDOUT, $count.PHP_EOL);
 
 fwrite(STDOUT, "Loading recordset ... ");
-$rs = $DB->get_recordset('amos_repository', null, 'id');    // Ordering is important here
+$rs = $DB->get_recordset('amos_repository', $conditions, 'id');    // Ordering is important here
 fwrite(STDOUT, "done".PHP_EOL);
 
 fwrite(STDOUT, "Processing ... ".PHP_EOL);
