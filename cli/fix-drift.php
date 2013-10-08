@@ -116,6 +116,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'cachestore'            => 'cache/stores',
             'cachelock'             => 'cache/locks',
             'tinymce'               => 'lib/editor/tinymce/plugins',
+            'atto'                  => 'lib/editor/atto/plugins',
+            'calendartype'          => 'calendar/type',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
