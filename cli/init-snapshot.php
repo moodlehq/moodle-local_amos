@@ -86,12 +86,13 @@ foreach ($rs as $record) {
     );
 
     if ($current === false) {
-        $DB->insert_record('amos_snapshot', (object)array(
+        $newid = $DB->insert_record('amos_snapshot', (object)array(
             'branch' => $record->branch,
             'component' => $record->component,
             'lang' => $record->lang,
             'stringid' => $record->stringid,
             'repoid' => $record->id));
+        fwrite(STDERR, "Registered a new snapshot ".$newid." of the string ".$record->id.PHP_EOL);
 
     } else {
         if ($current->branch != $record->branch or $current->component !== $record->component
@@ -100,8 +101,12 @@ foreach ($rs as $record) {
             exit(1);
         }
 
-        if ($current->timemodified <= $record->timemodified) {
-            fwrite(STDERR, $record->id." is newer than ".$current->repoid.PHP_EOL);
+        if ($current->timemodified < $record->timemodified) {
+            fwrite(STDERR, "Relinking snapshot ".$current->snapshotid." from the string ".$current->repoid." to the newer string ".$record->id.PHP_EOL);
+            $DB->set_field('amos_snapshot', 'repoid', $record->id, array('id' => $current->snapshotid));
+
+        } else if ($current->timemodified == $record->timemodified and $record->id != $current->repoid) {
+            fwrite(STDERR, "Relinking snapshot ".$current->snapshotid." from the string ".$current->repoid." to the string ".$record->id.PHP_EOL);
             $DB->set_field('amos_snapshot', 'repoid', $record->id, array('id' => $current->snapshotid));
         }
     }
