@@ -108,17 +108,18 @@ class amos_checker {
     }
 
     /**
-     * Outputs the given message to the stdout and eventually to the stderr, too
+     * Outputs the given message to the stdout or to the stderr
      *
      * @param string $message text to display
-     * @param bool $error is this the error message
+     * @param bool $error is this the error message for stderr
      * @return void
      */
     protected function output($message, $error = false) {
         $full = sprintf("[%-19s] %s\n", date('Y-m-d H:i:s'), $message);
-        fputs(STDOUT, $full);
         if ($error) {
             fputs(STDERR, $full);
+        } else {
+            fputs(STDOUT, $full);
         }
     }
 
