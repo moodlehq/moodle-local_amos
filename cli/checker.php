@@ -38,11 +38,14 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  */
 class amos_checker {
 
+    const RESULT_SUCCESS = 0;
+    const RESULT_FAILURE = 1;
+
     /**
      * Checks the decsep and thousandssep config strings are set correctly
      *
      * @link http://tracker.moodle.org/browse/MDL-31332
-     * @return bool check success flag
+     * @return int
      */
     protected function check_decsep_thousandssep() {
 
@@ -76,7 +79,7 @@ class amos_checker {
 
         ksort($details);
         foreach ($details as $language => $branches) {
-            $msg = sprintf('Invalid decsep and/or thousandssep in %s {%s} at', $langnames[$language], $language);
+            $msg = sprintf('  Invalid decsep and/or thousandssep in %s {%s} at', $langnames[$language], $language);
             foreach ($branches as $branch => $severity) {
                 $msg .= ' ' . $branch . str_repeat('!', $severity);
             }
@@ -84,9 +87,9 @@ class amos_checker {
         }
 
         if (empty($details)) {
-            return 0;
+            return self::RESULT_SUCCESS;
         }
-        return 1;
+        return self::RESULT_FAILURE;
     }
 
     /**
@@ -125,18 +128,21 @@ class amos_checker {
      * @return int 0 for success, >0 if some checks fail
      */
     public function execute() {
-        $this->output('AMOS checks report START');
+        $this->output('START AMOS checks report');
         $result = 0;
         foreach ($this->get_checkers() as $method) {
+            $this->output(' RUNNING ' . $method);
             $status = $this->$method();
-            if ($status > 0) {
-                $this->output('Executing ' . $method . ' FAIL', true);
+            if ($status === self::RESULT_FAILURE) {
+                $this->output(' FAILED ' . $method, true);
                 $result = 1;
+            } else if ($status === self::RESULT_SUCCESS) {
+                $this->output(' OK ' . $method);
             } else {
-                $this->output('Executing ' . $method . ' OK');
+                $this->output(' ERROR ' . $method . ' returned unexpected value', true);
             }
         }
-        $this->output('AMOS checks report END');
+        $this->output('END AMOS checks report');
         return $result;
     }
 
