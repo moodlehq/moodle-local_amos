@@ -32,6 +32,7 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
 
 /**
  * Provides all the checks to execute and some helper methods
@@ -92,6 +93,58 @@ class amos_checker {
         return self::RESULT_FAILURE;
     }
 
+    /**
+     * Search for pending contributions left if the "In review" state
+     *
+     * If all strings are already translated in the contribution (it means,
+     * there are no actual translated strings after the contribution is
+     * applied and rebased) then automatically mark such contribution
+     * as accepted.
+     *
+     * @return int
+     */
+    protected function check_pending_reviews() {
+        global $DB;
+
+        // Suppose this check will pass successfully.
+        $status = self::RESULT_SUCCESS;
+
+        // Search for contributions in "In review" state not modified for
+        // couple of days.
+        $rs = $DB->get_recordset_select("amos_contributions",
+            "status = :status AND timemodified <= :timemodified",
+            array(
+                'status' => local_amos_contribution::STATE_REVIEW,
+                'timemodified' => time() - 3 * DAYSECS,
+            )
+        );
+
+        foreach ($rs as $contribution) {
+            // Get the contributed components and rebase them to see what would happen.
+            $stash = mlang_stash::instance_from_id($contribution->stashid);
+            $stage = new mlang_stage();
+            $stash->apply($stage);
+            $stage->rebase();
+            list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
+
+            if ($rebasedstrings == 0) {
+                $msg = sprintf('  Contribution #%d still in review with no new strings to be committed - marking as accepted',
+                    $contribution->id);
+                $this->output($msg, true);
+                $status = self::RESULT_FAILURE;
+                $DB->set_field('amos_contributions', 'status', local_amos_contribution::STATE_ACCEPTED,
+                    array('id' => $contribution->id));
+
+            } else {
+                $msg = sprintf('  Contribution #%d still in review', $contribution->id);
+                $this->output($msg, true);
+                $status = self::RESULT_FAILURE;
+            }
+        }
+        $rs->close();
+
+        return $status;
+    }
     /**
      * Returns the list of check methods to execute
      *
