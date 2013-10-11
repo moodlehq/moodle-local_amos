@@ -270,9 +270,6 @@ if (!empty($CFG->usecomments)) {
     comment::init();
 }
 
-// Output starts here
-echo $output->header();
-
 // Particular contribution record
 if ($id) {
 
@@ -312,10 +309,21 @@ if ($id) {
     $contribinfo->strings       = $origstrings;
     $contribinfo->stringsreb    = $rebasedstrings;
 
+    if ($maintainerof and ($maintainerof === 'all' or in_array($contribution->lang, $maintainerof))) {
+        if ($contribution->status == local_amos_contribution::STATE_REVIEW and $contribinfo->stringsreb == 0) {
+            // Maintainers tend to leave the contribution in the "In review" state.
+            // So let us automatically accept it if all strings are already translated.
+            // This may lead to unexpected acceptance in certain situations but of the
+            // evils, many "in review" contributions appear to be the worse one.
+            redirect(new moodle_url('/local/amos/contrib.php', array('accept' => $contribution->id, 'sesskey' => sesskey())));
+        }
+    }
+
+    echo $output->header();
     echo $output->render($contribinfo);
 
     echo html_writer::start_tag('div', array('class' => 'contribactions'));
-    if ($maintainerof) {
+    if ($maintainerof and ($maintainerof === 'all' or in_array($contribution->lang, $maintainerof))) {
         if ($contribution->status == local_amos_contribution::STATE_NEW) {
             echo $output->single_button(new moodle_url($PAGE->url, array('review' => $id)), get_string('contribstartreview', 'local_amos'),
                     'post', array('class' => 'singlebutton review'));
@@ -360,6 +368,8 @@ if ($id) {
     echo $output->footer();
     exit;
 }
+
+echo $output->header();
 
 // Incoming contributions
 if (has_capability('local/amos:commit', get_system_context())) {
