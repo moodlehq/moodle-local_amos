@@ -495,7 +495,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var uri = M.cfg.wwwroot + '/local/amos/translate.ajax.php';
             var cfg = {
                 method: 'GET',
-                data: build_querystring({enid: enid, lang: lang, sesskey: M.cfg.sesskey}),
+                data: build_querystring({enid: enid, lng: lang, sesskey: M.cfg.sesskey}),
                 on: {
                     success : this.translate_success,
                     failure : this.translate_failure,

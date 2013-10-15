@@ -41,7 +41,7 @@ if (!confirm_sesskey(optional_param('sesskey', -1, PARAM_RAW))) {
 }
 
 $enid = optional_param('enid', null, PARAM_INT);
-$lang = optional_param('lang', null, PARAM_SAFEDIR);
+$lang = optional_param('lng', null, PARAM_SAFEDIR);
 if (is_null($enid) or empty($lang)) {
     error_log('AMOS Invalid parameters provided');
     header('HTTP/1.1 400 Bad Request');
