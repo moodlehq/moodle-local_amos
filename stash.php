@@ -155,10 +155,10 @@ if ($submitform->is_cancelled()) {
         $a->id          = $contribution->id;
         $a->subject     = $contribution->subject;
         $a->url         = $url->out();
-        $emailsubject   = get_string('emailcontributionsubject', 'local_amos');
-        $emailbody      = get_string('emailcontributionbody', 'local_amos', $a);
 
         foreach ($maintainers as $maintainer) {
+            $emailsubject = get_string_manager()->get_string('emailcontributionsubject', 'local_amos', null, $maintainer->lang);
+            $emailbody = get_string_manager()->get_string('emailcontributionbody', 'local_amos', $a, $maintainer->lang);
             email_to_user($maintainer, $amosbot, $emailsubject, $emailbody);
         }
     }

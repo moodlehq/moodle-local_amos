@@ -165,8 +165,8 @@ if ($review) {
     $a->subject     = $contribution->subject;
     $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
     $a->url         = $url->out();
-    $emailsubject   = get_string('emailreviewsubject', 'local_amos');
-    $emailbody      = get_string('emailreviewbody', 'local_amos', $a);
+    $emailsubject   = get_string_manager()->get_string('emailreviewsubject', 'local_amos', null, $author->lang);
+    $emailbody      = get_string_manager()->get_string('emailreviewbody', 'local_amos', $a, $author->lang);
     email_to_user($author, $amosbot, $emailsubject, $emailbody);
 
     $a = new stdClass();
@@ -216,8 +216,8 @@ if ($accept) {
     $a->subject     = $contribution->subject;
     $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
     $a->url         = $url->out();
-    $emailsubject   = get_string('emailacceptsubject', 'local_amos');
-    $emailbody      = get_string('emailacceptbody', 'local_amos', $a);
+    $emailsubject   = get_string_manager()->get_string('emailacceptsubject', 'local_amos', null, $author->lang);
+    $emailbody      = get_string_manager()->get_string('emailacceptbody', 'local_amos', $a, $author->lang);
     email_to_user($author, $amosbot, $emailsubject, $emailbody);
 
     redirect(new moodle_url($PAGE->url, array('id' => $accept)));
@@ -258,8 +258,8 @@ if ($reject) {
     $a->subject     = $contribution->subject;
     $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
     $a->url         = $url->out();
-    $emailsubject   = get_string('emailrejectsubject', 'local_amos');
-    $emailbody      = get_string('emailrejectbody', 'local_amos', $a);
+    $emailsubject   = get_string_manager()->get_string('emailrejectsubject', 'local_amos', null, $author->lang);
+    $emailbody      = get_string_manager()->get_string('emailrejectbody', 'local_amos', $a, $author->lang);
     email_to_user($author, $amosbot, $emailsubject, $emailbody);
 
     redirect(new moodle_url($PAGE->url, array('id' => $reject)));
