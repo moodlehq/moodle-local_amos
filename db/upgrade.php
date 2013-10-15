@@ -170,5 +170,44 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013040400, 'local', 'amos');
     }
 
+    // Add new table amos_filter_usage
+    if ($oldversion < 2013101500) {
+        $table = new xmldb_table('amos_filter_usage');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('timesubmitted', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('sesskey', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userlang', XMLDB_TYPE_CHAR, '30', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('currentlang', XMLDB_TYPE_CHAR, '30', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usercountry', XMLDB_TYPE_CHAR, '2', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('ismaintainer', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usesdefaultversion', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('usesdefaultlang', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('numofversions', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('numoflanguages', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('numofcomponents', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('showmissingonly', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('showhelpsonly', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('withsubstring', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('substringregex', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('substringcasesensitive', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('withstringid', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('stringidpartial', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('showstagedonly', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('showgreylistedonly', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('showwithoutgreylisted', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('page', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Amos savepoint reached.
+        upgrade_plugin_savepoint(true, 2013101500, 'local', 'amos');
+    }
+
     return $result;
 }

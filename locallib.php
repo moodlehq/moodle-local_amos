@@ -44,6 +44,15 @@ class local_amos_filter implements renderable {
     /** @var moodle_url */
     protected $permalink = null;
 
+    /** @var stdClass */
+    protected $datadefault = null;
+
+    /** @var stdClass|null */
+    protected $datasubmitted = null;
+
+    /** @var stdClass|null */
+    protected $datapermalink = null;
+
     /**
      * Creates the filter and sets the default filter values
      *
@@ -56,7 +65,14 @@ class local_amos_filter implements renderable {
             'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
             'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
-        $this->handler  = $handler;
+        $this->handler = $handler;
+        $this->datadefault = $this->get_data_default();
+        $this->datasubmitted = $this->get_data_submitted();
+        $this->permalink = $this->get_data_permalink();
+
+        if (!is_null($this->datasubmitted)) {
+            $this->log_usage($this->datasubmitted, $this->datadefault);
+        }
     }
 
     /**
@@ -67,9 +83,9 @@ class local_amos_filter implements renderable {
     public function get_data() {
         $data = new stdclass();
 
-        $default    = $this->get_data_default();
-        $submitted  = $this->get_data_submitted();
-        $permalink  = $this->get_data_permalink();
+        $default    = $this->datadefault;
+        $submitted  = $this->datasubmitted;
+        $permalink  = $this->datapermalink;
 
         foreach ($this->fields as $field) {
             if (isset($submitted->{$field})) {
@@ -379,6 +395,45 @@ class local_amos_filter implements renderable {
      */
     public function get_permalink() {
         return $this->permalink;
+    }
+
+    /**
+     * Logs the information about filter submitted data for usability analysis
+     *
+     * @param stdClass $submitted data as returned by {@link self::get_data_submitted()}
+     * @param stdClass $default data as returned by {@link self::get_data_default()}
+     */
+    protected function log_usage(stdClass $submitted, stdClass $default) {
+        global $DB, $USER;
+
+        $data = (object)array(
+            'timesubmitted' => time(),
+            'sesskey' => sesskey(),
+            'userid' => $USER->id,
+            'userlang' => $USER->lang,
+            'currentlang' => current_language(),
+            'usercountry' => $USER->country,
+            'ismaintainer' => has_capability('local/amos:commit', context_system::instance()),
+            'usesdefaultversion' => (int)($submitted->version === $default->version),
+            'usesdefaultlang' => (int)($submitted->language === $default->language),
+            'numofversions' => count($submitted->version),
+            'numoflanguages' => count($submitted->language),
+            'numofcomponents' => count($submitted->component),
+            'showmissingonly' => (int)$submitted->missing,
+            'showhelpsonly' => (int)$submitted->helps,
+            'withsubstring' => (int)($submitted->substring !== ''),
+            'substringregex' => (int)$submitted->substringregex,
+            'substringcasesensitive' => (int)$submitted->substringcs,
+            'withstringid' => (int)($submitted->stringid !== ''),
+            'stringidpartial' => (int)$submitted->stringidpartial,
+            'showstagedonly' => (int)$submitted->stagedonly,
+            'showgreylistedonly' => (int)$submitted->greylistedonly,
+            'showwithoutgreylisted' => (int)$submitted->withoutgreylisted,
+            'page' => $submitted->page,
+
+        );
+
+        $DB->insert_record('amos_filter_usage', $data, false);
     }
 }
 
