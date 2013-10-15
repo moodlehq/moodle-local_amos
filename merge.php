@@ -50,7 +50,8 @@ if ($data = $mergeform->get_data()) {
     }
 
     $tree = mlang_tools::components_tree(array('branch' => $sourceversion->code, 'lang' => $data->language));
-    $sourcecomponentnames = array_keys(reset(reset($tree)));
+    $tree = reset($tree);
+    $sourcecomponentnames = array_keys(reset($tree));
     unset($tree);
 
     foreach ($sourcecomponentnames as $sourcecomponentname) {
