@@ -56,6 +56,10 @@ class amos_checker {
         foreach ($tree as $branch => $languages) {
             $version = mlang_version::by_code($branch);
             foreach (array_keys($languages) as $language) {
+                if ($language === 'en_fix') {
+                    // Having empty values in en_fix is expected, do not check it.
+                    continue;
+                }
                 $langconfig = mlang_component::from_snapshot('langconfig', $language, $version);
                 if ($langname = $langconfig->get_string('thislanguageint')) {
                     $langnames[$language] = $langname->text;
