@@ -68,7 +68,7 @@ class local_amos_filter implements renderable {
         $this->handler = $handler;
         $this->datadefault = $this->get_data_default();
         $this->datasubmitted = $this->get_data_submitted();
-        $this->permalink = $this->get_data_permalink();
+        $this->datapermalink = $this->get_data_permalink();
 
         if (!is_null($this->datasubmitted)) {
             $this->log_usage($this->datasubmitted, $this->datadefault);
