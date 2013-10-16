@@ -321,7 +321,11 @@ class local_amos_renderer extends plugin_renderer_base {
                 html_writer::tag('span', $componentname, array('class'=>'component')).']';
             $cells[0] = new html_table_cell($stringinfo);
             // original of the string
-            $o = html_writer::tag('div', self::add_breaks(s($string->original)), array('class' => 'preformatted english'));
+            $original = self::add_breaks(s($string->original));
+            // work around https://bugzilla.mozilla.org/show_bug.cgi?id=116083
+            $original = nl2br($original);
+            $original = str_replace(array("\n", "\r"), '', $original);
+            $o = html_writer::tag('div', $original, array('class' => 'preformatted english'));
             $g = html_writer::tag('div', '', array('class' => 'googleicon'));
             $p = '';
             if (preg_match('/\{\$a(->.+)?\}/', $string->original)) {
