@@ -48,6 +48,11 @@ if (is_null($enid) or empty($lang)) {
     die();
 }
 
+if (empty($CFG->amosgoogleapi)) {
+    header('HTTP/1.1 500 Internal Server Error - Google API key not defined');
+    die();
+}
+
 try {
     $string = $DB->get_record('amos_repository', array('id' => $enid, 'lang' => 'en', 'deleted' => 0), '*', MUST_EXIST);
 
