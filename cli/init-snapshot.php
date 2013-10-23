@@ -86,13 +86,31 @@ foreach ($rs as $record) {
     );
 
     if ($current === false) {
-        $newid = $DB->insert_record('amos_snapshot', (object)array(
-            'branch' => $record->branch,
-            'component' => $record->component,
-            'lang' => $record->lang,
-            'stringid' => $record->stringid,
-            'repoid' => $record->id));
-        fwrite(STDERR, "Registered a new snapshot ".$newid." of the string ".$record->id.PHP_EOL);
+        try {
+            $newid = $DB->insert_record('amos_snapshot', (object)array(
+                'branch' => $record->branch,
+                'component' => $record->component,
+                'lang' => $record->lang,
+                'stringid' => $record->stringid,
+                'repoid' => $record->id));
+            fwrite(STDERR, "Registered a new snapshot ".$newid." of the string ".$record->id.PHP_EOL);
+        } catch (dml_write_exception $e) {
+            // Because of the JOIN used here, there is a chance that the snapshot
+            // record refers to a repo record that has been manually removed. Let's
+            // try it.
+            $broken = $DB->get_record('amos_snapshot', array(
+                'branch' => $record->branch,
+                'component' => $record->component,
+                'lang' => $record->lang,
+                'stringid' => $record->stringid));
+            if ($broken === false) {
+                // this should not happen, re-throw the exception.
+                throw $e;
+            } else {
+                fwrite(STDERR, "Relinking broken snapshot ".$broken->id." from non-existing string ".$broken->repoid." to the string ".$record->id.PHP_EOL);
+                $DB->set_field('amos_snapshot', 'repoid', $record->id, array('id' => $broken->id));
+            }
+        }
 
     } else {
         if ($current->branch != $record->branch or $current->component !== $record->component
