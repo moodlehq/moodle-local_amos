@@ -2718,7 +2718,6 @@
     <plugins type="editor">
       <plugin>textarea</plugin>
       <plugin>tinymce</plugin>
-      <plugin>atto</plugin>
     </plugins>
     <plugins type="format">
       <plugin>singleactivity</plugin>
@@ -2904,6 +2903,7 @@
       <plugin>comments</plugin>
       <plugin>file</plugin>
       <plugin>offline</plugin>
+      <plugin>editpdf</plugin>
     </plugins>
     <plugins type="assignment">
       <plugin>offline</plugin>
@@ -2968,23 +2968,6 @@
     </plugins>
     <plugins type="workshopeval">
       <plugin>best</plugin>
-    </plugins>
-    <plugins type="atto">
-      <plugin>bold</plugin>
-      <plugin>clear</plugin>
-      <plugin>html</plugin>
-      <plugin>image</plugin>
-      <plugin>indent</plugin>
-      <plugin>italic</plugin>
-      <plugin>link</plugin>
-      <plugin>media</plugin>
-      <plugin>orderedlist</plugin>
-      <plugin>outdent</plugin>
-      <plugin>strike</plugin>
-      <plugin>title</plugin>
-      <plugin>underline</plugin>
-      <plugin>unlink</plugin>
-      <plugin>unorderedlist</plugin>
     </plugins>
     <plugins type="tinymce">
       <plugin>ctrlhelp</plugin>
