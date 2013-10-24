@@ -43,12 +43,14 @@ class amos_checker {
     const RESULT_FAILURE = 1;
 
     /**
-     * Checks the decsep and thousandssep config strings are set correctly
+     * Checks the decsep, thousandssep and listsep config strings are set correctly
      *
      * @link http://tracker.moodle.org/browse/MDL-31332
+     * @link http://tracker.moodle.org/browse/MDL-30788
+     * @link http://docs.moodle.org/dev/Translation_langconfig#listsep.2Ccore_langconfig
      * @return int
      */
-    protected function check_decsep_thousandssep() {
+    protected function check_separators() {
 
         $details = array();
         $langnames = array();
@@ -72,29 +74,37 @@ class amos_checker {
                 if ($thousandssep = $langconfig->get_string('thousandssep')) {
                     $thousandssep = $thousandssep->text;
                 }
+                if ($listsep = $langconfig->get_string('listsep')) {
+                    $listsep = $listsep->text;
+                }
+                $details[$language][$version->label] = array();
                 if (empty($decsep) and empty($thousandssep)) {
-                    $details[$language][$version->label] = 1;
+                    $details[$language][$version->label][] = '! empty decsep and thousandssep';
                 } else if (empty($decsep) or empty($thousandssep)) {
-                    $details[$language][$version->label] = 2;
+                    $details[$language][$version->label][] = '!! empty descsep or thousandssep';
                 } else if ($decsep === $thousandssep) {
-                    $details[$language][$version->label] = 3;
+                    $details[$language][$version->label][] = '!!! decsep === thousandssep';
+                }
+                if (empty($listsep)) {
+                    $details[$language][$version->label][] = '! empty listsep';
+                } else if ($listsep === $decsep) {
+                    $details[$language][$version->label][] = '!!! listsep === decsep';
                 }
             }
         }
 
         ksort($details);
+        $status = self::RESULT_SUCCESS;
         foreach ($details as $language => $branches) {
-            $msg = sprintf('  Invalid decsep and/or thousandssep in %s {%s} at', $langnames[$language], $language);
-            foreach ($branches as $branch => $severity) {
-                $msg .= ' ' . $branch . str_repeat('!', $severity);
+            foreach ($branches as $branch => $msgs) {
+                foreach ($msgs as $msg) {
+                    $this->output(sprintf('  Misconfigured separators: %s {%s} %s %s', $langnames[$language], $language, $branch, $msg), true);
+                    $status = self::RESULT_FAILURE;
+                }
             }
-            $this->output($msg, true);
         }
 
-        if (empty($details)) {
-            return self::RESULT_SUCCESS;
-        }
-        return self::RESULT_FAILURE;
+        return $status;
     }
 
     /**
