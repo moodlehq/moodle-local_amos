@@ -669,8 +669,8 @@ class local_amos_translator implements renderable {
                                 }
                             }
                             if ($missing) {
-                                // missing or outdated string only
-                                if (($string->translation or $string->translation === '0' or $string->original === '') and !$string->outdated) {
+                                // missing (no translation committed) or outdated strings only
+                                if ($string->class === 'translated' and !$string->outdated) {
                                     continue; // it is considered up-top-date - do not display it
                                 }
                             }

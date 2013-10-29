@@ -355,7 +355,7 @@ class local_amos_renderer extends plugin_renderer_base {
                         'title' => get_string('stringhistory', 'local_amos'))),
                     array('class' => 'timelinelink')));
             // Translation
-            if (empty($string->translation) and $string->translation !== '0') {
+            if (is_null($string->translation)) {
                 $missing++;
             }
             $t = self::add_breaks(s($string->translation));
