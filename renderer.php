@@ -507,12 +507,6 @@ class local_amos_renderer extends plugin_renderer_base {
                 } else {
                     $cells[3]->attributes['class'] .= 'uncommittable removal';
                 }
-            } else if (trim($string->current) === trim($string->new)) {
-                // no difference
-                $t = self::add_breaks(s($string->current));
-                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
-                $cells[3] = new html_table_cell($t . $unstagebutton);
-                $cells[3]->attributes['class'] .= ' uncommittable nodiff';
             } else if (is_null($string->current)) {
                 // new translation
                 $t = $t = self::add_breaks(s($string->new));
@@ -525,6 +519,12 @@ class local_amos_renderer extends plugin_renderer_base {
                 if (!$string->committable) {
                     $cells[3]->attributes['class'] .= ' uncommittable new';
                 }
+            } else if (trim($string->current) === trim($string->new)) {
+                // no difference
+                $t = self::add_breaks(s($string->current));
+                $t = html_writer::tag('div', $t, array('class' => 'preformatted'));
+                $cells[3] = new html_table_cell($t . $unstagebutton);
+                $cells[3]->attributes['class'] .= ' uncommittable nodiff';
             } else {
                 // there is a difference
                 $c = s($string->current);
