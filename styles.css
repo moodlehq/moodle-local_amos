@@ -23,6 +23,15 @@
     margin-bottom: 5px;
 }
 
+.path-local-amos .lazyform .item.nothingselected {
+    background-color: #ffd3d9;
+}
+
+.path-local-amos .lazyform .item .nothingselectedinfo {
+    font-weight: bold;
+    color: red;
+}
+
 .path-local-amos .lazyform .item .label {
     display: inline-block;
     text-align: right;
@@ -70,6 +79,7 @@
     height: 100px;
     overflow: auto;
     overflow-y: scroll;
+    background-color: white;
 }
 
 .path-local-amos #amosfilter_fcmp table tr th,

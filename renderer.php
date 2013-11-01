@@ -41,50 +41,74 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
 
         // version checkboxes
-        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
-        $output .= html_writer::tag('label', get_string('filterver', 'local_amos'), array('for' => 'amosfilter_fver'));
-        $output .= html_writer::tag('div', get_string('filterver_desc', 'local_amos'), array('class' => 'description'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
+        $current = $filter->get_data()->version;
+        $someselected = false;
         $fver = '';
         foreach (mlang_version::list_all() as $version) {
             if ($version->code < 2000) {
                 continue;
             }
-            $checkbox = html_writer::checkbox('fver[]', $version->code, in_array($version->code, $filter->get_data()->version),
-                    $version->label);
+            if (in_array($version->code, $current)) {
+                $someselected = true;
+                $thisselected = true;
+            } else {
+                $thisselected = false;
+            }
+            $checkbox = html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label);
             $fver .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));
         }
+        if (!$someselected) {
+            $extraclass = ' nothingselected';
+        } else {
+            $extraclass = '';
+        }
+        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
+        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::tag('label', get_string('filterver', 'local_amos'), array('for' => 'amosfilter_fver'));
+        $output .= html_writer::tag('div', get_string('filterver_desc', 'local_amos'), array('class' => 'description'));
+        if (!$someselected) {
+            $output .= html_writer::tag('div', get_string('filtervernothingselected', 'local_amos'),
+                array('class' => 'nothingselectedinfo'));
+        }
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $output .= html_writer::tag('div', $fver, array('id' => 'amosfilter_fver', 'class' => 'checkboxgroup'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
 
         // language selector
-        $output .= html_writer::start_tag('div', array('class' => 'item select'));
+        $current = $filter->get_data()->language;
+        $someselected = false;
+        $options = mlang_tools::list_languages(false);
+        foreach ($options as $langcode => $langname) {
+            if (!$someselected and in_array($langcode, $current)) {
+                $someselected = true;
+            }
+            $options[$langcode] = $langname;
+        }
+        if (!$someselected) {
+            $extraclass = ' nothingselected';
+        } else {
+            $extraclass = '';
+        }
+        $output .= html_writer::start_tag('div', array('class' => 'item select'.$extraclass));
         $output .= html_writer::start_tag('div', array('class' => 'label'));
         $output .= html_writer::tag('label', get_string('filterlng', 'local_amos'), array('for' => 'amosfilter_flng'));
         $output .= html_writer::tag('div', get_string('filterlng_desc', 'local_amos'), array('class' => 'description'));
+        if (!$someselected) {
+            $output .= html_writer::tag('div', get_string('filterlngnothingselected', 'local_amos'),
+                array('class' => 'nothingselectedinfo'));
+        }
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
-        $options = mlang_tools::list_languages();
-        foreach ($options as $langcode => $langname) {
-            $options[$langcode] = $langname;
-        }
-        unset($options['en']); // English is not translatable via AMOS
-        $output .= html_writer::select($options, 'flng[]', $filter->get_data()->language, '',
+        $output .= html_writer::select($options, 'flng[]', $current, '',
                     array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 3));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_flng_actions', 'class' => 'actions'));
         $output .= html_writer::end_tag('div');
+
         $output .= html_writer::end_tag('div');
 
         // component selector
-        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
-        $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
-        $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
         $optionscore = array();
         $optionsstandard = array();
         $optionscontrib = array();
@@ -126,36 +150,68 @@ class local_amos_renderer extends plugin_renderer_base {
         asort($optionscore);
         asort($optionsstandard);
         asort($optionscontrib);
-        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fcmp', 'class' => 'checkboxgroup'));
-        $output .= html_writer::start_tag('table', array('border' => '0'));
 
-        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
+        $current = $filter->get_data()->component;
+        $someselected = false;
+
+        $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscore as $key => $label) {
-            $selected = in_array($key, $filter->get_data()->component);
-            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $selected = in_array($key, $current);
+            $cssclasses = 'labelled_checkbox';
+            if ($selected) {
+                $someselected = true;
+                $cssclasses .= ' preset';
+            }
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
+            $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'standard core'));
         }
 
-        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionsstandard as $key => $label) {
-            $selected = in_array($key, $filter->get_data()->component);
-            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $selected = in_array($key, $current);
+            $cssclasses = 'labelled_checkbox';
+            if ($selected) {
+                $someselected = true;
+                $cssclasses .= ' preset';
+            }
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
+            $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'standard plugin'));
         }
 
-        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscontrib as $key => $label) {
-            $selected = in_array($key, $filter->get_data()->component);
-            $cssclasses = 'labelled_checkbox' . ($selected ? ' preset' : '');
+            $selected = in_array($key, $current);
+            $cssclasses = 'labelled_checkbox';
+            if ($selected) {
+                $someselected = true;
+                $cssclasses .= ' preset';
+            }
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
-            $output .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
+            $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
                 array('class' => 'contrib plugin'));
         }
 
+        if (!$someselected) {
+            $extraclass = ' nothingselected';
+        } else {
+            $extraclass = '';
+        }
+
+        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
+        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
+        $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
+        if (!$someselected) {
+            $output .= html_writer::tag('div', get_string('filtercmpnothingselected', 'local_amos'),
+                array('class' => 'nothingselectedinfo'));
+        }
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'element'));
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fcmp', 'class' => 'checkboxgroup'));
+        $output .= html_writer::start_tag('table', array('border' => '0'));
+        $output .= $table;
         $output .= html_writer::end_tag('table');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
