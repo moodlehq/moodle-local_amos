@@ -700,6 +700,17 @@ class local_amos_translator implements renderable {
                 $string->translatable = true;
             }
         }
+        $standard = local_amos_standard_plugins();
+        foreach ($this->strings as $string) {
+            if ($string->language === 'en_fix') {
+                if (!isset($standard[$string->branch][$string->component])) {
+                    $string->committable = false;
+                    $string->translatable = false;
+                    $string->translation = get_string('unableenfixaddon', 'local_amos');
+                    $string->class = 'missing';
+                }
+            }
+        }
     }
 
     /**

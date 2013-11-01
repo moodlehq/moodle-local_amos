@@ -343,6 +343,7 @@ Language pack maintainers can see a small red symbol in the corner of the cells 
 $string['typecontrib'] = 'Non-standard plugins';
 $string['typecore'] = 'Core subsystems';
 $string['typestandard'] = 'Standard plugins';
+$string['unableenfixaddon'] = 'English fixes allowed for standard plugins only';
 $string['unstage'] = 'Unstage';
 $string['unstageconfirm'] = 'Really?';
 $string['unstaging'] = 'Unstaging';
