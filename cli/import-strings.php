@@ -75,7 +75,7 @@ if ($options['help'] or empty($options['message']) or empty($unrecognized)) {
 
 $filepath = $unrecognized[0];
 if (!is_readable($filepath)) {
-    echo 'File not readable' . PHP_EOL;
+    echo 'File "'.$filepath.'" not readable' . PHP_EOL;
     echo $usage . PHP_EOL;
     exit(2);
 }
