@@ -1599,7 +1599,7 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_27,
-                'label'         => '2.7dev',
+                'label'         => 'DEV',
                 'branch'        => 'MOODLE_27_STABLE',
                 'dir'           => '2.7',
                 'translatable'  => true,
