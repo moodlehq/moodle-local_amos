@@ -209,5 +209,37 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013101500, 'local', 'amos');
     }
 
+    // Add table amos_texts
+    if ($oldversion < 2013121900) {
+        $table = new xmldb_table('amos_texts');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('texthash', XMLDB_TYPE_CHAR, '40', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('text', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_index('ix_texthash', XMLDB_INDEX_UNIQUE, array('texthash'));
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2013121900, 'local', 'amos');
+    }
+
+    // Add field textid to amos_repository
+    if ($oldversion < 2013121901) {
+        $table = new xmldb_table('amos_repository');
+        $field = new xmldb_field('textid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'text');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $table = new xmldb_table('amos_repository');
+        $key = new xmldb_key('fk_text', XMLDB_KEY_FOREIGN, array('textid'), 'amos_texts', array('id'));
+        $dbman->add_key($table, $key);
+
+        upgrade_plugin_savepoint(true, 2013121901, 'local', 'amos');
+    }
+
     return $result;
 }
