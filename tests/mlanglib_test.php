@@ -328,7 +328,8 @@ EOF;
         $this->assertEquals(1, $DB->count_records('amos_snapshot'));
         $snapshot = $DB->get_record('amos_snapshot', array());
         $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid));
-        $this->assertEquals('Welcome!', $repo->text);
+        $textid = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Welcome!')), MUST_EXIST);
+        $this->assertEquals($textid, $repo->textid);
     }
 
     public function test_component_from_phpfile_legacy_format() {
@@ -486,11 +487,11 @@ EOF;
         $component->clear();
         unset($component);
         unset($stage);
+        $textid_tree = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Tree')), MUST_EXIST);
+        $textid_three = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Three')), MUST_EXIST);
         $where = "component = 'numbers' AND lang = 'en' AND stringid = 'three'";
-        $this->assertTrue($DB->record_exists_select('amos_repository',
-                "$where AND ".$DB->sql_compare_text('text')." = ".$DB->sql_compare_text("'Tree'")));
-        $this->assertTrue($DB->record_exists_select('amos_repository',
-                "$where AND ".$DB->sql_compare_text('text')." = ".$DB->sql_compare_text("'Three'")));
+        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_tree)));
+        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_three)));
 
         // get the most recent version (so called "cap") of the component
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
@@ -1579,6 +1580,7 @@ AMOS END';
 
         $this->assertEquals(0, $DB->count_records('amos_commits'));
         $this->assertEquals(0, $DB->count_records('amos_repository'));
+        $this->assertEquals(0, $DB->count_records('amos_texts'));
         $this->assertEquals(0, $DB->count_records('amos_snapshot'));
 
         $snapshot = (object)array(
@@ -1606,13 +1608,15 @@ AMOS END';
             );
             $commit->id = $DB->insert_record('amos_commits', $commit);
 
+            $textid = $DB->insert_record('amos_texts', array('text' => 'Whatever', 'texthash' => sha1('Whatever')));
+
             $repo = (object)array(
                 'commitid' => $commit->id,
                 'branch' => 2500,
                 'lang' => 'en',
                 'component' => 'test',
                 'stringid' => 'whatever',
-                'text' => 'Whatever',
+                'textid' => $textid,
                 'timemodified' => time() - 60,
                 'deleted' => 0,
             );
@@ -1646,6 +1650,7 @@ AMOS END';
         $this->assertTrue($thrown3);
         $this->assertEquals(0, $DB->count_records('amos_commits'));
         $this->assertEquals(0, $DB->count_records('amos_repository'));
+        $this->assertEquals(0, $DB->count_records('amos_texts'));
         $this->assertEquals(1, $DB->count_records('amos_snapshot'));
     }
 

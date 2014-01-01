@@ -48,9 +48,10 @@ if ($ajax) {
     echo $OUTPUT->header();
 }
 
-$sql = "SELECT s.id, s.lang, s.text, s.timemodified, s.deleted,
+$sql = "SELECT s.id, s.lang, t.text, s.timemodified, s.deleted,
                c.userinfo, c.commitmsg, c.commithash
           FROM {amos_repository} s
+          JOIN {amos_texts} t ON t.id = s.textid
           JOIN {amos_commits} c ON c.id = s.commitid
          WHERE branch = ? AND (lang = 'en' OR lang = ?) AND component = ? AND stringid = ?
       ORDER BY s.timemodified DESC, s.id DESC";

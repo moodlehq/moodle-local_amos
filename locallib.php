@@ -511,9 +511,10 @@ class local_amos_translator implements renderable {
         $rs->close();
 
         // get all the strings for the translator
-        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.timeupdated, r.deleted
+        $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
                   FROM {amos_snapshot} s
                   JOIN {amos_repository} r ON s.repoid = r.id
+                  JOIN {amos_texts} t ON r.textid = t.id
                  WHERE s.branch {$sqlbranches}
                        AND s.lang {$sqllanguages}
                        AND s.component {$sqlcomponents}";
@@ -1011,9 +1012,10 @@ class local_amos_log implements renderable {
 
         $countsql   = "SELECT COUNT(r.id)";
         $getsql     = "SELECT r.id, c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo,
-                              r.commitid, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted";
+                              r.commitid, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.deleted";
         $sql        = "  FROM {amos_commits} c
                          JOIN {amos_repository} r ON (c.id = r.commitid)
+                         JOIN {amos_texts} t ON (r.textid = t.id)
                         WHERE c.id $csql";
 
         if ($branchsql) {

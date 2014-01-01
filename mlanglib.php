@@ -197,12 +197,13 @@ class mlang_component {
             $params = array_merge($params, $inner_strparams, $outer_strparams);
         }
         if ($fullinfo) {
-            $sql = "SELECT r.id, r.commitid, r.branch, r.lang, r.component, r.stringid, r.text, r.timemodified, r.deleted,
+            $sql = "SELECT r.id, r.commitid, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.deleted,
                            c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
         } else {
-            $sql = "SELECT r.stringid, r.text, r.timemodified, r.deleted";
+            $sql = "SELECT r.stringid, t.text, r.timemodified, r.deleted";
         }
         $sql .= " FROM {amos_repository} r
+                  JOIN {amos_texts} t ON r.textid = t.id
                   JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
                           FROM {amos_repository}
                          WHERE branch=:inner_branch
@@ -888,13 +889,28 @@ class mlang_stage {
 
             foreach ($this->components as $cx => $component) {
                 foreach ($component->get_iterator() as $string) {
+
+                    // Make sure the string text itself is stored.
+                    $texthash = sha1($string->text);
+                    $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), IGNORE_MISSING);
+
+                    if ($textid === false) {
+                        try {
+                            $textid = $DB->insert_record('amos_texts', array('texthash' => $texthash, 'text' => $string->text), true);
+                        } catch (dml_write_exception $e) {
+                            // Chances are the race conditions just happened.
+                            $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), MUST_EXIST);
+                        }
+                    }
+
                     $record = new stdclass();
                     $record->commitid   = $commit->id;
                     $record->branch     = $component->version->code;
                     $record->lang       = $component->lang;
                     $record->component  = $component->name;
                     $record->stringid   = $string->id;
-                    $record->text       = $string->text;
+                    $record->text       = '$@UNUSED@$'; // TODO remove this once the column is dropped
+                    $record->textid     = $textid;
                     $record->timemodified = $string->timemodified;
                     $record->deleted    = $string->deleted;
 
@@ -1724,13 +1740,14 @@ class mlang_tools {
 
         if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
             $cache = array();
-            $sql = "SELECT r.lang AS code, r.text AS name
+            $sql = "SELECT r.lang AS code, t.text AS name
                       FROM {amos_repository} r
+                      JOIN {amos_texts} t ON r.textid = t.id
                       JOIN {amos_snapshot} s ON s.repoid = r.id
                      WHERE s.component = ?
                        AND (s.stringid = ? OR s.stringid = ?)
                        AND r.deleted   = 0
-                  ORDER BY s.branch DESC, s.stringid DESC, r.timemodified DESC, text";
+                  ORDER BY s.branch DESC, s.stringid DESC, r.timemodified DESC, t.text";
             $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
             foreach ($rs as $lang) {
                 if (!isset($cache[$lang->code])) {
