@@ -372,7 +372,7 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $componentname = $string->component;
             }
-            $stringinfo = html_writer::tag('span', $string->branch, array('class'=>'version'));
+            $stringinfo = html_writer::tag('span', $string->branchlabel, array('class'=>'version'));
             $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
                 html_writer::tag('span', $componentname, array('class'=>'component')).']';
             $cells[0] = new html_table_cell($stringinfo);

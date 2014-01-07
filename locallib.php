@@ -595,8 +595,9 @@ class local_amos_translator implements renderable {
                                 continue;
                             }
                             $string = new stdclass();
-                            $string->branch = mlang_version::by_code($branchcode)->label;
+                            $string->branchdir = mlang_version::by_code($branchcode)->dir;
                             $string->branchcode = mlang_version::by_code($branchcode)->code;
+                            $string->branchlabel = mlang_version::by_code($branchcode)->label;
                             $string->language = $lang;
                             $string->component = $component;
                             $string->stringid = $stringid;
@@ -704,7 +705,7 @@ class local_amos_translator implements renderable {
         $standard = local_amos_standard_plugins();
         foreach ($this->strings as $string) {
             if ($string->language === 'en_fix') {
-                if (!isset($standard[$string->branch][$string->component])) {
+                if (!isset($standard[$string->branchdir][$string->component])) {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
