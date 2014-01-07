@@ -909,7 +909,6 @@ class mlang_stage {
                     $record->lang       = $component->lang;
                     $record->component  = $component->name;
                     $record->stringid   = $string->id;
-                    $record->text       = '$@UNUSED@$'; // TODO remove this once the column is dropped
                     $record->textid     = $textid;
                     $record->timemodified = $string->timemodified;
                     $record->deleted    = $string->deleted;

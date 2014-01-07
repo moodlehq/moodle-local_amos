@@ -241,5 +241,14 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2013121901, 'local', 'amos');
     }
 
+    // Note - after this upgrade step, it is expected that you manually run
+    // cli/init-texts.php tool and then modify the database. We do not perform
+    // that step here in order to prevent accidental data loss for sites
+    // running their own AMOS instance.
+    //
+    // # ALTER TABLE mdl_amos_repository DROP COLUMN text;
+    // # ALTER TABLE mdl_amos_repository ALTER COLUMN textid SET NOT NULL;
+    // # VACUUM FULL VERBOSE ANALYZE;
+
     return $result;
 }
