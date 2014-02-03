@@ -23,13 +23,21 @@ HOWTO Prepare branches with en_fix strings for integration
 
 4. Make a temporary directory that will hold symlinks to all language files.
 
+    # make enfix-symlinks
+
+    Note: this applies to David's Makefile. It effectively executes:
+
     # mkdir tmp
     # /path/to/amos/site/local/amos/cli/enfix-symlinks.sh $(pwd) tmp
     # ls -al tmp
 
 5. Run the enfix-merge.php.
 
-    # php /path/to/amos/site/local/amos/cli/enfix-merge.php --symlinksdir=$(pwd)/tmp --enfixdir=/home/mudrd8mz/tmp/export-enfix/2.6 > enfix.log
+    # make enfix-merge VER="2.7"
+
+    Note: again, this just executes:
+
+    # php /path/to/amos/site/local/amos/cli/enfix-merge.php --symlinksdir=$(pwd)/tmp --enfixdir=/home/mudrd8mz/tmp/export-enfix/2.7 > enfix.log
 
 6. Review the changes.
 
