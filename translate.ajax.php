@@ -54,7 +54,11 @@ if (empty($CFG->amosgoogleapi)) {
 }
 
 try {
-    $string = $DB->get_record('amos_repository', array('id' => $enid, 'lang' => 'en', 'deleted' => 0), '*', MUST_EXIST);
+    $string = $DB->get_record_sql("SELECT t.text AS text
+                                     FROM {amos_repository} r
+                                     JOIN {amos_texts} t ON t.id = r.textid
+                                    WHERE r.id = :enid AND r.lang = :lang AND r.deleted = 0",
+        array('enid' => $enid, 'lang' => 'en'), MUST_EXIST);
 
 } catch (Exception $e) {
     error_log('AMOS Unable to find the string to translate');
