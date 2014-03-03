@@ -3316,6 +3316,7 @@
       <plugin>qeupgradehelper</plugin>
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
+      <plugin>task</plugin>
       <plugin>timezoneimport</plugin>
       <plugin>unittest</plugin>
       <plugin>uploadcourse</plugin>
