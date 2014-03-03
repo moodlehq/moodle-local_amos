@@ -30,7 +30,7 @@ require_once($CFG->libdir  . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-list($options, $unrecognized) = cli_get_params(array('execute' => false));
+list($options, $unrecognized) = cli_get_params(array('execute' => false, 'aggresive' => false));
 
 fputs(STDOUT, "*****************************************\n");
 fputs(STDOUT, date('Y-m-d H:i', time()));
@@ -63,6 +63,22 @@ foreach ($tree as $vercode => $languages) {
             $enfix = mlang_component::from_snapshot($componentname, $langcode, $version);
             $enfix->intersect($en);
             $removed = $enfix->complement($en);
+
+            if ($options['aggresive']) {
+                foreach ($enfix->get_iterator() as $enfixstring) {
+                    $enstring = $en->get_string($enfixstring->id);
+                    if ($enstring === null) {
+                        fputs(STDERR, 'orphaned string '.$enfixstring->id.' in '.$componentname.' '.$version->label.PHP_EOL);
+                        continue;
+                    }
+                    if ($enstring->timemodified > $enfixstring->timemodified) {
+                        fputs(STDERR, 'string '.$enfixstring->id.' outdated in '.$componentname.' '.$version->label.PHP_EOL);
+                        $enfix->unlink_string($enfixstring->id);
+                        $removed++;
+                    }
+                }
+            }
+
             if ($removed) {
 
                 if ($options['execute']) {
