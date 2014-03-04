@@ -713,6 +713,14 @@ class local_amos_translator implements renderable {
                 }
             }
         }
+        foreach ($this->strings as $string) {
+            if ($string->language === 'en_fix' and $string->component = 'countries') {
+                $string->committable = false;
+                $string->translatable = false;
+                $string->translation = get_string('unableenfixcountries', 'local_amos');
+                $string->class = 'missing';
+           }
+        }
     }
 
     /**
