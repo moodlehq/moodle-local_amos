@@ -118,6 +118,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'tinymce'               => 'lib/editor/tinymce/plugins',
             'atto'                  => 'lib/editor/atto/plugins',
             'calendartype'          => 'calendar/type',
+            'logstore'              => 'admin/tool/log/store',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
