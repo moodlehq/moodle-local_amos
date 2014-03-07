@@ -3310,6 +3310,7 @@
       <plugin>innodb</plugin>
       <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
+      <plugin>log</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
@@ -3446,6 +3447,11 @@
       <plugin>pdw</plugin>
       <plugin>spellchecker</plugin>
       <plugin>wrap</plugin>
+    </plugins>
+    <plugins type="logstore">
+      <plugin>database</plugin>
+      <plugin>legacy</plugin>
+      <plugin>standard</plugin>
     </plugins>
   </moodle>
 </standard_plugins>
