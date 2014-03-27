@@ -3182,6 +3182,7 @@
       <plugin>glossary</plugin>
     </plugins>
     <plugins type="editor">
+      <plugin>atto</plugin>
       <plugin>textarea</plugin>
       <plugin>tinymce</plugin>
     </plugins>
@@ -3337,29 +3338,11 @@
       <plugin>file</plugin>
     </plugins>
     <plugins type="theme">
-      <plugin>afterburner</plugin>
-      <plugin>anomaly</plugin>
-      <plugin>arialist</plugin>
       <plugin>base</plugin>
-      <plugin>binarius</plugin>
       <plugin>bootstrapbase</plugin>
-      <plugin>boxxie</plugin>
-      <plugin>brick</plugin>
       <plugin>canvas</plugin>
       <plugin>clean</plugin>
-      <plugin>formal_white</plugin>
-      <plugin>formfactor</plugin>
-      <plugin>fusion</plugin>
-      <plugin>leatherbound</plugin>
-      <plugin>magazine</plugin>
-      <plugin>nimble</plugin>
-      <plugin>nonzero</plugin>
-      <plugin>overlay</plugin>
-      <plugin>serenity</plugin>
-      <plugin>sky_high</plugin>
-      <plugin>splash</plugin>
-      <plugin>standard</plugin>
-      <plugin>standardold</plugin>
+      <plugin>more</plugin>
     </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
@@ -3435,6 +3418,38 @@
     </plugins>
     <plugins type="workshopeval">
       <plugin>best</plugin>
+    </plugins>
+    <plugins type="atto">
+      <plugin>accessibilitychecker</plugin>
+      <plugin>accessibilityhelper</plugin>
+      <plugin>align</plugin>
+      <plugin>backcolor</plugin>
+      <plugin>bold</plugin>
+      <plugin>charmap</plugin>
+      <plugin>clear</plugin>
+      <plugin>collapse</plugin>
+      <plugin>emoticon</plugin>
+      <plugin>equation</plugin>
+      <plugin>fontcolor</plugin>
+      <plugin>html</plugin>
+      <plugin>image</plugin>
+      <plugin>indent</plugin>
+      <plugin>italic</plugin>
+      <plugin>link</plugin>
+      <plugin>managefiles</plugin>
+      <plugin>media</plugin>
+      <plugin>noautolink</plugin>
+      <plugin>orderedlist</plugin>
+      <plugin>rtl</plugin>
+      <plugin>strike</plugin>
+      <plugin>subscript</plugin>
+      <plugin>superscript</plugin>
+      <plugin>table</plugin>
+      <plugin>title</plugin>
+      <plugin>underline</plugin>
+      <plugin>undo</plugin>
+      <plugin>unlink</plugin>
+      <plugin>unorderedlist</plugin>
     </plugins>
     <plugins type="tinymce">
       <plugin>ctrlhelp</plugin>
