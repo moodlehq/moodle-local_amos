@@ -35,10 +35,6 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 // list of branches to process
 $branches = array(
-    'MOODLE_20_STABLE',
-    'MOODLE_21_STABLE',
-    'MOODLE_22_STABLE',
-    'MOODLE_23_STABLE',
     'MOODLE_24_STABLE',
     'MOODLE_25_STABLE',
     'MOODLE_26_STABLE',
