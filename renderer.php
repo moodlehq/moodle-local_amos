@@ -897,14 +897,14 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_index_page(local_amos_index_page $data) {
 
         $output = '<?php
-require(dirname(dirname(dirname(__FILE__)))."/config.php");
-require(dirname(dirname(dirname(__FILE__)))."/menu.php");
+require("/var/www/vhosts/download.moodle.org/html/config.php");
+require("/var/www/vhosts/download.moodle.org/html/menu.php");
 
 print_header("Moodle: Download: Language Packs", "Moodle Downloads",
         "<a href=\"$CFG->wwwroot/\">Download</a> -> Language Packs",
         "", "", true, " ", $navmenu);
 $current = "lang";
-require(dirname(dirname(dirname(__FILE__)))."/tabs.php");
+require("/var/www/vhosts/download.moodle.org/html/tabs.php");
 
 print_simple_box_start("center", "100%", "#FFFFFF", 20);
 ?>';
