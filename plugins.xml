@@ -2986,6 +2986,7 @@
       <plugin>access</plugin>
       <plugin>admin</plugin>
       <plugin>auth</plugin>
+      <plugin>availability</plugin>
       <plugin>backup</plugin>
       <plugin>badges</plugin>
       <plugin>block</plugin>
@@ -2994,7 +2995,6 @@
       <plugin>cache</plugin>
       <plugin>calendar</plugin>
       <plugin>cohort</plugin>
-      <plugin>condition</plugin>
       <plugin>completion</plugin>
       <plugin>countries</plugin>
       <plugin>course</plugin>
@@ -3045,6 +3045,14 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
+    </plugins>
+    <plugins type="availability">
+      <plugin>completion</plugin>
+      <plugin>date</plugin>
+      <plugin>grade</plugin>
+      <plugin>group</plugin>
+      <plugin>grouping</plugin>
+      <plugin>profile</plugin>
     </plugins>
     <plugins type="qtype">
       <plugin>calculated</plugin>
@@ -3122,6 +3130,7 @@
       <plugin>self</plugin>
     </plugins>
     <plugins type="message">
+      <plugin>airnotifier</plugin>
       <plugin>email</plugin>
       <plugin>jabber</plugin>
       <plugin>popup</plugin>
@@ -3173,6 +3182,7 @@
       <plugin>censor</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
+      <plugin>mathjaxloader</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
       <plugin>tex</plugin>
@@ -3204,6 +3214,7 @@
       <plugin>completion</plugin>
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
+      <plugin>eventlist</plugin>
       <plugin>log</plugin>
       <plugin>loglive</plugin>
       <plugin>outline</plugin>
@@ -3302,6 +3313,7 @@
     </plugins>
     <plugins type="tool">
       <plugin>assignmentupgrade</plugin>
+      <plugin>availabilityconditions</plugin>
       <plugin>behat</plugin>
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
@@ -3315,7 +3327,6 @@
       <plugin>multilangupgrade</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
-      <plugin>qeupgradehelper</plugin>
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
@@ -3448,7 +3459,6 @@
       <plugin>title</plugin>
       <plugin>underline</plugin>
       <plugin>undo</plugin>
-      <plugin>unlink</plugin>
       <plugin>unorderedlist</plugin>
     </plugins>
     <plugins type="tinymce">
