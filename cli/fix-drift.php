@@ -74,6 +74,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             $pluginname = substr($frankenstylename, strpos($frankenstylename, '_') + 1);
         }
         // very hacky way to get plugin basedirs for all versions
+        // see core_component::fetch_plugintypes() in lib/classes/component.php
+        // when adding a new one.
         $basedirs = array(
             'mod'                   => 'mod',
             'auth'                  => 'auth',
@@ -119,7 +121,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'atto'                  => 'lib/editor/atto/plugins',
             'calendartype'          => 'calendar/type',
             'logstore'              => 'admin/tool/log/store',
-            'availability'          => 'availability',
+            'availability'          => 'availability/condition',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
