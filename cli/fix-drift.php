@@ -119,6 +119,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'atto'                  => 'lib/editor/atto/plugins',
             'calendartype'          => 'calendar/type',
             'logstore'              => 'admin/tool/log/store',
+            'availability'          => 'availability',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
