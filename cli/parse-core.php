@@ -285,7 +285,6 @@ $MLANG_PARSE_BRANCHES = array(
 );
 
 $standardplugins = local_amos_standard_plugins();
-$plugintypes = get_plugin_types(false);
 $stage = new mlang_stage();
 
 fputs(STDOUT, "*****************************************\n");
