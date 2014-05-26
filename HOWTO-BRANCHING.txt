@@ -2,73 +2,81 @@ Registering a new Moodle branch in AMOS
 =======================================
 
 Whenever the new major Moodle version is released, several steps must be done
-in AMOS. For the purpose of this document, let us expect that Moodle 2.6 was
-just released and the new branch MOODLE_27_STABLE was created in moodle.git.
-So now we must tell AMOS that the master branch is 2.8.
+in AMOS. For the purpose of this document, let us expect that Moodle X.X was
+just released and the new branch MOODLE_XX_STABLE was created in moodle.git.
+So now we must tell AMOS that the master branch is Y.Y.
 
-1. Make sure that MOODLE_27_STABLE is fetched into the moodle.git clone that
-   AMOS tracks.
-2. Turn Jenkins off.
-3. Switch the portal to the maintenance mode and backup AMOS database.
-4. Define new mlang_version for MOODLE_28_STABLE in mlanglib.php.
-5. Grep for the current usage of MOODLE_27_STABLE and add the new
-   MOODLE_28_STABLE record where needed and/or replace the current reference to
-   the 2.7 with the reference to 2.8. Most notably in
-   cli/parse-core.php, cli/export-installer.php and cli/fix-drift.php
-   Grep for MOODLE_27 and check if other places need an update, too
-   (most notably cli/utilslib.php).
-6. Make sure that plugins.xml contains declaration for 2.8.
-7. Increase the initial version of new language packs in admin/newlanguage.php
-8. Deploy the code at the production site.
-9. Fork the new branch in the repository
+Note that in AMOS, the mlang_version already calls the new git branch as
+MOODLE_YY_STABLE even if it is actually master at the moment.
 
-        php cli/make-branch.php --from=MOODLE_27_STABLE --to=MOODLE_28_STABLE
+* Disable new logins at the portal and announce the maintenance via
+  @moodlesites twitter.
+* Make sure that origin/MOODLE_XX_STABLE is fetched into the moodle.git clone
+  that AMOS tracks.
+* Turn Jenkins off.
+* Switch the portal to the climaintenance mode.
+* Backup AMOS database.
+* Define new mlang_version for MOODLE_YY_STABLE in mlanglib.php.
+* Grep for the current usage of MOODLE_XX and update it with MOODLE_YY where
+  needed. The affected files should probably be:
 
-   and do not forget to reinitilize the snapshot table
+        admin/newlanguage.php
+        cli/export-installer.php
+        cli/fix-drift.php
+        cli/parse-core.php
+        cli/utilslib.php
 
-        php cli/init-snapshot.php --branch=2800
+* Make sure that plugins.xml contains declaration for Y.Y.
+* Deploy the code at the production site.
+* Fork the new branch in the repository
 
-10. Copy moodledata/amos/var/MOODLE_27_STABLE.startat to
-    MOODLE_28_STABLE.startat. Fix the content of MOODLE_27_STABLE.startat so
-    that it points to the HEAD of the real MOODLE_27_STABLE (and not the master).
-11. Make moodledata/amos/var/export-zip/2.8/
-12. Force AMOS to regenerate all ZIPs including those for 2.8:
+        php cli/make-branch.php --from=MOODLE_XX_STABLE --to=MOODLE_YY_STABLE
+
+  and do not forget to reinitilize the snapshot table
+
+        php cli/init-snapshot.php --branch=YY00
+
+* Copy moodledata/amos/var/MOODLE_XX_STABLE.startat to
+  MOODLE_YY_STABLE.startat. Fix the content of MOODLE_XX_STABLE.startat so
+  that it points to the HEAD of the real MOODLE_XX_STABLE (and not the master).
+* Make moodledata/amos/var/export-zip/Y.Y/
+* Force AMOS to regenerate all ZIPs including those for Y.Y:
 
         UPDATE mdl_config_plugins SET value=1 WHERE plugin='local_amos' AND name='lastexportzip';
 
-13. Create new MOODLE_27_STABLE and install_27_STABLE branches at
-    /home/amosbot/git/moodle-install and update publish-moodle-install.sh
+* Create new MOODLE_XX_STABLE and install_XX_STABLE branches at
+  /home/amosbot/git/moodle-install and update publish-moodle-install.sh
 
         su amosbot
         cd /home/amosbot/git/moodle-install
-        git checkout -b MOODLE_27_STABLE upstream/MOODLE_27_STABLE
-        git checkout -b install_27_STABLE upstream/MOODLE_27_STABLE
+        git checkout -b MOODLE_XX_STABLE upstream/MOODLE_XX_STABLE
+        git checkout -b install_XX_STABLE upstream/MOODLE_XX_STABLE
         vi ~/bin/publish-moodle-install.sh
 
-14. Create MOODLE_28_STABLE branch at /home/amosbot/git/moodle-langpacks
+* Create MOODLE_YY_STABLE branch at /home/amosbot/git/moodle-langpacks
 
         cd /home/amosbot/git/moodle-langpacks
         git checkout master
-        git branch MOODLE_28_STABLE
+        git branch MOODLE_YY_STABLE
 
-    and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
+  and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
 
         cd /home/amosbot/git/moodle-langpacks-clones
-        git clone /home/amosbot/git/moodle-langpacks 2.8
-        cd 2.8
-        git checkout -b MOODLE_28_STABLE origin/MOODLE_28_STABLE
+        git clone /home/amosbot/git/moodle-langpacks Y.Y
+        cd Y.Y
+        git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
         git branch -d master
 
-    and finally modify publish-moodle-langpacks.sh
+  and finally modify publish-moodle-langpacks.sh
 
         vi ~/bin/publish-moodle-langpacks.sh
 
-15. Turn Jenkins on and let it re-generate the ZIP packages.
-16. Check http://download.moodle.org/langpack/
-17. Clone greylisted strings
+* Turn Jenkins on and let it re-generate the ZIP packages.
+* Check http://download.moodle.org/langpack/
+* Clone greylisted strings
 
         INSERT INTO mdl_amos_greylist (branch, component, stringid)
-        SELECT 2800 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = 2700;
+        SELECT YY00 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = XX00;
 
-18. Disable the site maintenance mode.
-19. Have a beer!
+* Disable the site maintenance mode.
+* Have a beer!
