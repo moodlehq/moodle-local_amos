@@ -30,7 +30,7 @@ $add = optional_param('add', null, PARAM_INT);  // userid to grant privileges to
 $del = optional_param('del', null, PARAM_INT);  // userid to revoke privileges from editing a language
 
 require_login(SITEID, false);
-require_capability('local/amos:manage', get_system_context());
+require_capability('local/amos:manage', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/translators.php');
@@ -38,7 +38,7 @@ $PAGE->set_title('AMOS ' . get_string('maintainers', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('maintainers', 'local_amos'));
 
 // available translators
-$available = get_users_by_capability(get_system_context(), 'local/amos:commit',
+$available = get_users_by_capability(context_system::instance(), 'local/amos:commit',
         $fields='u.id,u.firstname,u.lastname,u.email', $sort='u.lastname,u.firstname');
 
 if (!empty($add) and array_key_exists($add, $available)) {

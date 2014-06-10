@@ -28,7 +28,7 @@ require_once(dirname(dirname(__FILE__)).'/mlanglib.php');
 require_once(dirname(__FILE__).'/newlanguage_form.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:manage', get_system_context());
+require_capability('local/amos:manage', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/newlanguage.php');

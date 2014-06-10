@@ -31,7 +31,7 @@ require_once(dirname(__FILE__).'/mlangparser.php');
 require_once(dirname(__FILE__).'/importfile_form.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:importfile', get_system_context());
+require_capability('local/amos:importfile', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/importfile.php');
@@ -41,7 +41,7 @@ $PAGE->set_heading('AMOS ' . get_string('importfile', 'local_amos'));
 
 $importform = new local_amos_importfile_form(null, local_amos_importfile_options());
 
-if (($data = $importform->get_data()) and has_capability('local/amos:stage', get_system_context())) {
+if (($data = $importform->get_data()) and has_capability('local/amos:stage', context_system::instance())) {
     $tmpdir = $CFG->dataroot . '/amos/temp/import-uploads/' . $USER->id;
     check_dir_exists($tmpdir);
     $filenameorig = basename($importform->get_new_filename('importfile'));

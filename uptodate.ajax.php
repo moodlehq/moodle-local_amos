@@ -30,7 +30,7 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 require_login(SITEID, false);
-if (!has_capability('local/amos:commit', get_system_context())) {
+if (!has_capability('local/amos:commit', context_system::instance())) {
     header('HTTP/1.1 403 Forbidden');
     die();
 }

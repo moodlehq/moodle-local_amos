@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:stage', get_system_context());
+require_capability('local/amos:stage', context_system::instance());
 
 $component  = required_param('component', PARAM_ALPHANUMEXT);
 $language   = required_param('language', PARAM_ALPHANUMEXT);
@@ -40,7 +40,7 @@ $ajax       = optional_param('ajax', 0, PARAM_BOOL);
 
 $PAGE->set_url('/local/amos/timeline.ajax.php');
 $PAGE->set_pagelayout('popup');
-$PAGE->set_context(get_context_instance(CONTEXT_SYSTEM));
+$PAGE->set_context(context_system::instance());
 
 if ($ajax) {
     @header('Content-Type: text/plain; charset=utf-8');

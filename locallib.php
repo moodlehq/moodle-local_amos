@@ -806,20 +806,20 @@ class local_amos_stage implements renderable {
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         $needed = array();  // describes all strings that we will have to load to displaye the stage
 
-        if (has_capability('local/amos:importfile', get_system_context(), $user)) {
+        if (has_capability('local/amos:importfile', context_system::instance(), $user)) {
             $this->importform = new local_amos_importfile_form(new moodle_url('/local/amos/importfile.php'), local_amos_importfile_options());
         }
 
-        if (has_capability('local/amos:commit', get_system_context(), $user)) {
+        if (has_capability('local/amos:commit', context_system::instance(), $user)) {
             $this->showpropagateform = true;
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
         }
 
-        if (has_capability('local/amos:stage', get_system_context(), $user)) {
+        if (has_capability('local/amos:stage', context_system::instance(), $user)) {
             $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }
 
-        if (has_all_capabilities(array('local/amos:execute', 'local/amos:stage'), get_system_context(), $user)) {
+        if (has_all_capabilities(array('local/amos:execute', 'local/amos:stage'), context_system::instance(), $user)) {
             $this->executeform = new local_amos_execute_form(new moodle_url('/local/amos/execute.php'), local_amos_execute_options());
         }
 

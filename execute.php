@@ -30,8 +30,8 @@ require_once(dirname(__FILE__).'/mlanglib.php');
 require_once(dirname(__FILE__).'/execute_form.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:execute', get_system_context());
-require_capability('local/amos:stage', get_system_context());
+require_capability('local/amos:execute', context_system::instance());
+require_capability('local/amos:stage', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/execute.php');

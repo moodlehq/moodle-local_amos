@@ -49,7 +49,7 @@ class local_amos_log_form extends moodleform {
         $mform->setAdvanced('committedbefore');
 
         // Committer
-        $committers = get_users_by_capability(get_system_context(), 'local/amos:commit', user_picture::fields('u'), 'lastname, firstname');
+        $committers = get_users_by_capability(context_system::instance(), 'local/amos:commit', user_picture::fields('u'), 'lastname, firstname');
         $users = array('' => '');
         foreach ($committers as $committer) {
             $users[$committer->id] = s(fullname($committer) . ' <' . $committer->email . '>');

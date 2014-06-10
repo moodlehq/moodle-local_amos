@@ -30,7 +30,7 @@ require_once(dirname(__FILE__).'/mlanglib.php');
 require_once(dirname(__FILE__).'/merge_form.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:commit', get_system_context()); // for langpack maintainers only
+require_capability('local/amos:commit', context_system::instance()); // for langpack maintainers only
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/merge.php');

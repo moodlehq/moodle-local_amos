@@ -31,7 +31,7 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
 require_login(SITEID, false);
-require_capability('local/amos:stage', get_system_context());
+require_capability('local/amos:stage', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');

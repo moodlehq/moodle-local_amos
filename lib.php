@@ -34,17 +34,17 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_amos_extends_navigation(global_navigation $navigation) {
     $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'));
-    if (has_capability('local/amos:stage', get_system_context())) {
+    if (has_capability('local/amos:stage', context_system::instance())) {
         $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'));
         $amos->add(get_string('stage', 'local_amos'), new moodle_url('/local/amos/stage.php'));
     }
-    if (has_capability('local/amos:stash', get_system_context())) {
+    if (has_capability('local/amos:stash', context_system::instance())) {
         $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'));
         $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'));
     }
     $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'));
     $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'));
-    if (has_capability('local/amos:manage', get_system_context())) {
+    if (has_capability('local/amos:manage', context_system::instance())) {
         $admin = $amos->add(get_string('administration'));
         $admin->add(get_string('maintainers', 'local_amos'), new moodle_url('/local/amos/admin/translators.php'));
         $admin->add(get_string('newlanguage', 'local_amos'), new moodle_url('/local/amos/admin/newlanguage.php'));
@@ -88,7 +88,7 @@ function local_amos_comment_validate($commentparams) {
         throw new comment_exception('invalidcommentarea');
     }
 
-    $syscontext = get_system_context();
+    $syscontext = context_system::instance();
     if ($syscontext->id != $commentparams->context->id) {
         throw new comment_exception('invalidcontext');
     }

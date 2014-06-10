@@ -42,13 +42,13 @@ echo $output->container(get_string('about', 'local_amos'));
 
 echo $output->heading(get_string('privileges', 'local_amos'));
 $caps = array();
-if (has_capability('local/amos:manage', get_system_context())) {
+if (has_capability('local/amos:manage', context_system::instance())) {
     $caps[] = get_string('amos:manage', 'local_amos');
 }
-if (has_capability('local/amos:stage', get_system_context())) {
+if (has_capability('local/amos:stage', context_system::instance())) {
     $caps[] = get_string('amos:stage', 'local_amos');
 }
-if (has_capability('local/amos:commit', get_system_context())) {
+if (has_capability('local/amos:commit', context_system::instance())) {
     $allowed = mlang_tools::list_allowed_languages($USER->id);
     if (empty($allowed)) {
         $allowed = get_string('committablenone', 'local_amos');

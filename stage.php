@@ -40,7 +40,7 @@ $unstageall = optional_param('unstageall', null, PARAM_INT);
 $propagate  = optional_param('propagate', null, PARAM_INT);
 
 require_login(SITEID, false);
-require_capability('local/amos:stage', get_system_context());
+require_capability('local/amos:stage', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
@@ -52,7 +52,7 @@ $PAGE->requires->yui_module('moodle-local_amos-stage', 'M.local_amos.init_stage'
 if (!empty($message)) {
     // committing the stage
     require_sesskey();
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     if (isset($_POST['commit2'])) {
         $clear = false;
     } else {

@@ -36,7 +36,7 @@ $drop   = optional_param('drop', null, PARAM_INT);
 $submit = optional_param('submit', null, PARAM_INT);
 
 require_login(SITEID, false);
-require_capability('local/amos:stash', get_system_context());
+require_capability('local/amos:stash', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stash.php');
@@ -57,7 +57,7 @@ if ($new) {
 
 if ($apply) {
     require_sesskey();
-    require_capability('local/amos:stage', get_system_context());
+    require_capability('local/amos:stage', context_system::instance());
     $stash = mlang_stash::instance_from_id($apply);
     if ($stash->ownerid != $USER->id) {
         print_error('stashaccessdenied', 'local_amos');
@@ -71,7 +71,7 @@ if ($apply) {
 
 if ($pop) {
     require_sesskey();
-    require_capability('local/amos:stage', get_system_context());
+    require_capability('local/amos:stage', context_system::instance());
     $stash = mlang_stash::instance_from_id($pop);
     if ($stash->ownerid != $USER->id) {
         print_error('stashaccessdenied', 'local_amos');
@@ -209,7 +209,7 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
 
     foreach ($stashes as $stashdata) {
         $stash = local_amos_stash::instance_from_record($stashdata, $USER);
-        if (has_capability('local/amos:stage', get_system_context())) {
+        if (has_capability('local/amos:stage', context_system::instance())) {
             $stash->add_action('apply', new moodle_url($PAGE->url, array('apply' => $stash->id)), get_string('stashapply', 'local_amos'));
             if (!$stash->isautosave) {
                 $stash->add_action('pop', new moodle_url($PAGE->url, array('pop' => $stash->id)), get_string('stashpop', 'local_amos'));

@@ -39,7 +39,7 @@ $reject = optional_param('reject', null, PARAM_INT);
 $closed = optional_param('closed', false, PARAM_BOOL);  // show resolved contributions, too
 
 require_login(SITEID, false);
-require_capability('local/amos:stash', get_system_context());
+require_capability('local/amos:stash', context_system::instance());
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/contrib.php');
@@ -56,7 +56,7 @@ $PAGE->set_heading('AMOS ' . get_string('contributions', 'local_amos'));
 //$PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 
 if ($assign) {
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
@@ -84,7 +84,7 @@ if ($assign) {
 }
 
 if ($resign) {
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $resign, 'assignee' => $USER->id), '*', MUST_EXIST);
@@ -96,7 +96,7 @@ if ($resign) {
 }
 
 if ($apply) {
-    require_capability('local/amos:stage', get_system_context());
+    require_capability('local/amos:stage', context_system::instance());
     require_sesskey();
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $apply), '*', MUST_EXIST);
@@ -125,7 +125,7 @@ if ($apply) {
 }
 
 if ($review) {
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
@@ -182,7 +182,7 @@ if ($review) {
 }
 
 if ($accept) {
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
@@ -224,7 +224,7 @@ if ($accept) {
 }
 
 if ($reject) {
-    require_capability('local/amos:commit', get_system_context());
+    require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
@@ -273,7 +273,7 @@ if (!empty($CFG->usecomments)) {
 // Particular contribution record
 if ($id) {
 
-    if (has_capability('local/amos:commit', get_system_context())) {
+    if (has_capability('local/amos:commit', context_system::instance())) {
         $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
         $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
         foreach ($maintenances as $maintained) {
@@ -336,7 +336,7 @@ if ($id) {
                     'post', array('class' => 'singlebutton assign'));
         }
     }
-    if (has_capability('local/amos:stage', get_system_context())) {
+    if (has_capability('local/amos:stage', context_system::instance())) {
         echo $output->single_button(new moodle_url($PAGE->url, array('apply' => $id)), get_string('contribapply', 'local_amos'),
                 'post', array('class' => 'singlebutton apply'));
     }
@@ -355,7 +355,7 @@ if ($id) {
 
     if (!empty($CFG->usecomments)) {
         $options = new stdClass();
-        $options->context = get_system_context();
+        $options->context = context_system::instance();
         $options->area    = 'amos_contribution';
         $options->itemid  = $contribution->id;
         $options->showcount = true;
@@ -372,7 +372,7 @@ if ($id) {
 echo $output->header();
 
 // Incoming contributions
-if (has_capability('local/amos:commit', get_system_context())) {
+if (has_capability('local/amos:commit', context_system::instance())) {
     $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
