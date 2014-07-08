@@ -63,7 +63,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $extraclass = '';
         }
         $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'label first'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel first'));
         $output .= html_writer::tag('label', get_string('filterver', 'local_amos'), array('for' => 'amosfilter_fver'));
         $output .= html_writer::tag('div', get_string('filterver_desc', 'local_amos'), array('class' => 'description'));
         if (!$someselected) {
@@ -92,7 +92,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $extraclass = '';
         }
         $output .= html_writer::start_tag('div', array('class' => 'item select'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', get_string('filterlng', 'local_amos'), array('for' => 'amosfilter_flng'));
         $output .= html_writer::tag('div', get_string('filterlng_desc', 'local_amos'), array('class' => 'description'));
         if (!$someselected) {
@@ -200,7 +200,7 @@ class local_amos_renderer extends plugin_renderer_base {
         }
 
         $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
         $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
         if (!$someselected) {
@@ -220,7 +220,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // other filter settings
         $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', get_string('filtermis', 'local_amos'), array('for' => 'amosfilter_fmis'));
         $output .= html_writer::tag('div', get_string('filtermis_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -253,7 +253,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // must contain string
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', get_string('filtertxt', 'local_amos'), array('for' => 'amosfilter_ftxt'));
         $output .= html_writer::tag('div', get_string('filtertxt_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -270,7 +270,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // string identifier
         $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', get_string('filtersid', 'local_amos'), array('for' => 'amosfilter_fsid'));
         $output .= html_writer::tag('div', get_string('filtersid_desc', 'local_amos'), array('class' => 'description'));
         $output .= html_writer::end_tag('div');
@@ -291,7 +291,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // submit
         $output .= html_writer::start_tag('div', array('class' => 'item submit'));
-        $output .= html_writer::start_tag('div', array('class' => 'label'));
+        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
         $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'element'));
@@ -304,7 +304,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $permalink = $filter->get_permalink();
         if (!is_null($permalink)) {
             $output .= html_writer::start_tag('div', array('class' => 'item static'));
-            $output .= html_writer::tag('div', '', array('class' => 'label'));
+            $output .= html_writer::tag('div', '', array('class' => 'itemlabel'));
             $output .= html_writer::start_tag('div', array('class' => 'element'));
             $output .= html_writer::link($permalink, get_string('permalink', 'local_amos'));
             $output .= html_writer::end_tag('div');
