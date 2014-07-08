@@ -26,9 +26,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['about'] = '<p>AMOS stands for Automated Manipulation Of Strings. AMOS is a central repository of Moodle strings and their history. It tracks the addition of English strings into Moodle code, gathers translations, handles common translation tasks and generates language packages to be deployed on Moodle servers.</p>
+$string['about'] = '<p>AMOS is a central repository of Moodle strings and their history. It tracks the addition of English strings into Moodle code, gathers translations, handles common translation tasks and generates language packages to be deployed on Moodle servers.</p>
 <p>See <a href="http://docs.moodle.org/en/AMOS">AMOS documentation</a> for more information.</p>';
-$string['amos'] = 'AMOS - Moodle translation tool';
+$string['amos'] = 'AMOS translation tool';
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
 $string['amos:execute'] = 'Execute the given AMOScript';
 $string['amos:importfile'] = 'Import translations from uploaded file and stage them';
@@ -101,6 +101,10 @@ $string['contribsubject'] = 'Subject';
 $string['contribsubmittednone'] = 'No submitted contributions';
 $string['contribsubmittedsome'] = 'Your contributions ({$a})';
 $string['contribtimemodified'] = 'Modified';
+$string['contribute'] = 'Contribute';
+$string['contributenow'] = 'Contribute now!';
+$string['contributestats'] = 'Total of <strong>{$a->count}</strong> strings translated by community members have been submitted into AMOS so far.';
+$string['contributethanks'] = 'Many thanks to {$a->listcontributors} for their recent contributions!';
 $string['contributions'] = 'Contributions';
 $string['creditscontact'] = 'Send message';
 $string['creditscontributors'] = 'Other contributors';
@@ -268,6 +272,11 @@ $string['propagate_help'] = 'Staged translations can be propagated to selected b
 $string['propagatednone'] = 'No translations propagated';
 $string['propagatedsome'] = '{$a} staged translations propagated';
 $string['propagaterun'] = 'Propagate';
+$string['quicklinks'] = 'Quick links';
+$string['quicklinks_amos'] = 'AMOS translator';
+$string['quicklinks_forum'] = 'Translation forum';
+$string['quicklinks_manual'] = 'User manual';
+$string['quicklinks_newcomers'] = 'Help for newcomers';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';

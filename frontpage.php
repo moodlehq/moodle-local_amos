@@ -15,76 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Displays the lang.moodle.org front page content
+ *
  * @package     local_amos
  * @copyright   2012 David Mudrak <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Returns static welcome front page for the page.
+ * Populates the contribution front page block contents.
  *
- * @return string HTML
+ * @return string
  */
-function local_amos_frontpage() {
-    return '
-        <div class="showroom">
-            <h2>Welcome everyone!</h2>
-            <p>Welcome to our Moodle languages portal, containing <a title="AMOS home page" href="http://lang.moodle.org/local/amos/">AMOS</a>, the Moodle translation tool. See <a title="Moodle Docs - Translation" href="http://docs.moodle.org/en/Translation">Translation</a> for details of the translation process.</p>
-        </div>
-        <table class="frontpagetable" width="100%">
-            <tbody>
-                <tr>
-                    <td class="frontpageimage c0">
-                        <div>
-                            <a class="frontpagelink" href="http://lang.moodle.org/local/amos/">
-                                <img src="http://lang.moodle.org/theme/moodleofficial/pix/fp/fp_amos.png" alt="AMOS" />
-                                <br />
-                                AMOS translator
-                            </a>
-                        </div>
-                    </td>
-                    <td class="frontpageimage c1">
-                        <div>
-                            <a class="frontpagelink" href="http://lang.moodle.org/course/view.php?id=2">
-                                <img src="http://lang.moodle.org/theme/moodleofficial/pix/fp/fp_discussion.png" alt="Discussion" />
-                                <br />
-                                Translation forum
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="frontpageimage c0">
-                        <div>
-                            <a class="frontpagelink" href="http://lang.moodle.org/mod/page/view.php?id=9">
-                                <img src="http://lang.moodle.org/theme/moodleofficial/pix/fp/fp_help.png" alt="Help" />
-                                <br />
-                                Help for newcomers
-                            </a>
-                        </div>
-                    </td>
-                    <td class="frontpageimage c1">
-                        <div>
-                            <a class="frontpagelink" href="http://lang.moodle.org/mod/url/view.php?id=16&amp;redirect=1" target="_blank">
-                                <img src="http://lang.moodle.org/theme/moodleofficial/pix/fp/fp_manual.png" alt="Manual" />
-                                <br />
-                                AMOS user manual
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>';
-}
-
-/**
- * TODO: short description.
- *
- * @return TODO
- */
-function local_amos_frontpage_stats() {
+function local_amos_frontpage_contribution_stats() {
     global $CFG, $DB;
 
     $total = (int)$DB->get_field_sql("
@@ -93,11 +36,12 @@ function local_amos_frontpage_stats() {
           JOIN mdl_amos_stashes s ON c.stashid = s.id
          WHERE c.status = 30");
 
+    $namefields = get_all_user_name_fields(true, "u");
     $recent = $DB->get_records_sql("
-        SELECT c.authorid AS id, u.lastname, u.firstname, MAX(c.timecreated) AS mostrecent
+        SELECT c.authorid AS id, $namefields, MAX(c.timecreated) AS mostrecent
           FROM {amos_contributions} c
           JOIN {user} u ON u.id = c.authorid
-      GROUP BY c.authorid, u.lastname, u.firstname
+      GROUP BY c.authorid, $namefields
       ORDER BY mostrecent DESC", null, 0, 4);
 
     $links = array();
@@ -109,19 +53,39 @@ function local_amos_frontpage_stats() {
 
     $links = implode(', ', $links) . ' and ' . $last;
 
-    return '
-        <div style="text-align:center;margin-botton:30px;">
-            Total of <span style="font-size:x-large">'.$total.'</span> strings translated by community members have been submitted into AMOS so far.
+    return '<p>' . get_string('contributestats', 'local_amos', array('count' => $total)) . '</p>
+        <div style="text-align:center; margin:1em;">
+        <a class="btn btn-large btn-success" href="/local/amos/">' . get_string('contributenow', 'local_amos') . '</a>
         </div>
-        <div style="text-align:center;margin:30px;">
-        <a style="padding:20px;background-color:#88de85;color:white;font-size:xx-large;font-weight:bold;border-radius:15px;-webkit-border-radius:15px;-moz-border-radius:15px;border:1px solid green;text-decoration:none;" href="http://lang.moodle.org/local/amos/">
-                Contribute now!
-            </a>
-        </div>
-        <div style="text-align:center;margin:30px;">
-            Many thanks to '.$links.' for their recent contributions!
-        </div>';
+        <p>' . get_string('contributethanks', 'local_amos', array('listcontributors' => $links)) . '</p>';
 }
 
-echo local_amos_frontpage();
-echo local_amos_frontpage_stats();
+?>
+
+<div id="amos-custom-front-page" class="container-fluid">
+    <div class="row-fluid">
+        <div class="span4">
+            <div class="well frontpageblock">
+                <h2><?php print_string('amos', 'local_amos'); ?></h2>
+                <div><?php print_string('about', 'local_amos'); ?></div>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="well frontpageblock">
+                <h2><?php print_string('contribute', 'local_amos'); ?></h2>
+                <?php echo local_amos_frontpage_contribution_stats(); ?>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="well frontpageblock">
+                <h2><?php print_string('quicklinks', 'local_amos'); ?></h2>
+                <ul class="unstyled">
+                    <li><a href="/local/amos/"><i class="icon-pencil"></i> <?php print_string('quicklinks_amos', 'local_amos'); ?></a></li>
+                    <li><a href="/course/view.php?id=2"><i class="icon-comment"></i> <?php print_string('quicklinks_forum', 'local_amos'); ?></a></li>
+                    <li><a href="/mod/page/view.php?id=9"><i class="icon-info-sign"></i> <?php print_string('quicklinks_newcomers', 'local_amos'); ?></a></li>
+                    <li><a href="/mod/url/view.php?id=16&amp;redirect=1"><i class="icon-book"></i> <?php print_string('quicklinks_manual', 'local_amos'); ?></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
