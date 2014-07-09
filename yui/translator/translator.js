@@ -50,9 +50,9 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                               M.util.get_string('languagesnone', 'local_amos') + '</a>';
             flngactions.set('innerHTML', flnghtml);
             var flngselectall = filter.one('#amosfilter_flng_actions_all');
-            flngselectall.on('click', function(e) { flng.all('option').set('selected', true); });
+            flngselectall.on('click', function(e) { e.preventDefault(); flng.all('option').set('selected', true); });
             var flngselectnone = filter.one('#amosfilter_flng_actions_none');
-            flngselectnone.on('click', function(e) { flng.all('option').set('selected', false); });
+            flngselectnone.on('click', function(e) { e.preventDefault(); flng.all('option').set('selected', false); });
 
             // add select All / None links to the filter components selector field
             var fcmp        = filter.one('#amosfilter_fcmp');
@@ -71,21 +71,25 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
             fcmpenlarge.on('click', function(e) {
                 // Enlarge the components selection box.
+                e.preventDefault();
                 fcmp.setStyle('height', parseInt(fcmp.getComputedStyle('height')) * 2 + 'px');
             });
             var fcmpselectallstandard = filter.one('#amosfilter_fcmp_actions_allstandard');
             fcmpselectallstandard.on('click', function(e) {
                 // Check all displayed standard components.
+                e.preventDefault();
                 fcmp.all('tr.standard:not(.hidden) input').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
                 // Check all displayed components.
+                e.preventDefault();
                 fcmp.all('tr:not(.hidden) input').set('checked', true);
             });
             var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
             fcmpselectnone.on('click', function(e) {
                 // Uncheck all components (even those not displayed).
+                e.preventDefault();
                 fcmp.all('tr input').set('checked', false);
             });
 
