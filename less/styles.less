@@ -14,70 +14,29 @@
         text-align: center;
     }
 
-    .lazyform {
-        border: 1px solid #eee;
-        margin: auto;
-        padding: 1em 0;
-
-        .item {
+    #amosfilter_form {
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-top: 4px; // Undo the dodgy hack from theme/bootstrapbase/less/moodle/forms.less
+            margin-right: 0;
+        }
+        .help-block {
+            font-size: 66%;
+        }
+        .jsactions {
             display: block;
-            margin-bottom: 5px;
-
-            &.nothingselected {
-                background-color: #ffd3d9;
-
-                .nothingselectedinfo {
-                    font-weight: bold;
-                    color: red;
-                }
-            }
-
-            .itemlabel {
-                display: inline-block;
-                text-align: right;
-                width: 35%;
-                margin-right: 10px;
-                vertical-align: top;
-                label {
-                    margin: 0;
-                }
-                .description {
-                    color: #999;
-                    font-size: 80%;
-                }
-            }
-
-            .element {
-                display: inline-block;
-                text-align: left;
-                vertical-align: top;
-            }
-
-            &.select, &.elementsgroup {
-                .actions {
-                    display: block;
-                    margin-top: 2px;
-                }
-            }
-        }
-
-        .labelled_checkbox label {
-            margin: 0em 1.5em 0em 0.5em;
-        }
-
-        .inputmodifier {
-            margin-left: 0.5em;
+            margin-top: 2px;
         }
     }
 
-    #amosfilter_fver, #amosfilter_fgrey {
-        .labelled_checkbox {
-            display: inline;
-        }
+    #amosfilter_submitted_icon {
+        display: inline-block;
+        min-width: 20px;
     }
 
     #amosfilter_fcmp {
-        border: 1px solid #999;
+        border: 1px solid rgb(204,204,204);
+        .border-radius(4px);
         padding: 0px 5px;
         height: 100px;
         overflow: auto;

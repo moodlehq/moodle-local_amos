@@ -66,7 +66,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                               ' / <a href="#" id="amosfilter_fcmp_actions_none">' +
                               M.util.get_string('componentsnone', 'local_amos') + '</a>' +
                               ' <input type="text" size="8" maxlength="20" placeholder="' + M.util.get_string('search', 'core') +
-                                '" name="amosfilter_fcmp_actions_search" id="amosfilter_fcmp_actions_search" />';
+                                '" name="amosfilter_fcmp_actions_search" class="search-query" id="amosfilter_fcmp_actions_search" />';
             fcmpactions.set('innerHTML', fcmphtml);
             var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
             fcmpenlarge.on('click', function(e) {
@@ -126,14 +126,15 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
             // display the "loading" icon after the filter button is pressed
             var fform       = Y.one('#amosfilter_form');
-            var fsubmit     = fform.one('input.submit');
+            var fsubmit     = fform.one('button[type="submit"]');
             var translatorw = Y.one('.translatorwrapper');
             var ficonholder = fform.one('#amosfilter_submitted_icon');
             var ficonhtml   = '<img src="'+M.cfg.loadingicon+'" class="spinner" style="display:none" />';
             ficonholder.set('innerHTML', ficonhtml);
 
             fform.on('submit', function(e) {
-                        fsubmit.set('value', 'Processing...');
+                        fsubmit.setStyle('minWidth', fsubmit.getComputedStyle('width'));
+                        fsubmit.set('text', M.util.get_string('processing', 'local_amos'));
                         ficonholder.one('img').setStyle('display', 'inline');
                         translatorw.setStyle('display', 'none');
                         });

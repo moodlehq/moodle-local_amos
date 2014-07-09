@@ -264,6 +264,7 @@ $string['presetcommitmessage2'] = 'Merged missing strings from {$a->source} to {
 $string['presetcommitmessage3'] = 'Fixing differences between {$a->versiona} and {$a->versionb}';
 $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
+$string['processing'] = 'Processing ...';
 $string['propagate'] = 'Propagate translations';
 $string['propagate_help'] = 'Staged translations can be propagated to selected branches. AMOS iterates over the list of staged translations and tries to apply them to each selected target branche. Propagation is not possible if:
 

@@ -18,7 +18,7 @@
 /**
  * AMOS renderer class is defined here
  *
- * @package   local-amos
+ * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,12 +33,12 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Renders the filter form
      *
-     * @todo this code was used as sort of prototype of the HTML produced by the future forms framework, to be replaced by proper forms library
      * @param local_amos_filter $filter
      * @return string
      */
     protected function render_local_amos_filter(local_amos_filter $filter) {
         $output = '';
+        $alerts = array();
 
         // version checkboxes
         $current = $filter->get_data()->version;
@@ -54,27 +54,29 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $thisselected = false;
             }
-            $checkbox = html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label);
-            $fver .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));
+            $fver .= html_writer::tag('label',
+                html_writer::checkbox('fver[]', $version->code, $thisselected) . ' ' . $version->label,
+                array('class' => 'checkbox inline')
+            );
         }
+
         if (!$someselected) {
-            $extraclass = ' nothingselected';
+            $extraclass = ' error';
+            $alerts[] = get_string('filtervernothingselected', 'local_amos');
         } else {
             $extraclass = '';
         }
-        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel first'));
-        $output .= html_writer::tag('label', get_string('filterver', 'local_amos'), array('for' => 'amosfilter_fver'));
-        $output .= html_writer::tag('div', get_string('filterver_desc', 'local_amos'), array('class' => 'description'));
-        if (!$someselected) {
-            $output .= html_writer::tag('div', get_string('filtervernothingselected', 'local_amos'),
-                array('class' => 'nothingselectedinfo'));
-        }
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
-        $output .= html_writer::tag('div', $fver, array('id' => 'amosfilter_fver', 'class' => 'checkboxgroup'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
+
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
+        $output .= html_writer::tag('label',
+            get_string('filterver', 'local_amos') . html_writer::tag('span', get_string('filterver_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_fver')
+        );
+
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fver', 'class' => 'controls'));
+        $output .= $fver;
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // language selector
         $current = $filter->get_data()->language;
@@ -87,26 +89,25 @@ class local_amos_renderer extends plugin_renderer_base {
             $options[$langcode] = $langname;
         }
         if (!$someselected) {
-            $extraclass = ' nothingselected';
+            $extraclass = ' error';
+            $alerts[] = get_string('filterlngnothingselected', 'local_amos');
         } else {
             $extraclass = '';
         }
-        $output .= html_writer::start_tag('div', array('class' => 'item select'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', get_string('filterlng', 'local_amos'), array('for' => 'amosfilter_flng'));
-        $output .= html_writer::tag('div', get_string('filterlng_desc', 'local_amos'), array('class' => 'description'));
-        if (!$someselected) {
-            $output .= html_writer::tag('div', get_string('filterlngnothingselected', 'local_amos'),
-                array('class' => 'nothingselectedinfo'));
-        }
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
+
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
+
+        $output .= html_writer::tag('label',
+            get_string('filterlng', 'local_amos') . html_writer::tag('div', get_string('filterlng_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_flng')
+        );
+
+        $output .= html_writer::start_tag('div', array('class' => 'controls'));
         $output .= html_writer::select($options, 'flng[]', $current, '',
                     array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 3));
-        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_flng_actions', 'class' => 'actions'));
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_flng_actions', 'class' => 'jsactions'));
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // component selector
         $optionscore = array();
@@ -194,94 +195,106 @@ class local_amos_renderer extends plugin_renderer_base {
         }
 
         if (!$someselected) {
-            $extraclass = ' nothingselected';
+            $extraclass = ' error';
+            $alerts[] = get_string('filtercmpnothingselected', 'local_amos');
         } else {
             $extraclass = '';
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'.$extraclass));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', get_string('filtercmp', 'local_amos'), array('for' => 'amosfilter_fcmp'));
-        $output .= html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'description'));
-        if (!$someselected) {
-            $output .= html_writer::tag('div', get_string('filtercmpnothingselected', 'local_amos'),
-                array('class' => 'nothingselectedinfo'));
-        }
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
-        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fcmp', 'class' => 'checkboxgroup'));
-        $output .= html_writer::start_tag('table', array('border' => '0'));
-        $output .= $table;
-        $output .= html_writer::end_tag('table');
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'actions'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
+        $output .= html_writer::tag('label',
+            get_string('filtercmp', 'local_amos') . html_writer::tag('div', get_string('filtercmp_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_fcmp')
+        );
+
+        $output .= html_writer::start_tag('div', array('class' => 'controls'));
+        $output .= html_writer::div(
+            html_writer::tag('table', $table, array('border' => '0')),
+            '', array('id' => 'amosfilter_fcmp')
+        );
+        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'jsactions'));
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // other filter settings
-        $output .= html_writer::start_tag('div', array('class' => 'item elementsgroup'));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', get_string('filtermis', 'local_amos'), array('for' => 'amosfilter_fmis'));
-        $output .= html_writer::tag('div', get_string('filtermis_desc', 'local_amos'), array('class' => 'description'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $output .= html_writer::tag('label',
+            get_string('filtermis', 'local_amos') . html_writer::tag('div', get_string('filtermis_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_fmis')
+        );
 
-        $fmis    = html_writer::checkbox('fmis', 1, $filter->get_data()->missing, get_string('filtermisfmis', 'local_amos'));
-        $fmis    = html_writer::tag('div', $fmis, array('class' => 'labelled_checkbox'));
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fmis', 'class' => 'controls'));
 
-        $fhlp    = html_writer::checkbox('fhlp', 1, $filter->get_data()->helps, get_string('filtermisfhlp', 'local_amos'));
-        $fhlp    = html_writer::tag('div', $fhlp, array('class' => 'labelled_checkbox'));
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fmis', 1, $filter->get_data()->missing) . get_string('filtermisfmis', 'local_amos'),
+            array('class' => 'checkbox')
+        );
 
-        $fstg    = html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly, get_string('filtermisfstg', 'local_amos'));
-        $fstg    = html_writer::tag('div', $fstg, array('class' => 'labelled_checkbox'));
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fhlp', 1, $filter->get_data()->helps) . get_string('filtermisfhlp', 'local_amos'),
+            array('class' => 'checkbox')
+        );
 
-        $fgrey   = html_writer::start_tag('div', array('id' => 'amosfilter_fgrey', 'class' => 'checkboxgroup'));
-        $fgrey  .= html_writer::tag('div',
-                        html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, get_string('filtermisfglo', 'local_amos'),
-                                                array('id' => 'amosfilter_fglo')),
-                        array('class' => 'labelled_checkbox'));
-        $fgrey  .= html_writer::tag('div',
-                        html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, get_string('filtermisfwog', 'local_amos'),
-                                                array('id' => 'amosfilter_fwog')),
-                        array('class' => 'labelled_checkbox'));
-        $fgrey  .= html_writer::end_tag('div');
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly) . get_string('filtermisfstg', 'local_amos'),
+            array('class' => 'checkbox')
+        );
 
-        $output .= html_writer::tag('div', $fmis.$fhlp.$fstg.$fgrey, array('id' => 'amosfilter_fmis', 'class' => 'checkboxgroup'));
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, '', array('id' => 'amosfilter_fglo')) . get_string('filtermisfglo', 'local_amos'),
+            array('class' => 'checkbox')
+        );
 
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, '', array('id' => 'amosfilter_fwog')) . get_string('filtermisfwog', 'local_amos'),
+            array('class' => 'checkbox')
+        );
+
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // must contain string
-        $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', get_string('filtertxt', 'local_amos'), array('for' => 'amosfilter_ftxt'));
-        $output .= html_writer::tag('div', get_string('filtertxt_desc', 'local_amos'), array('class' => 'description'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $output .= html_writer::tag('label',
+            get_string('filtertxt', 'local_amos') . html_writer::tag('div', get_string('filtertxt_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_ftxt')
+        );
+
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_ftxt', 'class' => 'controls'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
-        $output .= html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex, get_string('filtertxtregex', 'local_amos'),
-                    array('class' => 'inputmodifier'));
-        $output .= html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs, get_string('filtertxtcasesensitive', 'local_amos'),
-                    array('class' => 'inputmodifier'));
 
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex) . get_string('filtertxtregex', 'local_amos'),
+            array('class' => 'checkbox')
+        );
+
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs) . get_string('filtertxtcasesensitive', 'local_amos'),
+            array('class' => 'checkbox')
+        );
+
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // string identifier
-        $output .= html_writer::start_tag('div', array('class' => 'item text'));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', get_string('filtersid', 'local_amos'), array('for' => 'amosfilter_fsid'));
-        $output .= html_writer::tag('div', get_string('filtersid_desc', 'local_amos'), array('class' => 'description'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $output .= html_writer::tag('label',
+            get_string('filtersid', 'local_amos') . html_writer::tag('div', get_string('filtersid_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_fsid')
+        );
+
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fsid', 'class' => 'controls'));
 
         $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filter->get_data()->stringid));
-        $output .= html_writer::checkbox('fsix', 1, $filter->get_data()->stringidpartial, get_string('filtersidpartial', 'local_amos'),
-                    array('class' => 'inputmodifier'));
 
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fsix', 1, $filter->get_data()->stringidpartial) . get_string('filtersidpartial', 'local_amos'),
+            array('class' => 'checkbox')
+        );
+
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
 
         // hidden fields
         $output .= html_writer::start_tag('div');
@@ -289,36 +302,33 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         $output .= html_writer::end_tag('div');
 
-        // submit
-        $output .= html_writer::start_tag('div', array('class' => 'item submit'));
-        $output .= html_writer::start_tag('div', array('class' => 'itemlabel'));
-        $output .= html_writer::tag('label', '&nbsp;', array('for' => 'amosfilter_fsbm'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'element'));
-        $output .= html_writer::empty_tag('input', array('type' => 'submit', 'value' => get_string('savefilter', 'local_amos'), 'class' => 'submit'));
+        // submit and permalink
+        $output .= html_writer::start_tag('div', array('class' => 'form-actions'));
+        $output .= html_writer::tag('button', get_string('savefilter', 'local_amos'), array('class' => 'btn btn-primary', 'type' => 'submit'));
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-
-        // permalink
         $permalink = $filter->get_permalink();
         if (!is_null($permalink)) {
-            $output .= html_writer::start_tag('div', array('class' => 'item static'));
-            $output .= html_writer::tag('div', '', array('class' => 'itemlabel'));
-            $output .= html_writer::start_tag('div', array('class' => 'element'));
-            $output .= html_writer::link($permalink, get_string('permalink', 'local_amos'));
-            $output .= html_writer::end_tag('div');
-            $output .= html_writer::end_tag('div');
+            $output .= html_writer::span(html_writer::link($permalink, get_string('permalink', 'local_amos')), 'permalink');
+        }
+        $output .= html_writer::end_tag('div');
+
+        // alerts
+        if (!empty($alerts)) {
+            $alertsout = '';
+            foreach ($alerts as $alert) {
+                $alertsout .= html_writer::div($alert, 'alert alert-error');
+            }
+            $output = $alertsout . $output;
         }
 
-        // block wrapper for xhtml strictness
-        $output = html_writer::tag('div', $output, array('id' => 'amosfilter'));
+        // block wrapper
+        $output = html_writer::tag('fieldset', $output, array('id' => 'amosfilter'));
 
         // form
         $attributes = array('method' => 'post',
                             'action' => $filter->handler->out(),
                             'id'     => 'amosfilter_form',
-                            'class'  => 'lazyform ' . $filter->lazyformname,
+                            'class'  => 'lazyform form-horizontal ' . $filter->lazyformname,
                         );
         $output = html_writer::tag('form', $output, $attributes);
         $output = html_writer::tag('div', $output, array('class' => 'filterwrapper'));
