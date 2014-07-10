@@ -40,15 +40,15 @@ if (!confirm_sesskey()) {
     die();
 }
 
-$stringid = optional_param('stringid', null, PARAM_ALPHANUMEXT);
-$text     = optional_param('text', null, PARAM_RAW);
+$lang = optional_param('lang', null, PARAM_SAFEDIR);
+$originalid = optional_param('originalid', null, PARAM_INT);
+$text = optional_param('text', null, PARAM_RAW);
 
-if (is_null($stringid) or is_null($text)) {
+if (is_null($lang) or is_null($originalid) or is_null($text)) {
     header('HTTP/1.1 400 Bad Request');
     die();
 }
 
-list($lang, $originalid, $translationid) = local_amos_translator::decode_identifier($stringid);
 $record = $DB->get_record('amos_repository', array('id' => $originalid), 'id,stringid,component,branch', MUST_EXIST);
 $version = mlang_version::by_code($record->branch);
 $component = new mlang_component($record->component, $lang, $version);

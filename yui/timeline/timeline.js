@@ -14,7 +14,7 @@ YUI.add('moodle-local_amos-timeline', function(Y) {
         initializer : function(config) {
             var translator = Y.one('#amostranslator');
             if (translator) {
-                translator.delegate('click', this.display, '.timelinelink a', this);
+                translator.delegate('click', this.display, '.info-timeline a', this);
             }
         },
 

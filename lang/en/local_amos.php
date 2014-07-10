@@ -173,13 +173,14 @@ $string['filterver_desc'] = 'Show strings from these Moodle versions';
 $string['found'] = 'Found: {$a->found} &nbsp;&nbsp;&nbsp; Missing: {$a->missing} ({$a->missingonpage})';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
+$string['googletranslate'] = 'ask google';
 $string['gotofirst'] = 'go to the first page';
 $string['gotoprevious'] = 'go to the previous page';
 $string['greylisted'] = 'Greylisted strings';
 $string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\'. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
 
 If you notice a greylisted string which is still being used in Moodle, please inform us by a forum post in Translating Moodle course at this site. Otherwise, you can save valuable time by translating strings which are most likely used in Moodle and ignoring greylisted strings.';
-$string['greylistedwarning'] = 'string is greylisted';
+$string['greylistedwarning'] = 'greylisted';
 $string['importfile'] = 'Import translated strings from file';
 $string['importfile_help'] = 'If you have your strings translated offline, you can stage them via this form.
 
@@ -221,6 +222,7 @@ $string['maintainers'] = 'Maintainers';
 $string['markuptodate'] = 'Marking the translation as up-to-date';
 $string['markuptodate_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Review the translation. If you find it up-to-date, click the checkbox. Edit it otherwise.';
 $string['markuptodate_link'] = 'local/amos/outdatedstrings';
+$string['markuptodatelabel'] = 'Mark as up-to-date';
 $string['merge'] = 'Merge';
 $string['mergestrings'] = 'Merge strings from another branch';
 $string['mergestrings_help'] = 'This will pick and stage all strings from the source branch that are not translated yet in the target branch and are used there. You can use this tool to copy a translated string into all other versions of the pack. Only language pack maintainers can use this tool.';
@@ -240,7 +242,7 @@ $string['numofcommitsunderlimit'] = 'Found {$a->found} commits matching the comm
 $string['numofmatchingstrings'] = 'Within that, {$a->strings} modifications in {$a->commits} commits match the string filter';
 $string['outdatednotcommitted'] = 'Outdated string';
 $string['outdatednotcommitted_help'] = 'AMOS detected that the string may be outdated as the English version was modified after it had been translated. Please review the translation.';
-$string['outdatednotcommittedwarning'] = 'outdated';
+$string['outdatednotcommittedwarning'] = 'Outdated';
 $string['ownstashactions'] = 'Stash actions';
 $string['ownstashactions_help'] = '* Apply - copy the translated strings from the stash into the stage and keep the stash unmodified. If the string is already in the stage, it is overwritten with the stashed one.
 * Pop - move the translated strings from the stash into the stage and drop the stash (that is Apply and Drop).
@@ -254,7 +256,7 @@ $string['placeholder'] = 'Placeholders';
 $string['placeholder_help'] = 'Placeholders are special statements like `{$a}` or `{$a->something}` within the string. They are replaced with a value when the string is actually printed.
 
 It is important to copy them exactly as they are in the original string. Do not translate them nor change their left-to-right orientation.';
-$string['placeholderwarning'] = 'string contains a placeholder';
+$string['placeholderwarning'] = 'placeholders';
 $string['pluginclasscore'] = 'Core subsystems';
 $string['pluginclassnonstandard'] = 'Non-standard plugins';
 $string['pluginclassstandard'] = 'Standard plugins';
@@ -333,6 +335,7 @@ $string['strings'] = 'Strings';
 $string['submitting'] = 'Submitting a contribution';
 $string['submitting_help'] = 'This will send translated strings to official language maintainers. They will be able to apply your work into their stage, review it and eventually commit. Please provide a message for them describing your work and why you would like to see your contribution included.';
 $string['targetversion'] = 'Target version';
+$string['timeline'] = 'timeline';
 $string['translatortool'] = 'Translator';
 $string['translatorstring'] = 'String';
 $string['translatorstring_help'] = 'Displays Moodle branch (version), the string identifier and the component this string belongs to.';

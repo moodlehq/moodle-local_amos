@@ -722,45 +722,6 @@ class local_amos_translator implements renderable {
            }
         }
     }
-
-    /**
-     * Given AMOS string id, returns the suitable name of HTTP parameter to hold the translation
-     *
-     * @see self::decode_identifier()
-     * @param string $lang language code
-     * @param int $amosid_original AMOS id of the English origin of the string
-     * @param int $amosid_translation AMOS id of the string translation, if it exists
-     * @return string to be safely used as a name of the textarea or HTTP parameter
-     */
-    public static function encode_identifier($lang, $amosid_original, $amosid_translation=null) {
-        if (empty($amosid_original) && ($amosid_original !== 0)) {
-            throw new coding_exception('Illegal AMOS string identifier passed');
-        }
-        return $lang . '___' . $amosid_original . '___' . $amosid_translation;
-    }
-
-    /**
-     * Decodes the identifier encoded by {@see self::encode_identifier()}
-     *
-     * @param string $encoded
-     * @return array of (string)lang, (int)amosid_original, (int)amosid_translation
-     */
-    public static function decode_identifier($encoded) {
-        $parts = explode('___', $encoded, 3);
-        if (count($parts) < 2) {
-            throw new coding_exception('Invalid encoded identifier supplied');
-        }
-        $result = array();
-        $result[0] = $parts[0]; // lang code
-        $result[1] = $parts[1]; // amosid_original
-        if (isset($parts[2])) {
-            $result[2] = $parts[2];
-        } else {
-            $result[2] = null;
-        }
-        return $result;
-    }
-
 }
 
 /**

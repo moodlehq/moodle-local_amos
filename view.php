@@ -18,9 +18,7 @@
 /**
  * Main AMOS translation page
  *
- * Displays strings filter and the translation table. Data submitted from the
- * whole translation table are handled by savebulk.php which should redirect
- * back here.
+ * Displays strings filter and the translation table.
  *
  * @package   local-amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -39,9 +37,11 @@ $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->requires->string_for_js('search', 'core');
 $PAGE->requires->strings_for_js(array(
-    'languagesall', 'languagesnone', 'componentsenlarge', 'componentsall', 'componentsnone', 'componentsstandard', 'processing'), 'local_amos');
-$PAGE->requires->yui_module('moodle-local_amos-translator', 'M.local_amos.init_translator');
-$PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_timeline');
+    'languagesall', 'languagesnone', 'componentsenlarge', 'componentsall', 'componentsnone', 'componentsstandard', 'processing', 'googletranslate'), 'local_amos');
+$PAGE->requires->yui_module('moodle-theme_moodleorgcleaned-finesses', 'M.theme_moodleorgcleaned.finesses.gridRowsEqualHeight', array('#amostranslator .string-text'));
+$PAGE->requires->yui_module('moodle-local_amos-filter', 'M.local_amos.init_filter', null, null, true);
+$PAGE->requires->yui_module('moodle-local_amos-translator', 'M.local_amos.init_translator', null, null, true);
+$PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_timeline', null, null, true);
 
 $output = $PAGE->get_renderer('local_amos');
 

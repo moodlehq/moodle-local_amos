@@ -35,15 +35,15 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var translator  = Y.one('#amostranslator');
 
             if (translator) {
-
                 translator.delegate('click', function (e) {
-                    if (e.target.ancestor('.uptodatecheckbox, .uptodatelabel', true, '.translatable')) {
-                        // clicking the up-to-date checkbox (or its label) marks it as up-to-date
+                    Y.log(e.currentTarget, 'debug');
+                    if (e.target.ancestor('button.markuptodate', true, '.translatable')) {
+                        // clicking the up-to-date button
                         // catch it when it bubbles up to the checkbox
-                        if (e.target.test('.uptodatecheckbox')) {
+                        if (e.target.test('button.markuptodate')) {
                             this.mark_update(e);
                         }
-                    } else if (e.target.ancestor('.helplink', true, '.translatable')) {
+                    } else if (e.target.ancestor('.helptooltip', true, '.translatable')) {
                         // do nothing, propagate the event
                     } else if (e.currentTarget.one('textarea.translation-edit')) {
                         // it is already in the edit mode
@@ -80,13 +80,14 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Y.Event} e
          */
         mark_update: function(e) {
-            var cell = e.currentTarget;
-            var checkbox = cell.one('input.uptodatecheckbox');
-            var amosid = checkbox.get('id').split('_', 2)[1];
-            var checked  = checkbox.get('checked');
-            if (checked) {
-                this.uptodate(amosid);
+            var translationid = e.currentTarget.ancestor('.string-control-group').getData('amos-translationid');
+
+            if (! Y.Lang.isValue(translationid)) {
+                alert('Error - Unknown translation id!');
+                return;
             }
+
+            this.uptodate(translationid);
         },
 
         /**
@@ -105,13 +106,26 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Bool} focus shall the new editor get focus?
          */
         editor_on: function(cell, focus) {
+            Y.log(cell);
             var current     = cell.one('.translation-view');    // <div> with the current translation
             var stext       = current.get('text');
             stext           = stext.replace(/\u200b/g, '');     // remove U+200B zero-width space
             var editor      = Y.Node.create('<textarea class="translation-edit">' + stext + '</textarea>');
             editor.on('blur', this.editor_blur, this);
+            var ch = cell.get('clientHeight') * 1;
+            var eh = editor.get('offsetHeight') * 1;
+            var cw = cell.get('clientWidth') * 1;
+            var ew = editor.get('offsetWidth') * 1;
+
             cell.append(editor);
-            editor.setStyle('height', cell.getComputedStyle('height'));
+
+            if (eh < ch - 20) {
+                editor.setStyle('height', ch - 20 + 'px');
+            }
+            if (ew < cw - 20) {
+                editor.setStyle('width', cw - 20 + 'px');
+            }
+
             if (focus) {
                 editor.focus();
             }
@@ -162,11 +176,12 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var newtext     = editor.get('value');
 
             if (Y.Lang.trim(oldtext) == Y.Lang.trim(newtext)) {
-                // no change
-                this.editor_off(cell, null, null);
-                var updater = cell.one('.uptodatewrapper');
-                if (updater) {
-                    updater.setStyle('display', 'block');
+                if (oldtext != '') {
+                    this.editor_off(cell, null, null);
+                    var updater = cell.one('.uptodatewrapper');
+                    if (updater) {
+                        updater.setStyle('display', 'block');
+                    }
                 }
             } else {
                 editor.set('disabled', true);
@@ -181,15 +196,20 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Y.Node} editor
          */
         submit: function(cell, editor) {
-            // stop the IO queue so we can add to it
-            Y.io.queue.stop();
-
             // configure the async request
-            var cellid = cell.get('id');
+            var ctrlgrp = cell.ancestor('.string-control-group');
+            var lang = ctrlgrp.getData('amos-lang');
+            var originalid = ctrlgrp.getData('amos-originalid');
+
+            if (! Y.Lang.isValue(originalid) || ! Y.Lang.isString(lang)) {
+                alert('Error - Unable to stage the translation!');
+                return;
+            }
+
             var uri = M.cfg.wwwroot + '/local/amos/saveajax.php';
             var cfg = {
                 method: 'POST',
-                data: build_querystring({stringid: cellid, text: editor.get('value'), sesskey: M.cfg.sesskey}),
+                data: build_querystring({'lang': lang, 'originalid': originalid, 'text': editor.get('value'), 'sesskey': M.cfg.sesskey}),
                 on: {
                     success : this.submit_success,
                     failure : this.submit_failure,
@@ -200,9 +220,12 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                 context: this
             };
 
+            // stop the IO queue so we can add to it
+            Y.io.queue.stop();
+
             // add a new async request into the queue
             Y.io.queue(uri, cfg);
-            this.ajaxqueue.push(cellid);
+            this.ajaxqueue.push(lang + '/' + originalid);
 
             // re-start queue processing
             Y.io.queue.start();
@@ -290,10 +313,12 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
             var timeupdated = outcome.timeupdated;
             if (timeupdated > 0) {
-                var translator = Y.one('#amostranslator');
-                var checkbox = translator.one('#update_' + amosid);
-                var cell = checkbox.get('parentNode').get('parentNode');
-                checkbox.get('parentNode').remove(); // remove whole wrapping div
+                var translator = Y.one('#amostranslator'),
+                    btn = translator.one('#uptodate_' + amosid),
+                    cell = btn.ancestor('.string-text'),
+                    wrapper = btn.ancestor('.uptodatewrapper');
+
+                wrapper.remove();
                 cell.removeClass('outdated');
             }
         },
@@ -318,9 +343,9 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                 // no strings available at the page
                 return;
             }
-            var iconcontainers = translator.all('.googleicon');
-            iconcontainers.each(this.init_google_icon, this);
-            translator.delegate('click', this.google_translate, '.googleicon img', this);
+            var iconcontainers = translator.all('.info-google');
+            iconcontainers.each(this.init_google_action, this);
+            translator.delegate('click', this.google_translate, '.info-google a', this);
         },
 
         /**
@@ -345,11 +370,11 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          *
          * @param {Y.Node} container the div container of the icon
          */
-        init_google_icon: function(container, index, iconcontainers) {
-            var iconhtml = '<img alt="Google Translate" title="Use Google Translate service" src="' + M.util.image_url('google', 'local_amos') + '" />';
-            var lang = container.get('parentNode').get('parentNode').one('td.lang .langcode').get('innerHTML');
-            if (Y.Array.indexOf(this.translatable, lang) >= 0) {
-                container.set('innerHTML', iconhtml);
+        init_google_action: function(container, index, iconcontainers) {
+            var lang = container.ancestor('.string-control-group').getData('amos-lang');
+            if (Y.Lang.isString(lang) && Y.Array.indexOf(this.translatable, lang) >= 0) {
+                var linkhtml = ' | <a href="#">' + M.util.get_string('googletranslate', 'local_amos') + '</a>';
+                container.set('innerHTML', linkhtml);
             }
         },
 
@@ -357,13 +382,18 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Y.Event} e
          */
         google_translate: function(e) {
-            var icon = e.currentTarget;
-            var row = icon.ancestor('tr');
-            var rowid = row.one('td.translation').get('id').split('___');
-            var lang = rowid[0];
-            var enid = rowid[1];
+            e.preventDefault();
 
-            icon.set('src', M.cfg.loadingicon);
+            var actionlink = e.currentTarget,
+                ctrlgrp = e.currentTarget.ancestor('.string-control-group'),
+                lang = ctrlgrp.getData('amos-lang'),
+                enid = ctrlgrp.getData('amos-originalid'),
+                placeholder = ctrlgrp.one('.google-translation');
+
+            if (! Y.Lang.isString(lang) || ! Y.Lang.isValue(enid)) {
+                alert('Error - Unable to translate!');
+                return;
+            }
 
             // stop the IO queue so we can add to it
             Y.io.queue.stop();
@@ -378,9 +408,10 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                     failure : this.translate_failure,
                 },
                 'arguments': {
-                    icon: icon,
-                    enid: enid,
-                    lang: lang
+                    'placeholder': placeholder,
+                    'actionlink': actionlink,
+                    'enid': enid,
+                    'lang': lang
                 }
             };
 
@@ -399,21 +430,21 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Mixed} args
          */
         translate_success: function(tid, outcome, args) {
-            var icon = args.icon;
-            var enid = args.enid;
-            var lang = args.lang;
+            var placeholder = args.placeholder,
+                actionlink = args.actionlink,
+                enid = args.enid,
+                lang = args.lang;
+
+            actionlink.remove();
 
             try {
                 result = Y.JSON.parse(outcome.responseText);
                 if (!result.error) {
-                    container = icon.get('parentNode');
-                    container.set('innerHTML', result.data.translation);
-                    container.replaceClass('googleicon', 'googletranslation');
-                    container.addClass('preformatted');
+                    placeholder.set('innerHTML', result.data.translation);
+                    placeholder.addClass('googleok preformatted alert alert-success');
                 } else {
-                    container = icon.get('parentNode');
-                    container.set('innerHTML', result.error.message);
-                    container.replaceClass('googleicon', 'googleerror');
+                    placeholder.set('innerHTML', result.error.message);
+                    placeholder.addClass('googleerror alert alert-error');
                 }
             } catch(e) {
                 alert('AJAX error - can not parse response');

@@ -345,14 +345,15 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_translator(local_amos_translator $translator) {
         global $PAGE;
 
-        $table = new html_table();
-        $table->id = 'amostranslator';
-        $table->head = array(
+        $listlanguages = mlang_tools::list_languages();
+
+        /*
                 get_string('translatorstring', 'local_amos') . $this->help_icon('translatorstring', 'local_amos'),
                 get_string('translatororiginal', 'local_amos') . $this->help_icon('translatororiginal', 'local_amos'),
                 get_string('translatorlang', 'local_amos') . $this->help_icon('translatorlang', 'local_amos'),
                 get_string('translatortranslation', 'local_amos') . $this->help_icon('translatortranslation', 'local_amos'));
         $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
+        */
 
         if (empty($translator->strings)) {
             if ($translator->currentpage > 1) {
@@ -369,108 +370,153 @@ class local_amos_renderer extends plugin_renderer_base {
             return $output;
         }
 
+        $trout = '';
         $missing = 0;
         $standard = array();
+
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
+
         foreach ($translator->strings as $string) {
-            $cells = array();
-            // string identification
+
+            // string information
+            $infoversion = html_writer::span($string->branchlabel, 'info info-version');
+
+            $infostringid = html_writer::span($string->stringid, 'info info-stringid');
+
             if (isset($standard[$string->component])) {
-                $componentname = $standard[$string->component];
+                $infocomponent = $standard[$string->component];
             } else {
-                $componentname = $string->component;
+                $infocomponent = $string->component;
             }
-            $stringinfo = html_writer::tag('span', $string->branchlabel, array('class'=>'version'));
-            $stringinfo .= '&nbsp;['.html_writer::tag('span', $string->stringid, array('class'=>'stringid')).','.
-                html_writer::tag('span', $componentname, array('class'=>'component')).']';
-            $cells[0] = new html_table_cell($stringinfo);
+            $infocomponent = html_writer::span($infocomponent, 'info info-component');
+
+            $infoplaceholder = '';
+            if (preg_match('/\{\$a(->.+)?\}/', $string->original)) {
+                $infoplaceholder = html_writer::span($this->help_icon('placeholder', 'local_amos', get_string('placeholderwarning', 'local_amos')),
+                    'info info-placeholder');
+            }
+
+            $infogreylisted = '';
+            if ($string->greylisted) {
+                $infogreylisted = html_writer::span($this->help_icon('greylisted', 'local_amos', get_string('greylistedwarning', 'local_amos')),
+                   'info info-greylisted');
+            }
+
+            $infolanguage = html_writer::span($listlanguages[$string->language], 'info info-language');
+
+            $infotimeline = html_writer::span(html_writer::tag('a', get_string('timeline', 'local_amos'), array(
+                'target' => '_blank',
+                'title' => get_string('stringhistory', 'local_amos'),
+                'href' => new moodle_url('/local/amos/timeline.php', array(
+                    'component' => $string->component,
+                    'language'  => $string->language,
+                    'branch'    => $string->branchcode,
+                    'stringid'  => $string->stringid
+                ))
+            )), 'info info-timeline');
+
+            if (has_capability('local/amos:usegoogle', context_system::instance())) {
+                $infogoogle = html_writer::span('', 'info info-google');
+            } else {
+                $infogoogle = '';
+            }
+
             // original of the string
             $original = self::add_breaks(s($string->original));
             // work around https://bugzilla.mozilla.org/show_bug.cgi?id=116083
             $original = nl2br($original);
             $original = str_replace(array("\n", "\r"), '', $original);
-            $o = html_writer::tag('div', $original, array('class' => 'preformatted english'));
-            $g = html_writer::tag('div', '', array('class' => 'googleicon'));
-            $p = '';
-            if (preg_match('/\{\$a(->.+)?\}/', $string->original)) {
-                $p = html_writer::tag('div', $this->help_icon('placeholder', 'local_amos',
-                        get_string('placeholderwarning', 'local_amos')), array('class' => 'placeholderinfo'));
+            $original = html_writer::div($original, 'preformatted english');
+
+            if ($infogoogle) {
+                $original .= html_writer::div('', 'google-translation');
             }
-            $l = '';
-            if ($string->greylisted) {
-                $l = html_writer::tag('div', $this->help_icon('greylisted', 'local_amos',
-                        get_string('greylistedwarning', 'local_amos')), array('class' => 'greylistedinfo'));
-            }
-            $cells[1] = new html_table_cell($o.$g.$p.$l);
-            if ($string->greylisted) {
-                $cells[1]->attributes['class'] .= ' greylisted';
-            }
-            // the language in which the original is displayed and the timeline link
-            $url = new moodle_url('/local/amos/timeline.php', array(
-                'component' => $string->component,
-                'language'  => $string->language,
-                'branch'    => $string->branchcode,
-                'stringid'  => $string->stringid));
-            $text  = html_writer::tag('span', '+', array('class'=>'plus'));
-            $text .= html_writer::tag('span', '-', array('class'=>'minus'));
-            $cells[2] = new html_table_cell(
-                html_writer::tag('div', $string->language, array('class' => 'langcode')).
-                html_writer::tag('div', html_writer::tag('a', $text, array('href' => $url, 'target' => '_blank',
-                        'title' => get_string('stringhistory', 'local_amos'))),
-                    array('class' => 'timelinelink')));
-            // Translation
+
+            // translation
             if (is_null($string->translation)) {
                 $missing++;
             }
-            $t = self::add_breaks(s($string->translation));
-            $sid = local_amos_translator::encode_identifier($string->language, $string->originalid, $string->translationid);
-            $t = html_writer::tag('div', $t, array('class' => 'preformatted translation-view'));
-            $i = html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'fields[]', 'value' => $sid));
-            if ($string->outdated and $string->committable and $string->translation) {
-                if ($string->translationid) {
-                    $c = html_writer::empty_tag('input', array('type' => 'checkbox', 'id' => 'update_' . $string->translationid,
-                        'name' => 'updates[]', 'class' => 'uptodatecheckbox', 'value' => $string->translationid));
-                    $help = $this->help_icon('markuptodate', 'local_amos');
-                    $c .= html_writer::tag('label', 'mark as up-to-date', array('class' => 'uptodatelabel',
-                        'for' => 'update_' . $string->translationid));
-                    $c .= $help;
-                } else {
-                    $c = $this->help_icon('outdatednotcommitted', 'local_amos', get_string('outdatednotcommittedwarning', 'local_amos'));
-                }
-                $c  = html_writer::tag('div', $c, array('class' => 'uptodatewrapper'));
-            } else {
-                $c = '';
-            }
-            $cells[3] = new html_table_cell($t . $c . $i);
-            $cells[3]->id = $sid;
-            $cells[3]->attributes['width'] = '30%';
-            $cells[3]->attributes['class'] = $string->class;
+            $translation = self::add_breaks(s($string->translation));
+            $translation = html_writer::tag('div', $translation, array('class' => 'preformatted translation-view'));
+
+            $trclasses = ' ' . $string->class;
             if ($string->translatable) {
-                $cells[3]->attributes['class'] .= ' translatable';
+                $trclasses .= ' translatable';
             } else {
-                $cells[3]->attributes['class'] .= ' nontranslatable';
+                $trclasses .= ' nontranslatable';
             }
             if ($string->committable) {
-                $cells[3]->attributes['class'] .= ' committable';
+                $trclasses .= ' committable';
             }
             if ($string->outdated) {
-                $cells[3]->attributes['class'] .= ' outdated';
+                $trclasses .= ' outdated';
             }
-            $row = new html_table_row($cells);
-            $table->data[] = $row;
+
+            // mark as up-to-date
+            if ($string->outdated and $string->committable and $string->translation) {
+                if ($string->translationid) {
+                    $uptodate = html_writer::tag('button',
+                        get_string('markuptodatelabel', 'local_amos'),
+                        array('id' => 'uptodate_'.$string->translationid, 'class' => 'btn btn-small btn-warning markuptodate'));
+                    $uptodate .= $this->help_icon('markuptodate', 'local_amos');
+                } else {
+                    $uptodate = $this->help_icon('outdatednotcommitted', 'local_amos', get_string('outdatednotcommittedwarning', 'local_amos'));
+                }
+                $uptodate = html_writer::div($uptodate, 'uptodatewrapper');
+            } else {
+                $uptodate = '';
+            }
+
+            // info lines
+            $infoline1 = $infoversion.' | '.$infostringid.' | '.$infocomponent;
+
+            if ($infogreylisted) {
+                $infoline1 .= ' | '.$infogreylisted;
+            }
+
+            if ($infoplaceholder) {
+                $infoline1 .= ' | '.$infoplaceholder;
+            }
+
+            $infoline2 = $infolanguage.' | '.$infotimeline . ' ' . $infogoogle;
+
+            $data = array(
+                'data-amos-lang' => $string->language,
+                'data-amos-originalid' => $string->originalid,
+            );
+
+            if (!empty($string->translationid)) {
+                $data['data-amos-translationid'] = $string->translationid;
+            }
+
+            $trout .= html_writer::start_div('string-control-group', $data);
+            $trout .= html_writer::start_div('string-control-label');
+            $trout .= html_writer::start_div('row-fluid');
+            $trout .= html_writer::div($infoline1, 'span6');
+            $trout .= html_writer::div($infoline2, 'span6');
+            $trout .= html_writer::end_div(); // .row-fluid
+            $trout .= html_writer::end_div(); // .string-control-label
+
+            $trout .= html_writer::start_div('string-controls');
+            $trout .= html_writer::start_div('row-fluid');
+            $trout .= html_writer::div(html_writer::div($original, 'string-text original'), 'span6');
+            $trout .= html_writer::div(html_writer::div($translation.$uptodate, 'string-text translation' . $trclasses), 'span6');
+            $trout .= html_writer::end_div(); // .row-fluid
+            $trout .= html_writer::end_div(); // .string-controls
+            $trout .= html_writer::end_div(); // .string-control-group
         }
 
-        $a                  = new stdClass();
-        $a->found           = $translator->numofrows;
-        $a->missing         = $translator->numofmissing;
-        $a->missingonpage   = $missing;
-        $heading = get_string('found', 'local_amos', $a);
-        $output = $this->heading_with_help($heading, 'foundinfo', 'local_amos');
+        $a = array(
+            'found' => $translator->numofrows,
+            'missing' => $translator->numofmissing,
+            'missingonpage' => $missing
+        );
+        $output = $this->heading_with_help(get_string('found', 'local_amos', $a), 'foundinfo', 'local_amos');
         $pages = ceil($translator->numofrows / local_amos_translator::PERPAGE);
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
-        $output .= html_writer::table($table);
+        $output .= html_writer::div($trout, '', array('id' => 'amostranslator'));
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
 

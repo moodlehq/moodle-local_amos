@@ -1,6 +1,8 @@
 @import "../../../theme/bootstrapbase/less/bootstrap/variables.less";
 @import "../../../theme/bootstrapbase/less/bootstrap/mixins.less";
 
+@amos-color-red: #ffd3d9;
+
 #amos-custom-front-page {
     margin-top: 3em;
     ul li {
@@ -77,17 +79,13 @@
         _white-space: pre;          /* IE only hack to re-specify in addition to word-wrap  */
     }
 
-    #amostranslator, #amosstage {
+    #amosstage {
         margin: 1em auto;
-    }
-
-    #amostranslator th.header .helplink {
-        display: block;
     }
 
     .unstagebutton button[type="button"].tobeconfirmed,
     .drop input[type="submit"] {
-        background-color: #ffd3d9;
+        background-color: @amos-color-red;
     }
 
     .stagewrapper {
@@ -120,7 +118,7 @@
                 &.unstageall {
                     margin-left: 2em;
                     input[type="submit"] {
-                        background-color: #ffd3d9;
+                        background-color: @amos-color-red;
                     }
                 }
 
@@ -136,45 +134,81 @@
         }
 
     }
+
+    #amostranslator {
+        margin: 1em auto;
+
+        .string-control-group {
+            margin-bottom: 1em;
+        }
+
+        .string-control-label {
+            font-size: 66%;
+            color: #7f7f7f;
+
+            .span6 {
+                 min-height: 0; // overwrite bootstrap's defaults here
+            }
+
+            .info img.iconhelp {
+                width: 10px;
+                height: 10px;
+                padding: 0 2px;
+            }
+        }
+
+        .string-text {
+            border: 1px solid rgb(204,204,204);
+            .border-radius(4px);
+            margin-bottom: 5px;
+
+            .preformatted {
+                margin: 10px;
+                min-height: 3em;
+            }
+
+            textarea.translation-edit {
+                margin: 5px;
+                padding: 4px;
+            }
+        }
+
+        .original.greylisted {
+            background-color: #f7f7f7;
+        }
+
+        .translation.translatable {
+            cursor: text;
+        }
+
+        .translation.nontranslatable {
+            background-color: #f7f7f7;
+        }
+
+        .translation.committable {
+            background-image:url([[pix:core|i/ne_red_mark]]);background-position:100% 0;background-repeat:no-repeat;
+        }
+
+        .translation.translatable.missing, .translation.committable.missing {
+            background-color: @amos-color-red;
+        }
+
+        .uptodatewrapper {
+            margin: 5px;
+        }
+
+        .google-translation.googleok {
+            padding: 3px;
+            margin: 3px;
+        }
+
+        .google-translation.googleerror {
+            padding: 3px;
+            margin: 3px;
+        }
+    }
 }
 
-
-
-.path-local-amos #amostranslator tr,
-.path-local-amos #amosstage tr {
-    border: 1px solid #ddd;
-}
-
-.path-local-amos #amosstage .r0,
-.path-local-amos #amostranslator .r0 {
-    background-color: white;
-}
-
-.path-local-amos #amosstage .r1,
-.path-local-amos #amostranslator .r1 {
-    background-color: #f9f9f9;
-}
-
-/* minimal width for these two columns */
-.path-local-amos #amostranslator .stringinfo,
-.path-local-amos #amostranslator .lang,
-.path-local-amos #amosstage .stringinfo,
-.path-local-amos #amosstage .lang {
-    width: 1px;
-}
-
-.path-local-amos #amostranslator .lang .timelinelink {
-    font-family: monospace;
-    font-weight: bold;
-}
-
-.path-local-amos #amostranslator .lang .timelinelink span.plus {
-    color: green;
-}
-
-.path-local-amos #amostranslator .lang .timelinelink span.minus {
-    color: red;
-}
 
 .path-local-amos #amosstage .translation.diff del {
     color: #999;
@@ -186,26 +220,6 @@
     font-weight: bold;
 }
 
-.path-local-amos #amostranslator .original.greylisted {
-    background-color: #f7f7f7;
-}
-
-.path-local-amos #amostranslator .translation.translatable {
-    cursor: text;
-}
-
-.path-local-amos #amostranslator .translation.nontranslatable {
-    background-color: #f7f7f7;
-}
-
-.path-local-amos #amostranslator .translation.committable {
-    background-image:url([[pix:core|i/ne_red_mark]]);background-position:100% 0;background-repeat:no-repeat;
-}
-
-.path-local-amos #amostranslator .translation.translatable.missing,
-.path-local-amos #amostranslator .translation.committable.missing {
-    background-color: #ffd3d9;
-}
 
 .path-local-amos #amosstage .translation.uncommittable {
     background-color: #d2ebff;
@@ -223,7 +237,7 @@
 }
 
 .path-local-amos #amosstage .translation.committable.removal {
-    background-color: #ffd3d9;
+    background-color: @amos-color-red;
 }
 
 .path-local-amos #amosstage .translation.committable.diff {
@@ -247,42 +261,15 @@
     background-color: #d2ebff;
 }
 
-.path-local-amos #amostranslator .uptodatewrapper {
-    margin: 5px 0px 0px;
-    text-align: right;
-}
-
 .path-local-amos #amostranslator .stringinfo .metainfo {
     color: #999;
     font-size: small;
 }
 
-.path-local-amos #amostranslator textarea.translation-edit {
-    width: 96%;
-    min-height: 4em;
-}
-
 .path-local-amos #amostranslator .placeholderinfo,
-.path-local-amos #amostranslator .greylistedinfo,
-.path-local-amos #amostranslator .googleicon {
+.path-local-amos #amostranslator .greylistedinfo {
     display: inline-block;
     vertical-align: middle;
-}
-
-.path-local-amos #amostranslator .googleicon img {
-    cursor: pointer;
-    vertical-align: middle;
-}
-
-.path-local-amos #amostranslator .googletranslation {
-    background-color: #ebeff9;
-    padding: 3px;
-}
-
-.path-local-amos #amostranslator .googleerror {
-    background-color: #ffd3d9;
-    border: 1px dotted #dd0000;
-    padding: 3px;
 }
 
 #page-local-amos-index h1.main,
@@ -469,7 +456,7 @@
 .path-local-amos .contributionlist .status20 .status,
 .path-local-amos .contributionwrapper .details .status20 td,
 .path-local-amos .contribactions .singlebutton.reject input[type="submit"] {
-    background-color: #ffd3d9;
+    background-color: @amos-color-red;
 }
 
 .path-local-amos .contributionlist .status30 .id,
