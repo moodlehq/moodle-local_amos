@@ -45,8 +45,10 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                         }
                     } else if (e.target.ancestor('.helptooltip', true, '.translatable')) {
                         // do nothing, propagate the event
+                        return;
                     } else if (e.currentTarget.one('textarea.translation-edit')) {
                         // it is already in the edit mode
+                        return;
                     } else {
                         // clicking on a translatable cell makes it editable
                         this.make_editable(e);
@@ -175,8 +177,8 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var oldtext     = current.get('text');
             var newtext     = editor.get('value');
 
-            if (Y.Lang.trim(oldtext) == Y.Lang.trim(newtext)) {
-                if (oldtext != '') {
+            if (Y.Lang.trim(oldtext) === Y.Lang.trim(newtext)) {
+                if (oldtext !== '') {
                     this.editor_off(cell, null, null);
                     var updater = cell.one('.uptodatewrapper');
                     if (updater) {
@@ -339,7 +341,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          */
         init_google_translator: function() {
             var translator = Y.one('#amostranslator');
-            if (translator == null) {
+            if (translator === null) {
                 // no strings available at the page
                 return;
             }
@@ -472,6 +474,6 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
     M.local_amos.init_translator = function(config) {
         M.local_amos.Translator = new Translator(config);
-    }
+    };
 
 }, '0.0.1', { requires:['base', 'node', 'event', 'io-queue', 'json', 'selector-css3'] });
