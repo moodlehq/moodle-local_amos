@@ -40,44 +40,6 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
         $alerts = array();
 
-        // version checkboxes
-        $current = $filter->get_data()->version;
-        $someselected = false;
-        $fver = '';
-        foreach (mlang_version::list_all() as $version) {
-            if ($version->code < 2000) {
-                continue;
-            }
-            if (in_array($version->code, $current)) {
-                $someselected = true;
-                $thisselected = true;
-            } else {
-                $thisselected = false;
-            }
-            $fver .= html_writer::tag('label',
-                html_writer::checkbox('fver[]', $version->code, $thisselected) . ' ' . $version->label,
-                array('class' => 'checkbox inline')
-            );
-        }
-
-        if (!$someselected) {
-            $extraclass = ' error';
-            $alerts[] = get_string('filtervernothingselected', 'local_amos');
-        } else {
-            $extraclass = '';
-        }
-
-        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
-        $output .= html_writer::tag('label',
-            get_string('filterver', 'local_amos') . html_writer::tag('span', get_string('filterver_desc', 'local_amos'), array('class' => 'help-block')),
-            array('class' => 'control-label', 'for' => 'amosfilter_fver')
-        );
-
-        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fver', 'class' => 'controls'));
-        $output .= $fver;
-        $output .= html_writer::end_tag('div'); // .controls
-        $output .= html_writer::end_tag('div'); // .control-group
-
         // language selector
         $current = $filter->get_data()->language;
         $someselected = false;
@@ -213,6 +175,44 @@ class local_amos_renderer extends plugin_renderer_base {
             '', array('id' => 'amosfilter_fcmp')
         );
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_fcmp_actions', 'class' => 'jsactions'));
+        $output .= html_writer::end_tag('div'); // .controls
+        $output .= html_writer::end_tag('div'); // .control-group
+
+        // version checkboxes
+        $current = $filter->get_data()->version;
+        $someselected = false;
+        $fver = '';
+        foreach (mlang_version::list_all() as $version) {
+            if ($version->code < 2000) {
+                continue;
+            }
+            if (in_array($version->code, $current)) {
+                $someselected = true;
+                $thisselected = true;
+            } else {
+                $thisselected = false;
+            }
+            $fver .= html_writer::tag('label',
+                html_writer::checkbox('fver[]', $version->code, $thisselected) . ' ' . $version->label,
+                array('class' => 'checkbox inline')
+            );
+        }
+
+        if (!$someselected) {
+            $extraclass = ' error';
+            $alerts[] = get_string('filtervernothingselected', 'local_amos');
+        } else {
+            $extraclass = '';
+        }
+
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
+        $output .= html_writer::tag('label',
+            get_string('filterver', 'local_amos') . html_writer::tag('span', get_string('filterver_desc', 'local_amos'), array('class' => 'help-block')),
+            array('class' => 'control-label', 'for' => 'amosfilter_fver')
+        );
+
+        $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fver', 'class' => 'controls'));
+        $output .= $fver;
         $output .= html_writer::end_tag('div'); // .controls
         $output .= html_writer::end_tag('div'); // .control-group
 
