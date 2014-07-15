@@ -40,8 +40,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
         $alerts = array();
 
+        $filterdata = $filter->get_data();
+
         // language selector
-        $current = $filter->get_data()->language;
+        $current = $filterdata->language;
         $someselected = false;
         $options = mlang_tools::list_languages(false);
         foreach ($options as $langcode => $langname) {
@@ -114,7 +116,7 @@ class local_amos_renderer extends plugin_renderer_base {
         asort($optionsstandard);
         asort($optionscontrib);
 
-        $current = $filter->get_data()->component;
+        $current = $filterdata->component;
         $someselected = false;
 
         $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
@@ -179,7 +181,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div'); // .control-group
 
         // version checkboxes
-        $current = $filter->get_data()->version;
+        $current = $filterdata->version;
         $someselected = false;
         $fver = '';
         foreach (mlang_version::list_all() as $version) {
@@ -218,43 +220,55 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // other filter settings
         $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $collapsible = ' collapsible collapsed';
+        foreach (array('missing', 'helps', 'stagedonly', 'greylistedonly', 'withoutgreylisted') as $ff) {
+            if (!empty($filterdata->$ff)) {
+                $collapsible = '';
+            }
+        }
         $output .= html_writer::tag('label',
             get_string('filtermis', 'local_amos') . html_writer::tag('div', get_string('filtermis_desc', 'local_amos'), array('class' => 'help-block')),
-            array('class' => 'control-label', 'for' => 'amosfilter_fmis')
+            array('class' => 'control-label'.$collapsible, 'for' => 'amosfilter_fmis')
         );
 
         $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fmis', 'class' => 'controls'));
 
+        $collapsible = empty($filterdata->missing) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fmis', 1, $filter->get_data()->missing) . get_string('filtermisfmis', 'local_amos'),
-            array('class' => 'checkbox')
+            html_writer::checkbox('fmis', 1, $filterdata->missing) . get_string('filtermisfmis', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
         );
 
+        $collapsible = empty($filterdata->helps) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fhlp', 1, $filter->get_data()->helps) . get_string('filtermisfhlp', 'local_amos'),
-            array('class' => 'checkbox')
+            html_writer::checkbox('fhlp', 1, $filterdata->helps) . get_string('filtermisfhlp', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
         );
 
+        $collapsible = empty($filterdata->stagedonly) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fstg', 1, $filter->get_data()->stagedonly) . get_string('filtermisfstg', 'local_amos'),
-            array('class' => 'checkbox')
+            html_writer::checkbox('fstg', 1, $filterdata->stagedonly) . get_string('filtermisfstg', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
         );
 
+        $collapsible = empty($filterdata->greylistedonly) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fglo', 1, $filter->get_data()->greylistedonly, '', array('id' => 'amosfilter_fglo')) . get_string('filtermisfglo', 'local_amos'),
-            array('class' => 'checkbox')
+            html_writer::checkbox('fglo', 1, $filterdata->greylistedonly, '', array('id' => 'amosfilter_fglo')) . get_string('filtermisfglo', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
         );
 
+        $collapsible = empty($filterdata->withoutgreylisted) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fwog', 1, $filter->get_data()->withoutgreylisted, '', array('id' => 'amosfilter_fwog')) . get_string('filtermisfwog', 'local_amos'),
-            array('class' => 'checkbox')
+            html_writer::checkbox('fwog', 1, $filterdata->withoutgreylisted, '', array('id' => 'amosfilter_fwog')) . get_string('filtermisfwog', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
         );
 
         $output .= html_writer::end_tag('div'); // .controls
         $output .= html_writer::end_tag('div'); // .control-group
 
         // must contain string
-        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $collapsible = empty($filterdata->substring) ? ' collapsible collapsed' : '';
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$collapsible));
         $output .= html_writer::tag('label',
             get_string('filtertxt', 'local_amos') . html_writer::tag('div', get_string('filtertxt_desc', 'local_amos'), array('class' => 'help-block')),
             array('class' => 'control-label', 'for' => 'amosfilter_ftxt')
@@ -262,15 +276,15 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', array('id' => 'amosfilter_ftxt', 'class' => 'controls'));
 
-        $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filter->get_data()->substring));
+        $output .= html_writer::empty_tag('input', array('name' => 'ftxt', 'type' => 'text', 'value' => $filterdata->substring));
 
         $output .= html_writer::tag('label',
-            html_writer::checkbox('ftxr', 1, $filter->get_data()->substringregex) . get_string('filtertxtregex', 'local_amos'),
+            html_writer::checkbox('ftxr', 1, $filterdata->substringregex) . get_string('filtertxtregex', 'local_amos'),
             array('class' => 'checkbox')
         );
 
         $output .= html_writer::tag('label',
-            html_writer::checkbox('ftxs', 1, $filter->get_data()->substringcs) . get_string('filtertxtcasesensitive', 'local_amos'),
+            html_writer::checkbox('ftxs', 1, $filterdata->substringcs) . get_string('filtertxtcasesensitive', 'local_amos'),
             array('class' => 'checkbox')
         );
 
@@ -278,7 +292,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div'); // .control-group
 
         // string identifier
-        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        $collapsible = empty($filterdata->stringid) ? ' collapsible collapsed' : '';
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$collapsible));
         $output .= html_writer::tag('label',
             get_string('filtersid', 'local_amos') . html_writer::tag('div', get_string('filtersid_desc', 'local_amos'), array('class' => 'help-block')),
             array('class' => 'control-label', 'for' => 'amosfilter_fsid')
@@ -286,10 +301,10 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fsid', 'class' => 'controls'));
 
-        $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filter->get_data()->stringid));
+        $output .= html_writer::empty_tag('input', array('name' => 'fsid', 'type' => 'text', 'value' => $filterdata->stringid));
 
         $output .= html_writer::tag('label',
-            html_writer::checkbox('fsix', 1, $filter->get_data()->stringidpartial) . get_string('filtersidpartial', 'local_amos'),
+            html_writer::checkbox('fsix', 1, $filterdata->stringidpartial) . get_string('filtersidpartial', 'local_amos'),
             array('class' => 'checkbox')
         );
 
@@ -308,8 +323,9 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
         $permalink = $filter->get_permalink();
         if (!is_null($permalink)) {
-            $output .= html_writer::span(html_writer::link($permalink, get_string('permalink', 'local_amos')), 'permalink');
+            $output .= html_writer::link($permalink, get_string('permalink', 'local_amos'), array('class' => 'permalink btn btn-link'));
         }
+        $output .= html_writer::span('', 'collapsible-control');
         $output .= html_writer::end_tag('div');
 
         // alerts

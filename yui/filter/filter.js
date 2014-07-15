@@ -117,6 +117,18 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 }
             });
 
+            // set up collapsible fields
+            if (filter.one('.collapsible.collapsed')) {
+                var collapsibleControl = Y.Node.create('<button class="btn">' + M.util.get_string('morefilteringoptions', 'local_amos') + '</button>');
+                filter.one('.collapsible-control').replace(collapsibleControl);
+
+                collapsibleControl.on('click', function(e) {
+                    e.preventDefault();
+                    filter.all('.collapsible.collapsed').removeClass('collapsed');
+                    collapsibleControl.remove(true);
+                });
+            }
+
             // display the "loading" icon after the filter button is pressed
             var fform       = Y.one('#amosfilter_form');
             var fsubmit     = fform.one('button[type="submit"]');

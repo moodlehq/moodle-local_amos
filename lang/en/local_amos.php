@@ -227,6 +227,7 @@ $string['merge'] = 'Merge';
 $string['mergestrings'] = 'Merge strings from another branch';
 $string['mergestrings_help'] = 'This will pick and stage all strings from the source branch that are not translated yet in the target branch and are used there. You can use this tool to copy a translated string into all other versions of the pack. Only language pack maintainers can use this tool.';
 $string['mergestrings_link'] = 'local/amos/merge';
+$string['morefilteringoptions'] = 'More options';
 $string['newlanguage'] = 'New language';
 $string['nodiffs'] = 'No differences found';
 $string['nofiletoimport'] = 'Please provide a file to import from.';
