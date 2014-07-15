@@ -709,7 +709,7 @@ class local_amos_translator implements renderable {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
-                    $string->class = 'missing';
+                    $string->class = 'missing explanation';
                 }
             }
         }
@@ -718,7 +718,7 @@ class local_amos_translator implements renderable {
                 $string->committable = false;
                 $string->translatable = false;
                 $string->translation = get_string('unableenfixcountries', 'local_amos');
-                $string->class = 'missing';
+                $string->class = 'missing explanation';
            }
         }
     }
