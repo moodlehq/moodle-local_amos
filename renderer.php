@@ -363,14 +363,6 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $listlanguages = mlang_tools::list_languages();
 
-        /*
-                get_string('translatorstring', 'local_amos') . $this->help_icon('translatorstring', 'local_amos'),
-                get_string('translatororiginal', 'local_amos') . $this->help_icon('translatororiginal', 'local_amos'),
-                get_string('translatorlang', 'local_amos') . $this->help_icon('translatorlang', 'local_amos'),
-                get_string('translatortranslation', 'local_amos') . $this->help_icon('translatortranslation', 'local_amos'));
-        $table->colclasses = array('stringinfo', 'original', 'lang', 'translation');
-        */
-
         if (empty($translator->strings)) {
             if ($translator->currentpage > 1) {
                 $output  = $this->heading(get_string('nostringsfoundonpage', 'local_amos', $translator->currentpage));
@@ -496,7 +488,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $infoline1 .= ' | '.$infoplaceholder;
             }
 
-            $infoline2 = $infolanguage.' | '.$infotimeline . ' ' . $infogoogle;
+            $infoline2 = $this->help_icon('translatortranslation', 'local_amos') . ' ' . $infolanguage.' | '.$infotimeline . ' ' . $infogoogle;
 
             $data = array(
                 'data-amos-lang' => $string->language,

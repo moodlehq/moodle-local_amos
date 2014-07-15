@@ -338,12 +338,6 @@ $string['submitting_help'] = 'This will send translated strings to official lang
 $string['targetversion'] = 'Target version';
 $string['timeline'] = 'timeline';
 $string['translatortool'] = 'Translator';
-$string['translatorstring'] = 'String';
-$string['translatorstring_help'] = 'Displays Moodle branch (version), the string identifier and the component this string belongs to.';
-$string['translatororiginal'] = 'Original';
-$string['translatororiginal_help'] = 'Displays the English original of the string. Below it, you can see a link to translate the string automatically via Google Translator (if the language is supported and your browser has Javascript enabled). Also, you may find some additional information attached, such as if the string contains a placeholder.';
-$string['translatorlang'] = 'Lang';
-$string['translatorlang_help'] = 'Displays the code of the language to translate the string to. Click the <strong>+-</strong> link to display the timeline history of the string.';
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 
