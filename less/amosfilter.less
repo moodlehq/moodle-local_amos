@@ -1,0 +1,62 @@
+// Strings filter at the translator page
+
+.path-local-amos {
+
+    #amosfilter_form {
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-top: 4px; // Undo the dodgy hack from theme/bootstrapbase/less/moodle/forms.less
+            margin-right: 0;
+        }
+        .help-block {
+            font-size: 66%;
+        }
+        .jsactions {
+            display: block;
+            margin-top: 2px;
+            min-height: 20px;
+        }
+        .collapsible.collapsed {
+            display: none;
+        }
+    }
+
+    #amosfilter_submitted_icon {
+        display: inline-block;
+        min-width: 20px;
+    }
+
+    #amosfilter_fcmp {
+        border: 1px solid rgb(204,204,204);
+        .border-radius(4px);
+        padding: 0px 5px;
+        height: 100px;
+        overflow: auto;
+        overflow-y: scroll;
+        background-color: white;
+    }
+
+    #amosfilter_fcmp table tr th, #amosfilter_fcmp table tr td {
+        border: none;
+        padding: 0px 1px;
+        margin: 0px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    #amosfilter_fcmp table tr th {
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    #amosfilter_fcmp table tr td.version span {
+        background-color: #ccc;
+        font-size: 70%;
+        color: white;
+        padding: 2px;
+    }
+
+    #amosfilter_fcmp input[type=checkbox]:checked + label {
+        font-weight: bold;
+    }
+}

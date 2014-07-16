@@ -31,18 +31,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
         },
 
         replace_unstage_buttons : function() {
-            Y.all('#amosstage .singlebutton.unstagebutton').each(function(wrapper) {
-                // hide the original form
-                var form = wrapper.one('form');
-                form.setStyle('display', 'none');
-                // create a new button that will trigger AJAX request
-                var button = Y.Node.create('<button type="button">' + M.util.get_string('unstage', 'local_amos') + '</button>');
-                wrapper.append(button);
-                // find all required values from the original form and set them as the button's data
-                form.all('input[name=unstage],input[name=component],input[name=lang],input[name=branch]').each(function(input) {
-                    this.setData(input.get('name'), input.get('value'));
-                }, button);
-                button.setData('sesskey', M.cfg.sesskey);
+            Y.all('#amosstage .unstagebutton').each(function(button) {
                 // attach the onclick handler for the button that triggers the request
                 button.on('click', function (e, button) {
                     e.halt();
@@ -50,6 +39,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                     if (!(button.hasClass('tobeconfirmed') || button.hasClass('confirmed'))) {
                         button.setContent(M.util.get_string('unstageconfirm', 'local_amos'));
                         button.addClass('tobeconfirmed');
+                        button.replaceClass('btn-warning', 'btn-danger');
                         return;
                     }
                     // when the user clicks for the 3rd time, do nothing
@@ -68,7 +58,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                             start: function(transid, args) {
                                 args.button.setContent(M.util.get_string('unstaging', 'local_amos'));
                                 wheel = Y.Node.create(' <img src="' + M.cfg.loadingicon + '" />');
-                                args.button.get('parentNode').append(wheel);
+                                args.button.insert(wheel, 'after');
                             },
                             success: function(transid, outcome, args) {
                                 try {
@@ -78,32 +68,27 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                                 }
 
                                 if (result.success) {
-                                    var wrapper = args.button.get('parentNode')
-                                    args.button.destroy(true);
-                                    wrapper.setContent('');
-                                    var row = wrapper.ancestor('tr');
-                                    // update the page heading - the number of staged strings
-                                    var numofstrings = {staged: row.ancestor('table').all('tr').size() - 2}; // one for header, one to be removed
+                                    var row = args.button.ancestor('.string-control-group');
+                                    // update the page heading - the number of staged strings after the removal
+                                    var numofstrings = {staged: Y.all('#amosstage .string-control-group').size() - 1};
                                     Y.one('#numberofstagedstrings').setContent(M.util.get_string('stagestringsnocommit', 'local_amos', numofstrings));
                                     // remove the row from the table
                                     var anim = new Y.Anim({
                                         node: row,
-                                        duration: 0.25,
-                                        from: { opacity: 1 },
-                                        to: { opacity: 0 },
+                                        duration: 0.5,
+                                        to: { height: 0 },
                                     });
                                     anim.run();
                                     anim.on('end', function() {
-                                        var row = this.get('node'); // this === anim
-                                        row.get('parentNode').removeChild(row);
+                                        this.get('node').remove(true);
                                     });
                                     // if all strings unstaged, reload the stage screen
                                     if (numofstrings.staged <= 0) {
                                         location.href = M.cfg.wwwroot + '/local/amos/stage.php';
                                     }
                                 } else {
-                                    args.button.get('parentNode').setContent('Error: ' + result.error);
-                                    args.button.get('parentNode').addClass('error');
+                                    args.button.setContent('Error: ' + result.error);
+                                    args.button.addClass('btn-inverse');
                                 }
                             },
                             failure: function(transid, outcome, args) {
@@ -111,8 +96,8 @@ YUI.add('moodle-local_amos-stage', function(Y) {
                                 if (M.cfg.developerdebug) {
                                     debuginfo += ' (' + ajaxurl + ')';
                                 }
-                                args.button.get('parentNode').addClass('error');
-                                args.button.get('parentNode').setContent(debuginfo);
+                                args.button.setContent(debuginfo);
+                                args.button.addClass('btn-inverse');
                             }
                         },
                     };
