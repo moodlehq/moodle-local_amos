@@ -32,6 +32,7 @@ require_once(dirname(__FILE__).'/diff_form.php');
 require_once(dirname(__FILE__).'/execute_form.php');
 
 $message    = optional_param('message', null, PARAM_RAW); // commit message
+$keepstaged = optional_param('keepstaged', false, PARAM_BOOL); // keep staged after commit
 $unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
 $prune      = optional_param('prune', null, PARAM_INT);
 $rebase     = optional_param('rebase', null, PARAM_INT);
@@ -46,18 +47,24 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('stage', 'local_amos'));
-$PAGE->requires->strings_for_js(array('unstage', 'unstageconfirm', 'unstaging', 'confirmaction', 'stagestringsnocommit', 'diffstaged'), 'local_amos');
+$PAGE->requires->strings_for_js(array('commitmessageempty', 'unstage', 'unstageconfirm', 'unstaging',
+    'confirmaction', 'stagestringsnocommit', 'diffstringmode'), 'local_amos');
 $PAGE->requires->yui_module('moodle-theme_moodleorgcleaned-finesses', 'M.theme_moodleorgcleaned.finesses.gridRowsEqualHeight', array('#amosstage .string-text'));
 $PAGE->requires->yui_module('moodle-local_amos-stage', 'M.local_amos.init_stage');
+$PAGE->requires->yui_module('moodle-local_amos-collapsible', 'M.local_amos.collapsible.init', array(
+    array(
+        'wrapper' => '.stagetool.collapsible',
+        'control' => '.stagetool-title',
+    )
+));
 
 if (!empty($message)) {
-    // committing the stage
     require_sesskey();
     require_capability('local/amos:commit', context_system::instance());
-    if (isset($_POST['commit2'])) {
-        $clear = false;
-    } else {
+    if (empty($keepstaged)) {
         $clear = true;
+    } else {
+        $clear = false;
     }
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $allowed = mlang_tools::list_allowed_languages($USER->id);

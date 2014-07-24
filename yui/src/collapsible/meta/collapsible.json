@@ -1,0 +1,10 @@
+{
+    "moodle-local_amos-collapsible": {
+        "requires": [
+            "base",
+            "node",
+            "node-event-delegate"
+        ]
+    }
+}
+

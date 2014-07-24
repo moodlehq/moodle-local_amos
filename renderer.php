@@ -574,13 +574,6 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function render_local_amos_stage(local_amos_stage $stage) {
         global $CFG;
 
-        /*
-                get_string('stagestring', 'local_amos'),
-                get_string('stageoriginal', 'local_amos'),
-                get_string('stagelang', 'local_amos'),
-                get_string('stagetranslation', 'local_amos') . $this->help_icon('stagetranslation', 'local_amos'));
-         */
-
         $listlanguages = mlang_tools::list_languages();
         $committable = 0;
         $standard = array();
@@ -623,7 +616,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 'sesskey'   => sesskey(),
             ));
             $unstagebutton = html_writer::link($unstageurl, get_string('unstage', 'local_amos'), array(
-                'class' => 'btn btn-warning btn-small protected unstagebutton',
+                'class' => 'btn btn-warning btn-small unstagebutton',
                 'data-unstage' => $string->stringid,
                 'data-component' => $string->component,
                 'data-branch' => $string->branch,
@@ -640,7 +633,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 'd' => $string->stringid,
             ));
             $editbutton = html_writer::link($editurl, get_string('edit'),
-                array('class' => 'btn btn-small editbutton'));
+                array('class' => 'btn btn-info btn-small editbutton'));
 
             $trclasses = ' ';
 
@@ -653,7 +646,7 @@ class local_amos_renderer extends plugin_renderer_base {
                     $trclasses .= ' uncommittable removal';
                 }
                 $t = html_writer::div(self::add_breaks(s($string->current)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.' '.$editbutton, 'translationactions');
+                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
             } else if (is_null($string->current)) {
                 // new translation
                 if ($string->committable) {
@@ -664,12 +657,12 @@ class local_amos_renderer extends plugin_renderer_base {
                     $trclasses .= ' uncommittable new';
                 }
                 $t = html_writer::div(self::add_breaks(s($string->new)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.' '.$editbutton, 'translationactions');
+                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
             } else if (trim($string->current) === trim($string->new)) {
                 // no difference
                 $trclasses .= ' uncommittable nodiff';
                 $t = html_writer::div(self::add_breaks(s($string->current)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.' '.$editbutton, 'translationactions');
+                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
             } else {
                 // there is a difference
                 if ($string->committable) {
@@ -725,7 +718,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $c = html_writer::tag('div', self::add_breaks($c), array('class' => 'preformatted stringtext current', 'style' => $cstyle));
                 $t = html_writer::tag('div', self::add_breaks($t), array('class' => 'preformatted stringtext diff', 'style' => $tstyle));
                 $t = html_writer::div($n . $c . $t);
-                $t .= html_writer::div($unstagebutton.' '.$editbutton, 'translationactions');
+                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
             }
 
             // info lines
@@ -758,125 +751,68 @@ class local_amos_renderer extends plugin_renderer_base {
             $trout .= html_writer::end_div(); // .string-control-group
         }
 
-        if ($stage->showpropagateform) {
-            $propagateform  = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-            $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
-            foreach (mlang_version::list_all() as $version) {
-                if ($version->code < 2000) {
-                    continue;
-                }
-                $checkbox = html_writer::checkbox('ver[]', $version->code, true, $version->label);
-                $propagateform .= html_writer::tag('div', $checkbox, array('class' => 'labelled_checkbox'));
-            }
-            $propagateform .= html_writer::empty_tag('input', array('value' => get_string('propagaterun', 'local_amos'), 'type' => 'submit'));
-            $propagateform  = html_writer::tag('div', $propagateform);
-            $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-            $propagateform .= html_writer::tag('legend', get_string('propagate', 'local_amos') . $this->help_icon('propagate', 'local_amos'));
-            $propagateform = html_writer::tag('fieldset', $propagateform, array('class' => 'propagateformwrapper protected'));
-        } else {
-            $propagateform = '';
-        }
-
-        $commitform  = html_writer::label(get_string('commitmessage', 'local_amos'), 'commitmessage', false);
-        $commitform .= html_writer::empty_tag('img', array('src' => $this->pix_url('req'), 'title' => 'Required', 'alt' => 'Required', 'class' => 'req'));
-        $commitform .= html_writer::empty_tag('br');
-        $commitform .= html_writer::tag('textarea', s($stage->presetmessage), array('id' => 'commitmessage', 'name' => 'message'));
-        $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $button1 = html_writer::empty_tag('input', array('name' => 'commit1', 'value' => get_string('commitbutton', 'local_amos'), 'type' => 'submit'));
-        $button2 = html_writer::empty_tag('input', array('name' => 'commit2', 'value' => get_string('commitbutton2', 'local_amos'), 'type' => 'submit'));
-        $button = html_writer::tag('div', $button1.' '.$button2);
-        $commitform = html_writer::tag('div', $commitform . $button);
-        $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-        $commitform .= html_writer::tag('legend', get_string('commitstage', 'local_amos') . $this->help_icon('commitstage', 'local_amos'));
-        $commitform = html_writer::tag('fieldset', $commitform, array('class' => 'commitformwrapper protected'));
-
-        $a = new stdClass();
-        $a->time = userdate(time(), get_string('strftimedaydatetime', 'langconfig'));
-        $stashtitle = get_string('stashtitledefault', 'local_amos', $a);
-
-        $stashform  = html_writer::label(get_string('stashtitle', 'local_amos'), 'stashtitle', true);
-        $stashform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-        $stashform .= html_writer::empty_tag('input', array('name' => 'new', 'value' => 1, 'type' => 'hidden'));
-        $stashform .= html_writer::empty_tag('input', array('name' => 'name',
-                                                            'value' => $stashtitle,
-                                                            'type' => 'text',
-                                                            'size' => 50,
-                                                            'id' => 'stashtitle',
-                                                            'maxlength' => 255));
-        $stashform .= html_writer::empty_tag('input', array('value' => get_string('stashpush', 'local_amos'), 'type' => 'submit'));
-        $stashform  = html_writer::tag('div', $stashform);
-        $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
-        $stashform  = html_writer::tag('div', $stashform, array('class' => 'stashformwrapper'));
-
-        $submiturl = new moodle_url('/local/amos/stage.php', array('submit' => 1));
-        $submitbutton = $this->single_button($submiturl, get_string('stagesubmit', 'local_amos'), 'post', array('class'=>'singlebutton submit'));
-
-        $pruneurl = new moodle_url('/local/amos/stage.php', array('prune' => 1));
-        $prunebutton = $this->single_button($pruneurl, get_string('stageprune', 'local_amos'), 'post', array('class'=>'singlebutton protected prune'));
-
-        $rebaseurl = new moodle_url('/local/amos/stage.php', array('rebase' => 1));
-        $rebasebutton = $this->single_button($rebaseurl, get_string('stagerebase', 'local_amos'), 'post', array('class'=>'singlebutton protected rebase'));
-
-        $unstageallurl = new moodle_url('/local/amos/stage.php', array('unstageall' => 1));
-        $unstageallbutton = $this->single_button($unstageallurl, get_string('stageunstageall', 'local_amos'), 'post', array('class'=>'singlebutton protected unstageall'));
-
-        $i = 0;
-        foreach ($stage->filterfields->fver as $fver) {
-            $params['fver['.$i.']'] = $fver;
-            $i++;
-        }
-        $i = 0;
-        foreach ($stage->filterfields->flng as $flng) {
-            $params['flng['.$i.']'] = $flng;
-            $i++;
-        }
-        $i = 0;
-        foreach ($stage->filterfields->fcmp as $fcmp) {
-            $params['fcmp['.$i.']'] = $fcmp;
-            $i++;
-        }
-        $params['fstg'] = 1;
-        $params['__lazyform_amosfilter'] = 1;
-        $editurl = new moodle_url('/local/amos/view.php', $params);
-        $editbutton = $this->single_button($editurl, get_string('stageedit', 'local_amos'), 'post', array('class'=>'singlebutton edit'));
-
         if (empty($stage->strings)) {
             $output = $this->heading(get_string('stagestringsnone', 'local_amos'), 2, 'main', 'numberofstagedstrings');
 
+            $output .= html_writer::div(
+                html_writer::link(
+                    new moodle_url('/local/amos/view.php'),
+                    get_string('translatortoolopen', 'local_amos'),
+                    array('class' => 'btn btn-success')
+                ),
+                'stagetool simple opentranslator'
+            );
+
             if ($stage->importform) {
-                $legend = html_writer::tag('legend', get_string('importfile', 'local_amos') . $this->help_icon('importfile', 'local_amos'));
                 ob_start();
                 $stage->importform->display();
-                $importform = ob_get_contents();
+                $formoutput = ob_get_contents();
                 ob_end_clean();
-                $output .= html_writer::tag('fieldset', $legend.$importform, array('class' => 'wrappedmform importform'));
+
+                $output .= $this->collapsible_stage_tool(
+                    get_string('importfile', 'local_amos'),
+                    $formoutput,
+                    $this->output->help_icon('importfile', 'local_amos')
+                );
             }
 
             if ($stage->mergeform) {
-                $legend = html_writer::tag('legend', get_string('mergestrings', 'local_amos') . $this->help_icon('mergestrings', 'local_amos'));
                 ob_start();
                 $stage->mergeform->display();
-                $mergeform = ob_get_contents();
+                $formoutput = ob_get_contents();
                 ob_end_clean();
-                $output .= html_writer::tag('fieldset', $legend.$mergeform, array('class' => 'wrappedmform mergeform'));
+
+                $output .= $this->collapsible_stage_tool(
+                    get_string('mergestrings', 'local_amos'),
+                    $formoutput,
+                    $this->help_icon('mergestrings', 'local_amos')
+                );
             }
 
             if ($stage->diffform) {
-                $legend = html_writer::tag('legend', get_string('diffstrings', 'local_amos') . $this->help_icon('diffstrings', 'local_amos'));
                 ob_start();
                 $stage->diffform->display();
-                $diffform = ob_get_contents();
+                $formoutput = ob_get_contents();
                 ob_end_clean();
-                $output .= html_writer::tag('fieldset', $legend.$diffform, array('class' => 'wrappedmform diffform'));
+
+                $output .= $this->collapsible_stage_tool(
+                    get_string('diffstrings', 'local_amos'),
+                    $formoutput,
+                    $this->help_icon('diffstrings', 'local_amos')
+                );
             }
 
             if ($stage->executeform) {
-                $legend = html_writer::tag('legend', get_string('script', 'local_amos') . $this->help_icon('script', 'local_amos'));
                 ob_start();
                 $stage->executeform->display();
-                $executeform = ob_get_contents();
+                $formoutput = ob_get_contents();
                 ob_end_clean();
-                $output .= html_writer::tag('fieldset', $legend.$executeform, array('class' => 'wrappedmform executeform'));
+
+                $output .= $this->collapsible_stage_tool(
+                    get_string('script', 'local_amos'),
+                    $formoutput,
+                    $this->help_icon('script', 'local_amos')
+                );
             }
 
         } else {
@@ -893,36 +829,212 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             unset($a);
 
-            $justpropagated = optional_param('justpropagated', null, PARAM_INT); // usability hack to hide the propagator just after it was used
-            if (is_null($justpropagated)) {
-                $output .= $propagateform;
-            } else if ($justpropagated == 0) {
-                $output .= $this->heading(get_string('propagatednone', 'local_amos'));
-            } else {
-                $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
+            // Propagate translations
+            if ($stage->canpropagate and count($stage->strings) == $committable) {
+                $justpropagated = optional_param('justpropagated', null, PARAM_INT);
+                if (is_null($justpropagated)) {
+                    $expandpropagate = true;
+                } else {
+                    $expandpropagate = false;
+                    if ($justpropagated == 0) {
+                        $output .= $this->heading(get_string('propagatednone', 'local_amos'));
+                    } else {
+                        $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
+                    }
+                }
+
+                $propagateform  = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+                $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
+                foreach (mlang_version::list_all() as $version) {
+                    if ($version->code < 2000) {
+                        continue;
+                    }
+                    $propagateform .= html_writer::tag('label',
+                        html_writer::checkbox('ver[]', $version->code, true) . $version->label,
+                        array('class' => 'checkbox inline')
+                    );
+                }
+                $propagateform .= html_writer::empty_tag('input',
+                    array(
+                        'value' => get_string('propagaterun', 'local_amos'),
+                        'type' => 'submit'
+                    )
+                );
+                $propagateform  = html_writer::tag('div', $propagateform);
+                $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+                $output .= $this->collapsible_stage_tool(
+                    get_string('propagate', 'local_amos'),
+                    $propagateform,
+                    $this->help_icon('propagate', 'local_amos'),
+                    $expandpropagate,
+                    'protected propagate'
+                );
             }
 
-            if ($committable) {
-                $output .= $commitform;
+            if ($committable and $stage->cancommit) {
+                $commitform = html_writer::div(
+                    html_writer::tag('textarea', s($stage->presetmessage), array(
+                        'placeholder' => get_string('commitmessage', 'local_amos'),
+                        'name' => 'message',
+                        'rows' => 3
+                    ))
+                );
+                $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+                $commitform .= html_writer::tag('label',
+                    html_writer::checkbox('keepstaged', 1, false) . get_string('commitkeepstaged', 'local_amos'),
+                    array('class' => 'inline checkbox')
+                );
+                $commitform .= html_writer::div(
+                    html_writer::tag('button', get_string('commitbutton', 'local_amos'), array(
+                        'type' => 'submit',
+                        'class' => 'btn btn-success'
+                    ))
+                );
+                $commitform = html_writer::div($commitform, 'protected');
+                $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+
+                $output .= $this->collapsible_stage_tool(
+                    get_string('commitstage', 'local_amos'),
+                    $commitform,
+                    $this->help_icon('commitstage', 'local_amos'),
+                    true,
+                    'commit'
+                );
             }
 
-            $legend = html_writer::tag('legend', get_string('stageactions', 'local_amos') . $this->help_icon('stageactions', 'local_amos'));
-            $actionbuttons = $legend.$submitbutton.$editbutton;
+            // Submit strings to language pack maintainers
+            if ($stage->canstash and $committable == 0) {
+                $output .= html_writer::div(
+                    html_writer::link(
+                        new moodle_url('/local/amos/stage.php', array('submit' => 1, 'sesskey' => sesskey())),
+                        get_string('stagesubmit', 'local_amos'),
+                        array('class' => 'btn btn-success')
+                    ),
+                    'stagetool simple'
+                );
+            }
+
+            // Stage actions
+            $prunebutton = html_writer::link(
+                new moodle_url('/local/amos/stage.php', array('prune' => 1, 'sesskey' => sesskey())),
+                get_string('stageprune', 'local_amos'),
+                array('class' => 'btn btn-warning protected prune')
+            );
+
+            $rebasebutton = html_writer::link(
+                new moodle_url('/local/amos/stage.php', array('rebase' => 1, 'sesskey' => sesskey())),
+                get_string('stagerebase', 'local_amos'),
+                array('class' => 'btn btn-warning protected rebase')
+            );
+
+            $unstageallbutton = html_writer::link(
+                new moodle_url('/local/amos/stage.php', array('unstageall' => 1, 'sesskey' => sesskey())),
+                get_string('stageunstageall', 'local_amos'),
+                array('class' => 'btn btn-danger protected unstageall')
+            );
+
+            $i = 0;
+            foreach ($stage->filterfields->fver as $fver) {
+                $params['fver['.$i.']'] = $fver;
+                $i++;
+            }
+            $i = 0;
+            foreach ($stage->filterfields->flng as $flng) {
+                $params['flng['.$i.']'] = $flng;
+                $i++;
+            }
+            $i = 0;
+            foreach ($stage->filterfields->fcmp as $fcmp) {
+                $params['fcmp['.$i.']'] = $fcmp;
+                $i++;
+            }
+            $params['fstg'] = 1;
+            $params['__lazyform_amosfilter'] = 1;
+            $params['sesskey'] = sesskey();
+
+            $editbutton = html_writer::link(
+                new moodle_url('/local/amos/view.php', $params),
+                get_string('stageedit', 'local_amos'),
+                array('class' => 'btn btn-info edit')
+            );
+
+            $actionbuttons = $editbutton.$rebasebutton;
             if ($committable) {
-                $actionbuttons .= $prunebutton.$rebasebutton;
+                $actionbuttons .= $prunebutton;
             }
             $actionbuttons .= $unstageallbutton;
-            $output .= html_writer::tag('fieldset', $actionbuttons, array('class' => 'actionbuttons'));
+            $output .= $this->collapsible_stage_tool(
+                get_string('stageactions', 'local_amos'),
+                $actionbuttons,
+                $this->help_icon('stageactions', 'local_amos'),
+                false,
+                'stageactions'
+            );
 
-            $legend = html_writer::tag('legend', get_string('stashactions', 'local_amos') . $this->help_icon('stashactions', 'local_amos'));
-            $output .= html_writer::tag('fieldset', $legend.$stashform, array('class' => 'actionbuttons'));
+            // Save work in progress
+            if ($stage->canstash) {
+                $a = array(
+                    'time' => userdate(time(), get_string('strftimedaydatetime', 'langconfig'))
+                );
+                $stashtitle = get_string('stashtitledefault', 'local_amos', $a);
 
+                $stashform = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+                $stashform .= html_writer::empty_tag('input', array('name' => 'new', 'value' => 1, 'type' => 'hidden'));
+                $stashform .= html_writer::empty_tag('input', array('name' => 'name',
+                                                                    'value' => $stashtitle,
+                                                                    'placeholder' => get_string('stashtitle', 'local_amos'),
+                                                                    'type' => 'text',
+                                                                    'size' => 50,
+                                                                    'id' => 'stashtitle',
+                                                                    'maxlength' => 255));
+                $stashform .= html_writer::empty_tag('input', array('value' => get_string('stashpush', 'local_amos'), 'type' => 'submit'));
+                $stashform  = html_writer::div($stashform);
+                $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
+                $output .= $this->collapsible_stage_tool(
+                    get_string('stashactions', 'local_amos'),
+                    $stashform,
+                    $this->help_icon('stashactions', 'local_amos'),
+                    false,
+                    'stashactions'
+                );
+            }
+
+            // And finally the staged strings themselves.
             $output .= html_writer::div($trout, '', array('id' => 'amosstage'));
         }
+
         $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));
 
         return $output;
 
+    }
+
+    /**
+     * Helper method for rendering collapsible tools at the stage page
+     *
+     * @param string $title
+     * @param string $content
+     * @param string $helpcicon
+     * @param bool $expanded
+     * @return string
+     */
+    protected function collapsible_stage_tool($title, $content, $helpicon = '', $expanded = false, $extraclasses = '') {
+
+        if ($expanded) {
+            $attr = array('data-initial-state' => 'expanded');
+        } else {
+            $attr = array('data-initial-state' => 'collapsed');
+        }
+
+        $output = html_writer::start_div('stagetool collapsible '.$extraclasses, $attr);
+        $output .= html_writer::div(
+            html_writer::span($title, 'stagetool-title').html_writer::span($helpicon, 'stagetool-helpicon'),
+            'stagetool-heading'
+        );
+        $output .= html_writer::div($content, 'stagetool-content');
+        $output .= html_writer::end_div(); // $classes;
+
+        return $output;
     }
 
     /**

@@ -1,0 +1,129 @@
+// Styles used at the stage page
+
+@collapsible-padding: 20px;
+
+.path-local-amos {
+
+    .stagewrapper {
+
+        .stagetool {
+            border: 1px solid #ddd;
+            .border-radius(10px);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stagetool.simple {
+            text-align: center;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .stagetool.collapsible {
+
+            .stagetool-title {
+                font-size: larger;
+                margin-left: @collapsible-padding;
+            }
+
+            .collapsible-control {
+                > a {
+                    background: url([[pix:core|t/expanded]]) no-repeat scroll 0 center;
+                    padding-left: @collapsible-padding;
+                    margin-left: -@collapsible-padding;
+                }
+            }
+
+            .stagetool-content {
+                margin-top: 15px;
+            }
+        }
+
+        .stagetool.collapsible.collapsible-collapsed {
+            .collapsible-control > a {
+                background-image: url([[pix:core|t/collapsed]]);
+            }
+
+            .stagetool-content {
+                display: none;
+            }
+        }
+
+        .stagetool.commit, .stagetool.propagate, .stagetool.stageactions, .stagetool.stashactions {
+            .stagetool-content {
+                text-align: center;
+            }
+        }
+
+        .stagetool.propagate {
+
+            input[type="submit"] {
+                margin: 5px 20px;
+            }
+
+            label.checkbox input[type="checkbox"] {
+                margin-top: 4px; // Undo the dodgy hack from theme/bootstrapbase/less/moodle/forms.less
+                margin-right: 0;
+            }
+        }
+
+        .stagetool.commit {
+            label.checkbox {
+                margin-bottom: 5px;
+            }
+            label.checkbox input[type="checkbox"] {
+                margin-top: 4px; // Undo the dodgy hack from theme/bootstrapbase/less/moodle/forms.less
+                margin-right: 0;
+            }
+        }
+
+        .stagetool.stageactions {
+            .btn {
+                margin: 2px;
+            }
+        }
+
+    }
+
+    #amosstage {
+
+        .translation.uncommittable {
+            background-color: #d2ebff;
+        }
+
+        .translation.uncommittable.nodiff {
+            background-color: white;
+            color: #999;
+        }
+
+        .translation.committable.new {
+            background-color: #e7f1c3;
+        }
+
+        .translation.committable.diff {
+            background-color: #f3f2aa;
+        }
+
+        .translation.committable.removal {
+            background-color: @amos-color-red;
+        }
+
+        .translation .translationactions {
+            margin: 3px;
+            .btn {
+                margin: 2px;
+            }
+        }
+
+        .translation.diff {
+            del {
+                color: #999;
+            }
+            ins {
+                color: green;
+                text-decoration: none;
+                font-weight: bold;
+            }
+        }
+    }
+}

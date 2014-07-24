@@ -37,9 +37,10 @@ $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:usegoogle'] = 'Use Google Translate services';
-$string['commitbutton'] = 'Commit and unstage all';
-$string['commitbutton2'] = 'Commit and keep staged';
+$string['commitbutton'] = 'Commit';
+$string['commitkeepstaged'] = 'Keep strings staged';
 $string['commitmessage'] = 'Commit message';
+$string['commitmessageempty'] = 'Please fill the commit message';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['committableall'] = 'all languages';
@@ -124,7 +125,7 @@ $string['diffmode3'] = 'Either English or translated strings have changed (but n
 $string['diffmode4'] = 'Both English and translated strings have changed';
 $string['diffprogress'] = 'Comparing selected branches';
 $string['diffprogressdone'] = 'Total of {$a} differences found';
-$string['diffstaged'] = 'diff';
+$string['diffstringmode'] = 'Switch diff mode';
 $string['diffstrings'] = 'Compare strings at two branches';
 $string['diffstrings_help'] = 'This will compare all strings at the two selected branches. If there is difference in strings on the branches, both versions are staged. You can then use "Edit staged strings" feature to review and fix the changes as needed.';
 $string['diffversions'] = 'Versions';
@@ -269,7 +270,7 @@ $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
 $string['processing'] = 'Processing ...';
 $string['propagate'] = 'Propagate translations';
-$string['propagate_help'] = 'Staged translations can be propagated to selected branches. AMOS iterates over the list of staged translations and tries to apply them to each selected target branche. Propagation is not possible if:
+$string['propagate_help'] = 'Staged translations can be propagated to selected branches. AMOS iterates over the list of staged translations and tries to apply them to each selected target branch. Propagation is not possible if:
 
 * the English originals of the string are different on the source and target branches,
 * the string is staged several times with different translation';
@@ -296,15 +297,12 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Rebase - unstage all translations that either do not modify the current translation or are older than the most recent translation in the repository. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
 $string['stageedit'] = 'Edit staged strings';
-$string['stagelang'] = 'Lang';
-$string['stageoriginal'] = 'Original';
 $string['stageprune'] = 'Prune non-committable';
 $string['stagerebase'] = 'Rebase';
-$string['stagestring'] = 'String';
 $string['stagestringsnocommit'] = 'There are {$a->staged} staged strings';
 $string['stagestringsnone'] = 'There are no staged strings';
 $string['stagestringssome'] = 'There are {$a->staged} staged strings, {$a->committable} of them can be committed';
-$string['stagesubmit'] = 'Submit to maintainers';
+$string['stagesubmit'] = 'Send strings to language pack maintainers';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
@@ -313,7 +311,7 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * Blue - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['stageunstageall'] = 'Unstage all';
-$string['stashactions'] = 'Stashing actions';
+$string['stashactions'] = 'Save work in progress';
 $string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be submitted to the official language pack maintainers for inclusion into the language pack.';
 $string['stashapply'] = 'Apply';
 $string['stashautosave'] = 'Automatically saved backup stash';
@@ -330,7 +328,7 @@ $string['stashsubmitdetails'] = 'Submitting details';
 $string['stashsubmitmessage'] = 'Message';
 $string['stashsubmitsubject'] = 'Subject';
 $string['stashtitle'] = 'Stash title';
-$string['stashtitledefault'] = 'WIP - {$a->time}';
+$string['stashtitledefault'] = 'Work in progress - {$a->time}';
 $string['stringhistory'] = 'History';
 $string['strings'] = 'Strings';
 $string['submitting'] = 'Submitting a contribution';
@@ -338,6 +336,7 @@ $string['submitting_help'] = 'This will send translated strings to official lang
 $string['targetversion'] = 'Target version';
 $string['timeline'] = 'timeline';
 $string['translatortool'] = 'Translator';
+$string['translatortoolopen'] = 'Open AMOS translator';
 $string['translatortranslation'] = 'Translation';
 $string['translatortranslation_help'] = 'Click the cell to turn it into the input editor. Insert the translation and click outside the cell to stage the translation. The background color of the cell means:
 

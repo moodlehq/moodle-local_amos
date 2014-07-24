@@ -2,8 +2,9 @@
 @import "../../../theme/bootstrapbase/less/bootstrap/mixins.less";
 @import "variables.less";
 @import "sitefrontpage.less";
-@import "amosfilter.less";
-@import "amosstrings.less";
+@import "filter.less";
+@import "strings.less";
+@import "stage.less";
 
 
 // Styles used within the AMOS tool itself
@@ -12,59 +13,6 @@
 
     h2 {
         text-align: center;
-    }
-
-    .stagewrapper {
-
-        .propagateformwrapper {
-            padding: 10px;
-            form div {
-                display: inline;
-            }
-        }
-
-        .commitformwrapper {
-            margin: 0em auto;
-            padding: 10px;
-            textarea {
-                width: 30em;
-                min-height: 5em;
-            }
-        }
-
-        .actionbuttons {
-            .singlebutton {
-                margin: 0px 2px;
-                &.submit {
-                    margin-right: 2em;
-                    input[type="submit"], input[type="submit"] {
-                        background-color: #e7f1c3;
-                    }
-                }
-                &.unstageall {
-                    margin-left: 2em;
-                    input[type="submit"] {
-                        background-color: @amos-color-red;
-                    }
-                }
-
-                &.edit input[type="submit"], &.apply input[type="submit"] {
-                    background-color: #d2ebff;
-                }
-
-
-            }
-            .singlebutton, .singlebutton form, .singlebutton form div {
-                display: inline;
-            }
-        }
-
-    }
-
-    #amosstage {
-        .translationactions {
-            margin: 5px;
-        }
     }
 
     // Translator specific styling
@@ -120,46 +68,9 @@
 
 }
 
-
-.path-local-amos #amosstage .translation.diff del {
-    color: #999;
-}
-
-.path-local-amos #amosstage .translation.diff ins {
-    color: green;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-
-.path-local-amos #amosstage .translation.uncommittable {
-    background-color: #d2ebff;
-}
-
-.path-local-amos #amosstage .translation.uncommittable.nodiff {
-    background-color: white;
-    color: #999;
-}
-
 .path-local-amos #amostranslator .translation.translatable,
-.path-local-amos #amostranslator .translation.committable,
-.path-local-amos #amosstage .translation.committable.new {
+.path-local-amos #amostranslator .translation.committable {
     background-color: #e7f1c3;
-}
-
-.path-local-amos #amosstage .translation.committable.removal {
-    background-color: @amos-color-red;
-}
-
-.path-local-amos #amosstage .translation.committable.diff {
-    background-color: #f3f2aa;
-}
-
-.path-local-amos #amosstage .translation .diffmode {
-    float: right;
-    color: #0C67D7;
-    cursor: pointer;
-    font-size: 80%;
 }
 
 .path-local-amos #amostranslator .translation.translatable.outdated,

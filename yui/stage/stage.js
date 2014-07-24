@@ -12,6 +12,7 @@ YUI.add('moodle-local_amos-stage', function(Y) {
 
     Y.extend(Stage, Y.Base, {
         initializer : function(config) {
+            this.setup_commit_message_validator();
             this.setup_protector();
             this.replace_unstage_buttons();
             this.setup_diffmode_switcher();
@@ -24,6 +25,11 @@ YUI.add('moodle-local_amos-stage', function(Y) {
          */
         setup_protector : function() {
             Y.all('.stagewrapper .protected form').on('submit', function(e) {
+                if (!confirm(M.util.get_string('confirmaction', 'local_amos'))) {
+                    e.halt();
+                }
+            });
+            Y.all('.btn.protected').on('click', function(e) {
                 if (!confirm(M.util.get_string('confirmaction', 'local_amos'))) {
                     e.halt();
                 }
@@ -107,22 +113,39 @@ YUI.add('moodle-local_amos-stage', function(Y) {
         },
 
         setup_diffmode_switcher: function() {
-            var links = Y.all('#amosstage .translation .diffmode');
-            links.setContent(M.util.get_string('diffstaged', 'local_amos'));
             var amosstage = Y.one('#amosstage');
+
             if (amosstage) {
+                amosstage.all('.translation.diff .translationactions').append(
+                    '<a href="#" class="btn btn-small diffmodebutton">' + M.util.get_string('diffstringmode', 'local_amos') + '</a>'
+                );
                 amosstage.delegate('click', function(e) {
-                    Y.log(e);
-                    var link = e.currentTarget;
-                    var cell = link.ancestor('td');
-                    cell.all('.stringtext').each(function(stringtext) {
+                    e.preventDefault();
+                    e.currentTarget.ancestor('.translation').all('.stringtext').each(function(stringtext) {
                         if (stringtext.getStyle('display') == 'none') {
                             stringtext.setStyle('display', 'block');
                         } else if (stringtext.getStyle('display') == 'block') {
                             stringtext.setStyle('display', 'none');
                         }
                     });
-                }, '.translation .diffmode');
+                }, '.translation .diffmodebutton');
+            }
+        },
+
+        setup_commit_message_validator: function() {
+            var btn = Y.one('.stagewrapper .stagetool.commit button[type="submit"]'),
+                msg = Y.one('.stagewrapper .stagetool.commit textarea');
+
+            if (btn) {
+                btn.on('click', function(e) {
+                    if (Y.Lang.trim(msg.get('value')) === '') {
+                        e.preventDefault();
+                        Y.use('moodle-core-notification-alert', function() {
+                            var alert = new M.core.alert({ message: M.util.get_string('commitmessageempty', 'local_amos')});
+                            alert.show();
+                        });
+                    }
+                });
             }
         }
 

@@ -1,0 +1,10 @@
+{
+    "name": "moodle-local_amos-collapsible",
+    "builds": {
+        "moodle-local_amos-collapsible": {
+            "jsfiles": [
+                "collapsible.js"
+            ]
+        }
+    }
+}

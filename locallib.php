@@ -742,7 +742,7 @@ class local_amos_stage implements renderable {
     public $mergeform;
 
     /** @var local_amos_diff_form to stage differences between two branches */
-    public $difform;
+    public $diffform;
 
     /** @var local_amos_execute_form to execute a given AMOScript */
     public $executeform;
@@ -754,7 +754,13 @@ class local_amos_stage implements renderable {
     public $stagedcontribution;
 
     /** @var bool */
-    public $showpropagateform = false;
+    public $cancommit = false;
+
+    /** @var bool */
+    public $canstash = false;
+
+    /** @var bool */
+    public $canpropagate = false;
 
     /**
      * @param stdclass $user the owner of the stage
@@ -772,12 +778,14 @@ class local_amos_stage implements renderable {
         }
 
         if (has_capability('local/amos:commit', context_system::instance(), $user)) {
-            $this->showpropagateform = true;
+            $this->cancommit = true;
+            $this->canpropagate = true;
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
+            $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }
 
-        if (has_capability('local/amos:stage', context_system::instance(), $user)) {
-            $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
+        if (has_capability('local/amos:stash', context_system::instance(), $user)) {
+            $this->canstash = true;
         }
 
         if (has_all_capabilities(array('local/amos:execute', 'local/amos:stage'), context_system::instance(), $user)) {
