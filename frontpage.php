@@ -80,7 +80,7 @@ function local_amos_frontpage_contribution_stats() {
             <div class="well frontpageblock">
                 <h2><?php print_string('quicklinks', 'local_amos'); ?></h2>
                 <ul class="unstyled">
-                    <li><a href="/local/amos/"><i class="icon-pencil"></i> <?php print_string('quicklinks_amos', 'local_amos'); ?></a></li>
+                    <li><a href="/local/amos/view.php"><i class="icon-pencil"></i> <?php print_string('quicklinks_amos', 'local_amos'); ?></a></li>
                     <li><a href="/course/view.php?id=2"><i class="icon-comment"></i> <?php print_string('quicklinks_forum', 'local_amos'); ?></a></li>
                     <li><a href="/mod/page/view.php?id=9"><i class="icon-info-sign"></i> <?php print_string('quicklinks_newcomers', 'local_amos'); ?></a></li>
                     <li><a href="/mod/url/view.php?id=16&amp;redirect=1"><i class="icon-book"></i> <?php print_string('quicklinks_manual', 'local_amos'); ?></a></li>
