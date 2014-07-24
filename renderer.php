@@ -317,15 +317,16 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         $output .= html_writer::end_tag('div');
 
-        // submit and permalink
+        // Form actions
         $output .= html_writer::start_tag('div', array('class' => 'form-actions'));
         $output .= html_writer::tag('button', get_string('savefilter', 'local_amos'), array('class' => 'btn btn-primary', 'type' => 'submit'));
+        $output .= html_writer::span('', 'collapsible-control');
         $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
         $permalink = $filter->get_permalink();
         if (!is_null($permalink)) {
             $output .= html_writer::link($permalink, get_string('permalink', 'local_amos'), array('class' => 'permalink btn btn-link'));
         }
-        $output .= html_writer::span('', 'collapsible-control');
+        $output .= html_writer::link(new moodle_url('/local/amos/stage.php'), get_string('stage', 'local_amos'), array('class' => 'btn btn-link'));
         $output .= html_writer::end_tag('div');
 
         // alerts
@@ -526,6 +527,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
         $output .= html_writer::div($trout, '', array('id' => 'amostranslator'));
         $output .= html_writer::tag('div', self::page_links($pages, $translator->currentpage), array('class' => 'pagination'));
+        $output .= html_writer::div(
+            html_writer::link(
+                new moodle_url('/local/amos/stage.php'),
+                get_string('stagetoolopen', 'local_amos'),
+                array('class' => 'btn btn-success')
+            ),
+            'stagetoolopen'
+        );
         $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
 
         return $output;

@@ -253,7 +253,7 @@ $string['ownstashactions_help'] = '* Apply - copy the translated strings from th
 $string['ownstashes'] = 'Your stashes';
 $string['ownstashes_help'] = 'This is a list of all your stashes. ';
 $string['ownstashesnone'] = 'No own stashes found';
-$string['permalink'] = 'permalink';
+$string['permalink'] = 'Permalink';
 $string['placeholder'] = 'Placeholders';
 $string['placeholder_help'] = 'Placeholders are special statements like `{$a}` or `{$a->something}` within the string. They are replaced with a value when the string is actually printed.
 
@@ -297,6 +297,7 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Rebase - unstage all translations that either do not modify the current translation or are older than the most recent translation in the repository. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
 $string['stageedit'] = 'Edit staged strings';
+$string['stagetoolopen'] = 'Go to the stage';
 $string['stageprune'] = 'Prune non-committable';
 $string['stagerebase'] = 'Rebase';
 $string['stagestringsnocommit'] = 'There are {$a->staged} staged strings';
