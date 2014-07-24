@@ -36,7 +36,6 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
             if (translator) {
                 translator.delegate('click', function (e) {
-                    Y.log(e.currentTarget, 'debug');
                     if (e.target.ancestor('button.markuptodate', true, '.translatable')) {
                         // clicking the up-to-date button
                         // catch it when it bubbles up to the checkbox
@@ -57,7 +56,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
                 // turn editing mode on for all translatable missing strings by default
                 var missing = translator.all('.translatable.missing.translation');
-                missing.each(function (node, index, list) { this.editor_on(node); }, this);
+                missing.each(function (node, index, list) { this.editor_on(node, false, index + 1); }, this);
 
                 // protect from leaving the page if there is a pending ajax request
                 Y.one('body').delegate('click', function(e) {
@@ -106,13 +105,18 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          *
          * @param {Y.Node} cell translator table cell
          * @param {Bool} focus shall the new editor get focus?
+         * @param {Int} tabindex of the new editor
          */
-        editor_on: function(cell, focus) {
-            Y.log(cell);
+        editor_on: function(cell, focus, tabindex) {
             var current     = cell.one('.translation-view');    // <div> with the current translation
             var stext       = current.get('text');
             stext           = stext.replace(/\u200b/g, '');     // remove U+200B zero-width space
             var editor      = Y.Node.create('<textarea class="translation-edit">' + stext + '</textarea>');
+
+            if (tabindex) {
+                editor.setAttribute('tabindex', tabindex);
+            }
+
             editor.on('blur', this.editor_blur, this);
             var ch = cell.get('clientHeight') * 1;
             var eh = editor.get('offsetHeight') * 1;
