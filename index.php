@@ -38,7 +38,27 @@ $output = $PAGE->get_renderer('local_amos');
 /// Output starts here
 echo $output->header();
 echo $output->heading(get_string('amos', 'local_amos'), 1);
-echo $output->container(get_string('about', 'local_amos'));
+
+$amosroot = $PAGE->navigation->get('amos_root');
+
+echo html_writer::start_div('amostools');
+
+foreach ($amosroot->get_children_key_list() as $childkey) {
+    $child = $amosroot->get($childkey);
+    if (!($child->action instanceof moodle_url)) {
+        continue;
+    }
+    echo html_writer::div(
+        html_writer::link(
+            $child->action,
+            $child->text,
+            array('class' => 'btn btn-large')
+        ),
+        'well amostool amostool-'.$child->key
+    );
+}
+
+echo html_writer::end_div(); // .amostools
 
 echo $output->heading(get_string('privileges', 'local_amos'));
 $caps = array();

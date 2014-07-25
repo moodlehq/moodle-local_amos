@@ -33,17 +33,17 @@ defined('MOODLE_INTERNAL') || die();
  * @param global_navigation $navigation
  */
 function local_amos_extends_navigation(global_navigation $navigation) {
-    $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'));
+    $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'), navigation_node::TYPE_CUSTOM, null, 'amos_root');
     if (has_capability('local/amos:stage', context_system::instance())) {
-        $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'));
-        $amos->add(get_string('stage', 'local_amos'), new moodle_url('/local/amos/stage.php'));
+        $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'), navigation_node::TYPE_CUSTOM, null, 'translator');
+        $amos->add(get_string('stage', 'local_amos'), new moodle_url('/local/amos/stage.php'), navigation_node::TYPE_CUSTOM, null, 'stage');
     }
     if (has_capability('local/amos:stash', context_system::instance())) {
-        $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'));
-        $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'));
+        $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'), navigation_node::TYPE_CUSTOM, null, 'stashes');
+        $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'), navigation_node::TYPE_CUSTOM, null, 'contributions');
     }
-    $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'));
-    $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'));
+    $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'), navigation_node::TYPE_CUSTOM, null, 'log');
+    $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'), navigation_node::TYPE_CUSTOM, null, 'credits');
     if (has_capability('local/amos:manage', context_system::instance())) {
         $admin = $amos->add(get_string('administration'));
         $admin->add(get_string('maintainers', 'local_amos'), new moodle_url('/local/amos/admin/translators.php'));
