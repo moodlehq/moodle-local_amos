@@ -915,7 +915,7 @@ class local_amos_log implements renderable {
 
         if (!empty($filter['userinfo'])) {
             $where['userinfo'] = $DB->sql_like('userinfo', '?', false, false);
-            $params[] = '%'.$filter['userinfo'].'%';
+            $params[] = '%'.$DB->sql_like_escape($filter['userinfo']).'%';
         }
 
         if (!empty($where['userinfo']) and !empty($where['userid'])) {
@@ -941,12 +941,12 @@ class local_amos_log implements renderable {
 
         if (!empty($filter['commitmsg'])) {
             $where['commitmsg'] = $DB->sql_like('commitmsg', '?', false, false);
-            $params[] = '%'.$filter['commitmsg'].'%';
+            $params[] = '%'.$DB->sql_like_escape($filter['commitmsg']).'%';
         }
 
         if (!empty($filter['commithash'])) {
             $where['commithash'] = $DB->sql_like('commithash', '?', false, false);
-            $params[] = $filter['commithash'].'%';
+            $params[] = $DB->sql_like_escape($filter['commithash']).'%';
         }
 
         if ($where) {

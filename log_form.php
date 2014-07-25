@@ -78,10 +78,12 @@ class local_amos_log_form extends moodleform {
 
         // Commit message
         $mform->addElement('text', 'commitmsg', get_string('logfiltercommitmsg', 'local_amos'));
+        $mform->setType('commitmsg', PARAM_RAW);
         $mform->setAdvanced('commitmsg');
 
         // Commit hash
         $mform->addElement('text', 'commithash', get_string('logfiltercommithash', 'local_amos'));
+        $mform->setType('commithash', PARAM_RAW);
         $mform->setAdvanced('commithash');
 
         // Strings filter
