@@ -212,6 +212,7 @@ class amos_export_zip {
 
             $this->rebuild_languages_md5($version, $packinfo);
             $this->rebuild_index_php($version, $packinfo);
+            $this->rebuild_index_tablehtml($version, $packinfo);
         }
     }
 
@@ -709,6 +710,23 @@ class amos_export_zip {
         $indexpagehtml = $output->render($indexpage);
         $this->log($version->dir.'/index.php', amos_cli_logger::LEVEL_DEBUG);
         file_put_contents($this->outputdirroot.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
+    }
+
+    /**
+     * Rebuilds lang-table.html file for the given version
+     *
+     * @todo This will eventually replace rebuild_index_php when MDLSITE-2784 is completed.
+     * @param mlang_version $version
+     * @param array $packinfo
+     */
+    protected function rebuild_index_tablehtml(mlang_version $version, array $packinfo) {
+        global $PAGE;
+
+        $indextable = new local_amos_index_tablehtml($version, $packinfo);
+        $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
+        $tablehtml = $output->render($indextable);
+        $this->log($version->dir.'/lang-table.html', amos_cli_logger::LEVEL_DEBUG);
+        file_put_contents($this->outputdirroot.'/'.$version->dir.'/'.'lang-table.html', $tablehtml);
     }
 }
 
