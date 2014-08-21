@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+# Register English string changes in moodle.git
+# Reads recent commits in moodle.git. If the commit touches some string file,
+# it records the string changes (new, modifed and removed strings).
+# If the commit message contains an AMOScript, it is executed.
+# upstream: en-pull
+# downstream: en-fixdrift
+
+php $AMOSCLIROOT/parse-core.php

@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# Make installer language packages
+# Generates string files to be submitted for integration into /install/lang/ folder in moodle.git
+# and store them in dataroot/amos/export-install/*/install/lang
+# periodically: H 0 * * *
+# downstream: install-packs-publish
+
+php $AMOSCLIROOT/export-installer.php

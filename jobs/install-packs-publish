@@ -1,0 +1,55 @@
+#!/bin/bash -e
+
+# Publish installer language packages at gitlab
+# Merges newly generated installer strings into a local clone of moodle.git and pushes changes into a remote repository.
+# upstream: install-packs-make
+
+REPO=~/amos/git/moodle-install/
+
+#
+# STEP 1 - update upstream tracking branches
+#
+
+cd $REPO
+git fetch upstream
+for BRANCH in master MOODLE_27_STABLE MOODLE_26_STABLE MOODLE_25_STABLE MOODLE_24_STABLE; do
+	git checkout $BRANCH
+	git merge upstream/$BRANCH
+done
+
+#
+# STEP 2 - merge install strings
+#
+
+# $1 the install branch in git
+# $2 the upstream branch
+# $3 the directory in export-install
+function update_branch {
+	cd $REPO
+	git checkout $1
+	GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" git merge $2
+
+	cd $REPO/install
+	rm -rf lang
+	cp -r $AMOSDATAROOT/export-install/$3/install/lang .
+	set +e
+	# Commit changed and deleted files first
+	GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" git commit -a -m "Automatically generated installer lang files"
+	# Add and commit new files
+	git add .
+	GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" git commit -a -m "Automatically generated installer lang files"
+	set -e
+
+	cd $REPO
+	git push git@gitlab-amos:amosbot/moodle-install.git $1:$1
+	git push git@gitlab-amos:amosbot/moodle-install.git $2:$2
+}
+
+update_branch install_master master 2.8
+update_branch install_27_STABLE MOODLE_27_STABLE 2.7
+update_branch install_26_STABLE MOODLE_26_STABLE 2.6
+update_branch install_25_STABLE MOODLE_25_STABLE 2.5
+update_branch install_24_STABLE MOODLE_24_STABLE 2.4
+
+cd $REPO
+git gc

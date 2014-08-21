@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Publish ZIP language packages at download.moodle.org
+# Uploads new ZIP packages to the download.moodle.org server, together with the updated stats page and md5 checksum file.
+# upstream: zip-packs-make
+# dowstream: zip-packs-commit
+
+rsync -av $AMOSDATAROOT/export-zip/ $AMOSZIPRSYNCDEST

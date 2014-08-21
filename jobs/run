@@ -1,0 +1,18 @@
+#!/bin/bash -e
+
+# This is a wrapper to run AMOS jobs from Jenkins. Jenkins is supposed to provide environment variable
+# AMOSJOBSROOT with the full path to the folder containing the job scripts.
+
+if [[ -z $1 ]]; then
+	echo "Usage: $0 [jobname]" >&2
+	exit 1;
+fi
+
+JOBPATH=${AMOSJOBSROOT}/$1
+
+if [[ ! -x $JOBPATH ]]; then
+    echo "Job $1 not found or not executable" >&2
+    exit 2;
+fi
+
+$JOBPATH "${@:2}"

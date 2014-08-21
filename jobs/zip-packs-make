@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Make ZIP language packages
+# Generates ZIP packages and MD5 file for the download server at moodledata/amos/export-zip/
+# 0 * * * *
+# downstream: zip-packs-publish
+
+php $AMOSCLIROOT/export-zip.php

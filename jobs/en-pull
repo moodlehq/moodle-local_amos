@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+# Pull upstream changes into moodle.git
+# Pulls upstream changes into the local clone of moodle.git repository.
+# The build status is set to SUCCESS if the local clone has been actually updated 
+# which happens after weekly builds are released. If there are no actual changes,
+# the return status is set to UNSTABLE (so no other consequent builds are executed).
+# periodically: H/5 * * * *
+# downstream: en-track
+
+cd $AMOSDATAROOT/repos/moodle
+OLDMD5=$(md5sum version.php)
+git pull
+NEWMD5=$(md5sum version.php)
+
+if [[ "$OLDMD5" == "$NEWMD5" ]]; then
+    echo "No changes detected in version.php"
+    echo "JENKINS:SET-STATUS-UNSTABLE"
+else
+    echo "Changes detected in version.php"
+fi

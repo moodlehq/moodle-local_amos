@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+# Commit the snapshot of language packs
+# Everytime new ZIP language packages are generated, their content is pushed into
+# a custom Git repository at http://git.moodle.org/
+# upstream: zip-packs-publish
+# downstream: zip-packs-pull
+
+CLONESROOT=~/amos/git/moodle-langpacks-clones
+
+rsync -a --exclude 'README*' --exclude '*.zip' --exclude '.git' $AMOSDATAROOT/temp/export-zip/ $CLONESROOT
+
+for VER in 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 ; do
+        cd $CLONESROOT/$VER
+	set +e
+        git add .
+        GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" git commit -m 'Moodle language packs snapshot' .
+	set -e
+        git push
+done
+
+cd ~/amos/git/moodle-langpacks
+git push git@gitlab-amos:moodle/moodle-langpacks.git refs/heads/*:refs/heads/*

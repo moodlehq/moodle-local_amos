@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+# Reverse cleanup
+# Propagates deletions of English strings into other lang packs
+# The procedure is known as reverse cleanup. This script takes the most recent
+# snapshot of every component in the English lang pack. If a string removal is
+# part of the snapshot, the script propagates such removal into all other
+# languages. If the string is already removed in the other language, the
+# removing commit is not recorded.
+# upstream: en-fixdrift
+# downstream: en-orphan
+
+php $AMOSCLIROOT/rev-clean.php

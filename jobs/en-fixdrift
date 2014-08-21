@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+# Fix drift between moodle.git and AMOS
+# Sometimes, the English string changes are not parsed correctly (due to non-linearity of Git commits).
+# This job checks for differences between the Git and AMOS repositories.
+# On detected drift, the status is set to UNSTABLE and e-mail is sent. It is necessary to check the
+# situation and eventually run the CLI script with --execute parameter.
+# upstream: en-track
+# downstream: en-revclean
+
+php $AMOSCLIROOT/fix-drift.php
