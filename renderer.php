@@ -1241,7 +1241,7 @@ print_footer();
             } else {
                 $row[0] = html_writer::tag('em', $langpack->langname, array('style'=>'margin-left:1em;'));
             }
-            $row[1] = '<a href="/download.php/langpack/'.$data->version->dir.'/'.$langpack->filename.'">'.$langpack->filename.'</a>';
+            $row[1] = '<a class="btn btn-primary" href="/download.php/langpack/'.$data->version->dir.'/'.$langpack->filename.'">'.$langpack->filename.'</a>';
             $row[2] = display_size($langpack->filesize);
             if (time() - $langpack->modified < WEEKSECS) {
                 $row[3] = html_writer::tag('strong', self::commit_datetime($langpack->modified), array('class'=>'recentlymodified'));
