@@ -1,6 +1,12 @@
 HOWTO Prepare branches with en_fix strings for integration
 ==========================================================
 
+To make it easier for the community to participate on fixing/rewording strings in the English language pack for standard
+components (core and standard plugins), the en_fix language pack is created in AMOS. Every two months before the release, strings
+accumulated in AMOS are submitted for integration and merged into moodle.git. When they become part of moodle.git, strings are
+removed from the en_fix language pack in AMOS. This article describes how to prepare en_fix branches to be submitted for
+integration.
+
 1. Create (clone) an issue in the tracker to cover this task.
 
     <https://tracker.moodle.org/issues/?jql=summary ~ "Import fixed English strings (en_fix) into the main English pack" ORDER BY key DESC>
@@ -51,7 +57,7 @@ HOWTO Prepare branches with en_fix strings for integration
    Check for syntax errors.
 
     # cd tmp
-    # for f in *.php; do php -l $f; done
+    # for f in *.php; do php -l $f; done | grep -v '^No syntax errors detected in'
     # cd ..
 
 7. Commit the modified files.
