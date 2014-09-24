@@ -292,7 +292,9 @@ class local_amos_filter implements renderable {
             if (!empty($flng) and is_array($flng)) {
                 foreach ($flng as $language) {
                     // todo if valid language code
-                    $data->language[] = $language;
+                    if (!empty($language)) {
+                        $data->language[] = $language;
+                    }
                 }
             }
         }
@@ -466,11 +468,13 @@ class local_amos_translator implements renderable {
 
         // get the list of strings to display according the current filter values
         $branches   = $filter->get_data()->version;
-        $languages  = array_merge(array('en'), $filter->get_data()->language);
+        $languages  = $filter->get_data()->language;
         $components = $filter->get_data()->component;
         if (empty($branches) or empty($components) or empty($languages)) {
             return;
         }
+        $languages  = array_merge(array('en'), $languages);
+
         $missing            = $filter->get_data()->missing;
         $helps              = $filter->get_data()->helps;
         $substring          = $filter->get_data()->substring;
