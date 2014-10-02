@@ -42,56 +42,57 @@ foreach ($languages as $langcode => $langname) {
     $list[$langcode] = (object)array('langname' => $langname, 'maintainers' => array(), 'contributors' => array());
 }
 
-// Get the list of assigned maintainers.
+// Get the list of maintainers, explicitly assigned contributors and
+// other contributors based on submitted contributions.
 
 $userfields = user_picture::fields('u');
-list($sortsql, $sortparams) = users_order_by_sql('u');
+list($sortsql, $sortparams) = users_order_by_sql();
 
-$sql = "SELECT t.lang, {$userfields}
+$sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, {$userfields}
           FROM {amos_translators} t
           JOIN {user} u ON t.userid = u.id
-         WHERE t.lang <> 'X' and t.lang <> 'en'
-      ORDER BY {$sortsql}";
+         WHERE t.lang <> 'X' AND t.lang <> 'en'
 
-$rs = $DB->get_recordset_sql($sql, $sortparams);
+         UNION
 
-foreach ($rs as $maintainer) {
-    $lang = $maintainer->lang;
-    unset($maintainer->lang);
-    if (empty($list[$lang])) {
-        debugging('Unknown language ' . $lang, DEBUG_DEVELOPER);
-        continue;
-    }
-    $list[$lang]->maintainers[$maintainer->id] = $maintainer;
-}
-
-$rs->close();
-
-// Get the list of users who contributed to a language pack.
-
-$sql = "SELECT c.lang, {$userfields}, COUNT(*) AS numofcontributions
+        SELECT c.lang AS amoslang, ".AMOS_USER_CONTRIBUTOR." AS contribstatus, {$userfields}
           FROM {amos_contributions} c
           JOIN {user} u ON c.authorid = u.id
          WHERE c.status = :status
       GROUP BY c.lang, {$userfields}
         HAVING COUNT(*) >= 3
-      ORDER BY {$sortsql}";
+
+      ORDER BY amoslang, contribstatus, {$sortsql}";
 
 $rs = $DB->get_recordset_sql($sql, array_merge($sortparams,
     array('status' => local_amos_contribution::STATE_ACCEPTED)));
 
-foreach ($rs as $contributor) {
-    $lang = $contributor->lang;
-    unset($contributor->lang);
+foreach ($rs as $user) {
+
+    $lang = $user->amoslang;
+    unset($user->amoslang);
+
+    $status = $user->contribstatus;
+    unset($user->contribstatus);
+
     if (empty($list[$lang])) {
         debugging('Unknown language ' . $lang, DEBUG_DEVELOPER);
         continue;
     }
-    if (isset($list[$lang]->maintainers[$contributor->id])) {
-        debugging('Already in maintainers: '.$contributor->id, DEBUG_DEVELOPER);
-        continue;
+
+    if ($status == AMOS_USER_MAINTAINER) {
+        if (!isset($list[$lang]->maintainers[$user->id])) {
+            $list[$lang]->maintainers[$user->id] = $user;
+        }
+
+    } else if ($status == AMOS_USER_CONTRIBUTOR) {
+        if (!isset($list[$lang]->maintainers[$user->id]) and !isset($list[$lang]->contributors[$user->id])) {
+            $list[$lang]->contributors[$user->id] = $user;
+        }
+
+    } else {
+        debugging('Unknown credit status for user '.$user->id, DEBUG_DEVELOPER);
     }
-    $list[$lang]->contributors[$contributor->id] = $contributor;
 }
 
 $rs->close();
