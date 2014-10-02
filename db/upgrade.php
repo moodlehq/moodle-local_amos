@@ -250,5 +250,30 @@ function xmldb_local_amos_upgrade($oldversion) {
     // # ALTER TABLE mdl_amos_repository ALTER COLUMN textid SET NOT NULL;
     // # VACUUM FULL VERBOSE ANALYZE;
 
+    // Add field status to amos_translators.
+    if ($oldversion < 2014100200) {
+        $table = new xmldb_table('amos_translators');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'lang');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2014100200, 'local', 'amos');
+    }
+
+    // Set the status values and drop the 'default 0'
+    if ($oldversion < 2014100201) {
+
+        // All current records represent regular maintainers.
+        $DB->set_field('amos_translators', 'status', 0);
+
+        $table = new xmldb_table('amos_translators');
+        $field = new xmldb_field('status', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null, 'lang');
+
+        $dbman->change_field_default($table, $field);
+
+        upgrade_plugin_savepoint(true, 2014100201, 'local', 'amos');
+    }
     return $result;
 }
