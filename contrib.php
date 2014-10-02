@@ -59,7 +59,7 @@ if ($assign) {
     require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
-    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
         if ($maintained->lang === 'X') {
@@ -128,7 +128,7 @@ if ($review) {
     require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
-    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
         if ($maintained->lang === 'X') {
@@ -185,7 +185,7 @@ if ($accept) {
     require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
-    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
         if ($maintained->lang === 'X') {
@@ -227,7 +227,7 @@ if ($reject) {
     require_capability('local/amos:commit', context_system::instance());
     require_sesskey();
 
-    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
         if ($maintained->lang === 'X') {
@@ -274,7 +274,7 @@ if (!empty($CFG->usecomments)) {
 if ($id) {
 
     if (has_capability('local/amos:commit', context_system::instance())) {
-        $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+        $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
         $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
         foreach ($maintenances as $maintained) {
             if ($maintained->lang === 'X') {
@@ -373,7 +373,7 @@ echo $output->header();
 
 // Incoming contributions
 if (has_capability('local/amos:commit', context_system::instance())) {
-    $maintenances = $DB->get_records('amos_translators', array('userid' => $USER->id));
+    $maintenances = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id));
     $maintainerof = array();  // list of languages the USER is maintainer of, or 'all'
     foreach ($maintenances as $maintained) {
         if ($maintained->lang === 'X') {

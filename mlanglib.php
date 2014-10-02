@@ -1822,9 +1822,10 @@ class mlang_tools {
      * @return array of (string)langcode => (string)langcode
      */
     public static function list_allowed_languages($userid) {
-        global $DB;
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/local/amos/locallib.php');
 
-        $records = $DB->get_records('amos_translators', array('userid' => $userid));
+        $records = $DB->get_records('amos_translators', array('userid' => $userid, 'status' => AMOS_USER_MAINTAINER));
         $langs = array();
         foreach ($records as $record) {
             $langs[$record->lang] = $record->lang;

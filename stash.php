@@ -146,8 +146,8 @@ if ($submitform->is_cancelled()) {
         $sql = "SELECT u.*
                   FROM {amos_translators} t
                   JOIN {user} u ON t.userid = u.id
-                 WHERE t.lang = ?";
-        $maintainers = $DB->get_records_sql($sql, array($lang));
+                 WHERE t.status = :status AND t.lang = :lang";
+        $maintainers = $DB->get_records_sql($sql, array('status' => AMOS_USER_MAINTAINER, 'lang' => $lang));
 
         $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
         $a              = new stdClass();

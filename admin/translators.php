@@ -25,6 +25,7 @@
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
 require_once(dirname(dirname(__FILE__)).'/mlanglib.php');
+require_once(dirname(dirname(__FILE__)).'/locallib.php');
 
 $add = optional_param('add', null, PARAM_INT);  // userid to grant privileges to edit a language
 $del = optional_param('del', null, PARAM_INT);  // userid to revoke privileges from editing a language
@@ -47,7 +48,7 @@ if (!empty($add) and array_key_exists($add, $available)) {
     if (empty($lang)) {
         print_error('err_invalidlangcode', 'local_amos');
     }
-    $DB->insert_record('amos_translators', (object)array('userid' => $add, 'lang' => $lang));
+    $DB->insert_record('amos_translators', (object)array('userid' => $add, 'lang' => $lang, 'status' => AMOS_USER_MAINTAINER));
     redirect($PAGE->url);
 }
 
@@ -57,7 +58,7 @@ if (!empty($del)) {
     if (empty($lang)) {
         print_error('err_invalidlangcode', 'local_amos');
     }
-    $DB->delete_records('amos_translators', array('userid' => $del, 'lang' => $lang));
+    $DB->delete_records('amos_translators', array('userid' => $del, 'lang' => $lang, 'status' => AMOS_USER_MAINTAINER));
     redirect($PAGE->url);
 }
 
@@ -75,8 +76,9 @@ foreach ($languages as $langcode => $langname) {
 $sql = "SELECT at.id AS tid, at.lang, u.id, u.lastname, u.firstname, u.email, u.imagealt, u.picture
           FROM {amos_translators} at
           JOIN {user} u ON at.userid=u.id
+         WHERE at.status = :status
       ORDER BY at.lang, u.lastname, u.firstname";
-$translators = $DB->get_records_sql($sql);
+$translators = $DB->get_records_sql($sql, array('status' => AMOS_USER_MAINTAINER));
 foreach ($translators as $translator) {
     if (empty($list[$translator->lang])) {
         debugging('Unknown language ' . $translator->lang);

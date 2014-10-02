@@ -27,6 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__).'/mlanglib.php');
 
+define('AMOS_USER_MAINTAINER',  0);
+define('AMOS_USER_CONTRIBUTOR', 1);
+
 /**
  * Represent the AMOS translator filter and its settings
  */
