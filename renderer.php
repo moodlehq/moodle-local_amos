@@ -1392,11 +1392,17 @@ print_footer();
     /**
      * Renders the AMOS credits page
      *
+     * The $editmode is interpreted as follows:
+     * - false: the user does not have rights to edit this page
+     * - null: the user can edit this page but the editing mode is off
+     * - true: the editing mode is on
+     *
      * @param array $people as populated in credits.php
      * @param string $currentlanguage the user's current language
+     * @param bool|null $editmode
      * @return string
      */
-    public function page_credits(array $people, $currentlanguage) {
+    public function page_credits(array $people, $currentlanguage, $editmode = false) {
 
         $out = $this->output->heading(get_string('creditstitlelong', 'local_amos'));
         $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'thanks');
@@ -1433,12 +1439,32 @@ print_footer();
                         new moodle_url('/message/index.php', array('id' => $maintainer->id)),
                         new pix_icon('t/message', get_string('creditscontact', 'local_amos')),
                         null,
-                        array('class' => 'contact')
+                        array('class' => 'action contact')
                     );
+                    if ($editmode) {
+                        $out .= $this->output->action_icon(
+                            new moodle_url('/local/amos/admin/translators.php', array(
+                                'action' => 'del',
+                                'status' => AMOS_USER_MAINTAINER,
+                                'langcode' => $langcode,
+                                'user' => $maintainer->id
+                            )),
+                            new pix_icon('t/delete', get_string('remove')),
+                            null,
+                            array('class' => 'action delete')
+                        );
+                    }
                     $out .= $this->output->container_end();
                 }
             }
-            $out .= $this->output->container_end();
+            if ($editmode) {
+                $out .= html_writer::link(
+                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_MAINTAINER, 'langcode' => $langcode)),
+                    get_string('creditsaddmaintainer', 'local_amos'),
+                    array('class' => 'btn')
+                );
+            }
+            $out .= $this->output->container_end(); // .maintainers
 
             $out .= $this->output->container_start('contributors');
             if (!empty($langdata->contributors)) {
@@ -1447,10 +1473,30 @@ print_footer();
                     $out .= $this->output->container_start('contributor');
                     $out .= $this->output->user_picture($contributor, array('size' => 16));
                     $out .= $this->output->container(fullname($contributor), 'fullname');
+                    if ($editmode and $contributor->iseditable) {
+                        $out .= $this->output->action_icon(
+                            new moodle_url('/local/amos/admin/translators.php', array(
+                                'action' => 'del',
+                                'status' => AMOS_USER_CONTRIBUTOR,
+                                'langcode' => $langcode,
+                                'user' => $contributor->id
+                            )),
+                            new pix_icon('t/delete', get_string('remove')),
+                            null,
+                            array('class' => 'action delete')
+                        );
+                    }
                     $out .= $this->output->container_end();
                 }
             }
-            $out .= $this->output->container_end();
+            if ($editmode) {
+                $out .= html_writer::link(
+                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_CONTRIBUTOR, 'langcode' => $langcode)),
+                    get_string('creditsaddcontributor', 'local_amos'),
+                    array('class' => 'btn btn-small')
+                );
+            }
+            $out .= $this->output->container_end(); // .contributors
 
             $out .= $this->output->container_end();
         }

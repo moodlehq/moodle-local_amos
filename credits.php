@@ -28,11 +28,29 @@ require_once($CFG->dirroot.'/local/amos/locallib.php');
 require_once($CFG->dirroot.'/local/amos/mlanglib.php');
 require_once($CFG->dirroot.'/local/amos/renderer.php');
 
+$editmode = optional_param('editmode', false, PARAM_BOOL);
+$canedit = has_capability('local/amos:manage', context_system::instance());
+
+if (!$canedit) {
+    $editmode = false;
+} else if (!$editmode) {
+    $editmode = null;
+} else {
+    $editmode = true;
+}
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/credits.php');
 $PAGE->set_title(get_string('creditstitleshort', 'local_amos'));
 $PAGE->set_heading(get_string('creditstitleshort', 'local_amos'));
+
+if ($canedit and $editmode) {
+    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, array('editmode' => 0)), get_string('turneditingoff'), 'get'));
+    $PAGE->set_url(new moodle_url($PAGE->url, array('editmode' => 1)));
+} else if ($canedit and !$editmode) {
+    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, array('editmode' => 1)), get_string('turneditingon'), 'get'));
+}
 
 $languages = mlang_tools::list_languages(false, true, false);
 
@@ -48,21 +66,21 @@ foreach ($languages as $langcode => $langname) {
 $userfields = user_picture::fields('u');
 list($sortsql, $sortparams) = users_order_by_sql();
 
-$sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, {$userfields}
+$sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable, {$userfields}
           FROM {amos_translators} t
           JOIN {user} u ON t.userid = u.id
          WHERE t.lang <> 'X' AND t.lang <> 'en'
 
          UNION
 
-        SELECT c.lang AS amoslang, ".AMOS_USER_CONTRIBUTOR." AS contribstatus, {$userfields}
+        SELECT c.lang AS amoslang, ".AMOS_USER_CONTRIBUTOR." AS contribstatus, 0 AS iseditable, {$userfields}
           FROM {amos_contributions} c
           JOIN {user} u ON c.authorid = u.id
          WHERE c.status = :status
       GROUP BY c.lang, {$userfields}
         HAVING COUNT(*) >= 3
 
-      ORDER BY amoslang, contribstatus, {$sortsql}";
+      ORDER BY amoslang, contribstatus, {$sortsql}, iseditable";
 
 $rs = $DB->get_recordset_sql($sql, array_merge($sortparams,
     array('status' => local_amos_contribution::STATE_ACCEPTED)));
@@ -101,5 +119,5 @@ $rs->close();
 echo $OUTPUT->header();
 
 $output = $PAGE->get_renderer('local_amos');
-echo $output->page_credits($list, current_language());
+echo $output->page_credits($list, current_language(), $editmode);
 echo $OUTPUT->footer();
