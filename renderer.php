@@ -1428,7 +1428,7 @@ print_footer();
 
             $out .= $this->output->container_start('maintainers');
             if (empty($langdata->maintainers)) {
-                $out .= $this->output->container(get_string('creditsnomaintainer', 'local_amos', array('url' => 'http://docs.moodle.org/en/Translation')));
+                $out .= $this->output->container(get_string('creditsnomaintainer', 'local_amos', array('url' => 'https://docs.moodle.org/dev/Translation')));
             } else {
                 $out .= $this->output->container(get_string('creditsmaintainedby', 'local_amos'), 'maintainers-title');
                 foreach ($langdata->maintainers as $maintainer) {
