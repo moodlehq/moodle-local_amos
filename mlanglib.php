@@ -1615,7 +1615,7 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_28,
-                'label'         => 'DEV',
+                'label'         => '2.8',
                 'branch'        => 'MOODLE_28_STABLE',
                 'dir'           => '2.8',
                 'translatable'  => true,
