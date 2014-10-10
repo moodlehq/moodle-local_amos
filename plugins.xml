@@ -3731,10 +3731,12 @@
     </plugins>
     <plugins type="gradeimport">
       <plugin>csv</plugin>
+      <plugin>direct</plugin>
       <plugin>xml</plugin>
     </plugins>
     <plugins type="gradereport">
       <plugin>grader</plugin>
+      <plugin>history</plugin>
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
@@ -3802,7 +3804,6 @@
       <plugin>blackboard_six</plugin>
       <plugin>examview</plugin>
       <plugin>gift</plugin>
-      <plugin>learnwise</plugin>
       <plugin>missingword</plugin>
       <plugin>multianswer</plugin>
       <plugin>webct</plugin>
@@ -3822,6 +3823,7 @@
       <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
       <plugin>log</plugin>
+      <plugin>messageinbound</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
