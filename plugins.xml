@@ -3740,6 +3740,7 @@
       <plugin>outcomes</plugin>
       <plugin>overview</plugin>
       <plugin>user</plugin>
+      <plugin>singleview</plugin>
     </plugins>
     <plugins type="gradingform">
       <plugin>rubric</plugin>
@@ -3825,6 +3826,7 @@
       <plugin>log</plugin>
       <plugin>messageinbound</plugin>
       <plugin>multilangupgrade</plugin>
+      <plugin>monitor</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
       <plugin>replace</plugin>
@@ -3893,6 +3895,11 @@
     </plugins>
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
+    </plugins>
+    <plugins type="ltiservice">
+      <plugin>profile</plugin>
+      <plugin>toolproxy</plugin>
+      <plugin>toolsettings</plugin>
     </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
