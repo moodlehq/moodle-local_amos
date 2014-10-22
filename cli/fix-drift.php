@@ -122,6 +122,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'calendartype'          => 'calendar/type',
             'logstore'              => 'admin/tool/log/store',
             'availability'          => 'availability/condition',
+            'ltisource'             => 'mod/lti/source',
+            'ltiservice'            => 'mod/lti/service',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
