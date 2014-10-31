@@ -52,7 +52,7 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
     global $CFG; $DB;
     require_once($CFG->dirroot.'/mod/forum/lib.php');
 
-    if ($CFG->wwwroot !== 'http://lang.moodle.org') {
+    if ($CFG->wwwroot !== 'https://lang.moodle.org') {
         // this is intended for lang.moodle.org portal only
         return;
     }
