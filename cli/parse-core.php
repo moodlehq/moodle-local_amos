@@ -273,16 +273,11 @@ $MLANG_IGNORE_COMMITS = array(
 );
 
 $MLANG_PARSE_BRANCHES = array(
-    'MOODLE_19_STABLE',
-    'MOODLE_20_STABLE',
-    'MOODLE_21_STABLE',
-    'MOODLE_22_STABLE',
-    'MOODLE_23_STABLE',
-    'MOODLE_24_STABLE',
     'MOODLE_25_STABLE',
     'MOODLE_26_STABLE',
     'MOODLE_27_STABLE',
     'MOODLE_28_STABLE',
+    'MOODLE_29_STABLE',
 );
 
 $standardplugins = local_amos_standard_plugins();
@@ -295,7 +290,7 @@ fputs(STDOUT, " PARSE CORE JOB STARTED\n");
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
     fputs(STDOUT, "=========================================\n");
     fputs(STDOUT, "BRANCH {$branch}\n");
-    if ($branch == 'MOODLE_28_STABLE') {
+    if ($branch == 'MOODLE_29_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
