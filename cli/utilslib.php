@@ -345,13 +345,17 @@ class amos_export_zip {
         // If a change is detected for language xx on version y,
         // we need to update xx.zip at the version y as well as at all
         // other higher versions.
+        // In fact, it turned out that we need to update that pack at all
+        // versions. This is because of the way how non-standard components
+        // are propagated. If there is a Czech translation of an additional
+        // component mod_foo defined for the 2.0 version, and we detect we
+        // need to rebuild the cs.zip for 2.8, we still need to start building
+        // all the versions so that the foo.php is included in all of them.
         foreach ($this->get_versions() as $version) {
             if (isset($modified[$version->code])) {
                 foreach ($modified[$version->code] as $lang) {
                     foreach ($this->get_versions() as $tempversion) {
-                        if ($tempversion->code >= $version->code) {
-                            $return[$tempversion->code][$lang] = true;
-                        }
+                        $return[$tempversion->code][$lang] = true;
                     }
                 }
             }
