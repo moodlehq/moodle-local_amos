@@ -25,6 +25,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
         cli/fix-drift.php
         cli/parse-core.php
         cli/utilslib.php
+        jobs/install-packs-publish
 
 * Make sure that plugins.xml contains declaration for Y.Y.
 * Deploy the code at the production site.
@@ -45,30 +46,31 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
         UPDATE mdl_config_plugins SET value=1 WHERE plugin='local_amos' AND name='lastexportzip';
 
 * Create new MOODLE_XX_STABLE and install_XX_STABLE branches at
-  /home/amosbot/git/moodle-install and update publish-moodle-install.sh
+  /home/amosbot/git/moodle-install
 
-        su amosbot
-        cd /home/amosbot/git/moodle-install
-        git checkout -b MOODLE_XX_STABLE upstream/MOODLE_XX_STABLE
-        git checkout -b install_XX_STABLE upstream/MOODLE_XX_STABLE
-        vi ~/bin/publish-moodle-install.sh
+        $ sudo su vh-langmoodleorg
+        $ cd ~/amos/git/moodle-install/
+        $ git checkout -b MOODLE_XX_STABLE upstream/MOODLE_XX_STABLE
+        $ git checkout -b install_XX_STABLE upstream/MOODLE_XX_STABLE
 
 * Create MOODLE_YY_STABLE branch at /home/amosbot/git/moodle-langpacks
 
-        cd /home/amosbot/git/moodle-langpacks
-        git checkout master
-        git branch MOODLE_YY_STABLE
+        $ sudo su vh-langmoodleorg
+        $ cd ~/amos/git/moodle-langpacks
+        $ git checkout master
+        $ git branch MOODLE_YY_STABLE
 
   and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
 
-        cd /home/amosbot/git/moodle-langpacks-clones
-        git clone /home/amosbot/git/moodle-langpacks Y.Y
+        $ cd ~/amos/git/moodle-langpacks-clones
+        $ git clone ../moodle-langpacks Y.Y
         cd Y.Y
         git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
         git branch -d master
 
   and finally modify publish-moodle-langpacks.sh
 
+        # TODO this does not seem to be valid any more
         vi ~/bin/publish-moodle-langpacks.sh
 
 * Turn Jenkins on and let it re-generate the ZIP packages.
