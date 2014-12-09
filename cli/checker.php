@@ -42,6 +42,12 @@ class amos_checker {
     const RESULT_SUCCESS = 0;
     const RESULT_FAILURE = 1;
 
+    /** @var null|array used for caching the list of maintainers of a lang pack */
+    protected $maintainers = null;
+
+    /** @var null|stdClass the user record for the AMOS bot */
+    protected $amosbot = null;
+
     /**
      * Checks the decsep, thousandssep and listsep config strings are set correctly
      *
@@ -150,7 +156,19 @@ class amos_checker {
                     array('id' => $contribution->id));
 
             } else {
-                $msg = sprintf('  Contribution #%d still in review', $contribution->id);
+                $maintainers = $this->get_maintainers($contribution->lang);
+                if (empty($maintainers)) {
+                    $msg = sprintf('  Contribution #%d still in review - no active maintainers to notify!', $contribution->id);
+                } else {
+                    $msg = sprintf('  Contribution #%d still in review - notifying maintainers %s', $contribution->id, implode(',', array_keys($maintainers)));
+                    $this->notify($maintainers,
+                        get_string_manager()->get_string('checkercontribreview', 'local_amos', array('id' => $contribution->id), $contribution->lang),
+                        get_string_manager()->get_string('checkercontribreviewmsg', 'local_amos', array(
+                            'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+                            'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack'
+                        ), $contribution->lang)
+                    );
+                }
                 $this->output($msg, true);
                 $status = self::RESULT_FAILURE;
             }
@@ -159,6 +177,7 @@ class amos_checker {
 
         return $status;
     }
+
     /**
      * Returns the list of check methods to execute
      *
@@ -188,6 +207,75 @@ class amos_checker {
         } else {
             fputs(STDOUT, $full);
         }
+    }
+
+    /**
+     * Sends notification to the user(s)
+     *
+     * @param stdClass|array $users to be notified
+     * @param string $subject
+     * @param string $message
+     */
+    protected function notify($users, $subject, $message) {
+        global $DB;
+
+        if ($this->amosbot === null) {
+            $this->amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
+        }
+
+        if (!is_array($users)) {
+            $users = array($users);
+        }
+
+        foreach ($users as $user) {
+            $data = new stdClass();
+            $data->component = 'local_amos';
+            $data->name = 'checker';
+            $data->userfrom = $this->amosbot;
+            $data->userto = $user;
+            $data->subject = $subject;
+            $data->fullmessage = $message;
+            $data->fullmessageformat = FORMAT_PLAIN;
+            $data->fullmessagehtml = '';
+            $data->smallmessage = '';
+            $data->notification = 1;
+
+            message_send($data);
+        }
+    }
+
+    /**
+     * Returns maintainers of the given language pack
+     *
+     * @param string $langcode
+     * @return array
+     */
+    protected function get_maintainers($langcode) {
+        global $DB;
+
+        if ($this->maintainers === null) {
+            $this->maintainers = array();
+            $records = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER));
+            foreach ($records as $record) {
+                if ($record->lang === 'X') {
+                    // We do not want these "universal" maintainers here.
+                    continue;
+                }
+                $this->maintainers[$record->lang][$record->userid] = true;
+            }
+        }
+
+        if (empty($this->maintainers[$langcode])) {
+            return array();
+        }
+
+        foreach ($this->maintainers[$langcode] as $userid => $userinfo) {
+            if ($userinfo === true) {
+                $this->maintainers[$langcode][$userid] = $DB->get_record('user', array('id' => $userid));
+            }
+        }
+
+        return $this->maintainers[$langcode];
     }
 
     /**

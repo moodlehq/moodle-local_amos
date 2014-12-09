@@ -37,6 +37,20 @@ $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:usegoogle'] = 'Use Google Translate services';
+$string['checkercontribreview'] = '[AMOS] Contribution #{$a->id} still in review';
+$string['checkercontribreviewmsg'] = 'We have detected that there is a contributed translation for your language pack
+in AMOS pending in the \'review\' state:
+
+{$a->contriburl}
+
+As the language pack maintainer, you are supposed to review and eventually
+commit all submitted contributions. When done, please mark them as accepted or
+rejected.
+
+See {$a->docsurl} for more details.
+
+To change your preference for receiving these notifications, check the AMOS
+section in your messaging settings.';
 $string['commitbutton'] = 'Commit';
 $string['commitkeepstaged'] = 'Keep strings staged';
 $string['commitmessage'] = 'Commit message';
