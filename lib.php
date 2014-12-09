@@ -102,3 +102,63 @@ function local_amos_comment_validate($commentparams) {
 
     return true;
 }
+
+/**
+ * Callback on added comment.
+ *
+ * @param stdClass $comment
+ * @param stdClass $meta
+ */
+function local_amos_comment_add($comment, $meta) {
+    global $DB;
+
+    if ($comment->commentarea === 'amos_contribution') {
+        // Notify users about new comments.
+        $contribution = $DB->get_record('amos_contributions', array('id' => $comment->itemid), '*', MUST_EXIST);
+
+        // Populate the list of users who should be notified.
+        $users = array();
+        // The author of the contribution.
+        $users[$contribution->authorid] = true;
+        if (!empty($contribution->assignee)) {
+            // The assignee if the contribution has been assigned.
+            $users[$contribution->assignee] = true;
+        } else {
+            // All the maintainers if it has not been assigned yet.
+            $records = $DB->get_records('amos_translators', array('status' => 0, 'lang' => $contribution->lang));
+            foreach ($records as $record) {
+                $users[$record->userid] = true;
+            }
+        }
+
+        // Load all user records.
+        $amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
+        $fromuser = $DB->get_record('user', array('id' => $comment->userid));
+        $users = $DB->get_records_list('user', 'id', array_keys($users));
+
+        // Do not send the copy to the user themselves.
+        unset($users[$comment->userid]);
+
+        // Notify remaining users.
+        foreach ($users as $user) {
+            $data = new stdClass();
+            $data->component = 'local_amos';
+            $data->name = 'contribution';
+            $data->userfrom = $amosbot;
+            $data->userto = $user;
+            $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $user->lang);
+            $data->fullmessage = get_string_manager()->get_string('contribnotifcommented', 'local_amos', array(
+                'id' => $contribution->id,
+                'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+                'fullname' => fullname($fromuser),
+                'message' => $comment->content,
+            ), $user->lang);
+            $data->fullmessageformat = FORMAT_PLAIN;
+            $data->fullmessagehtml = '';
+            $data->smallmessage = '';
+            $data->notification = 1;
+
+            message_send($data);
+        }
+    }
+}

@@ -47,10 +47,7 @@ As the language pack maintainer, you are supposed to review and eventually
 commit all submitted contributions. When done, please mark them as accepted or
 rejected.
 
-See {$a->docsurl} for more details.
-
-To change your preference for receiving these notifications, check the AMOS
-section in your messaging settings.';
+See {$a->docsurl} for more details.';
 $string['commitbutton'] = 'Commit';
 $string['commitkeepstaged'] = 'Keep strings staged';
 $string['commitmessage'] = 'Commit message';
@@ -116,6 +113,14 @@ $string['contribsubject'] = 'Subject';
 $string['contribsubmittednone'] = 'No submitted contributions';
 $string['contribsubmittedsome'] = 'Your contributions ({$a})';
 $string['contribtimemodified'] = 'Modified';
+$string['contribnotif'] = '[AMOS] Contribution notification (#{$a->id})';
+$string['contribnotifcommented'] = '{$a->fullname} has commented on the contributed translation #{$a->id}:
+---------------------------------------------------------------------
+
+{$a->message}
+
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
 $string['contribute'] = 'Contribute';
 $string['contributenow'] = 'Contribute now!';
 $string['contributestats'] = 'Total of <strong>{$a->count}</strong> strings translated by community members have been submitted into AMOS so far.';
@@ -247,6 +252,7 @@ $string['mergestrings'] = 'Merge strings from another branch';
 $string['mergestrings_help'] = 'This will pick and stage all strings from the source branch that are not translated yet in the target branch and are used there. You can use this tool to copy a translated string into all other versions of the pack. Only language pack maintainers can use this tool.';
 $string['mergestrings_link'] = 'local/amos/merge';
 $string['messageprovider:checker'] = 'Language pack checker results';
+$string['messageprovider:contribution'] = 'Contributed translations';
 $string['morefilteringoptions'] = 'More options';
 $string['newlanguage'] = 'New language';
 $string['nodiffs'] = 'No differences found';
