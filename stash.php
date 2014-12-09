@@ -125,6 +125,9 @@ if ($submitform->is_cancelled()) {
 
     // create new contribution record for every language and attach a new stash to it
     foreach ($langstages as $lang => $stage) {
+
+        list($origstrings, $origlanguages, $origcomponents) = mlang_stage::analyze($stage);
+
         $langstash = mlang_stash::instance_from_stage($stage, 0, $submitdata->name);
         $langstash->message = $submitdata->message;
         $langstash->push();
@@ -142,24 +145,35 @@ if ($submitform->is_cancelled()) {
 
         $contribution->id = $DB->insert_record('amos_contributions', $contribution);
 
-        // inform the language pack maintainers
+        // Notify the language pack maintainers.
         $sql = "SELECT u.*
                   FROM {amos_translators} t
                   JOIN {user} u ON t.userid = u.id
                  WHERE t.status = :status AND t.lang = :lang";
         $maintainers = $DB->get_records_sql($sql, array('status' => AMOS_USER_MAINTAINER, 'lang' => $lang));
 
-        $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
-        $a              = new stdClass();
-        $a->author      = fullname($USER);
-        $a->id          = $contribution->id;
-        $a->subject     = $contribution->subject;
-        $a->url         = $url->out();
-
         foreach ($maintainers as $maintainer) {
-            $emailsubject = get_string_manager()->get_string('emailcontributionsubject', 'local_amos', null, $maintainer->lang);
-            $emailbody = get_string_manager()->get_string('emailcontributionbody', 'local_amos', $a, $maintainer->lang);
-            email_to_user($maintainer, $amosbot, $emailsubject, $emailbody);
+            $data = new stdClass();
+            $data->component = 'local_amos';
+            $data->name = 'contribution';
+            $data->userfrom = $amosbot;
+            $data->userto = $maintainer;
+            $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $maintainer->lang);
+            $data->fullmessage = get_string_manager()->get_string('contribnotifsubmitted', 'local_amos', array(
+                'id' => $contribution->id,
+                'subject' => $contribution->subject,
+                'message' => $contribution->message,
+                'language' => implode(', ', array_filter(array_map('trim', explode('/', $origlanguages)))),
+                'components' => implode(', ', array_filter(array_map('trim', explode('/', $origcomponents)))),
+                'strings' => $origstrings,
+                'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+                'fullname' => fullname($USER),
+            ), $maintainer->lang);
+            $data->fullmessageformat = FORMAT_PLAIN;
+            $data->fullmessagehtml = '';
+            $data->smallmessage = '';
+            $data->notification = 1;
+            message_send($data);
         }
     }
 

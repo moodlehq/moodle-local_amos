@@ -114,10 +114,33 @@ $string['contribsubmittednone'] = 'No submitted contributions';
 $string['contribsubmittedsome'] = 'Your contributions ({$a})';
 $string['contribtimemodified'] = 'Modified';
 $string['contribnotif'] = '[AMOS] Contribution notification (#{$a->id})';
-$string['contribnotifcommented'] = '{$a->fullname} has commented on the contributed translation #{$a->id}:
+$string['contribnotifaccepted'] = '{$a->fullname} has accepted your contributed translation
+#{$a->id} {$a->subject}
+
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
+$string['contribnotifcommented'] = '{$a->fullname} has commented on the contributed translation
+#{$a->id} {$a->subject}
 ---------------------------------------------------------------------
 
 {$a->message}
+
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
+$string['contribnotifrejected'] = '{$a->fullname} has rejected your contributed translation
+#{$a->id} {$a->subject}
+
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
+$string['contribnotifsubmitted'] = '{$a->fullname} has submitted a new contributed translation
+#{$a->id} {$a->subject}
+---------------------------------------------------------------------
+
+{$a->message}
+
+* Language: {$a->language}
+* Components: {$a->components}
+* Strings: {$a->strings}
 
 ---------------------------------------------------------------------
 Contribution page: {$a->contriburl}';
@@ -152,22 +175,6 @@ $string['diffstringmode'] = 'Switch diff mode';
 $string['diffstrings'] = 'Compare strings at two branches';
 $string['diffstrings_help'] = 'This will compare all strings at the two selected branches. If there is difference in strings on the branches, both versions are staged. You can then use "Edit staged strings" feature to review and fix the changes as needed.';
 $string['diffversions'] = 'Versions';
-$string['emailacceptbody'] = 'Language pack maintainer {$a->assignee} has accepted your contributed translation #{$a->id} {$a->subject}.
-
-Visit {$a->url} for more details.';
-$string['emailacceptsubject'] = '[AMOS contribution] Accepted';
-$string['emailcontributionbody'] = 'User {$a->author} submitted new translation #{$a->id} {$a->subject}.
-
-Visit {$a->url} for more details.';
-$string['emailcontributionsubject'] = '[AMOS contribution] New translation submitted';
-$string['emailrejectbody'] = 'Language pack maintainer {$a->assignee} has rejected your contributed translation #{$a->id} {$a->subject}.
-
-Visit {$a->url} for more details.';
-$string['emailrejectsubject'] = '[AMOS contribution] Rejected';
-$string['emailreviewbody'] = 'Language pack maintainer {$a->assignee} started a review of your contributed translation #{$a->id} {$a->subject}.
-
-Visit {$a->url} for more details.';
-$string['emailreviewsubject'] = '[AMOS contribution] Review started';
 $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid language code';
 $string['err_parser'] = 'Parsing error: {$a}';

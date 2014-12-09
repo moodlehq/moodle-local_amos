@@ -158,17 +158,6 @@ if ($review) {
     $stash->apply($stage);
     $stage->store();
 
-    // inform the contributor
-    $a              = new stdClass();
-    $a->assignee    = fullname($USER);
-    $a->id          = $contribution->id;
-    $a->subject     = $contribution->subject;
-    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
-    $a->url         = $url->out();
-    $emailsubject   = get_string_manager()->get_string('emailreviewsubject', 'local_amos', null, $author->lang);
-    $emailbody      = get_string_manager()->get_string('emailreviewbody', 'local_amos', $a, $author->lang);
-    email_to_user($author, $amosbot, $emailsubject, $emailbody);
-
     $a = new stdClass();
     $a->id = $contribution->id;
     $a->author = fullname($author);
@@ -209,16 +198,24 @@ if ($accept) {
     $contribution->status = local_amos_contribution::STATE_ACCEPTED;
     $DB->update_record('amos_contributions', $contribution);
 
-    // inform the contributor
-    $a              = new stdClass();
-    $a->assignee    = fullname($USER);
-    $a->id          = $contribution->id;
-    $a->subject     = $contribution->subject;
-    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
-    $a->url         = $url->out();
-    $emailsubject   = get_string_manager()->get_string('emailacceptsubject', 'local_amos', null, $author->lang);
-    $emailbody      = get_string_manager()->get_string('emailacceptbody', 'local_amos', $a, $author->lang);
-    email_to_user($author, $amosbot, $emailsubject, $emailbody);
+    // Notify the contributor.
+    $data = new stdClass();
+    $data->component = 'local_amos';
+    $data->name = 'contribution';
+    $data->userfrom = $amosbot;
+    $data->userto = $author;
+    $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $author->lang);
+    $data->fullmessage = get_string_manager()->get_string('contribnotifaccepted', 'local_amos', array(
+        'id' => $contribution->id,
+        'subject' => $contribution->subject,
+        'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+        'fullname' => fullname($USER),
+    ), $author->lang);
+    $data->fullmessageformat = FORMAT_PLAIN;
+    $data->fullmessagehtml = '';
+    $data->smallmessage = '';
+    $data->notification = 1;
+    message_send($data);
 
     redirect(new moodle_url($PAGE->url, array('id' => $accept)));
 }
@@ -251,16 +248,24 @@ if ($reject) {
     $contribution->status = local_amos_contribution::STATE_REJECTED;
     $DB->update_record('amos_contributions', $contribution);
 
-    // inform the contributor
-    $a              = new stdClass();
-    $a->assignee    = fullname($USER);
-    $a->id          = $contribution->id;
-    $a->subject     = $contribution->subject;
-    $url            = new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id));
-    $a->url         = $url->out();
-    $emailsubject   = get_string_manager()->get_string('emailrejectsubject', 'local_amos', null, $author->lang);
-    $emailbody      = get_string_manager()->get_string('emailrejectbody', 'local_amos', $a, $author->lang);
-    email_to_user($author, $amosbot, $emailsubject, $emailbody);
+    // Notify the contributor.
+    $data = new stdClass();
+    $data->component = 'local_amos';
+    $data->name = 'contribution';
+    $data->userfrom = $amosbot;
+    $data->userto = $author;
+    $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $author->lang);
+    $data->fullmessage = get_string_manager()->get_string('contribnotifrejected', 'local_amos', array(
+        'id' => $contribution->id,
+        'subject' => $contribution->subject,
+        'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+        'fullname' => fullname($USER),
+    ), $author->lang);
+    $data->fullmessageformat = FORMAT_PLAIN;
+    $data->fullmessagehtml = '';
+    $data->smallmessage = '';
+    $data->notification = 1;
+    message_send($data);
 
     redirect(new moodle_url($PAGE->url, array('id' => $reject)));
 }

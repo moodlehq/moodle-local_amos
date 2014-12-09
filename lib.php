@@ -149,6 +149,7 @@ function local_amos_comment_add($comment, $meta) {
             $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $user->lang);
             $data->fullmessage = get_string_manager()->get_string('contribnotifcommented', 'local_amos', array(
                 'id' => $contribution->id,
+                'subject' => $contribution->subject,
                 'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
                 'fullname' => fullname($fromuser),
                 'message' => $comment->content,
