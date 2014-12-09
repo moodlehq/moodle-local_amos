@@ -37,17 +37,6 @@ $string['amos:manage'] = 'Manage AMOS portal';
 $string['amos:stage'] = 'Use AMOS translation tool and stage the strings';
 $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:usegoogle'] = 'Use Google Translate services';
-$string['checkercontribreview'] = '[AMOS] Contribution #{$a->id} still in review';
-$string['checkercontribreviewmsg'] = 'We have detected that there is a contributed translation for your language pack
-in AMOS pending in the \'review\' state:
-
-{$a->contriburl}
-
-As the language pack maintainer, you are supposed to review and eventually
-commit all submitted contributions. When done, please mark them as accepted or
-rejected.
-
-See {$a->docsurl} for more details.';
 $string['commitbutton'] = 'Commit';
 $string['commitkeepstaged'] = 'Keep strings staged';
 $string['commitmessage'] = 'Commit message';
@@ -142,6 +131,16 @@ $string['contribnotifsubmitted'] = '{$a->fullname} has submitted a new contribut
 * Components: {$a->components}
 * Strings: {$a->strings}
 
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
+$string['contribnotifpending'] = 'There is a pending contributed translation requiring your action
+#{$a->id} {$a->subject}
+
+As the language pack maintainer, you are supposed to review and eventually
+commit all submitted contributions. When done, please mark them as accepted or
+rejected.
+
+See {$a->docsurl} for more details.
 ---------------------------------------------------------------------
 Contribution page: {$a->contriburl}';
 $string['contribute'] = 'Contribute';

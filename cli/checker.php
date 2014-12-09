@@ -114,7 +114,10 @@ class amos_checker {
     }
 
     /**
-     * Search for pending contributions left if the "In review" state
+     * Search for pending contributions
+     *
+     * Pending are contributions left in the "New" or "In review" states for
+     * longer than a week.
      *
      * If all strings are already translated in the contribution (it means,
      * there are no actual translated strings after the contribution is
@@ -123,19 +126,20 @@ class amos_checker {
      *
      * @return int
      */
-    protected function check_pending_reviews() {
+    protected function check_pending_contributions() {
         global $DB;
 
         // Suppose this check will pass successfully.
         $status = self::RESULT_SUCCESS;
 
         // Search for contributions in "In review" state not modified for
-        // couple of days.
+        // a week.
         $rs = $DB->get_recordset_select("amos_contributions",
-            "status = :status AND timemodified <= :timemodified",
+            "(status = :statusnew OR status = :statusreview) AND timemodified <= :timemodified",
             array(
-                'status' => local_amos_contribution::STATE_REVIEW,
-                'timemodified' => time() - 3 * DAYSECS,
+                'statusnew' => local_amos_contribution::STATE_NEW,
+                'statusreview' => local_amos_contribution::STATE_REVIEW,
+                'timemodified' => time() - 7 * DAYSECS,
             )
         );
 
@@ -148,8 +152,7 @@ class amos_checker {
             list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
 
             if ($rebasedstrings == 0) {
-                $msg = sprintf('  Contribution #%d still in review with no new strings to be committed - marking as accepted',
-                    $contribution->id);
+                $msg = sprintf('  Pending contribution #%d with no new strings to be committed - marking as accepted', $contribution->id);
                 $this->output($msg, true);
                 $status = self::RESULT_FAILURE;
                 $DB->set_field('amos_contributions', 'status', local_amos_contribution::STATE_ACCEPTED,
@@ -158,16 +161,21 @@ class amos_checker {
             } else {
                 $maintainers = $this->get_maintainers($contribution->lang);
                 if (empty($maintainers)) {
-                    $msg = sprintf('  Contribution #%d still in review - no active maintainers to notify!', $contribution->id);
+                    $msg = sprintf('  Pending contribution #%d - no active maintainers to notify!!', $contribution->id);
                 } else {
-                    $msg = sprintf('  Contribution #%d still in review - notifying maintainers %s', $contribution->id, implode(',', array_keys($maintainers)));
-                    $this->notify($maintainers,
-                        get_string_manager()->get_string('checkercontribreview', 'local_amos', array('id' => $contribution->id), $contribution->lang),
-                        get_string_manager()->get_string('checkercontribreviewmsg', 'local_amos', array(
-                            'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
-                            'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack'
-                        ), $contribution->lang)
-                    );
+                    $msg = sprintf('  Pending contribution #%d - notifying maintainers %s', $contribution->id, implode(',', array_keys($maintainers)));
+
+                    foreach ($maintainers as $maintainer) {
+                        $this->notify($maintainer,
+                            get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $maintainer->lang),
+                            get_string_manager()->get_string('contribnotifpending', 'local_amos', array(
+                                'id' => $contribution->id,
+                                'subject' => $contribution->subject,
+                                'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+                                'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack'
+                            ), $maintainer->lang)
+                        );
+                    }
                 }
                 $this->output($msg, true);
                 $status = self::RESULT_FAILURE;
@@ -212,36 +220,30 @@ class amos_checker {
     /**
      * Sends notification to the user(s)
      *
-     * @param stdClass|array $users to be notified
+     * @param stdClass $user to be notified
      * @param string $subject
      * @param string $message
      */
-    protected function notify($users, $subject, $message) {
+    protected function notify($user, $subject, $message) {
         global $DB;
 
         if ($this->amosbot === null) {
             $this->amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
         }
 
-        if (!is_array($users)) {
-            $users = array($users);
-        }
+        $data = new stdClass();
+        $data->component = 'local_amos';
+        $data->name = 'checker';
+        $data->userfrom = $this->amosbot;
+        $data->userto = $user;
+        $data->subject = $subject;
+        $data->fullmessage = $message;
+        $data->fullmessageformat = FORMAT_PLAIN;
+        $data->fullmessagehtml = '';
+        $data->smallmessage = '';
+        $data->notification = 1;
 
-        foreach ($users as $user) {
-            $data = new stdClass();
-            $data->component = 'local_amos';
-            $data->name = 'checker';
-            $data->userfrom = $this->amosbot;
-            $data->userto = $user;
-            $data->subject = $subject;
-            $data->fullmessage = $message;
-            $data->fullmessageformat = FORMAT_PLAIN;
-            $data->fullmessagehtml = '';
-            $data->smallmessage = '';
-            $data->notification = 1;
-
-            message_send($data);
-        }
+        message_send($data);
     }
 
     /**
