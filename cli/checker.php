@@ -116,8 +116,8 @@ class amos_checker {
     /**
      * Search for pending contributions
      *
-     * Pending are contributions left in the "New" or "In review" states for
-     * longer than a week.
+     * Pending are contributions left in the "New" state for longer than a week
+     * or in the "In review" state for longer than three days.
      *
      * If all strings are already translated in the contribution (it means,
      * there are no actual translated strings after the contribution is
@@ -135,11 +135,12 @@ class amos_checker {
         // Search for contributions in "In review" state not modified for
         // a week.
         $rs = $DB->get_recordset_select("amos_contributions",
-            "(status = :statusnew OR status = :statusreview) AND timemodified <= :timemodified",
+            "(status = :statusnew AND timecreated <= :timecreated) OR (status = :statusreview AND timemodified <= :timemodified)",
             array(
                 'statusnew' => local_amos_contribution::STATE_NEW,
                 'statusreview' => local_amos_contribution::STATE_REVIEW,
-                'timemodified' => time() - 7 * DAYSECS,
+                'timecreated' => time() - 7 * DAYSECS,
+                'timemodified' => time() - 3 * DAYSECS,
             )
         );
 
