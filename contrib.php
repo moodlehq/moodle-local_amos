@@ -140,7 +140,6 @@ if ($review) {
 
     $contribution = $DB->get_record('amos_contributions', array('id' => $review), '*', MUST_EXIST);
     $author       = $DB->get_record('user', array('id' => $contribution->authorid));
-    $amosbot      = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
