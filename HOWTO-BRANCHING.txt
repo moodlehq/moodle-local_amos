@@ -27,6 +27,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
         cli/utilslib.php
         jobs/install-packs-publish
 
+* Update jobs/zip-packs-snapshot and make it ready for the to-be-created branch.
 * Make sure that plugins.xml contains declaration for Y.Y.
 * Deploy the code at the production site.
 * Fork the new branch in the repository
@@ -68,10 +69,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
         git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
         git branch -d master
 
-  and finally modify publish-moodle-langpacks.sh
-
-        # TODO this does not seem to be valid any more
-        vi ~/bin/publish-moodle-langpacks.sh
+  Check that jobs/zip-packs-snapshot will process the new version.
 
 * Turn Jenkins on and let it re-generate the ZIP packages.
 * Check http://download.moodle.org/langpack/

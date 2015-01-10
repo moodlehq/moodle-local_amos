@@ -57,12 +57,10 @@ integration.
 
    Check for syntax errors.
 
-    # cd tmp
-    # for f in *.php; do php -l $f; done | grep -v '^No syntax errors detected in'
-    # cd ..
+    # for f in ./tmp/*.php; do php -l $f; done | grep -v '^No syntax errors detected in'
 
 7. Commit the modified files.
 
-    # git commit -a --author="Helen Foster <helen@moodle.org>" -e -m "MDL-xxxxx Merge English strings from the en_fix language pack"
+    # git commit -a --author="Helen Foster <helen@moodle.org>" -e -m "MDL-xxxxx lang: Merge English strings from the en_fix language pack"
 
 8. Repeat steps 3-7 for supported STABLE branches as well.
