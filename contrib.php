@@ -37,6 +37,7 @@ $review = optional_param('review', null, PARAM_INT);
 $accept = optional_param('accept', null, PARAM_INT);
 $reject = optional_param('reject', null, PARAM_INT);
 $closed = optional_param('closed', false, PARAM_BOOL);  // show resolved contributions, too
+$changelang = optional_param('changelang', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stash', context_system::instance());
@@ -269,6 +270,39 @@ if ($reject) {
     redirect(new moodle_url($PAGE->url, array('id' => $reject)));
 }
 
+if ($changelang) {
+    $newlang = required_param('newlang', PARAM_SAFEDIR);
+    require_capability('local/amos:changecontriblang', context_system::instance());
+    require_sesskey();
+
+    $contriborig = $DB->get_record('amos_contributions', array('id' => $changelang), '*', MUST_EXIST);
+
+    $stashorig = mlang_stash::instance_from_id($contriborig->stashid);
+    $stage = new mlang_stage();
+    $stashorig->apply($stage);
+
+    $stage->change_lang($contriborig->lang, $newlang);
+
+    $stashnew = mlang_stash::instance_from_stage($stage, 0, $stashorig->name);
+    $stashnew->message = $stashorig->message;
+    $stashnew->push();
+
+    $contribnew               = new stdClass();
+    $contribnew->authorid     = $contriborig->authorid;
+    $contribnew->lang         = $newlang;
+    $contribnew->assignee     = null;
+    $contribnew->subject      = $contriborig->subject;
+    $contribnew->message      = $contriborig->message."\n\n[Converted from #".$contriborig->id." by ".fullname($USER)."]";
+    $contribnew->stashid      = $stashnew->id;
+    $contribnew->status       = 0;
+    $contribnew->timecreated  = $stashnew->timecreated;
+    $contribnew->timemodified = null;
+
+    $contribnew->id = $DB->insert_record('amos_contributions', $contribnew);
+
+    redirect(new moodle_url($PAGE->url, array('id' => $contribnew->id)));
+}
+
 $output = $PAGE->get_renderer('local_amos');
 if (!empty($CFG->usecomments)) {
     comment::init();
@@ -356,6 +390,21 @@ if ($id) {
     }
     echo $output->help_icon('contribactions', 'local_amos');
     echo html_writer::end_tag('div');
+
+    if (has_capability('local/amos:changecontriblang', context_system::instance())) {
+        $listlanguages = mlang_tools::list_languages(false);
+        if (isset($listlanguages[$contribution->lang])) {
+            echo html_writer::start_tag('div', array('class' => 'contribactions'));
+            unset($listlanguages[$contribution->lang]);
+            echo html_writer::start_tag('form', array('action' => $PAGE->url, 'method' => 'post'));
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'changelang', 'value' => $contribution->id));
+            echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+            echo html_writer::select($listlanguages, 'newlang');
+            echo html_writer::tag('button', get_string('contriblanguagebutton', 'local_amos'), array('type' => 'submit'));
+            echo html_writer::end_tag('form');
+            echo html_writer::end_tag('div');
+        }
+    }
 
     if (!empty($CFG->usecomments)) {
         $options = new stdClass();

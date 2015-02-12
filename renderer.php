@@ -1366,7 +1366,26 @@ print_footer();
         }
         $table->data[] = $row;
 
-        $row = new html_table_row(array(get_string('contriblanguage', 'local_amos'), $contrib->language));
+        // Display the contribution language.
+        $listlanguages = mlang_tools::list_languages();
+
+        if (!empty($listlanguages[$contrib->language])) {
+            $languagename = $listlanguages[$contrib->language];
+        } else {
+            $languagename = $contrib->language;
+        }
+
+        $languagename = html_writer::span($languagename, 'languagename');
+
+        if (has_capability('local/amos:changecontriblang', context_system::instance())) {
+            $languagename .= ' '.$this->output->help_icon('contriblanguagechange', 'local_amos',
+                get_string('contriblanguagewrong', 'local_amos'));
+        } else {
+            $languagename .= ' '.$this->output->help_icon('contriblanguagereport', 'local_amos',
+                get_string('contriblanguagewrong', 'local_amos'));
+        }
+
+        $row = new html_table_row(array(get_string('contriblanguage', 'local_amos'), $languagename));
         $table->data[] = $row;
 
         $row = new html_table_row(array(get_string('contribcomponents', 'local_amos'), $contrib->components));

@@ -1136,6 +1136,21 @@ class mlang_stage {
 
         return $numofpropagated;
     }
+
+    /**
+     * Change the language of the staged component
+     *
+     * @param string $from
+     * @param string $to
+     */
+    public function change_lang($from, $to) {
+
+        foreach ($this->components as $component) {
+            if ($component->lang === $from) {
+                $component->lang = $to;
+            }
+        }
+    }
 }
 
 /**

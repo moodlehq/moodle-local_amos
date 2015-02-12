@@ -91,4 +91,12 @@ $capabilities = array(
             'user' => CAP_ALLOW,
         )
     ),
+
+    // Ability to convert an existing contribution to a new contribution with
+    // different language
+    'local/amos:changecontriblang' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array()
+    ),
 );
