@@ -277,29 +277,81 @@ if ($changelang) {
 
     $contriborig = $DB->get_record('amos_contributions', array('id' => $changelang), '*', MUST_EXIST);
 
+    if (empty($newlang)) {
+        redirect(new moodle_url($PAGE->url, array('id' => $contriborig->id)));
+    }
+
+    $listlanguages = mlang_tools::list_languages();
+
+    if (empty($listlanguages[$newlang])) {
+        print_error('err_invalid_target_language', 'local_amos', new moodle_url($PAGE->url, array('id' => $contriborig->id)), null, $newlang);
+    }
+
+    // Load the stash associated with the originial contribution.
     $stashorig = mlang_stash::instance_from_id($contriborig->stashid);
     $stage = new mlang_stage();
     $stashorig->apply($stage);
 
+    // Change the language of the stashed strings.
     $stage->change_lang($contriborig->lang, $newlang);
 
+    // Store them as the new stash.
     $stashnew = mlang_stash::instance_from_stage($stage, 0, $stashorig->name);
     $stashnew->message = $stashorig->message;
     $stashnew->push();
+
+    // Record the new contribution record associated with the new stash.
+    if (!empty($listlanguages[$contriborig->lang])) {
+        $languagenameorig = $listlanguages[$contriborig->lang];
+    } else {
+        $languagenameorig = "wrong (".$contriborig->lang.")";
+    }
 
     $contribnew               = new stdClass();
     $contribnew->authorid     = $contriborig->authorid;
     $contribnew->lang         = $newlang;
     $contribnew->assignee     = null;
     $contribnew->subject      = $contriborig->subject;
-    $contribnew->message      = $contriborig->message."\n\n[Converted from #".$contriborig->id." by ".fullname($USER)."]";
+    $contribnew->message      = $contriborig->message."\n\nNote: This contribution was previously submitted as #".$contriborig->id." on ".date('Y-m-d', $contriborig->timecreated)." to the ".$languagenameorig." language pack by mistake.";
     $contribnew->stashid      = $stashnew->id;
-    $contribnew->status       = 0;
+    $contribnew->status       = local_amos_contribution::STATE_NEW;
     $contribnew->timecreated  = $stashnew->timecreated;
     $contribnew->timemodified = null;
 
     $contribnew->id = $DB->insert_record('amos_contributions', $contribnew);
 
+    // Automatically reject the original contribution and add a note to it.
+    $contriborig->timemodified = time();
+    $contriborig->assignee = $USER->id;
+    $contriborig->status = local_amos_contribution::STATE_REJECTED;
+    $contriborig->message .= "\n\nNote: This contribution was submitted to the ".$languagenameorig." language pack by mistake and has been moved to the ".$listlanguages[$newlang]." language pack as #".$contribnew->id.".";
+
+    $DB->update_record('amos_contributions', $contriborig);
+
+    // Notify the contributor.
+    $author = $DB->get_record('user', array('id' => $contriborig->authorid));
+    $amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
+
+    $data = new stdClass();
+    $data->component = 'local_amos';
+    $data->name = 'contribution';
+    $data->userfrom = $amosbot;
+    $data->userto = $author;
+    $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contriborig->id), $author->lang);
+    $data->fullmessage = get_string_manager()->get_string('contribnotifconverted', 'local_amos', array(
+        'id' => $contriborig->id,
+        'subject' => $contriborig->subject,
+        'contriborigurl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contriborig->id)))->out(false),
+        'contribnewurl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribnew->id)))->out(false),
+        'fullname' => fullname($USER),
+    ), $author->lang);
+    $data->fullmessageformat = FORMAT_PLAIN;
+    $data->fullmessagehtml = '';
+    $data->smallmessage = '';
+    $data->notification = 1;
+    message_send($data);
+
+    // And redirect to the new contribution page.
     redirect(new moodle_url($PAGE->url, array('id' => $contribnew->id)));
 }
 

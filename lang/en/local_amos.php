@@ -78,10 +78,10 @@ $string['contribincomingsome'] = 'Incoming contributions ({$a})';
 $string['contriblanguage'] = 'Language';
 $string['contriblanguagebutton'] = 'Convert';
 $string['contriblanguagechange'] = 'Fixing wrong contribution language';
-$string['contriblanguagechange_help'] = 'Sometimes it can happen that strings are translated and contributed with the wrong language selected. You can use the button below to convert this contribution into a new one with the correct language. Please note, you should manually reject the original contribution and explain the situation in the comments.';
+$string['contriblanguagechange_help'] = 'If the contribution has been submitted to the wrong language pack by mistake, select the correct language in the dropdown menu below then click the Convert button.';
 $string['contriblanguagereport'] = 'Reporting wrong contribution language';
-$string['contriblanguagereport_help'] = 'Sometimes it can happen that strings are translated and contributed with the wrong language selected. If this is the case, please send an e-mail to `translation@moodle.org` with the link to this contribution. AMOS administrators will review the situation and eventually convert the contribution into a new one with the correct language set.';
-$string['contriblanguagewrong'] = 'Not a correct language?';
+$string['contriblanguagereport_help'] = 'If this contribution has been submitted to the wrong language pack by mistake, please copy and paste the contribution URL into an email to `translation@moodle.org`. The contribution will then be moved to the correct language.';
+$string['contriblanguagewrong'] = 'Wrong language?';
 $string['contribreject'] = 'Reject';
 $string['contribresign'] = 'Unassign';
 $string['contribstaged'] = 'Staged contribution <a href="contrib.php?id={$a->id}">#{$a->id}</a> by {$a->author}';
@@ -123,6 +123,20 @@ $string['contribnotifcommented'] = '{$a->fullname} has commented on the contribu
 
 ---------------------------------------------------------------------
 Contribution page: {$a->contriburl}';
+$string['contribnotifconverted'] = '{$a->fullname} has converted your contributed translation
+#{$a->id} {$a->subject}
+
+Thanks for your contribution. However, it seems it was submitted to the wrong
+language pack by mistake. Thus your contribution has been rejected from the
+wrong language pack and moved to the correct language pack for review by the
+language pack maintainer. No action from you is required.
+
+In future, please double-check that you have selected your own language before
+you start translating strings.
+
+---------------------------------------------------------------------
+Original contribution page: {$a->contriborigurl}
+New contribution page: {$a->contribnewurl}';
 $string['contribnotifrejected'] = '{$a->fullname} has rejected your contributed translation
 #{$a->id} {$a->subject}
 
