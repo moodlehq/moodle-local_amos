@@ -303,6 +303,8 @@ if ($changelang) {
     // Record the new contribution record associated with the new stash.
     if (!empty($listlanguages[$contriborig->lang])) {
         $languagenameorig = $listlanguages[$contriborig->lang];
+    } else if ($contriborig->lang === '') {
+        $languagenameorig = "undefined";
     } else {
         $languagenameorig = "wrong (".$contriborig->lang.")";
     }
@@ -445,7 +447,7 @@ if ($id) {
 
     if (has_capability('local/amos:changecontriblang', context_system::instance())) {
         $listlanguages = mlang_tools::list_languages(false);
-        if (isset($listlanguages[$contribution->lang])) {
+        if (empty($contribution->lang) or isset($listlanguages[$contribution->lang])) {
             echo html_writer::start_tag('div', array('class' => 'contribactions'));
             unset($listlanguages[$contribution->lang]);
             echo html_writer::start_tag('form', array('action' => $PAGE->url, 'method' => 'post'));
