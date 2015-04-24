@@ -3999,6 +3999,7 @@
       <plugin>cache</plugin>
       <plugin>calendar</plugin>
       <plugin>cohort</plugin>
+      <plugin>comment</plugin>
       <plugin>completion</plugin>
       <plugin>countries</plugin>
       <plugin>course</plugin>
@@ -4141,6 +4142,7 @@
     </plugins>
     <plugins type="block">
       <plugin>activity_modules</plugin>
+      <plugin>activity_results</plugin>
       <plugin>admin_bookmarks</plugin>
       <plugin>badges</plugin>
       <plugin>blog_menu</plugin>
@@ -4228,6 +4230,7 @@
       <plugin>security</plugin>
       <plugin>stats</plugin>
       <plugin>performance</plugin>
+      <plugin>usersessions</plugin>
     </plugins>
     <plugins type="gradeexport">
       <plugin>ods</plugin>
@@ -4324,6 +4327,7 @@
       <plugin>capability</plugin>
       <plugin>customlang</plugin>
       <plugin>dbtransfer</plugin>
+      <plugin>filetypes</plugin>
       <plugin>generator</plugin>
       <plugin>health</plugin>
       <plugin>innodb</plugin>
@@ -4338,7 +4342,7 @@
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
-      <plugin>timezoneimport</plugin>
+      <plugin>templatelibrary</plugin>
       <plugin>unittest</plugin>
       <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
