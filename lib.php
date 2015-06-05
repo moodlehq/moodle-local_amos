@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param global_navigation $navigation
  */
-function local_amos_extends_navigation(global_navigation $navigation) {
+function local_amos_extend_navigation(global_navigation $navigation) {
     $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'), navigation_node::TYPE_CUSTOM, null, 'amos_root');
     if (has_capability('local/amos:stage', context_system::instance())) {
         $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'), navigation_node::TYPE_CUSTOM, null, 'translator');
