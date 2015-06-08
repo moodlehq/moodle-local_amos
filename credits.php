@@ -85,16 +85,29 @@ $sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable, {
 $rs = $DB->get_recordset_sql($sql, array_merge($sortparams,
     array('status' => local_amos_contribution::STATE_ACCEPTED)));
 
+// Track credits with unexpected data.
+$issues = array();
+
 foreach ($rs as $user) {
 
     $lang = $user->amoslang;
+    if (empty($lang)) {
+        $issues[] = (object)array(
+            'problem' => 'Empty contribution language',
+            'record' => $user,
+        );
+        continue;
+    }
     unset($user->amoslang);
 
     $status = $user->contribstatus;
     unset($user->contribstatus);
 
     if (empty($list[$lang])) {
-        debugging('Unknown language ' . $lang, DEBUG_DEVELOPER);
+        $issues[] = (object)array(
+            'problem' => 'Unknown language',
+            'record' => $user,
+        );
         continue;
     }
 
@@ -109,7 +122,11 @@ foreach ($rs as $user) {
         }
 
     } else {
-        debugging('Unknown credit status for user '.$user->id, DEBUG_DEVELOPER);
+        $issues[] = (object)array(
+            'problem' => 'Unknown credit status',
+            'record' => $user,
+        );
+        continue;
     }
 }
 
@@ -120,4 +137,9 @@ echo $OUTPUT->header();
 
 $output = $PAGE->get_renderer('local_amos');
 echo $output->page_credits($list, current_language(), $editmode);
+
+if (!empty($issues) and has_capability('local/amos:manage', $PAGE->context)) {
+    echo $output->page_credits_issues($issues);
+}
+
 echo $OUTPUT->footer();

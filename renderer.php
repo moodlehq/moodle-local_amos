@@ -1524,6 +1524,28 @@ print_footer();
     }
 
     /**
+     * Render problematic contributions from the credits.php page.
+     *
+     * @param array $issues
+     * @return string
+     */
+    public function page_credits_issues(array $issues) {
+
+        $out = '';
+
+        $out = '<p><strong>There were some issues detected when checking for credits data</strong></p>';
+
+        $out .= html_writer::start_tag('ul');
+        foreach ($issues as $issue) {
+            $out .= html_writer::tag('li', $issue->problem.' (userid '.$issue->record->id.')');
+        }
+        $out .= html_writer::end_tag('ul');
+        $out = $this->output->notification($out);
+
+        return $out;
+    }
+
+    /**
      * Makes sure there is a zero-width space after non-word characters in the given string
      *
      * This is used to wrap long strings like 'A,B,C,D,...,x,y,z' in the translator
