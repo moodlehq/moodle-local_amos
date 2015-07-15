@@ -179,6 +179,14 @@ if ($submitform->is_cancelled()) {
 
     // stash has been submited so it is dropped
     $stash->drop();
+
+    // Drop the staged strings as they all have been sent to contributors now.
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage->clear();
+    $stage->store();
+    unset($SESSION->local_amos->presetcommitmessage);
+    unset($SESSION->local_amos->stagedcontribution);
+
     redirect(new moodle_url('/local/amos/contrib.php'));
 }
 
