@@ -239,6 +239,12 @@ class local_amos_renderer extends plugin_renderer_base {
             array('class' => 'checkbox'.$collapsible)
         );
 
+        $collapsible = empty($filterdata->outdated) ? ' collapsible collapsed' : '';
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fout', 1, $filterdata->outdated) . get_string('filtermisfout', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
+        );
+
         $collapsible = empty($filterdata->helps) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
             html_writer::checkbox('fhlp', 1, $filterdata->helps) . get_string('filtermisfhlp', 'local_amos'),

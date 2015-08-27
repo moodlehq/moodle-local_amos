@@ -64,7 +64,7 @@ class local_amos_filter implements renderable {
     public function __construct(moodle_url $handler) {
 
         $this->fields = array(
-            'version', 'language', 'component', 'missing', 'helps', 'substring',
+            'version', 'language', 'component', 'missing', 'outdated', 'helps', 'substring',
             'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
             'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
@@ -156,6 +156,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->missing)) {
            $data->missing = false;
         }
+        if (is_null($data->outdated)) {
+           $data->outdated = false;
+        }
         if (is_null($data->helps)) {
            $data->helps = false;
         }
@@ -235,6 +238,7 @@ class local_amos_filter implements renderable {
         }
 
         $data->missing              = optional_param('fmis', false, PARAM_BOOL);
+        $data->outdated             = optional_param('fout', false, PARAM_BOOL);
         $data->helps                = optional_param('fhlp', false, PARAM_BOOL);
         $data->substring            = optional_param('ftxt', '', PARAM_RAW);
         $data->substringregex       = optional_param('ftxr', false, PARAM_BOOL);
@@ -252,6 +256,11 @@ class local_amos_filter implements renderable {
 
         // reset the paginator to the first page every time the filter is saved
         $data->page = 1;
+
+        if ($data->missing and $data->outdated) {
+            // It does not make sense to have both.
+            $data->missing = false;
+        }
 
         return $data;
     }
@@ -321,6 +330,7 @@ class local_amos_filter implements renderable {
         }
 
         $data->missing              = optional_param('m', false, PARAM_BOOL);
+        $data->outdated             = optional_param('u', false, PARAM_BOOL);
         $data->helps                = optional_param('h', false, PARAM_BOOL);
         $data->substring            = optional_param('s', '', PARAM_RAW);
         $data->substringregex       = optional_param('r', false, PARAM_BOOL);
@@ -384,6 +394,7 @@ class local_amos_filter implements renderable {
 
         // checkboxes
         if ($fdata->missing)            $this->permalink->param('m', 1);
+        if ($fdata->outdated)           $this->permalink->param('u', 1);
         if ($fdata->helps)              $this->permalink->param('h', 1);
         if ($fdata->substringregex)     $this->permalink->param('r', 1);
         if ($fdata->substringcs)        $this->permalink->param('i', 1);
@@ -425,6 +436,7 @@ class local_amos_filter implements renderable {
             'numoflanguages' => count($submitted->language),
             'numofcomponents' => count($submitted->component),
             'showmissingonly' => (int)$submitted->missing,
+            'showoutdatedonly' => (int)$submitted->outdated,
             'showhelpsonly' => (int)$submitted->helps,
             'withsubstring' => (int)($submitted->substring !== ''),
             'substringregex' => (int)$submitted->substringregex,
@@ -479,6 +491,7 @@ class local_amos_translator implements renderable {
         $languages  = array_merge(array('en'), $languages);
 
         $missing            = $filter->get_data()->missing;
+        $outdated           = $filter->get_data()->outdated;
         $helps              = $filter->get_data()->helps;
         $substring          = $filter->get_data()->substring;
         $substringregex     = $filter->get_data()->substringregex;
@@ -678,9 +691,13 @@ class local_amos_translator implements renderable {
                                 }
                             }
                             if ($missing) {
-                                // missing (no translation committed) or outdated strings only
                                 if ($string->class === 'translated' and !$string->outdated) {
-                                    continue; // it is considered up-top-date - do not display it
+                                    continue;
+                                }
+                            }
+                            if ($outdated) {
+                                if (!$string->outdated) {
+                                    continue;
                                 }
                             }
                             $this->numofrows++;

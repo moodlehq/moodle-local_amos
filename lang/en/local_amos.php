@@ -209,6 +209,7 @@ $string['filtermis_desc'] = 'Additional conditions on strings to display';
 $string['filtermisfglo'] = 'greylisted strings only';
 $string['filtermisfhlp'] = 'help strings only';
 $string['filtermisfmis'] = 'missing and outdated strings only';
+$string['filtermisfout'] = 'outdated strings only';
 $string['filtermisfstg'] = 'staged strings only';
 $string['filtermisfwog'] = 'without greylisted strings';
 $string['filtersid'] = 'String identifier';

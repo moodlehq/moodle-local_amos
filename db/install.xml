@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20141002" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20150827" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -145,6 +145,7 @@
         <FIELD NAME="numoflanguages" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of selected languages"/>
         <FIELD NAME="numofcomponents" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of selected components"/>
         <FIELD NAME="showmissingonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only missing and outdated strings be displayed?"/>
+        <FIELD NAME="showoutdatedonly" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Should only outdated strings be displayed?"/>
         <FIELD NAME="showhelpsonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only help strings be displayed?"/>
         <FIELD NAME="withsubstring" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Was a substring to search for specified?"/>
         <FIELD NAME="substringregex" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should the substring be considered as a regex?"/>

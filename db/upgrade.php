@@ -275,5 +275,18 @@ function xmldb_local_amos_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2014100201, 'local', 'amos');
     }
+
+    // Add field showoutdatedonly to the table amos_filter_usage.
+    if ($oldversion < 2015082700) {
+        $table = new xmldb_table('amos_filter_usage');
+        $field = new xmldb_field('showoutdatedonly', XMLDB_TYPE_INTEGER, '3', null, null, null, null, 'showmissingonly');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2015082700, 'local', 'amos');
+    }
+
     return $result;
 }
