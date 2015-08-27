@@ -43,7 +43,7 @@ integration.
    Pay attention to eventual [ERR] and [WRN] messages in enfix.log - some
    strings (especially those double-quoted etc) are not detected well.
 
-    # less enfix.log
+    # grep -E '\[ERR\]|\[WRN\]' enfix.log
 
    Check for syntax errors.
 
@@ -61,4 +61,4 @@ integration.
 
     # mdk push -t
 
-9. Repeat steps c-7 for supported STABLE branches as well.
+9. Repeat steps 3-7 for supported STABLE branches as well.
