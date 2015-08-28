@@ -438,6 +438,18 @@ class local_amos_renderer extends plugin_renderer_base {
                 $infogoogle = '';
             }
 
+            if ($string->committable and $string->translationid) {
+                $infountranslate = ' | '.html_writer::span(html_writer::tag('a', get_string('untranslate', 'local_amos'), array(
+                    'href' => new moodle_url('/local/amos/untranslate.php', array(
+                        'component' => $string->component,
+                        'language'  => $string->language,
+                        'stringid' => $string->stringid
+                    ))
+                )), 'info info-untranslate');
+            } else {
+                $infountranslate = '';
+            }
+
             // original of the string
             $original = self::add_breaks(s($string->original));
             // work around https://bugzilla.mozilla.org/show_bug.cgi?id=116083
@@ -495,7 +507,10 @@ class local_amos_renderer extends plugin_renderer_base {
                 $infoline1 .= ' | '.$infoplaceholder;
             }
 
-            $infoline2 = $this->help_icon('translatortranslation', 'local_amos') . ' ' . $infolanguage.' | '.$infotimeline . ' ' . $infogoogle;
+            $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
+            $infoline2 .= ' | '.$infotimeline;
+            $infoline2 .= ' '.$infountranslate;
+            $infoline2 .= ' '.$infogoogle;
 
             $data = array(
                 'data-amos-lang' => $string->language,
