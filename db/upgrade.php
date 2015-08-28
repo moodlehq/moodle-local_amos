@@ -288,5 +288,17 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015082700, 'local', 'amos');
     }
 
+    // Add field showexistingonly to the table amos_filter_usage.
+    if ($oldversion < 2015082800) {
+        $table = new xmldb_table('amos_filter_usage');
+        $field = new xmldb_field('showexistingonly', XMLDB_TYPE_INTEGER, '3', null, null, null, null, 'showoutdatedonly');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2015082800, 'local', 'amos');
+    }
+
     return $result;
 }

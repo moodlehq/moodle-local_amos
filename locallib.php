@@ -64,7 +64,7 @@ class local_amos_filter implements renderable {
     public function __construct(moodle_url $handler) {
 
         $this->fields = array(
-            'version', 'language', 'component', 'missing', 'outdated', 'helps', 'substring',
+            'version', 'language', 'component', 'missing', 'outdated', 'has', 'helps', 'substring',
             'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
             'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
@@ -159,6 +159,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->outdated)) {
            $data->outdated = false;
         }
+        if (is_null($data->has)) {
+           $data->has = false;
+        }
         if (is_null($data->helps)) {
            $data->helps = false;
         }
@@ -239,6 +242,7 @@ class local_amos_filter implements renderable {
 
         $data->missing              = optional_param('fmis', false, PARAM_BOOL);
         $data->outdated             = optional_param('fout', false, PARAM_BOOL);
+        $data->has                  = optional_param('fhas', false, PARAM_BOOL);
         $data->helps                = optional_param('fhlp', false, PARAM_BOOL);
         $data->substring            = optional_param('ftxt', '', PARAM_RAW);
         $data->substringregex       = optional_param('ftxr', false, PARAM_BOOL);
@@ -331,6 +335,7 @@ class local_amos_filter implements renderable {
 
         $data->missing              = optional_param('m', false, PARAM_BOOL);
         $data->outdated             = optional_param('u', false, PARAM_BOOL);
+        $data->has                  = optional_param('x', false, PARAM_BOOL);
         $data->helps                = optional_param('h', false, PARAM_BOOL);
         $data->substring            = optional_param('s', '', PARAM_RAW);
         $data->substringregex       = optional_param('r', false, PARAM_BOOL);
@@ -395,6 +400,7 @@ class local_amos_filter implements renderable {
         // checkboxes
         if ($fdata->missing)            $this->permalink->param('m', 1);
         if ($fdata->outdated)           $this->permalink->param('u', 1);
+        if ($fdata->has)                $this->permalink->param('x', 1);
         if ($fdata->helps)              $this->permalink->param('h', 1);
         if ($fdata->substringregex)     $this->permalink->param('r', 1);
         if ($fdata->substringcs)        $this->permalink->param('i', 1);
@@ -437,6 +443,7 @@ class local_amos_filter implements renderable {
             'numofcomponents' => count($submitted->component),
             'showmissingonly' => (int)$submitted->missing,
             'showoutdatedonly' => (int)$submitted->outdated,
+            'showexistingonly' => (int)$submitted->has,
             'showhelpsonly' => (int)$submitted->helps,
             'withsubstring' => (int)($submitted->substring !== ''),
             'substringregex' => (int)$submitted->substringregex,
@@ -492,6 +499,7 @@ class local_amos_translator implements renderable {
 
         $missing            = $filter->get_data()->missing;
         $outdated           = $filter->get_data()->outdated;
+        $has                = $filter->get_data()->has;
         $helps              = $filter->get_data()->helps;
         $substring          = $filter->get_data()->substring;
         $substringregex     = $filter->get_data()->substringregex;
@@ -656,6 +664,9 @@ class local_amos_translator implements renderable {
                             }
                             unset($s[$lang][$component][$stringid][$branchcode]);
 
+                            if ($has and is_null($string->translation)) {
+                                continue;
+                            }
                             if ($stagedonly and $string->class != 'staged') {
                                 continue;   // do not display this string
                             }

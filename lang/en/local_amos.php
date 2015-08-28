@@ -207,6 +207,7 @@ $string['filterlng_desc'] = 'Display translations in these languages';
 $string['filtermis'] = 'Miscellaneous';
 $string['filtermis_desc'] = 'Additional conditions on strings to display';
 $string['filtermisfglo'] = 'greylisted strings only';
+$string['filtermisfhas'] = 'translated strings only';
 $string['filtermisfhlp'] = 'help strings only';
 $string['filtermisfmis'] = 'missing and outdated strings only';
 $string['filtermisfout'] = 'outdated strings only';

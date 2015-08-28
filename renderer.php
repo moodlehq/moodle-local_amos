@@ -221,7 +221,7 @@ class local_amos_renderer extends plugin_renderer_base {
         // other filter settings
         $output .= html_writer::start_tag('div', array('class' => 'control-group'));
         $collapsible = ' collapsible collapsed';
-        foreach (array('missing', 'helps', 'stagedonly', 'greylistedonly', 'withoutgreylisted') as $ff) {
+        foreach (array('missing', 'outdated', 'has', 'helps', 'stagedonly', 'greylistedonly', 'withoutgreylisted') as $ff) {
             if (!empty($filterdata->$ff)) {
                 $collapsible = '';
             }
@@ -242,6 +242,12 @@ class local_amos_renderer extends plugin_renderer_base {
         $collapsible = empty($filterdata->outdated) ? ' collapsible collapsed' : '';
         $output .= html_writer::tag('label',
             html_writer::checkbox('fout', 1, $filterdata->outdated) . get_string('filtermisfout', 'local_amos'),
+            array('class' => 'checkbox'.$collapsible)
+        );
+
+        $collapsible = empty($filterdata->has) ? ' collapsible collapsed' : '';
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fhas', 1, $filterdata->has) . get_string('filtermisfhas', 'local_amos'),
             array('class' => 'checkbox'.$collapsible)
         );
 
