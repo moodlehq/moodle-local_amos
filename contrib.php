@@ -401,14 +401,16 @@ if ($id) {
     $contribinfo->strings       = $origstrings;
     $contribinfo->stringsreb    = $rebasedstrings;
 
-    if ($maintainerof and ($maintainerof === 'all' or in_array($contribution->lang, $maintainerof))) {
-        if ($contribution->status == local_amos_contribution::STATE_REVIEW and $contribinfo->stringsreb == 0) {
-            // Maintainers tend to leave the contribution in the "In review" state.
-            // So let us automatically accept it if all strings are already translated.
-            // This may lead to unexpected acceptance in certain situations but of the
-            // evils, many "in review" contributions appear to be the worse one.
-            redirect(new moodle_url('/local/amos/contrib.php', array('accept' => $contribution->id, 'sesskey' => sesskey())));
-        }
+    if ($contribution->assignee == $USER->id
+        and $maintainerof
+        and ($maintainerof === 'all' or in_array($contribution->lang, $maintainerof))
+        and $contribution->status == local_amos_contribution::STATE_REVIEW
+        and $contribinfo->stringsreb == 0) {
+        // Maintainers tend to leave the contribution in the "In review" state.
+        // So let us automatically accept it if all strings are already translated.
+        // This may lead to unexpected acceptance in certain situations but of the
+        // evils, many "in review" contributions appear to be the worse one.
+        redirect(new moodle_url('/local/amos/contrib.php', array('accept' => $contribution->id, 'sesskey' => sesskey())));
     }
 
     echo $output->header();
