@@ -4573,8 +4573,12 @@
       <plugin>calculated</plugin>
       <plugin>calculatedmulti</plugin>
       <plugin>calculatedsimple</plugin>
+      <plugin>ddimageortext</plugin>
+      <plugin>ddmarker</plugin>
+      <plugin>ddwtos</plugin>
       <plugin>description</plugin>
       <plugin>essay</plugin>
+      <plugin>gapselect</plugin>
       <plugin>match</plugin>
       <plugin>missingtype</plugin>
       <plugin>multianswer</plugin>
