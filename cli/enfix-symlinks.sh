@@ -32,7 +32,7 @@ fi
 
 pushd $SYMLINKSDIR
 
-for f in $(find $DIRROOT -wholename '*/lang/en/*.php'); do
+for f in $(find $DIRROOT -wholename '*/lang/en/*.php' -not -wholename '*/tests/fixtures/*'); do
     if [[ $f == $DIRROOT/install/* ]]; then
         echo Skipping $f
     else
