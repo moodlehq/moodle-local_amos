@@ -30,11 +30,11 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 * Update jobs/zip-packs-snapshot and make it ready for the to-be-created branch.
 * Make sure that plugins.xml contains declaration for Y.Y.
 * Deploy the code at the production site.
-* Fork the new branch in the repository
+* Fork the new branch in the repository (takes cca 30 minutes)
 
         php cli/make-branch.php --from=MOODLE_XX_STABLE --to=MOODLE_YY_STABLE
 
-  and do not forget to reinitilize the snapshot table
+  and do not forget to reinitilize the snapshot table (takes cca 7 hours)
 
         php cli/init-snapshot.php --branch=YY00
 
@@ -71,7 +71,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 
   Check that jobs/zip-packs-snapshot will process the new version.
 
-* Turn Jenkins on and let it re-generate the ZIP packages.
+* Turn Jenkins on and let it re-generate all the ZIP packages (cca 40 minutes)
 * Check http://download.moodle.org/langpack/
 * Clone greylisted strings
 
