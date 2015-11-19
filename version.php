@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of mlang
+ * Defines the version of AMOS
  *
  * @package   local_amos
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component  = 'local_amos';
-$plugin->version    = 2015082800;
+$plugin->version    = 2015111900;
+$plugin->release    = '3.0.0';
 $plugin->maturity   = MATURITY_STABLE;
-$plugin->requires   = 2015051100;
+$plugin->requires   = 2015111600;
