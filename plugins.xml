@@ -4921,6 +4921,7 @@
       <plugin>imagegallery</plugin>
     </plugins>
     <plugins type="ltiservice">
+      <plugin>memberships</plugin>
       <plugin>profile</plugin>
       <plugin>toolproxy</plugin>
       <plugin>toolsettings</plugin>
