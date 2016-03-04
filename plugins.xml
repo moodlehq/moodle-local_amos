@@ -5013,6 +5013,7 @@
     <plugins type="core">
       <plugin>access</plugin>
       <plugin>admin</plugin>
+      <plugin>antivirus</plugin>
       <plugin>auth</plugin>
       <plugin>availability</plugin>
       <plugin>backup</plugin>
@@ -5074,6 +5075,9 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
+    </plugins>
+    <plugins type="antivirus">
+      <plugin>clamav</plugin>
     </plugins>
     <plugins type="availability">
       <plugin>completion</plugin>
@@ -5185,6 +5189,7 @@
       <plugin>course_overview</plugin>
       <plugin>course_summary</plugin>
       <plugin>feedback</plugin>
+      <plugin>globalsearch</plugin>
       <plugin>glossary_random</plugin>
       <plugin>html</plugin>
       <plugin>login</plugin>
@@ -5255,6 +5260,7 @@
       <plugin>participation</plugin>
       <plugin>progress</plugin>
       <plugin>questioninstances</plugin>
+      <plugin>search</plugin>
       <plugin>security</plugin>
       <plugin>stats</plugin>
       <plugin>performance</plugin>
@@ -5287,7 +5293,6 @@
       <plugin>enrol</plugin>
     </plugins>
     <plugins type="webservice">
-      <plugin>amf</plugin>
       <plugin>rest</plugin>
       <plugin>soap</plugin>
       <plugin>xmlrpc</plugin>
@@ -5323,6 +5328,9 @@
       <plugin>googledocs</plugin>
       <plugin>mahara</plugin>
       <plugin>picasa</plugin>
+    </plugins>
+    <plugins type="search">
+      <plugin>solr</plugin>
     </plugins>
     <plugins type="qbehaviour">
       <plugin>adaptive</plugin>
