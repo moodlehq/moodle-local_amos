@@ -471,6 +471,7 @@ if ($id) {
         $options->component = 'local_amos';
         $options->autostart = true;
         $commentmanager = new comment($options);
+        $commentmanager->set_fullwidth();
         echo $output->container($commentmanager->output(), 'commentswrapper');
     }
 

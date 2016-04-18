@@ -163,3 +163,23 @@ function local_amos_comment_add($comment, $meta) {
         }
     }
 }
+
+/**
+ * Overrides the default template used when printing comments to allow for better styling.
+ *
+ * @param stdClass $params
+ * @return string
+ */
+function local_amos_comment_template($params) {
+
+    $template  = html_writer::start_tag('div', array('class' => 'amos-comment'));
+    $template .= html_writer::start_div('comment-header');
+    $template .= html_writer::tag('div', '___picture___', array('class' => 'comment-userpicture'));
+    $template .= html_writer::tag('div', '___name___', array('class' => 'comment-userfullname'));
+    $template .= html_writer::tag('div', '___time___', array('class' => 'comment-time'));
+    $template .= html_writer::end_div(); // .comment-header
+    $template .= html_writer::tag('div', '___content___', array('class' => 'comment-comment'));
+    $template .= html_writer::end_tag('div'); // .plugin-comment
+
+    return $template;
+}
