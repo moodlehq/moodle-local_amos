@@ -5376,6 +5376,7 @@
       <plugin>monitor</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
+      <plugin>recyclebin</plugin>
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
