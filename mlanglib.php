@@ -2196,15 +2196,13 @@ class mlang_tools {
         // Get the list of all languages to auto merge to.
         if (empty($languages)) {
             $tree = self::components_tree(array('branch' => $from, 'component' => $componentname));
-            unset($tree[$from]['en']);
             $languages = array_keys($tree[$from]);
+        }
 
-        } else {
-            // Make sure the English is not in the given list
-            foreach ($languages as $index => $value) {
-                if ($value === 'en') {
-                    unset($languages[$index]);
-                }
+        // Exclude English and English fixes from the list.
+        foreach ($languages as $index => $value) {
+            if ($value === 'en' or $value === 'en_fix') {
+                unset($languages[$index]);
             }
         }
 

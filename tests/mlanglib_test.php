@@ -1659,6 +1659,7 @@ AMOS END';
 
         $this->register_language('en', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
         $this->register_language('cs', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
+        $this->register_language('en_fix', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
 
         $stage = new mlang_stage();
         $version19 = mlang_version::by_branch('MOODLE_19_STABLE');
@@ -1710,6 +1711,12 @@ AMOS END';
         $component->clear();
         $stage->commit('Translate some Foo 2.4 strings into Czech', array('source' => 'unittest'));
 
+        $component = new mlang_component('foo', 'en_fix', $version24);
+        $component->add_string(new mlang_string('modulename', 'Fooh', $time - 45 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Since 2.4, the module name is different', array('source' => 'unittest'));
+
         testable_mlang_tools::auto_merge('foo');
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version23);
@@ -1722,6 +1729,18 @@ AMOS END';
         $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
         $this->assertFalse($component->has_string('end')); // Because it's 2.4 only
         $this->assertFalse($component->has_string('orphan')); // Because it's not in 2.3 English
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('foo', 'en_fix', $version23);
+        $this->assertFalse($component->has_string('modulename'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('foo', 'en_fix', $version24);
+        $this->assertTrue($component->has_string('modulename'));
+        $component->clear();
+
+        $component = mlang_component::from_snapshot('foo', 'en_fix', $version24);
+        $this->assertFalse($component->has_string('modulename'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version24);
