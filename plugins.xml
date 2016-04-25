@@ -5026,6 +5026,7 @@
       <plugin>calendar</plugin>
       <plugin>cohort</plugin>
       <plugin>comment</plugin>
+      <plugin>competency</plugin>
       <plugin>completion</plugin>
       <plugin>countries</plugin>
       <plugin>course</plugin>
@@ -5194,6 +5195,7 @@
       <plugin>glossary_random</plugin>
       <plugin>html</plugin>
       <plugin>login</plugin>
+      <plugin>lp</plugin>
       <plugin>mentees</plugin>
       <plugin>messages</plugin>
       <plugin>mnet_hosts</plugin>
@@ -5242,6 +5244,13 @@
       <plugin>topics</plugin>
       <plugin>weeks</plugin>
     </plugins>
+    <plugins type="dataformat">
+      <plugin>html</plugin>
+      <plugin>csv</plugin>
+      <plugin>json</plugin>
+      <plugin>excel</plugin>
+      <plugin>ods</plugin>
+    </plugins>
     <plugins type="profilefield">
       <plugin>checkbox</plugin>
       <plugin>datetime</plugin>
@@ -5251,6 +5260,7 @@
     </plugins>
     <plugins type="report">
       <plugin>backups</plugin>
+      <plugin>competency</plugin>
       <plugin>completion</plugin>
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
@@ -5362,6 +5372,7 @@
       <plugin>availabilityconditions</plugin>
       <plugin>behat</plugin>
       <plugin>capability</plugin>
+      <plugin>cohortroles</plugin>
       <plugin>customlang</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>filetypes</plugin>
@@ -5371,7 +5382,10 @@
       <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
       <plugin>log</plugin>
+      <plugin>lp</plugin>
+      <plugin>lpmigrate</plugin>
       <plugin>messageinbound</plugin>
+      <plugin>mobile</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>monitor</plugin>
       <plugin>phpunit</plugin>
