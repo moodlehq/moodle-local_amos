@@ -124,6 +124,9 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'availability'          => 'availability/condition',
             'ltisource'             => 'mod/lti/source',
             'ltiservice'            => 'mod/lti/service',
+            'antivirus'             => 'lib/antivirus',
+            'dataformat'            => 'dataformat',
+            'search'                => 'search/engine',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
