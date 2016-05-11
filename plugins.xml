@@ -5140,6 +5140,7 @@
       <plugin>fc</plugin>
       <plugin>imap</plugin>
       <plugin>ldap</plugin>
+      <plugin>lti</plugin>
       <plugin>manual</plugin>
       <plugin>mnet</plugin>
       <plugin>nntp</plugin>
@@ -5162,6 +5163,7 @@
       <plugin>guest</plugin>
       <plugin>imsenterprise</plugin>
       <plugin>ldap</plugin>
+      <plugin>lti</plugin>
       <plugin>manual</plugin>
       <plugin>meta</plugin>
       <plugin>mnet</plugin>
