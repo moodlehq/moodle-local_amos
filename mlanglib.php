@@ -1633,7 +1633,7 @@ class mlang_version {
         return array(
             array(
                 'code'          => self::MOODLE_31,
-                'label'         => 'DEV',
+                'label'         => '3.1',
                 'branch'        => 'MOODLE_31_STABLE',
                 'dir'           => '3.1',
                 'translatable'  => true,
