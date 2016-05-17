@@ -1739,7 +1739,7 @@ AMOS END';
         $this->assertTrue($component->has_string('modulename'));
         $component->clear();
 
-        $component = mlang_component::from_snapshot('foo', 'en_fix', $version24);
+        $component = mlang_component::from_snapshot('foo', 'en_fix', $version25);
         $this->assertFalse($component->has_string('modulename'));
         $component->clear();
 
