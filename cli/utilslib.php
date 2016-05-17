@@ -800,7 +800,7 @@ class amos_merge_string_files {
 
         foreach ($tostrings as $changeid => $changetext) {
             if (!isset($fromstrings[$changeid])) {
-                $this->log('Attempting to merge an orphaned change: "'.$changeid.'"', amos_cli_logger::LEVEL_DEBUG);
+                $this->log('Attempting to merge an orphaned change: "'.$changeid.'"', amos_cli_logger::LEVEL_WARNING);
                 continue;
             }
             if ($fromstrings[$changeid] !== $changetext) {
