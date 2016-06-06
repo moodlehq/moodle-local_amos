@@ -1,13 +1,5 @@
-#
-# Configuration file for mdt (moodle deployment tools)
-#
-
-#
-# Our frankenstyle component name
-#
-mdt_component=local_amos
-
-#
-# Our path within the Moodle source code tree
-#
-mdt_relpath=local/amos/
+MDTSITE=lang.moodle.org
+MDTVERSION=3.0
+MDTCOMPONENT=local_amos
+MDTRELPATH=local/amos/
+MDTEXPORT=origin/master
