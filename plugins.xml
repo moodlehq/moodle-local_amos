@@ -5813,7 +5813,6 @@
       <plugin>participation</plugin>
       <plugin>progress</plugin>
       <plugin>questioninstances</plugin>
-      <plugin>search</plugin>
       <plugin>security</plugin>
       <plugin>stats</plugin>
       <plugin>performance</plugin>
@@ -5851,7 +5850,6 @@
       <plugin>xmlrpc</plugin>
     </plugins>
     <plugins type="repository">
-      <plugin>alfresco</plugin>
       <plugin>areafiles</plugin>
       <plugin>boxnet</plugin>
       <plugin>coursefiles</plugin>
@@ -5955,9 +5953,8 @@
       <plugin>file</plugin>
     </plugins>
     <plugins type="theme">
-      <plugin>base</plugin>
+      <plugin>boost</plugin>
       <plugin>bootstrapbase</plugin>
-      <plugin>canvas</plugin>
       <plugin>clean</plugin>
       <plugin>more</plugin>
     </plugins>
@@ -6016,6 +6013,7 @@
       <plugin>delaybetweenattempts</plugin>
       <plugin>ipaddress</plugin>
       <plugin>numattempts</plugin>
+      <plugin>offlineattempts</plugin>
       <plugin>openclosedate</plugin>
       <plugin>password</plugin>
       <plugin>safebrowser</plugin>
