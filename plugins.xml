@@ -5923,6 +5923,7 @@
       <plugin>langimport</plugin>
       <plugin>log</plugin>
       <plugin>lp</plugin>
+      <plugin>lpimportcsv</plugin>
       <plugin>lpmigrate</plugin>
       <plugin>messageinbound</plugin>
       <plugin>mobile</plugin>
@@ -5948,6 +5949,7 @@
       <plugin>mongodb</plugin>
       <plugin>session</plugin>
       <plugin>static</plugin>
+      <plugin>apcu</plugin>
     </plugins>
     <plugins type="cachelock">
       <plugin>file</plugin>
