@@ -5940,6 +5940,7 @@
       <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
       <plugin>unsuproles</plugin>
+      <plugin>usertours</plugin>
       <plugin>xmldb</plugin>
     </plugins>
     <plugins type="cachestore">
