@@ -127,6 +127,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'antivirus'             => 'lib/antivirus',
             'dataformat'            => 'dataformat',
             'search'                => 'search/engine',
+            'media'                 => 'media',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
