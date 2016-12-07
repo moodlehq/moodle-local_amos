@@ -1532,6 +1532,7 @@ class mlang_version {
     const MOODLE_30 = 3000;
     const MOODLE_31 = 3100;
     const MOODLE_32 = 3200;
+    const MOODLE_33 = 3300;
 
     /** @var int internal code of the version */
     public $code;
@@ -1633,12 +1634,20 @@ class mlang_version {
     protected static function versions_info() {
         return array(
             array(
-                'code'          => self::MOODLE_32,
+                'code'          => self::MOODLE_33,
                 'label'         => 'DEV',
+                'branch'        => 'MOODLE_33_STABLE',
+                'dir'           => '3.3',
+                'translatable'  => true,
+                'current'       => false,
+            ),
+            array(
+                'code'          => self::MOODLE_32,
+                'label'         => '3.2',
                 'branch'        => 'MOODLE_32_STABLE',
                 'dir'           => '3.2',
                 'translatable'  => true,
-                'current'       => false,
+                'current'       => true,
             ),
             array(
                 'code'          => self::MOODLE_31,
@@ -1646,7 +1655,7 @@ class mlang_version {
                 'branch'        => 'MOODLE_31_STABLE',
                 'dir'           => '3.1',
                 'translatable'  => true,
-                'current'       => true,
+                'current'       => false,
             ),
             array(
                 'code'          => self::MOODLE_30,

@@ -35,12 +35,9 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 // list of branches to process
 $branches = array(
-    'MOODLE_27_STABLE',
-    'MOODLE_28_STABLE',
-    'MOODLE_29_STABLE',
-    'MOODLE_30_STABLE',
     'MOODLE_31_STABLE',
     'MOODLE_32_STABLE',
+    'MOODLE_33_STABLE',
 );
 
 fputs(STDOUT, "*****************************************\n");
@@ -51,7 +48,7 @@ remove_dir(AMOS_EXPORT_INSTALLER_DIR, true);
 
 foreach ($branches as $branch) {
     fputs(STDOUT, "BRANCH {$branch}\n");
-    if ($branch == 'MOODLE_32_STABLE') {
+    if ($branch == 'MOODLE_33_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
