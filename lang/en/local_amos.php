@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['about'] = '<p>AMOS is a central repository of Moodle strings and their history. It tracks the addition of English strings into Moodle code, gathers translations, handles common translation tasks and generates language packages to be deployed on Moodle servers.</p>
-<p>See <a href="http://docs.moodle.org/en/AMOS">AMOS documentation</a> for more information.</p>';
+<p>See <a href="https://docs.moodle.org/dev/AMOS_manual">AMOS documentation</a> for more information.</p>';
 $string['amos'] = 'AMOS translation toolkit';
 $string['amos:changecontriblang'] = 'Change language of contributed strings';
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
