@@ -76,7 +76,7 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals($component->get_number_of_strings(), 6);
         $this->assertEquals($component->get_string('valid1')->text, 'This is {$a} valid string {$a->and} should be parsed');
         $this->assertEquals($component->get_string('valid2')->text, "Multiline\nstring");
-        $this->assertEquals($component->get_string('valid3')->text, 'What $a\'Pe%%"be');
+        $this->assertEquals($component->get_string('valid3')->text, 'What \$a\'Pe%%\"be');
         $this->assertEquals($component->get_string('valid4')->text, "\$string['self'] = 'Eh?';");
         $this->assertEquals($component->get_string('valid5')->text, 'First');
         $this->assertEquals($component->get_string('valid6')->text, 'Second');

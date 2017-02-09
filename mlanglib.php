@@ -719,7 +719,6 @@ class mlang_string {
 
         if (($format === 2) && ($from === 2)) {
             // sanity translations of 2.x strings
-            $clean = str_replace("\\", '', $clean); // delete all slashes
             $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
 
         } elseif (($format === 2) && ($from === 1)) {

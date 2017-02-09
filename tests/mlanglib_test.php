@@ -363,7 +363,7 @@ EOF;
         $this->assertTrue($component->has_string('author'));
         $this->assertTrue($component->has_string('syntax'));
         $this->assertEquals("Multiline\nstring", $component->get_string('about')->text);
-        $this->assertEquals('What $a\'Pe%%"be', $component->get_string('syntax')->text);
+        $this->assertEquals('What $a\'Pe%%\"be', $component->get_string('syntax')->text);
         $this->assertEquals('%%Y-%%m-%%d-%%H-%%M', $component->get_string('percents')->text);
         $component->clear();
 
@@ -695,7 +695,7 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote"), "'Murder!', she wrote"); // will be escaped by var_export()
         $this->assertEquals(mlang_string::fix_syntax("\t  Trim Hunter  \t\t"), 'Trim Hunter');
         $this->assertEquals(mlang_string::fix_syntax('Delete role "$a->role"?'), 'Delete role "$a->role"?');
-        $this->assertEquals(mlang_string::fix_syntax('Delete role \"$a->role\"?'), 'Delete role "$a->role"?');
+        $this->assertEquals(mlang_string::fix_syntax('Delete role \"$a->role\"?'), 'Delete role \"$a->role\"?');
         $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character"), 'Delete ASCII NULL control character');
         $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character"), 'Delete ASCII ENQUIRY control character');
         $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character"), 'Delete ASCII ACKNOWLEDGE control character');
@@ -860,7 +860,7 @@ EOF;
         $component->add_string(new mlang_string('third', "Multi   line  \n  trailing  "));
         $component->clean_texts();
         $this->assertEquals("Line\n\n\nline", $component->get_string('first')->text); // two blank lines allowed in format 2
-        $this->assertEquals('This really $a sucks. Yes {$a}, it {$a->does}', $component->get_string('second')->text);
+        $this->assertEquals('This \really \$a sucks. Yes {$a}, it {$a->does}', $component->get_string('second')->text);
         $this->assertEquals("Multi   line\n  trailing", $component->get_string('third')->text);
         $component->clear();
         unset($component);
