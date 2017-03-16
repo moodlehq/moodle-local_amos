@@ -6127,6 +6127,7 @@
       <plugin>enrol</plugin>
       <plugin>error</plugin>
       <plugin>filepicker</plugin>
+      <plugin>fileconverter</plugin>
       <plugin>files</plugin>
       <plugin>filters</plugin>
       <plugin>form</plugin>
@@ -6511,6 +6512,9 @@
     </plugins>
     <plugins type="cachelock">
       <plugin>file</plugin>
+    </plugins>
+    <plugins type="fileconverter">
+      <plugin>unoconv</plugin>
     </plugins>
     <plugins type="theme">
       <plugin>boost</plugin>

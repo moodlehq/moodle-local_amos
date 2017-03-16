@@ -128,6 +128,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'dataformat'            => 'dataformat',
             'search'                => 'search/engine',
             'media'                 => 'media/player',
+            'fileconverter'         => 'files/converter',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
