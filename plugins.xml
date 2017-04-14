@@ -6236,6 +6236,7 @@
       <plugin>nntp</plugin>
       <plugin>nologin</plugin>
       <plugin>none</plugin>
+      <plugin>oauth2</plugin>
       <plugin>pam</plugin>
       <plugin>pop3</plugin>
       <plugin>shibboleth</plugin>
@@ -6279,7 +6280,6 @@
       <plugin>community</plugin>
       <plugin>completionstatus</plugin>
       <plugin>course_list</plugin>
-      <plugin>course_overview</plugin>
       <plugin>course_summary</plugin>
       <plugin>feedback</plugin>
       <plugin>globalsearch</plugin>
@@ -6290,6 +6290,7 @@
       <plugin>mentees</plugin>
       <plugin>messages</plugin>
       <plugin>mnet_hosts</plugin>
+      <plugin>myoverview</plugin>
       <plugin>myprofile</plugin>
       <plugin>navigation</plugin>
       <plugin>news_items</plugin>
@@ -6418,6 +6419,7 @@
       <plugin>googledocs</plugin>
       <plugin>local</plugin>
       <plugin>merlot</plugin>
+      <plugin>onedrive</plugin>
       <plugin>picasa</plugin>
       <plugin>recent</plugin>
       <plugin>skydrive</plugin>
@@ -6486,6 +6488,7 @@
       <plugin>mobile</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>monitor</plugin>
+      <plugin>oauth2</plugin>
       <plugin>phpunit</plugin>
       <plugin>profiling</plugin>
       <plugin>recyclebin</plugin>
