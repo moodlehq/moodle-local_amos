@@ -6518,6 +6518,7 @@
     </plugins>
     <plugins type="fileconverter">
       <plugin>unoconv</plugin>
+      <plugin>googledrive</plugin>
     </plugins>
     <plugins type="theme">
       <plugin>boost</plugin>
