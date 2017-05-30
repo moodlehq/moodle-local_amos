@@ -134,13 +134,11 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             var fsubmit     = fform.one('button[type="submit"]');
             var translatorw = Y.one('.translatorwrapper');
             var ficonholder = fform.one('#amosfilter_submitted_icon');
-            var ficonhtml   = '<img src="'+M.cfg.loadingicon+'" class="spinner" style="display:none" />';
-            ficonholder.set('innerHTML', ficonhtml);
 
             fform.on('submit', function(e) {
                         fsubmit.setStyle('minWidth', fsubmit.getComputedStyle('width'));
                         fsubmit.set('text', M.util.get_string('processing', 'local_amos'));
-                        ficonholder.one('img').setStyle('display', 'inline');
+                        ficonholder.setStyle('display', 'inline');
                         translatorw.setStyle('display', 'none');
                         });
         },

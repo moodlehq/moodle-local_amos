@@ -333,7 +333,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'form-actions'));
         $output .= html_writer::tag('button', get_string('savefilter', 'local_amos'), array('class' => 'btn btn-primary', 'type' => 'submit'));
         $output .= html_writer::span('', 'collapsible-control');
-        $output .= html_writer::tag('span', '', array('id' => 'amosfilter_submitted_icon'));
+        $output .= html_writer::tag('span', $this->output->pix_icon('i/loading_small', ''), array('id' => 'amosfilter_submitted_icon',
+            'style' => 'display:none'));
         $permalink = $filter->get_permalink();
         if (!is_null($permalink)) {
             $output .= html_writer::link($permalink, get_string('permalink', 'local_amos'), array('class' => 'permalink btn btn-link'));
