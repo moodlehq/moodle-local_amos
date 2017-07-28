@@ -6660,6 +6660,7 @@
     <plugins type="core">
       <plugin>access</plugin>
       <plugin>admin</plugin>
+      <plugin>analytics</plugin>
       <plugin>antivirus</plugin>
       <plugin>auth</plugin>
       <plugin>availability</plugin>
@@ -6784,18 +6785,13 @@
       <plugin>cas</plugin>
       <plugin>db</plugin>
       <plugin>email</plugin>
-      <plugin>fc</plugin>
-      <plugin>imap</plugin>
       <plugin>ldap</plugin>
       <plugin>lti</plugin>
       <plugin>manual</plugin>
       <plugin>mnet</plugin>
-      <plugin>nntp</plugin>
       <plugin>nologin</plugin>
       <plugin>none</plugin>
       <plugin>oauth2</plugin>
-      <plugin>pam</plugin>
-      <plugin>pop3</plugin>
       <plugin>shibboleth</plugin>
       <plugin>webservice</plugin>
     </plugins>
@@ -6922,6 +6918,7 @@
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
       <plugin>eventlist</plugin>
+      <plugin>insights</plugin>
       <plugin>log</plugin>
       <plugin>loglive</plugin>
       <plugin>outline</plugin>
@@ -6955,6 +6952,10 @@
     <plugins type="gradingform">
       <plugin>rubric</plugin>
       <plugin>guide</plugin>
+    </plugins>
+    <plugins type="mlbackend">
+      <plugin>php</plugin>
+      <plugin>python</plugin>
     </plugins>
     <plugins type="mnetservice">
       <plugin>enrol</plugin>
@@ -7024,6 +7025,7 @@
       <plugin>xml</plugin>
     </plugins>
     <plugins type="tool">
+      <plugin>analytics</plugin>
       <plugin>assignmentupgrade</plugin>
       <plugin>availabilityconditions</plugin>
       <plugin>behat</plugin>

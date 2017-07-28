@@ -129,6 +129,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'search'                => 'search/engine',
             'media'                 => 'media/player',
             'fileconverter'         => 'files/converter',
+            'mlbackend'             => 'lib/mlbackend',
         );
 
         if ($version->code <= mlang_version::MOODLE_21) {
