@@ -105,6 +105,9 @@ if (data_submitted()) {
 
     }
 
+    $maintainedlangscache = cache::make_from_params(cache_store::MODE_APPLICATION, 'local_amos', 'maintainedlangs');
+    $maintainedlangscache->purge();
+
     redirect(new moodle_url('/local/amos/credits.php', array('editmode' => 1), 'credits-language-'.$langcode));
 }
 

@@ -407,6 +407,7 @@ $string['typecore'] = 'Core subsystems';
 $string['typestandard'] = 'Standard plugins';
 $string['unableenfixaddon'] = 'English fixes allowed for standard plugins only';
 $string['unableenfixcountries'] = 'Country names are copied from ISO 3166-1';
+$string['unableunmaintained'] = 'Language pack \'{$a}\' has no maintainer to process your contribution.';
 $string['unstage'] = 'Unstage';
 $string['unstageconfirm'] = 'Really?';
 $string['unstaging'] = 'Unstaging';

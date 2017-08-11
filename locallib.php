@@ -756,6 +756,27 @@ class local_amos_translator implements renderable {
                 $string->class = 'missing explanation';
            }
         }
+
+        // Check that the language has a maintainer to eventually commit the contribution.
+        $maintainedlangscache = cache::make_from_params(cache_store::MODE_APPLICATION, 'local_amos', 'maintainedlangs');
+
+        $maintainedlangs = $maintainedlangscache->get('maintainedlangs');
+
+        if ($maintainedlangs === false) {
+            $sql = "SELECT DISTINCT lang
+                      FROM {amos_translators}
+                     WHERE status = :maintainer";
+            $maintainedlangs = array_flip($DB->get_fieldset_sql($sql, ['maintainer' => AMOS_USER_MAINTAINER]));
+            $maintainedlangscache->set('maintainedlangs', $maintainedlangs);
+        }
+
+		foreach ($this->strings as $string) {
+            if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
+                $string->translatable = false;
+                $string->translation = get_string('unableunmaintained', 'local_amos', $string->language);
+                $string->class = 'missing explanation';
+            }
+        }
     }
 }
 
