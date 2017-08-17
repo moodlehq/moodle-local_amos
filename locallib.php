@@ -770,10 +770,12 @@ class local_amos_translator implements renderable {
             $maintainedlangscache->set('maintainedlangs', $maintainedlangs);
         }
 
+		$langnames = mlang_tools::list_languages();
+
 		foreach ($this->strings as $string) {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
                 $string->translatable = false;
-                $string->translation = get_string('unableunmaintained', 'local_amos', $string->language);
+                $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
                 $string->class = 'missing explanation';
             }
         }
