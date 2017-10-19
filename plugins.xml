@@ -6841,7 +6841,6 @@
       <plugin>login</plugin>
       <plugin>lp</plugin>
       <plugin>mentees</plugin>
-      <plugin>messages</plugin>
       <plugin>mnet_hosts</plugin>
       <plugin>myoverview</plugin>
       <plugin>myprofile</plugin>
@@ -7036,6 +7035,7 @@
       <plugin>filetypes</plugin>
       <plugin>generator</plugin>
       <plugin>health</plugin>
+      <plugin>httpsreplace</plugin>
       <plugin>innodb</plugin>
       <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
