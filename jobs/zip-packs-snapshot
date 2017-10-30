@@ -6,7 +6,7 @@
 # upstream: zip-packs-publish
 # downstream: zip-packs-pull
 
-CLONESROOT=~/amos/git/moodle-langpacks-clones
+CLONESROOT=${AMOSDATAROOT}/repos/moodle-langpacks-clones
 
 rsync -a --exclude 'README*' --exclude '*.zip' --exclude '.git' $AMOSDATAROOT/temp/export-zip/ $CLONESROOT
 
@@ -19,5 +19,5 @@ for VER in 2.0 2.1 2.2 2.3 2.4 2.5 2.6 2.7 2.8 2.9 3.0 3.1 3.2 3.3 3.4 ; do
     git push
 done
 
-cd ~/amos/git/moodle-langpacks
+cd ${AMOSDATAROOT}/repos/moodle-langpacks
 git push git@gitlab-amos:moodle/moodle-langpacks.git refs/heads/*:refs/heads/*

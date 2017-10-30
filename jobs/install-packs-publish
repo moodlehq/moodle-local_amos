@@ -4,7 +4,7 @@
 # Merges newly generated installer strings into a local clone of moodle.git and pushes changes into a remote repository.
 # upstream: install-packs-make
 
-REPO=~/amos/git/moodle-install/
+REPO=${AMOSDATAROOT}/repos/moodle-install/
 
 #
 # STEP 1 - update upstream tracking branches
