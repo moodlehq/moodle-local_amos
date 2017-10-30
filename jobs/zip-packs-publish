@@ -5,4 +5,4 @@
 # upstream: zip-packs-make
 # dowstream: zip-packs-commit
 
-rsync -av $AMOSDATAROOT/export-zip/ $AMOSZIPRSYNCDEST
+rsync -e "$AMOSZIPRSYNCRSH" -av $AMOSDATAROOT/export-zip/ $AMOSZIPRSYNCDEST
