@@ -15,4 +15,4 @@ if [[ ! -x $JOBPATH ]]; then
     exit 2;
 fi
 
-sudo -E -u ${AMOSRUNAS} $JOBPATH "${@:2}"
+sudo -E -H -u ${AMOSRUNAS} $JOBPATH "${@:2}"
