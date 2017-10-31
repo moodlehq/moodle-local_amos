@@ -41,8 +41,8 @@ function update_branch {
 	set -e
 
 	cd $REPO
-	git push git@gitlab-amos:amosbot/moodle-install.git $1:$1
-	git push git@gitlab-amos:amosbot/moodle-install.git $2:$2
+	git push git@git.in.moodle.com:amosbot/moodle-install.git $1:$1
+	git push git@git.in.moodle.com:amosbot/moodle-install.git $2:$2
 }
 
 update_branch install_master master 3.4
