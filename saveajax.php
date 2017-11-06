@@ -43,6 +43,7 @@ if (!confirm_sesskey()) {
 $lang = optional_param('lang', null, PARAM_SAFEDIR);
 $originalid = optional_param('originalid', null, PARAM_INT);
 $text = optional_param('text', null, PARAM_RAW);
+$nocleaning = optional_param('nocleaning', false, PARAM_BOOL);
 
 if (is_null($lang) or is_null($originalid) or is_null($text)) {
     header('HTTP/1.1 400 Bad Request');
@@ -57,6 +58,7 @@ if ($version->code < mlang_version::MOODLE_20) {
     die();
 }
 $string = new mlang_string($record->stringid, $text);
+$string->nocleaning = $nocleaning;
 $string->clean_text();
 $component->add_string($string);
 
@@ -68,6 +70,7 @@ mlang_stash::autosave($stage);
 header('Content-Type: application/json; charset: utf-8');
 $response = new stdclass();
 $response->text = local_amos_renderer::add_breaks(s($string->text));
+$response->nocleaning = $string->nocleaning;
 
 add_to_log(SITEID, 'amos', 'stage', '', $lang.' '.$version->label.' ['.$string->id.','.$component->name.']', 0, $USER->id);
 

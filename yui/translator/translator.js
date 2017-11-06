@@ -50,7 +50,11 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                         return;
                     } else {
                         // clicking on a translatable cell makes it editable
-                        this.make_editable(e);
+                        if (e.ctrlKey) {
+                            this.make_editable(e, true);
+                        } else {
+                            this.make_editable(e, false);
+                        };
                     }
                 }, '.translatable', this);
 
@@ -95,9 +99,10 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * Make the event target editable translator cell
          *
          * @param {Y.Event} e
+         * @param {Bool} nocleaning
          */
-        make_editable: function(e) {
-            this.editor_on(e.currentTarget, true);
+        make_editable: function(e, nocleaning) {
+            this.editor_on(e.currentTarget, true, null, nocleaning);
         },
 
         /**
@@ -106,12 +111,19 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          * @param {Y.Node} cell translator table cell
          * @param {Bool} focus shall the new editor get focus?
          * @param {Int} tabindex of the new editor
+         * @param {Bool} nocleaning - text should not be cleaned
          */
-        editor_on: function(cell, focus, tabindex) {
+        editor_on: function(cell, focus, tabindex, nocleaning) {
             var current     = cell.one('.translation-view');    // <div> with the current translation
             var stext       = current.get('text');
             stext           = stext.replace(/\u200b/g, '');     // remove U+200B zero-width space
             var editor      = Y.Node.create('<textarea class="translation-edit">' + stext + '</textarea>');
+            
+            if (nocleaning) {
+                cell.addClass('nocleaning');
+            } else {
+                cell.removeClass('nocleaning');
+            }
 
             if (tabindex) {
                 editor.setAttribute('tabindex', tabindex);
@@ -155,6 +167,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                 cell.removeClass('translated');
                 cell.removeClass('missing');
                 cell.removeClass('staged');
+                cell.removeClass('nocleaning');
                 cell.addClass(newclass);
             }
             // set the new contents of the translation text and show it
@@ -180,8 +193,16 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var current     = cell.one('.translation-view');    // <div> with the current translation
             var oldtext     = current.get('text');
             var newtext     = editor.get('value');
-
-            if (Y.Lang.trim(oldtext) === Y.Lang.trim(newtext)) {
+            
+            var nocleaning = cell.hasClass('nocleaning');
+            var nochanges;
+            if (nocleaning) {
+                nochanges = (oldtext === newtext);
+            } else {
+                nochanges = (oldtext === Y.Lang.trim(newtext));
+            }
+            
+            if (nochanges) {
                 if (oldtext !== '') {
                     this.editor_off(cell, null, null);
                     var updater = cell.one('.uptodatewrapper');
@@ -191,7 +212,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
                 }
             } else {
                 editor.set('disabled', true);
-                this.submit(cell, editor);
+                this.submit(cell, editor, nocleaning);
             }
         },
 
@@ -200,8 +221,9 @@ YUI.add('moodle-local_amos-translator', function(Y) {
          *
          * @param {Y.Node} cell
          * @param {Y.Node} editor
+         * @param {Bool} nocleaning
          */
-        submit: function(cell, editor) {
+        submit: function(cell, editor, nocleaning) {
             // configure the async request
             var ctrlgrp = cell.ancestor('.string-control-group');
             var lang = ctrlgrp.getData('amos-lang');
@@ -215,7 +237,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var uri = M.cfg.wwwroot + '/local/amos/saveajax.php';
             var cfg = {
                 method: 'POST',
-                data: build_querystring({'lang': lang, 'originalid': originalid, 'text': editor.get('value'), 'sesskey': M.cfg.sesskey}),
+                data: build_querystring({'lang': lang, 'originalid': originalid, 'text': editor.get('value'), 'sesskey': M.cfg.sesskey, 'nocleaning': nocleaning}),
                 on: {
                     success : this.submit_success,
                     failure : this.submit_failure,
@@ -256,7 +278,11 @@ YUI.add('moodle-local_amos-translator', function(Y) {
 
             var newtext = outcome.text;
             this.ajaxqueue.shift();
-            this.editor_off(cell, newtext, 'staged');
+            if (outcome.nocleaning) {
+                this.editor_off(cell, newtext, 'staged nocleaning');
+            } else {
+                this.editor_off(cell, newtext, 'staged');
+            }
         },
 
         /**

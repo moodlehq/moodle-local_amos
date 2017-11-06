@@ -487,6 +487,9 @@ class local_amos_renderer extends plugin_renderer_base {
             if ($string->outdated) {
                 $trclasses .= ' outdated';
             }
+            if ($string->nocleaning) {
+                $trclasses .= ' nocleaning';
+            }
 
             // mark as up-to-date
             if ($string->outdated and $string->committable and $string->translation) {
@@ -695,7 +698,8 @@ class local_amos_renderer extends plugin_renderer_base {
                 }
                 $t = html_writer::div(self::add_breaks(s($string->new)), 'preformatted');
                 $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
-            } else if (trim($string->current) === trim($string->new)) {
+            } else if (($string->nocleaning && $string->current === $string->new) ||
+                    (!$string->nocleaning && trim($string->current) === trim($string->new))) {
                 // no difference
                 $trclasses .= ' uncommittable nodiff';
                 $t = html_writer::div(self::add_breaks(s($string->current)), 'preformatted');
@@ -708,6 +712,9 @@ class local_amos_renderer extends plugin_renderer_base {
                 }
                 if (!$string->committable) {
                     $trclasses .= ' uncommittable diff';
+                }
+                if ($string->nocleaning) {
+                    $trclasses .= ' nocleaning';
                 }
 
                 $c = s($string->current);
