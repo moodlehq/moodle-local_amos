@@ -606,6 +606,7 @@ class local_amos_translator implements renderable {
                 $string->timemodified = $staged->timemodified;
                 $string->timeupdated = $staged->timemodified;
                 $string->class = 'staged';
+                $string->nocleaning = $staged->nocleaning;
                 $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
             }
         }
@@ -649,6 +650,11 @@ class local_amos_translator implements renderable {
                                 } else {
                                     $string->outdated = false;
                                 }
+                                if (isset($s[$lang][$component][$stringid][$branchcode]->nocleaning)) {
+                                    $string->nocleaning = $s[$lang][$component][$stringid][$branchcode]->nocleaning;
+                                } else {
+                                    $string->nocleaning = false;
+                                }
                             } else {
                                 $string->translation = null;
                                 $string->translationid = null;
@@ -656,6 +662,7 @@ class local_amos_translator implements renderable {
                                 $string->timeupdated = null;
                                 $string->class = 'missing';
                                 $string->outdated = false;
+                                $string->nocleaning = false;
                             }
                             if (isset($greylist[$branchcode][$component][$stringid])) {
                                 $string->greylisted = true;
@@ -870,6 +877,11 @@ class local_amos_stage implements renderable {
                 $string->current = null; // dtto
                 $string->new = $staged->text;
                 $string->committable = false;
+                if (isset($staged->nocleaning)) {
+                    $string->nocleaning = $staged->nocleaning;
+                } else {
+                    $string->nocleaning = false;
+                }
                 $stringstree[$string->component][$string->stringid][$string->language][$string->branch] = $string;
             }
         }
