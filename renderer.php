@@ -970,6 +970,12 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'btn btn-danger protected unstageall')
             );
 
+            $downloadbutton = html_writer::link(
+                new moodle_url('/local/amos/stage.php', array('download' => 1, 'sesskey' => sesskey())),
+                get_string('stagedownload', 'local_amos'),
+                array('class' => 'btn')
+            );
+
             $i = 0;
             foreach ($stage->filterfields->fver as $fver) {
                 $params['fver['.$i.']'] = $fver;
@@ -1000,6 +1006,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $actionbuttons .= $prunebutton;
             }
             $actionbuttons .= $unstageallbutton;
+            $actionbuttons .= $downloadbutton;
             $output .= $this->collapsible_stage_tool(
                 get_string('stageactions', 'local_amos'),
                 $actionbuttons,

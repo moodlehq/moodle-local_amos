@@ -350,6 +350,7 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Prune non-committable strings - unstage all translations that you are not allowed to commit. Stage is pruned automatically before it is committed.
 * Rebase - unstage all translations that either do not modify the current translation or are older than the most recent translation in the repository. Stage is rebased automatically before it is committed.
 * Unstage all - clears the stage, all staged translations are lost.';
+$string['stagedownload'] = 'Download';
 $string['stageedit'] = 'Edit staged strings';
 $string['stagetoolopen'] = 'Go to the stage';
 $string['stageprune'] = 'Prune non-committable';
@@ -372,6 +373,7 @@ $string['stashapply'] = 'Apply';
 $string['stashautosave'] = 'Automatically saved backup stash';
 $string['stashautosave_help'] = 'This stash contains the most recent snapshot of your stage. You can use it as a backup for cases when all strings are unstaged by accident, for example. Use \'Apply\' action to copy all stashed strings back into the stage (will overwrite the string if it is already staged).';
 $string['stashcomponents'] = '<span>Components:</span> {$a}';
+$string['stashdownload'] = 'Download';
 $string['stashdrop'] = 'Drop';
 $string['stashes'] = 'Stashes';
 $string['stashlanguages'] = '<span>Languages:</span> {$a}';

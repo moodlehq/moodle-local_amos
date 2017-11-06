@@ -38,6 +38,7 @@ $prune      = optional_param('prune', null, PARAM_INT);
 $rebase     = optional_param('rebase', null, PARAM_INT);
 $submit     = optional_param('submit', null, PARAM_INT);
 $unstageall = optional_param('unstageall', null, PARAM_INT);
+$download   = optional_param('download', null, PARAM_INT);
 $propagate  = optional_param('propagate', null, PARAM_INT);
 
 require_login(SITEID, false);
@@ -128,6 +129,11 @@ if (!empty($unstageall)) {
     unset($SESSION->local_amos->presetcommitmessage);
     unset($SESSION->local_amos->stagedcontribution);
     redirect($PAGE->url);
+}
+if (!empty($download)) {
+    require_sesskey();
+    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage->send_zip("stage.zip");
 }
 if (!empty($submit)) {
     require_sesskey();

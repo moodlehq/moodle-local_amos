@@ -33,6 +33,7 @@ $new    = optional_param('new', null, PARAM_BOOL);  // new stash requested
 $apply  = optional_param('apply', null, PARAM_INT);
 $pop    = optional_param('pop', null, PARAM_INT);
 $drop   = optional_param('drop', null, PARAM_INT);
+$download = optional_param('download', null, PARAM_INT);
 $submit = optional_param('submit', null, PARAM_INT);
 
 require_login(SITEID, false);
@@ -93,6 +94,16 @@ if ($drop) {
     }
     $stash->drop();
     redirect($PAGE->url);
+}
+
+if ($download) {
+    require_sesskey();
+    $stash = mlang_stash::instance_from_id($download);
+    if ($stash->ownerid != $USER->id) {
+        print_error('stashaccessdenied', 'local_amos');
+        die();
+    }
+    $stash->send_zip("stash.zip");
 }
 
 $submitform = new local_amos_submit_form();
@@ -239,6 +250,9 @@ if (!$stashes = $DB->get_records('amos_stashes', array('ownerid' => $USER->id), 
         }
         if (!$stash->isautosave) {
             $stash->add_action('drop', new moodle_url($PAGE->url, array('drop' => $stash->id)), get_string('stashdrop', 'local_amos'));
+        }
+        $stash->add_action('download', new moodle_url($PAGE->url, array('download' => $stash->id)), get_string('stashdownload', 'local_amos'));
+        if (!$stash->isautosave) {
             $stash->add_action('submit', new moodle_url($PAGE->url, array('submit' => $stash->id)), get_string('stashsubmit', 'local_amos'));
         }
 
