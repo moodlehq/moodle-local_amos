@@ -277,6 +277,7 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_32_STABLE',
     'MOODLE_33_STABLE',
     'MOODLE_34_STABLE',
+    'MOODLE_35_STABLE',
 );
 
 $standardplugins = local_amos_standard_plugins();
@@ -289,7 +290,7 @@ fputs(STDOUT, " PARSE CORE JOB STARTED\n");
 foreach ($MLANG_PARSE_BRANCHES as $branch) {
     fputs(STDOUT, "=========================================\n");
     fputs(STDOUT, "BRANCH {$branch}\n");
-    if ($branch == 'MOODLE_34_STABLE') {
+    if ($branch == 'MOODLE_35_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
