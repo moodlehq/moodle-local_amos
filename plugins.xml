@@ -7773,5 +7773,5 @@
       <plugin>legacy</plugin>
       <plugin>standard</plugin>
     </plugins>
-  </MOODLE>
+  </moodle>
 </standard_plugins>
