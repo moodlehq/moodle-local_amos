@@ -30,11 +30,13 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 * Update jobs/zip-packs-snapshot and make it ready for the to-be-created branch.
 * Make sure that plugins.xml contains declaration for Y.Y.
 * Deploy the code at the production site.
-* Fork the new branch in the repository (takes cca 30 minutes)
+* Make sure to perform the following tasks in tmux or similar to avoid
+  accidental cancellation.
+* Fork the new branch in the repository (took cca 60 minutes last time)
 
         php cli/make-branch.php --from=MOODLE_XX_STABLE --to=MOODLE_YY_STABLE
 
-  and do not forget to reinitilize the snapshot table (takes cca 7 hours)
+  and do not forget to reinitilize the snapshot table (took cca 2 hours)
 
         php cli/init-snapshot.php --branch=YY00
 
@@ -44,34 +46,31 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 * Make moodledata/amos/var/export-zip/Y.Y/
 * Force AMOS to regenerate all ZIPs including those for Y.Y:
 
-        UPDATE mdl_config_plugins SET value=1 WHERE plugin='local_amos' AND name='lastexportzip';
+        # sudo -u www-data php admin/cli/cfg.php --component=local_amos --name=lastexportzip --set=1
 
-* Create new MOODLE_XX_STABLE and install_XX_STABLE branches at
-  /home/amosbot/git/moodle-install
+* Create new MOODLE_XX_STABLE and install_XX_STABLE branches in moodle-install
 
-        $ sudo su vh-langmoodleorg
-        $ cd ~/amos/git/moodle-install/
-        $ git checkout -b MOODLE_XX_STABLE upstream/MOODLE_XX_STABLE
-        $ git checkout -b install_XX_STABLE upstream/MOODLE_XX_STABLE
+        # cd /opt/data/amos/repos/moodle-install
+        # sudo -u www-data git checkout -b MOODLE_XX_STABLE upstream/MOODLE_XX_STABLE
+        # sudo -u www-data git checkout -b install_XX_STABLE upstream/MOODLE_XX_STABLE
 
-* Create MOODLE_YY_STABLE branch at /home/amosbot/git/moodle-langpacks
+* Create MOODLE_YY_STABLE branch in moodle-langpacks
 
-        $ sudo su vh-langmoodleorg
-        $ cd ~/amos/git/moodle-langpacks
-        $ git checkout master
-        $ git branch MOODLE_YY_STABLE
+        # cd /opt/data/amos/repos/moodle-langpacks
+        # sudo -u www-data git checkout master
+        # sudo -u www-data git branch MOODLE_YY_STABLE
 
-  and make a clone for it at /home/amosbot/git/moodle-langpacks-clones
+  and make a clone for it at moodle-langpacks-clones
 
-        $ cd ~/amos/git/moodle-langpacks-clones
-        $ git clone ../moodle-langpacks Y.Y
-        cd Y.Y
-        git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
-        git branch -d master
+        # /opt/data/amos/repos/moodle-langpacks-clones
+        # sudo -u www-data git clone ../moodle-langpacks Y.Y
+        # cd Y.Y
+        # sudo -u www-data git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
+        # sudo -u www-data git branch -d master
 
   Check that jobs/zip-packs-snapshot will process the new version.
 
-* Turn Jenkins on and let it re-generate all the ZIP packages (cca 40 minutes)
+* Turn Jenkins on and let it re-generate all the ZIP packages (took cca 80 minutes)
 * Check http://download.moodle.org/langpack/
 * Clone greylisted strings
 
