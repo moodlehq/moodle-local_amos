@@ -40,7 +40,7 @@ class mlangparser_test extends basic_testcase {
         $this->assertTrue($parser instanceof mlang_php_parser);
         $another = mlang_parser_factory::get_parser('php');
         $this->assertSame($another, $parser);
-        $this->setExpectedException('coding_exception');
+        $this->expectException('coding_exception');
         $clone = clone($parser);
     }
 
@@ -107,7 +107,7 @@ class mlangparser_test extends basic_testcase {
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string["id"] = "This {$a} fails";';
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->setExpectedException('mlang_parser_exception');
+        $this->expectException('mlang_parser_exception');
         $parser->parse($data, $component);
     }
 
@@ -115,7 +115,7 @@ class mlangparser_test extends basic_testcase {
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string[\'invalid\'] = \'Hello \' . \' world\';';
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->setExpectedException('mlang_parser_exception');
+        $this->expectException('mlang_parser_exception');
         $parser->parse($data, $component);
     }
 
@@ -124,7 +124,7 @@ class mlangparser_test extends basic_testcase {
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string[\'dbpass\'] = $CFG->dbpass;'; // this would give the user sensitive data about AMOS portal
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->setExpectedException('mlang_parser_exception');
+        $this->expectException('mlang_parser_exception');
         $parser->parse($data, $component);
     }
 }

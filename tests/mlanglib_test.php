@@ -183,7 +183,7 @@ class mlang_test extends advanced_testcase {
         $component->add_string(new mlang_string('welcome', 'Welcome'));
         $component->add_string(new mlang_string('welcome', 'Overwriting existing must be forced'), true);
         $this->assertEquals($component->get_string('welcome')->text, 'Overwriting existing must be forced');
-        $this->setExpectedException('coding_exception');
+        $this->expectException('coding_exception');
         $component->add_string(new mlang_string('welcome', 'Overwriting existing throws exception'));
         $component->clear();
         unset($component);
