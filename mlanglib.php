@@ -1202,6 +1202,37 @@ class mlang_stage {
             }
         }
     }
+
+    /**
+     * Exports the stage into a zip file and sends it to browser
+     *
+     * @param string $filename filename to send
+     */
+    public function send_zip($filename) {
+        global $CFG, $USER;
+
+        $tmpdir = $CFG->dataroot . '/amos/temp/send-zip/' . md5(time() . '-' . $USER->id . '-'. random_string(20));
+        $zipfile = $tmpdir . '.zip';
+        remove_dir($tmpdir);
+        check_dir_exists($tmpdir);
+
+        $files = array();
+        foreach($this->get_iterator() as $component) {
+            if ($component->get_number_of_strings() > 0) {
+                $zipfilepath = $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
+                $realfilepath = $tmpdir . '/' . $zipfilepath;
+                $files[$zipfilepath] = $realfilepath;
+                check_dir_exists(dirname($realfilepath));
+                $component->export_phpfile($realfilepath);
+            }
+        }
+        $packer = get_file_packer('application/zip');
+        $packer->archive_to_pathname($files, $zipfile);
+        remove_dir($tmpdir);
+        send_file($zipfile, $filename, null, 0, false, true, 'application/zip', true);
+        unlink($zipfile);
+        die();
+    }
 }
 
 /**
@@ -1484,6 +1515,15 @@ class mlang_stash {
         }
 
         $this->stage = unserialize(file_get_contents($filename));
+    }
+
+    /**
+     * Exports the stash into a zip file and sends it to browser
+     *
+     * @param string $filename filename to send
+     */
+    public function send_zip($filename) {
+        $this->stage->send_zip($filename);
     }
 
     // INTERNAL API
