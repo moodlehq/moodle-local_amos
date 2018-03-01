@@ -21,9 +21,9 @@ integration.
     # tar czf /tmp/export-enfix.tgz export-enfix
     # exit
 
-    (use `kubectl get pod|grep lang` to get know the pod id for the following command)
+    (use `kubectl --context production get pod|grep lang` to get know the pod id for the following command)
 
-    # kubectl cp -c app lang-moodle-org-123456789-abcde:/tmp/export-enfix.tgz ~/export-enfix.tgz
+    # kubectl --context production cp -c app lang-moodle-org-123456789-abcde:/tmp/export-enfix.tgz ~/export-enfix.tgz
     # exit
 
     (now back at your notebook)
