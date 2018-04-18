@@ -7270,6 +7270,7 @@
       <plugin>plagiarism</plugin>
       <plugin>plugin</plugin>
       <plugin>portfolio</plugin>
+      <plugin>privacy</plugin>
       <plugin>publish</plugin>
       <plugin>question</plugin>
       <plugin>rating</plugin>
@@ -7556,6 +7557,7 @@
       <plugin>picasa</plugin>
     </plugins>
     <plugins type="search">
+      <plugin>simpledb</plugin>
       <plugin>solr</plugin>
     </plugins>
     <plugins type="qbehaviour">
@@ -7614,7 +7616,6 @@
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
       <plugin>templatelibrary</plugin>
-      <plugin>unittest</plugin>
       <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
       <plugin>unsuproles</plugin>
@@ -7684,6 +7685,7 @@
       <plugin>imagegallery</plugin>
     </plugins>
     <plugins type="ltiservice">
+      <plugin>gradebookservices</plugin>
       <plugin>memberships</plugin>
       <plugin>profile</plugin>
       <plugin>toolproxy</plugin>
@@ -7747,6 +7749,7 @@
       <plugin>media</plugin>
       <plugin>noautolink</plugin>
       <plugin>orderedlist</plugin>
+      <plugin>recordrtc</plugin>
       <plugin>rtl</plugin>
       <plugin>strike</plugin>
       <plugin>subscript</plugin>
