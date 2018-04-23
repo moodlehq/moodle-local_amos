@@ -7592,6 +7592,7 @@
       <plugin>capability</plugin>
       <plugin>cohortroles</plugin>
       <plugin>customlang</plugin>
+      <plugin>dataprivacy</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>filetypes</plugin>
       <plugin>generator</plugin>
@@ -7610,6 +7611,7 @@
       <plugin>monitor</plugin>
       <plugin>oauth2</plugin>
       <plugin>phpunit</plugin>
+      <plugin>policy</plugin>
       <plugin>profiling</plugin>
       <plugin>recyclebin</plugin>
       <plugin>replace</plugin>
