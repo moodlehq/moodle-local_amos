@@ -1,0 +1,9 @@
+#!/bin/bash -e
+
+# Publish ZIP language packages to a S3 bucket for download.moodle.org
+# Uses s3cmd sync to sync the files up to the specified S3 bucket
+# requires s3cmd to be configured properly, this will be done at the docker container layer
+# upstream: zip-packs-make
+# dowstream: zip-packs-commit
+
+s3cmd sync --delete-removed $AMOSDATAROOT/export-zip/ $AMOSS3BUCKET 

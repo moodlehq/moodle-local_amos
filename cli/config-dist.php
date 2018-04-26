@@ -52,6 +52,12 @@ define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');
 define('AMOS_EXPORT_INSTALLER_DIR', $CFG->dataroot . '/amos/export-install');
 
 /**
+ * S3 bucket where AMOS can write to
+ * Does not have a default option as no default makes sense
+ */
+define('AMOSS3BUCKET', '')
+
+/**
  * Full path to git
  */
 define('AMOS_PATH_GIT', '/usr/local/bin/git');
