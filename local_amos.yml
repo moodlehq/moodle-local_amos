@@ -1,0 +1,66 @@
+#
+# AMOS recipe file for https://moodle.org/plugins/tool_pluginskel
+#
+component: local_amos
+name: AMOS
+copyright: 2018 David Mudrák <david@moodle.com>
+
+privacy:
+  haspersonaldata: true
+  uselegacypolyfill: false
+  meta:
+    dbfields:
+      amos_commits:
+        - commitmsg
+        - timecommitted
+        - userinfo
+      amos_translators:
+        - lang
+        - status
+      amos_stashes:
+        - id
+        - languages
+        - components
+        - strings
+        - timecreated
+        - timemodified
+        - name
+        - message
+      amos_contributions:
+        - lang
+        - subject
+        - message
+        - stashid
+        - status
+        - timecreated
+        - timemodified
+      amos_filter_usage:
+        - timesubmitted
+        - userlang
+        - currentlang
+        - usercountry
+        - ismaintainer
+        - usesdefaultversion
+        - usesdefaultlang
+        - numofversions
+        - numoflanguages
+        - numofcomponents
+        - showmissingonly
+        - showoutdatedonly
+        - showexistingonly
+        - showhelpsonly
+        - withsubstring
+        - substringregex
+        - substringcasesensitive
+        - withstringid
+        - stringidpartial
+        - showstagedonly
+        - showgreylistedonly
+        - showwithoutgreylisted
+    subsystems:
+      - comment
+    external:
+      - languagepacks:
+          - firstname
+          - lastname
+          - email
