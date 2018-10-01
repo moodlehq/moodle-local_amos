@@ -7835,10 +7835,8 @@
       <plugin>plugin</plugin>
       <plugin>portfolio</plugin>
       <plugin>privacy</plugin>
-      <plugin>publish</plugin>
       <plugin>question</plugin>
       <plugin>rating</plugin>
-      <plugin>register</plugin>
       <plugin>repository</plugin>
       <plugin>rss</plugin>
       <plugin>role</plugin>
@@ -7985,6 +7983,7 @@
       <plugin>tag_flickr</plugin>
       <plugin>tag_youtube</plugin>
       <plugin>tags</plugin>
+      <plugin>timeline</plugin>
     </plugins>
     <plugins type="media">
       <plugin>html5audio</plugin>
@@ -8150,7 +8149,6 @@
     </plugins>
     <plugins type="tool">
       <plugin>analytics</plugin>
-      <plugin>assignmentupgrade</plugin>
       <plugin>availabilityconditions</plugin>
       <plugin>behat</plugin>
       <plugin>capability</plugin>
@@ -8190,7 +8188,6 @@
     </plugins>
     <plugins type="cachestore">
       <plugin>file</plugin>
-      <plugin>memcache</plugin>
       <plugin>memcached</plugin>
       <plugin>mongodb</plugin>
       <plugin>session</plugin>
