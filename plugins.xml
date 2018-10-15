@@ -6153,10 +6153,9 @@
       <plugin>plagiarism</plugin>
       <plugin>plugin</plugin>
       <plugin>portfolio</plugin>
-      <plugin>publish</plugin>
+      <plugin>privacy</plugin>
       <plugin>question</plugin>
       <plugin>rating</plugin>
-      <plugin>register</plugin>
       <plugin>repository</plugin>
       <plugin>rss</plugin>
       <plugin>role</plugin>
@@ -6473,6 +6472,7 @@
       <plugin>capability</plugin>
       <plugin>cohortroles</plugin>
       <plugin>customlang</plugin>
+      <plugin>dataprivacy</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>filetypes</plugin>
       <plugin>generator</plugin>
@@ -6490,13 +6490,13 @@
       <plugin>monitor</plugin>
       <plugin>oauth2</plugin>
       <plugin>phpunit</plugin>
+      <plugin>policy</plugin>
       <plugin>profiling</plugin>
       <plugin>recyclebin</plugin>
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
       <plugin>templatelibrary</plugin>
-      <plugin>unittest</plugin>
       <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
       <plugin>unsuproles</plugin>
@@ -6711,10 +6711,9 @@
       <plugin>plagiarism</plugin>
       <plugin>plugin</plugin>
       <plugin>portfolio</plugin>
-      <plugin>publish</plugin>
+      <plugin>privacy</plugin>
       <plugin>question</plugin>
       <plugin>rating</plugin>
-      <plugin>register</plugin>
       <plugin>repository</plugin>
       <plugin>rss</plugin>
       <plugin>role</plugin>
@@ -7031,6 +7030,7 @@
       <plugin>capability</plugin>
       <plugin>cohortroles</plugin>
       <plugin>customlang</plugin>
+      <plugin>dataprivacy</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>filetypes</plugin>
       <plugin>generator</plugin>
@@ -7049,13 +7049,13 @@
       <plugin>monitor</plugin>
       <plugin>oauth2</plugin>
       <plugin>phpunit</plugin>
+      <plugin>policy</plugin>
       <plugin>profiling</plugin>
       <plugin>recyclebin</plugin>
       <plugin>replace</plugin>
       <plugin>spamcleaner</plugin>
       <plugin>task</plugin>
       <plugin>templatelibrary</plugin>
-      <plugin>unittest</plugin>
       <plugin>uploadcourse</plugin>
       <plugin>uploaduser</plugin>
       <plugin>unsuproles</plugin>
@@ -7271,10 +7271,8 @@
       <plugin>plugin</plugin>
       <plugin>portfolio</plugin>
       <plugin>privacy</plugin>
-      <plugin>publish</plugin>
       <plugin>question</plugin>
       <plugin>rating</plugin>
-      <plugin>register</plugin>
       <plugin>repository</plugin>
       <plugin>rss</plugin>
       <plugin>role</plugin>
