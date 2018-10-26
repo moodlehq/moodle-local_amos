@@ -7805,6 +7805,7 @@
       <plugin>edufields</plugin>
       <plugin>enrol</plugin>
       <plugin>error</plugin>
+      <plugin>favourites</plugin>
       <plugin>filepicker</plugin>
       <plugin>fileconverter</plugin>
       <plugin>files</plugin>
