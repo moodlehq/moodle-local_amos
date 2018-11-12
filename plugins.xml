@@ -7972,6 +7972,8 @@
       <plugin>private_files</plugin>
       <plugin>quiz_results</plugin>
       <plugin>recent_activity</plugin>
+      <plugin>recentlyaccesseditems</plugin>
+      <plugin>recentlyaccessedcourses</plugin>
       <plugin>rss_client</plugin>
       <plugin>search_forums</plugin>
       <plugin>section_links</plugin>
@@ -7979,6 +7981,7 @@
       <plugin>settings</plugin>
       <plugin>site_main_menu</plugin>
       <plugin>social_activities</plugin>
+      <plugin>starredcourses</plugin>
       <plugin>tag_flickr</plugin>
       <plugin>tag_youtube</plugin>
       <plugin>tags</plugin>
@@ -8098,6 +8101,7 @@
       <plugin>googledocs</plugin>
       <plugin>local</plugin>
       <plugin>merlot</plugin>
+      <plugin>nextcloud</plugin>
       <plugin>onedrive</plugin>
       <plugin>picasa</plugin>
       <plugin>recent</plugin>
