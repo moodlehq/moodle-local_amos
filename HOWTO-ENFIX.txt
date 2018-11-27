@@ -60,7 +60,7 @@ integration.
 
 7. Commit the modified files.
 
-    # git commit -a --author="Helen Foster <helen@moodle.org>" -e -m "MDL-xxxxx lang: Merge English strings from the en_fix language pack"
+    # git commit -a --author="Helen Foster <helen@moodle.org>" -e -m "MDL-xxxxx lang: Import fixed English strings (en_fix)"
 
 8. Check against regressions in Behat feature files in the commit.
 
