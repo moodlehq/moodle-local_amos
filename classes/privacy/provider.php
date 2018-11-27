@@ -29,9 +29,11 @@ defined('MOODLE_INTERNAL') || die();
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 require_once($CFG->dirroot.'/local/amos/locallib.php');
@@ -135,6 +137,32 @@ class provider implements
         $contextlist->add_system_context();
 
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_system) {
+            return;
+        }
+
+        // Commit authors.
+        $sql = "SELECT userid FROM {amos_commits}";
+        $userlist->add_from_sql('userid', $sql, []);
+
+        // AMOS contributors.
+        $sql = "SELECT userid FROM {amos_translators}";
+        $userlist->add_from_sql('userid', $sql, []);
+
+        // Filter usage.
+        $sql = "SELECT userid FROM {amos_filter_usage}";
+        $userlist->add_from_sql('userid', $sql, []);
     }
 
     /**
@@ -432,6 +460,17 @@ class provider implements
      * @param approved_contextlist $contextlist List of contexts to delete data from.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
+        global $DB;
+
+        // Not implemented yet.
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
 
         // Not implemented yet.
