@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component  = 'local_amos';
-$plugin->version    = 2018052101;
-$plugin->release    = '3.5.1';
+$plugin->version    = 2018121200;
+$plugin->release    = '3.6.0';
 $plugin->maturity   = MATURITY_STABLE;
-$plugin->requires   = 2018042500;
+$plugin->requires   = 2018120300;
