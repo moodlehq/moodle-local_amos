@@ -62,7 +62,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 
   and make a clone for it at moodle-langpacks-clones
 
-        # /opt/data/amos/repos/moodle-langpacks-clones
+        # cd /opt/data/amos/repos/moodle-langpacks-clones
         # sudo -u www-data git clone ../moodle-langpacks Y.Y
         # cd Y.Y
         # sudo -u www-data git checkout -b MOODLE_YY_STABLE origin/MOODLE_YY_STABLE
