@@ -141,7 +141,7 @@ function local_amos_comment_add($comment, $meta) {
 
         // Notify remaining users.
         foreach ($users as $user) {
-            $data = new stdClass();
+            $data = new \core\message\message();
             $data->component = 'local_amos';
             $data->name = 'contribution';
             $data->userfrom = $amosbot;

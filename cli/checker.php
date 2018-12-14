@@ -232,7 +232,7 @@ class amos_checker {
             $this->amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
         }
 
-        $data = new stdClass();
+        $data = new \core\message\message();
         $data->component = 'local_amos';
         $data->name = 'checker';
         $data->userfrom = $this->amosbot;

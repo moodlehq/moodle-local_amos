@@ -164,7 +164,7 @@ if ($submitform->is_cancelled()) {
         $maintainers = $DB->get_records_sql($sql, array('status' => AMOS_USER_MAINTAINER, 'lang' => $lang));
 
         foreach ($maintainers as $maintainer) {
-            $data = new stdClass();
+            $data = new \core\message\message();
             $data->component = 'local_amos';
             $data->name = 'contribution';
             $data->userfrom = $amosbot;

@@ -199,7 +199,7 @@ if ($accept) {
     $DB->update_record('amos_contributions', $contribution);
 
     // Notify the contributor.
-    $data = new stdClass();
+    $data = new \core\message\message();
     $data->component = 'local_amos';
     $data->name = 'contribution';
     $data->userfrom = $amosbot;
@@ -249,7 +249,7 @@ if ($reject) {
     $DB->update_record('amos_contributions', $contribution);
 
     // Notify the contributor.
-    $data = new stdClass();
+    $data = new \core\message\message();
     $data->component = 'local_amos';
     $data->name = 'contribution';
     $data->userfrom = $amosbot;
@@ -334,7 +334,7 @@ if ($changelang) {
     $author = $DB->get_record('user', array('id' => $contriborig->authorid));
     $amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
 
-    $data = new stdClass();
+    $data = new \core\message\message();
     $data->component = 'local_amos';
     $data->name = 'contribution';
     $data->userfrom = $amosbot;
