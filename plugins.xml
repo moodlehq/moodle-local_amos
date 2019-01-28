@@ -8365,6 +8365,7 @@
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
+      <plugin>customfield</plugin>
       <plugin>dbtransfer</plugin>
       <plugin>debug</plugin>
       <plugin>editor</plugin>
@@ -8484,6 +8485,13 @@
     </plugins>
     <plugins type="calendartype">
       <plugin>gregorian</plugin>
+    </plugins>
+    <plugins type="customfield">
+      <plugin>checkbox</plugin>
+      <plugin>date</plugin>
+      <plugin>select</plugin>
+      <plugin>text</plugin>
+      <plugin>textarea</plugin>
     </plugins>
     <plugins type="enrol">
       <plugin>category</plugin>
