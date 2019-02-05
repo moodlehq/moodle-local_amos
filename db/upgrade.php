@@ -322,5 +322,11 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019020501, 'local', 'amos');
     }
 
+    if ($oldversion < 2019020502) {
+        // Make AMOS to regenerate all ZIP packs and gather all the stats.
+        set_config('lastexportzip', 1, 'local_amos');
+        upgrade_plugin_savepoint(true, 2019020502, 'local', 'amos');
+    }
+
     return $result;
 }
