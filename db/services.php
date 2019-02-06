@@ -1,5 +1,6 @@
 <?php
-
+// This file is part of Moodle - https://moodle.org/
+//
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * AMOS web services
+ * AMOS external functions and web services are declared here.
  *
  * @package   local_amos
  * @category  webservice
@@ -22,23 +23,25 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$functions = array(
-        'local_amos_update_strings_file' => array(
-                'classname'   => 'local_amos_external',
-                'methodname'  => 'update_strings_file',
-                'classpath'   => 'local/amos/externallib.php',
-                'description' => 'Imports strings from a string file.',
-                'type'        => 'write',
-        )
-);
+defined('MOODLE_INTERNAL') || die();
 
-$services = array(
-        'AMOS Import web service' => array(
-                'functions' => array(
-                    'local_amos_update_strings_file'
-                ),
-                'requiredcapability' => 'local/amos:importstrings',
-                'restrictedusers' => 1,
-                'enabled' => 1,
-        ),
-);
+$functions = [
+    'local_amos_update_strings_file' => [
+        'classname' => '\local_amos\external\api',
+        'methodname' => 'update_strings_file',
+        'classpath' => '',
+        'description' => 'Imports strings from a string file.',
+        'type' => 'write',
+    ],
+];
+
+$services = [
+    'AMOS Import web service' => [
+        'functions' => [
+            'local_amos_update_strings_file',
+        ],
+        'requiredcapability' => 'local/amos:importstrings',
+        'restrictedusers' => 1,
+        'enabled' => 1,
+    ],
+];

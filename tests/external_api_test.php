@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot.'/local/amos/externallib.php');
 
 /**
  * Unit tests for the AMOS external functions.
@@ -52,7 +51,7 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
 
         $this->expectException(required_capability_exception::class);
 
-        local_amos_external::update_strings_file('Test User <test@example.com>', 'Just a test update', []);
+        \local_amos\external\api::update_strings_file('Test User <test@example.com>', 'Just a test update', []);
     }
 
     /**
@@ -66,7 +65,7 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
 
         $this->assignUserCapability('local/amos:importstrings', SYSCONTEXTID);
 
-        local_amos_external::update_strings_file(
+        $raw = \local_amos\external\api::update_strings_file(
             'Johny Developer <developer@example.com>',
             'First version of the tool_foobar',
             [
@@ -86,6 +85,29 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
                 ],
             ]
         );
+
+        $clean = external_api::clean_returnvalue(\local_amos\external\api::update_strings_file_returns(), $raw);
+
+        $this->assertTrue(is_array($clean));
+        $this->assertEquals(2, count($clean));
+
+        $this->assertContains([
+            'componentname' => 'tool_foobar',
+            'moodlebranch' => '3.6',
+            'language' => 'en',
+            'status' => 'ok',
+            'found' => 1,
+            'changes' => 1,
+        ], $clean);
+
+        $this->assertContains([
+            'componentname' => 'tool_foobar',
+            'moodlebranch' => '3.5',
+            'language' => 'en',
+            'status' => 'ok',
+            'found' => 1,
+            'changes' => 1,
+        ], $clean);
 
         $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_36_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
