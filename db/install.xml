@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20190204" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20190206" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -189,6 +189,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="branchlangcomp" UNIQUE="false" FIELDS="branch, lang, component" COMMENT="Allows to  locate records during stats update"/>
+        <INDEX NAME="component" UNIQUE="false" FIELDS="component" COMMENT="Allows to quickly search by the component."/>
       </INDEXES>
     </TABLE>
   </TABLES>

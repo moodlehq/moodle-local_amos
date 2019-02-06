@@ -328,5 +328,17 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019020502, 'local', 'amos');
     }
 
+    if ($oldversion < 2019020602) {
+        // Add index component (not unique) to the table amos_stats.
+        $table = new xmldb_table('amos_stats');
+        $index = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
+
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2019020602, 'local', 'amos');
+    }
+
     return $result;
 }
