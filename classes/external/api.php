@@ -39,5 +39,6 @@ require_once($CFG->libdir.'/externallib.php');
  */
 class api extends \external_api {
 
+    use plugin_translation_stats;
     use update_strings_file;
 }
