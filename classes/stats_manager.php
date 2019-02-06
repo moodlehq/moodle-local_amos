@@ -66,4 +66,111 @@ class local_amos_stats_manager {
             $DB->insert_record('amos_stats', $record, false);
         }
     }
+
+    /**
+     * Return translation stats for the given component.
+     *
+     * @param string $component
+     * @return object|bool False if no component found, stats data otherwise.
+     */
+    public function get_component_stats(string $component) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+
+        $data = [];
+        $lastmodified = 0;
+        $rs = $DB->get_recordset('amos_stats', ['component' => $component], 'branch DESC, numofstrings DESC, lang ASC');
+
+        foreach ($rs as $record) {
+            if ($record->timemodified > $lastmodified) {
+                $lastmodified = $record->timemodified;
+            }
+            $data[$record->branch][$record->lang] = $record->numofstrings;
+        }
+
+        $rs->close();
+
+        if (empty($data)) {
+            // No such component.
+            return false;
+        }
+
+        $result = [
+            'lastmodified' => $lastmodified,
+            'langnames' => [],
+            'branches' => [],
+        ];
+
+        foreach (mlang_tools::list_languages() as $langcode => $langname) {
+            array_push($result['langnames'], [
+                'lang' => $langcode,
+                'name' => $langname,
+            ]);
+        }
+
+        foreach ($data as $branch => $langs) {
+            $mlangversion = mlang_version::by_code($branch);
+
+            if (empty($mlangversion)) {
+                debugging('Unknown branch code: '.$branch);
+                continue;
+            }
+
+            $branchinfo = [
+                'branch' => $mlangversion->dir,
+                'languages' => [],
+            ];
+
+            foreach ($langs as $lang => $numofstrings) {
+                $islangknown = false;
+
+                foreach ($result['langnames'] as $knownlang) {
+                    if ($knownlang['lang'] === $lang) {
+                        $islangknown = true;
+                    }
+                }
+
+                if (!$islangknown) {
+                    debugging('Unknown language code: '.$lang);
+                    continue;
+                }
+
+                $langinfo = [
+                    'lang' => $lang,
+                    'numofstrings' => $numofstrings,
+                    'ratio' => null,
+                ];
+
+                if ($lang === 'en') {
+                    array_unshift($branchinfo['languages'], $langinfo);
+                } else {
+                    array_push($branchinfo['languages'], $langinfo);
+                }
+            }
+
+            array_push($result['branches'], $branchinfo);
+        }
+
+        foreach ($result['branches'] as $bix => $branchinfo) {
+            $numofenglish = 0;
+            foreach ($branchinfo['languages'] as $lix => $langinfo) {
+                if ($langinfo['lang'] === 'en') {
+                    $numofenglish = $langinfo['numofstrings'];
+                    break;
+                }
+            }
+
+            if (empty($numofenglish)) {
+                unset($result['branches'][$bix]);
+                continue;
+            }
+
+            foreach ($branchinfo['languages'] as $lix => $langinfo) {
+                $ratio = round($langinfo['numofstrings'] / $numofenglish * 100);
+                $result['branches'][$bix]['languages'][$lix]['ratio'] = max(0, min(100, $ratio));
+            }
+        }
+
+        return $result;
+    }
 }
