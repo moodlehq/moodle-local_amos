@@ -300,5 +300,45 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015082800, 'local', 'amos');
     }
 
+    if ($oldversion < 2019020501) {
+        // Add a new table 'amos_stats'.
+        $table = new xmldb_table('amos_stats');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('branch', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('lang', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('component', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('numofstrings', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        $table->add_index('branchlangcomp', XMLDB_INDEX_NOTUNIQUE, ['branch', 'lang', 'component']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2019020501, 'local', 'amos');
+    }
+
+    if ($oldversion < 2019020502) {
+        // Make AMOS to regenerate all ZIP packs and gather all the stats.
+        set_config('lastexportzip', 1, 'local_amos');
+        upgrade_plugin_savepoint(true, 2019020502, 'local', 'amos');
+    }
+
+    if ($oldversion < 2019020602) {
+        // Add index component (not unique) to the table amos_stats.
+        $table = new xmldb_table('amos_stats');
+        $index = new xmldb_index('component', XMLDB_INDEX_NOTUNIQUE, ['component']);
+
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        upgrade_plugin_savepoint(true, 2019020602, 'local', 'amos');
+    }
+
     return $result;
 }

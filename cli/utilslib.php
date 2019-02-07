@@ -143,17 +143,26 @@ class amos_export_zip {
     /** @var array in-memory stash for caching various data for other steps of the execution */
     protected $stash = array();
 
+    /** @var local_amos_stats_manager instance used for updating translation stats while exporting the ZIPs */
+    protected $statsman;
+
     /**
      * Instantinate the exporter job
      *
      */
-    public function __construct(amos_cli_logger $logger) {
+    public function __construct(amos_cli_logger $logger, local_amos_stats_manager $statsman = null) {
         global $CFG;
 
         $this->logger = $logger;
         $this->outputdirroot = $CFG->dataroot.'/amos/export-zip';
         $this->tempdirroot = $CFG->dataroot.'/amos/temp/export-zip';
         $this->vardirroot = $CFG->dataroot.'/amos/var/export-zip';
+
+        if (!$statsman) {
+            $this->statsman = new local_amos_stats_manager();
+        } else {
+            $this->statsman = $statsman;
+        }
     }
 
     /**
@@ -191,6 +200,7 @@ class amos_export_zip {
                 $this->rebuild_zip_package($version, $langcode);
                 $this->push_zip_package($version, $langcode);
                 $this->update_packinfo($version, $langcode);
+                $this->update_stats($version, $langcode);
             }
         }
     }
@@ -535,6 +545,24 @@ class amos_export_zip {
         $info['filesize'] = filesize($zipfile);
 
         return $info;
+    }
+
+    /**
+     * Update the statistics about the number of translated strings.
+     *
+     * @param mlang_version $version
+     * @param string $langcode
+     */
+    protected function update_stats(mlang_version $version, string $langcode) {
+
+        if (!isset($this->stash['componentnumofstrings'][$version->code][$langcode])) {
+            $this->log('Number of strings not available for '.$version->dir.'/'.$langcode);
+            return;
+        }
+
+        foreach ($this->stash['componentnumofstrings'][$version->code][$langcode] as $componentname => $numberofstrings) {
+            $this->statsman->update_stats($version->code, $langcode, $componentname, $numberofstrings);
+        }
     }
 
     /**
