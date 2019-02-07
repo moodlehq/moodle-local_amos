@@ -43,9 +43,10 @@ $functions = [
 ];
 
 $services = [
-    'AMOS Import web service' => [
+    'AMOS integration with the Moodle Plugins directory' => [
         'functions' => [
             'local_amos_update_strings_file',
+            'local_amos_plugin_translation_stats',
         ],
         'requiredcapability' => 'local/amos:importstrings',
         'restrictedusers' => 1,
