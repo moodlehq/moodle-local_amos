@@ -101,12 +101,8 @@ class local_amos_stats_manager {
             'branches' => [],
         ];
 
-        foreach (mlang_tools::list_languages() as $langcode => $langname) {
-            array_push($result['langnames'], [
-                'lang' => $langcode,
-                'name' => $langname,
-            ]);
-        }
+        $langnames = mlang_tools::list_languages();
+        $langused = [];
 
         foreach ($data as $branch => $langs) {
             $mlangversion = mlang_version::by_code($branch);
@@ -122,18 +118,16 @@ class local_amos_stats_manager {
             ];
 
             foreach ($langs as $lang => $numofstrings) {
-                $islangknown = false;
-
-                foreach ($result['langnames'] as $knownlang) {
-                    if ($knownlang['lang'] === $lang) {
-                        $islangknown = true;
-                    }
-                }
-
-                if (!$islangknown) {
+                if (!isset($langnames[$lang])) {
                     debugging('Unknown language code: '.$lang);
                     continue;
                 }
+
+                if (empty($numofstrings)) {
+                    continue;
+                }
+
+                $langused[$lang] = $langnames[$lang];
 
                 $langinfo = [
                     'lang' => $lang,
@@ -169,6 +163,13 @@ class local_amos_stats_manager {
                 $ratio = round($langinfo['numofstrings'] / $numofenglish * 100);
                 $result['branches'][$bix]['languages'][$lix]['ratio'] = max(0, min(100, $ratio));
             }
+        }
+
+        foreach ($langused as $langcode => $langname) {
+            array_push($result['langnames'], [
+                'lang' => $langcode,
+                'name' => $langname,
+            ]);
         }
 
         return $result;

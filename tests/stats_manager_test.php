@@ -85,6 +85,8 @@ class local_amos_stats_manager_test extends advanced_testcase {
         $this->helper_add_language('en', 'English');
         $this->helper_add_language('cs', 'Czech');
         $this->helper_add_language('de', 'German');
+        $this->helper_add_language('en_us', 'English (US)');
+        $this->helper_add_language('sk', 'Slovak');
 
         $statsman = new local_amos_stats_manager();
 
@@ -101,6 +103,9 @@ class local_amos_stats_manager_test extends advanced_testcase {
         $statsman->update_stats('3600', 'de', 'tool_foo', 10000000);
 
         $statsman->update_stats('3700', 'fr', 'tool_foo', 1);
+
+        $statsman->update_stats('3600', 'sk', 'tool_foo', 0);
+        $statsman->update_stats('3500', 'sk', 'tool_foo', 0);
 
         $raw = $statsman->get_component_stats('tool_foo');
 
@@ -121,6 +126,8 @@ class local_amos_stats_manager_test extends advanced_testcase {
                  $this->assertTrue(isset($langinfo['numofstrings']));
                  $this->assertTrue(isset($langinfo['ratio']));
                  $data[$branchinfo['branch']][$langinfo['lang']] = $langinfo['ratio'];
+                 $this->assertTrue($langinfo['lang'] !== 'sk');
+                 $this->assertTrue($langinfo['lang'] !== 'en_us');
             }
         }
 
