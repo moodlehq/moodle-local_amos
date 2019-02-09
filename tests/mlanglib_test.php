@@ -1781,6 +1781,62 @@ AMOS END';
         $component->clear();
     }
 
+    /**
+     * Test the {@link mlang_string::should_be_included_in_stats()} results.
+     */
+    public function test_should_be_included_in_stats() {
+        $this->resetAfterTest();
+
+        $this->assertTrue((new mlang_string('one', 'One'))->should_be_included_in_stats());
+        $this->assertFalse((new mlang_string('one_link', 'foo'))->should_be_included_in_stats());
+        $this->assertFalse((new mlang_string('del', '', null, true))->should_be_included_in_stats());
+    }
+
+    /**
+     * Test the {@link mlang_component::get_number_of_strings()} results.
+     */
+    public function test_get_number_of_strings() {
+        $this->resetAfterTest();
+
+        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_37_STABLE'));
+
+        $this->assertEquals(0, $component->get_number_of_strings());
+
+        $component->add_string(new mlang_string('welcome', 'Welcome'));
+
+        $this->assertEquals(1, $component->get_number_of_strings());
+        $this->assertEquals(1, $component->get_number_of_strings(true));
+
+        $component->add_string(new mlang_string('welcome_help', 'This is used for the help tooltip.'));
+
+        $this->assertEquals(2, $component->get_number_of_strings());
+        $this->assertEquals(2, $component->get_number_of_strings(true));
+
+        $component->add_string(new mlang_string('welcome_link', 'test/welcome'));
+
+        $this->assertEquals(3, $component->get_number_of_strings());
+        $this->assertEquals(2, $component->get_number_of_strings(true));
+
+        $component->add_string(new mlang_string('deleted', '', null, true));
+
+        $this->assertEquals(4, $component->get_number_of_strings());
+        $this->assertEquals(2, $component->get_number_of_strings(true));
+
+        $component->unlink_string('deleted');
+        $component->unlink_string('welcome_link');
+
+        $this->assertEquals(2, $component->get_number_of_strings());
+        $this->assertEquals(2, $component->get_number_of_strings(true));
+
+        $component->unlink_string('welcome_help');
+
+        $this->assertEquals(1, $component->get_number_of_strings());
+        $this->assertEquals(1, $component->get_number_of_strings(true));
+
+        $component->clear();
+        unset($component);
+    }
+
     public function test_stash_push() {
 
     }

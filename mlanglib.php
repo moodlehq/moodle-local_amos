@@ -334,12 +334,28 @@ class mlang_component {
     /**
      * Returns the number of strings in the component
      *
-     * Beware - if deleted strings are loaded into this component, they are counted, too.
+     * Beware - if deleted strings are loaded into this component, they are counted too - unless non-translatable
+     * strings are excluded.
      *
+     * @param bool $forstats Counting strings for stats purposes, so non-translatable strings are excluded
      * @return int
      */
-    public function get_number_of_strings() {
-        return count($this->strings);
+    public function get_number_of_strings($forstats = false) {
+
+        if (!$forstats) {
+            return count($this->strings);
+
+        } else {
+            $result = 0;
+
+            foreach ($this->strings as $string) {
+                if ($string->should_be_included_in_stats()) {
+                    $result++;
+                }
+            }
+
+            return $result;
+        }
     }
 
     /**
@@ -800,6 +816,24 @@ class mlang_string {
         );
         $clean = preg_replace($search, $replace, $text);
         return $clean;
+    }
+
+    /**
+     * Should the string be counted when calculating the translation stats.
+     *
+     * @return bool
+     */
+    public function should_be_included_in_stats() {
+
+        if ($this->deleted) {
+            return false;
+        }
+
+        if (substr($this->id, -5) === '_link') {
+            return false;
+        }
+
+        return true;
     }
 }
 
