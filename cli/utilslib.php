@@ -607,7 +607,7 @@ class amos_export_zip {
             }
             $component->export_phpfile($file);
 
-            $numberofstrings = $component->get_number_of_strings();
+            $numberofstrings = $component->get_number_of_strings(true);
             $this->stash['componentnumofstrings'][$targetversion->code][$component->lang][$component->name] = $numberofstrings;
 
             $recentmodified = $component->get_recent_timemodified();

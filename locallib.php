@@ -1166,23 +1166,14 @@ class local_amos_index_page implements renderable {
         // only the standard plugins are taken into statistics calculation
         $standard = local_amos_standard_plugins();
         $english = array(); // holds the number of English strings per component
-        $nontranslatable = array(); // holds the number of strings per component that can not be translated via AMOS
-                                    // and therefore we should consider them as translated when calculating the ratio
+
         foreach ($standard[$this->version->dir] as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
-            $english[$componentname] = $component->get_number_of_strings();
+            $english[$componentname] = $component->get_number_of_strings(true);
             $this->totalenglish += $english[$componentname];
-            foreach ($component->get_iterator() as $string) {
-                if (substr($string->id, -5) === '_link') {
-                    if (isset($nontranslatable[$componentname])) {
-                        $nontranslatable[$componentname]++;
-                    } else {
-                        $nontranslatable[$componentname] = 1;
-                    }
-                }
-            }
             $component->clear();
         }
+
         foreach ($this->packinfo as $langcode => $info) {
             if ($langcode !== 'en') {
                 $this->numoflangpacks++;
@@ -1201,9 +1192,6 @@ class local_amos_index_page implements renderable {
             if ($langpack->parent == 'en') {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
-                    if (!empty($nontranslatable[$component])) {
-                        $translated += $nontranslatable[$component];
-                    }
                     if (isset($standard[$this->version->dir][$component])) {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
