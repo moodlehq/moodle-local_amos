@@ -8781,6 +8781,7 @@
     </plugins>
     <plugins type="theme">
       <plugin>boost</plugin>
+      <plugin>classic</plugin>
       <plugin>bootstrapbase</plugin>
       <plugin>clean</plugin>
       <plugin>more</plugin>
