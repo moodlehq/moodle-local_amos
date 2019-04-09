@@ -1176,6 +1176,8 @@ AMOS END';
         $this->assertEquals(testable_mlang_tools::legacy_component_name('core'), 'moodle');
         $this->assertEquals(testable_mlang_tools::legacy_component_name('core_grades'), 'grades');
         $this->assertEquals(testable_mlang_tools::legacy_component_name('block_foobar'), 'block_foobar');
+        $this->assertEquals(testable_mlang_tools::legacy_component_name('auth_oauth2'), 'auth_oauth2');
+        $this->assertEquals(testable_mlang_tools::legacy_component_name('mod_forum2'), 'forum2');
         $this->assertEquals(testable_mlang_tools::legacy_component_name('mod_foobar'), 'foobar');
         $this->assertEquals(testable_mlang_tools::legacy_component_name('moodle'), 'moodle');
         $this->assertEquals(testable_mlang_tools::legacy_component_name('admin'), 'admin');
@@ -1183,6 +1185,7 @@ AMOS END';
         $this->assertEquals(testable_mlang_tools::legacy_component_name('[syntaxerr'), false);
         $this->assertEquals(testable_mlang_tools::legacy_component_name('syntaxerr,'), false);
         $this->assertEquals(testable_mlang_tools::legacy_component_name('syntax err'), false);
+        $this->assertEquals(testable_mlang_tools::legacy_component_name('enrol__invalid'), false);
     }
 
     public function test_component_get_recent_timemodified() {
