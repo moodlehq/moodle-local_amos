@@ -171,6 +171,9 @@ trait update_strings_file {
         // The following will throw exception if the commit fails.
         $stage->commit($message, array('source' => 'import', 'userinfo' => $userinfo), true);
 
+        // The import might have introduce a new component, clear the caches.
+        \mlang_tools::list_components(false);
+
         // Auto-merge updated components.
         foreach ($componentnames as $componentname) {
             \mlang_tools::auto_merge($componentname);
