@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,17 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the version of AMOS
+ * Scheduled tasks provided by AMOS are declared here.
  *
- * @package   local_amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    task
+ * @copyright   2019 David Mudrák <david@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component  = 'local_amos';
-$plugin->version    = 2019040900;
-$plugin->release    = '3.6.2';
-$plugin->maturity   = MATURITY_STABLE;
-$plugin->requires   = 2018120300;
+$tasks = [
+    [
+        'classname' => '\local_amos\task\import_workplace_plugins',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => 'R',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+    ],
+];
