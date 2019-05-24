@@ -12,7 +12,7 @@ REPO=${AMOSDATAROOT}/repos/moodle-install/
 
 cd $REPO
 git fetch upstream
-for BRANCH in master MOODLE_36_STABLE MOODLE_35_STABLE MOODLE_34_STABLE MOODLE_33_STABLE MOODLE_32_STABLE MOODLE_31_STABLE; do
+for BRANCH in master MOODLE_37_STABLE MOODLE_36_STABLE MOODLE_35_STABLE; do
 	git checkout $BRANCH
 	git merge upstream/$BRANCH
 done
@@ -45,13 +45,10 @@ function update_branch {
 	git push git@git.in.moodle.com:amosbot/moodle-install.git $2:$2
 }
 
-update_branch install_master master 3.7
+update_branch install_master master 3.8
+update_branch install_37_STABLE MOODLE_37_STABLE 3.7
 update_branch install_36_STABLE MOODLE_36_STABLE 3.6
 update_branch install_35_STABLE MOODLE_35_STABLE 3.5
-update_branch install_34_STABLE MOODLE_34_STABLE 3.4
-update_branch install_33_STABLE MOODLE_33_STABLE 3.3
-update_branch install_32_STABLE MOODLE_32_STABLE 3.2
-update_branch install_31_STABLE MOODLE_31_STABLE 3.1
 
 cd $REPO
 git gc
