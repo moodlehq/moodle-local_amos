@@ -1,6 +1,6 @@
 // Styles used at the stage page
 
-@collapsible-padding: 20px;
+$collapsible-padding: 20px;
 
 .path-local-amos {
 
@@ -8,7 +8,7 @@
 
         .stagetool {
             border: 1px solid #ddd;
-            .border-radius(10px);
+            @include border-radius(10px);
             padding: 10px;
             margin-bottom: 10px;
         }
@@ -19,33 +19,32 @@
             margin-bottom: 20px;
         }
 
-        .stagetool.collapsible {
+        .stagetool {
 
             .stagetool-title {
                 font-size: larger;
-                margin-left: @collapsible-padding;
-            }
+                background: url([[pix:core|t/expanded]]) no-repeat scroll 0 center;
+                padding-left: $collapsible-padding;
+                cursor: pointer;
+                color: $link-color;
+                text-decoration: $link-decoration;
 
-            .collapsible-control {
-                > a {
-                    background: url([[pix:core|t/expanded]]) no-repeat scroll 0 center;
-                    padding-left: @collapsible-padding;
-                    margin-left: -@collapsible-padding;
+                &:hover {
+                    color: $link-hover-color;
+                    text-decoration: $link-hover-decoration;
                 }
             }
 
-            .stagetool-content {
-                margin-top: 15px;
-            }
-        }
-
-        .stagetool.collapsible.collapsible-collapsed {
-            .collapsible-control > a {
+            .collapsed .stagetool-title {
                 background-image: url([[pix:core|t/collapsed]]);
             }
 
             .stagetool-content {
-                display: none;
+                margin-top: 15px;
+
+                .form-control {
+                    width: 100vh;
+                }
             }
         }
 
@@ -88,7 +87,7 @@
     #amosstage {
 
         .translation.uncommittable {
-            background-color: #d2ebff;
+            background-color: $amos-color-staged;
         }
 
         .translation.uncommittable.nodiff {
@@ -97,20 +96,20 @@
         }
 
         .translation.committable.new {
-            background-color: #e7f1c3;
+            background-color: $amos-color-committable;
         }
 
         .translation.committable.diff {
-            background-color: #f3f2aa;
+            background-color: $amos-color-outdated;
         }
 
         .translation.committable.removal {
-            background-color: @amos-color-red;
+            background-color: $amos-color-red;
         }
 
         .translation.nocleaning {
             border-style: solid;
-            border-color: red;                
+            border-color: red;
         }
 
         .translation .translationactions {

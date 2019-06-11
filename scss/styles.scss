@@ -1,12 +1,10 @@
-@import "../../../theme/bootstrapbase/less/bootstrap/variables.less";
-@import "../../../theme/bootstrapbase/less/bootstrap/mixins.less";
-@import "variables.less";
-@import "sitefrontpage.less";
-@import "filter.less";
-@import "strings.less";
-@import "stage.less";
-@import "index.less";
-@import "comment.less";
+@import "variables.scss";
+@import "sitefrontpage.scss";
+@import "filter.scss";
+@import "strings.scss";
+@import "stage.scss";
+@import "index.scss";
+@import "comment.scss";
 
 
 // Styles used within the AMOS tool itself
@@ -36,7 +34,7 @@
         }
 
         .original.greylisted {
-            background-color: #f7f7f7;
+            background-color: $amos-color-greylisted;
         }
 
         .translation.translatable {
@@ -44,7 +42,7 @@
         }
 
         .translation.nontranslatable {
-            background-color: #f7f7f7;
+            background-color:   $amos-color-greylisted;
             &.explanation {
                 font-style: italic;
                 color: #909090;
@@ -52,16 +50,18 @@
         }
 
         .translation.committable {
-            background-image:url([[pix:core|i/ne_red_mark]]);background-position:100% 0;background-repeat:no-repeat;
+            background-image:url([[pix:core|i/ne_red_mark]]);
+            background-position:100% 0;
+            background-repeat:no-repeat;
         }
 
         .translation.translatable.missing, .translation.committable.missing {
-            background-color: @amos-color-red;
+            background-color: $amos-color-missing;
         }
 
         .translation.nocleaning  {
             border-style: solid;
-            border-color: red;                
+            border-color: red;
         }
 
         .uptodatewrapper {
@@ -84,17 +84,17 @@
 
 .path-local-amos #amostranslator .translation.translatable,
 .path-local-amos #amostranslator .translation.committable {
-    background-color: #e7f1c3;
+    background-color: $amos-color-committable;
 }
 
 .path-local-amos #amostranslator .translation.translatable.outdated,
 .path-local-amos #amostranslator .translation.committable.outdated {
-    background-color: #f3f2aa;
+    background-color: $amos-color-outdated;
 }
 
 .path-local-amos #amostranslator .translation.staged,
 .path-local-amos #amostranslator .translation.staged.outdated {
-    background-color: #d2ebff;
+    background-color: $amos-color-staged;
 }
 
 .path-local-amos #amostranslator .stringinfo .metainfo {
@@ -292,7 +292,7 @@
 .path-local-amos .contributionlist .status20 .status,
 .path-local-amos .contributionwrapper .details .status20 td,
 .path-local-amos .contribactions .singlebutton.reject input[type="submit"] {
-    background-color: @amos-color-red;
+    background-color: $amos-color-red;
 }
 
 .path-local-amos .contributionlist .status30 .id,
