@@ -1,6 +1,8 @@
 // Contribution comments
 
-@borderColor: rgb(223, 223, 223);
+$borderColor: rgb(223, 223, 223);
+$baseFontSize: $font-size-base;
+$fontSizeSmall: $font-size-sm;
 
 #page-local-amos-contrib {
 
@@ -20,10 +22,10 @@
         }
 
         .amos-comment {
-            font-size: @baseFontSize;
+            font-size: $baseFontSize;
             .comment-comment {
-                border: 1px solid @borderColor;
-                .border-radius(0 0 10px 10px);
+                border: 1px solid $borderColor;
+                @include border-radius(0 0 10px 10px);
                 padding: 1em;
                 ul li, li {
                     list-style-type: disc;
@@ -40,11 +42,11 @@
             }
             .comment-header {
                 padding: 5px;
-                border-top: 1px solid @borderColor;
-                border-left: 1px solid @borderColor;
-                border-right: 1px solid @borderColor;
-                .border-radius(10px 10px 0 0);
-                background-color: lighten(@borderColor, 11%);
+                border-top: 1px solid $borderColor;
+                border-left: 1px solid $borderColor;
+                border-right: 1px solid $borderColor;
+                @include border-radius(10px 10px 0 0);
+                background-color: lighten($borderColor, 11%);
                 display: block;
             }
             .comment-userpicture, .comment-userfullname, .comment-time {
@@ -52,12 +54,12 @@
                 margin-right: 1em;
             }
             .comment-time {
-                font-size: @fontSizeSmall;
+                font-size: $fontSizeSmall;
             }
         }
 
         .amos-comment.highlighted .comment-comment {
-            background-color: lighten(@borderColor, 11%);
+            background-color: lighten($borderColor, 11%);
         }
     }
 }

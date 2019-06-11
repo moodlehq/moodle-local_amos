@@ -35,7 +35,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
-$PAGE->requires->string_for_js('search', 'core');
+$PAGE->requires->string_for_js('filter', 'core');
 $PAGE->requires->strings_for_js(array(
     'languagesall', 'languagesnone', 'componentsenlarge', 'componentsall', 'componentsnone', 'componentsstandard',
     'processing', 'googletranslate', 'morefilteringoptions'), 'local_amos');

@@ -50,14 +50,7 @@ $PAGE->set_title('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->requires->strings_for_js(array('commitmessageempty', 'unstage', 'unstageconfirm', 'unstaging',
     'confirmaction', 'stagestringsnocommit', 'diffstringmode'), 'local_amos');
-$PAGE->requires->yui_module('moodle-theme_moodleorgcleaned-finesses', 'M.theme_moodleorgcleaned.finesses.gridRowsEqualHeight', array('#amosstage .string-text'));
 $PAGE->requires->yui_module('moodle-local_amos-stage', 'M.local_amos.init_stage');
-$PAGE->requires->yui_module('moodle-local_amos-collapsible', 'M.local_amos.collapsible.init', array(
-    array(
-        'wrapper' => '.stagetool.collapsible',
-        'control' => '.stagetool-title',
-    )
-));
 
 if (!empty($message)) {
     require_sesskey();

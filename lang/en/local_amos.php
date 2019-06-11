@@ -46,6 +46,7 @@ $string['commitstage_help'] = 'Permanently store all staged translations in AMOS
 $string['committableall'] = 'all languages';
 $string['committablenone'] = 'no languages allowed - please contact AMOS manager';
 $string['componentsall'] = 'All';
+$string['componentsapp'] = 'App';
 $string['componentsenlarge'] = 'Enlarge';
 $string['componentsnone'] = 'None';
 $string['componentsstandard'] = 'Standard';
