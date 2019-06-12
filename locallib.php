@@ -65,7 +65,7 @@ class local_amos_filter implements renderable {
 
         $this->fields = array(
             'version', 'language', 'component', 'missing', 'outdated', 'has', 'helps', 'substring',
-            'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'page',
+            'stringid', 'stringidpartial', 'stagedonly','greylistedonly', 'withoutgreylisted', 'app', 'page',
             'substringregex', 'substringcs');
         $this->lazyformname = 'amosfilter';
         $this->handler = $handler;
@@ -189,6 +189,9 @@ class local_amos_filter implements renderable {
         if (is_null($data->withoutgreylisted)) {
             $data->withoutgreylisted = false;
         }
+        if (is_null($data->app)) {
+            $data->app = false;
+        }
         if (is_null($data->page)) {
             $data->page = 1;
         }
@@ -257,6 +260,7 @@ class local_amos_filter implements renderable {
         $data->stagedonly           = optional_param('fstg', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('fglo', false, PARAM_BOOL);
         $data->withoutgreylisted    = optional_param('fwog', false, PARAM_BOOL);
+        $data->app                  = optional_param('fapp', false, PARAM_BOOL);
 
         // reset the paginator to the first page every time the filter is saved
         $data->page = 1;
@@ -350,6 +354,7 @@ class local_amos_filter implements renderable {
         $data->stagedonly           = optional_param('g', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('o', false, PARAM_BOOL);
         $data->withoutgreylisted    = optional_param('w', false, PARAM_BOOL);
+        $data->app                  = optional_param('a', false, PARAM_BOOL);
 
         // reset the paginator to the first page for permalinks
         $data->page = 1;
@@ -408,6 +413,7 @@ class local_amos_filter implements renderable {
         if ($fdata->stagedonly)         $this->permalink->param('g', 1);
         if ($fdata->greylistedonly)     $this->permalink->param('o', 1);
         if ($fdata->withoutgreylisted)  $this->permalink->param('w', 1);
+        if ($fdata->app)                $this->permalink->param('a', 1);
 
         return $this->permalink;
     }
@@ -453,6 +459,7 @@ class local_amos_filter implements renderable {
             'showstagedonly' => (int)$submitted->stagedonly,
             'showgreylistedonly' => (int)$submitted->greylistedonly,
             'showwithoutgreylisted' => (int)$submitted->withoutgreylisted,
+            'app' => (int)$submitted->app,
             'page' => $submitted->page,
 
         );
@@ -509,6 +516,7 @@ class local_amos_translator implements renderable {
         $stagedonly         = $filter->get_data()->stagedonly;
         $greylistedonly     = $filter->get_data()->greylistedonly;
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
+        $app                = $filter->get_data()->app;
 
         list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'branch00000');
         list($sqllanguages, $paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'lang00000');
@@ -537,6 +545,9 @@ class local_amos_translator implements renderable {
             $greylist[$s->branch][$s->component][$s->stringid] = true;
         }
         $rs->close();
+
+        // get the app strings
+        $applist = local_amos_applist_strings();
 
         // get all the strings for the translator
         $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
@@ -669,6 +680,15 @@ class local_amos_translator implements renderable {
                             } else {
                                 $string->greylisted = false;
                             }
+
+                            if ($component == 'local_moodlemobileapp') {
+                                $string->app = $stringid;
+                            } else if (isset($applist[$component.'/'.$stringid])) {
+                                $string->app = $applist[$component.'/'.$stringid];
+                            } else {
+                                $string->app = false;
+                            }
+
                             unset($s[$lang][$component][$stringid][$branchcode]);
 
                             if ($has and is_null($string->translation)) {
@@ -681,6 +701,9 @@ class local_amos_translator implements renderable {
                                 continue;   // do not display this string
                             }
                             if ($withoutgreylisted and $string->greylisted) {
+                                continue;   // do not display this string
+                            }
+                            if ($app and !$string->app) {
                                 continue;   // do not display this string
                             }
                             if (!empty($substring)) {
@@ -1429,6 +1452,49 @@ function local_amos_standard_plugins() {
     }
 
     return $list;
+}
+
+/**
+ * Returns the list of app components
+ *
+ * @return array (string)frankenstylename
+ */
+function local_amos_app_plugins() {
+    global $DB;
+
+    static $list = null;
+
+    if (is_null($list)) {
+        $components = $DB->get_fieldset_select('amos_app_strings', 'DISTINCT component', "");
+        $list = array_combine($components, $components);
+        $list['local_moodlemobileapp'] = 'local_moodlemobileapp';
+    }
+
+    return $list;
+}
+
+/**
+ * Returns the list of app components
+ *
+ * @return array (string)component/(string)stringid => (string)appid
+ */
+function local_amos_applist_strings() {
+    global $DB;
+
+    static $applist = null;
+
+    if (is_null($applist)) {
+        // get the app strings
+        $applist = array();
+        $rs = $DB->get_records('amos_app_strings');
+        foreach ($rs as $s) {
+            $applist[$s->component.'/'.$s->stringid] = $s->appid;
+        }
+    }
+
+
+
+    return $applist;
 }
 
 /**

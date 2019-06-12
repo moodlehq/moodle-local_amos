@@ -72,6 +72,19 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 fcmp.all('tr:not(.hidden) input').set('checked', false);
                 fcmp.all('tr.standard:not(.hidden) input').set('checked', true);
             });
+            var fcmpselectallapp = filter.one('#amosfilter_fcmp_actions_allapp');
+            fcmpselectallapp.on('click', function(e) {
+                // Check all displayed standard components.
+                e.preventDefault();
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+                fcmp.all('tr:not(.hidden) input').set('checked', false);
+                fcmp.all('tr.app:not(.hidden) input').set('checked', true);
+                filter.one('#fapp input').set('checked', true);
+                filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
+                filter.one('#fapp').ancestor().removeClass('collapse');
+                filter.all('.amosfilter_version input').set('checked', false);
+                filter.one('.amosfilter_version .current').set('checked', true);
+            });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
                 // Check all displayed components.

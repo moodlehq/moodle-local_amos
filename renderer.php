@@ -131,6 +131,8 @@ class local_amos_renderer extends plugin_renderer_base {
         $current = $filterdata->component;
         $someselected = false;
 
+        $app_plugins = local_amos_app_plugins();
+
         $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
         foreach ($optionscore as $key => $label) {
             $selected = in_array($key, $current);
@@ -139,9 +141,10 @@ class local_amos_renderer extends plugin_renderer_base {
                 $someselected = true;
                 $cssclasses .= ' preset';
             }
+            $isapp = isset($app_plugins[$key]) ? ' app' : '';
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
             $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
-                array('class' => 'standard core'));
+                array('class' => 'standard core'.$isapp));
         }
 
         $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
@@ -152,9 +155,10 @@ class local_amos_renderer extends plugin_renderer_base {
                 $someselected = true;
                 $cssclasses .= ' preset';
             }
+            $isapp = isset($app_plugins[$key]) ? ' app' : '';
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
             $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
-                array('class' => 'standard plugin'));
+                array('class' => 'standard plugin'.$isapp));
         }
 
         $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
@@ -165,9 +169,10 @@ class local_amos_renderer extends plugin_renderer_base {
                 $someselected = true;
                 $cssclasses .= ' preset';
             }
+            $isapp = isset($app_plugins[$key]) ? ' app' : '';
             $checkbox = html_writer::checkbox('fcmp[]', $key, $selected, $label);
             $table .= html_writer::tag('tr', html_writer::tag('td', $checkbox, array('class' => $cssclasses)) . $listversions[$key],
-                array('class' => 'contrib plugin'));
+                array('class' => 'contrib plugin'.$isapp));
         }
 
         if (!$someselected) {
@@ -192,6 +197,9 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
         $fcmpactions = html_writer::tag('label', $radio.' '.get_string('componentsstandard', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_allstandard', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
+
+        $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
+        $fcmpactions .= html_writer::tag('label', $radio.' '.get_string('componentsapp', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_allapp', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
 
         $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
         $fcmpactions .= html_writer::tag('label', $radio.' '.get_string('componentsall', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_all', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
@@ -229,8 +237,8 @@ class local_amos_renderer extends plugin_renderer_base {
                 $thisselected = false;
             }
 
-            $fver = html_writer::start_tag('div', array('class' => 'form-check form-check-inline'));
-            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, array('class' => 'form-check-input'));
+            $fver = html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
+            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, array('class' => 'form-check-input '. ($version->current ? 'current' : "")));
             $fver .= html_writer::end_tag('div'); // .form-check
 
             if (isset($version->supported) && $version->supported) {
@@ -265,7 +273,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // other filter settings
         $collapsible = ' collapse';
-        foreach (array('missing', 'outdated', 'has', 'helps', 'stagedonly', 'greylistedonly', 'withoutgreylisted') as $ff) {
+        foreach (array('missing', 'outdated', 'has', 'helps', 'stagedonly', 'greylistedonly', 'withoutgreylisted', 'app') as $ff) {
             if (!empty($filterdata->$ff)) {
                 $collapsible = '';
             }
@@ -334,6 +342,14 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('label',
             html_writer::checkbox('fwog', 1, $filterdata->withoutgreylisted, '', array('id' => 'amosfilter_fwog')) . get_string('filtermisfwog', 'local_amos'),
             array('class' => 'checkbox')
+        );
+        $output .= html_writer::end_tag('div'); // .form-check
+
+        $collapsible = empty($filterdata->app) ? ' collapse' : '';
+        $output .= html_writer::start_tag('div', array('class' => 'form-check'.$collapsible));
+        $output .= html_writer::tag('label',
+            html_writer::checkbox('fapp', 1, $filterdata->app) . get_string('filtermisfapp', 'local_amos'),
+            array('class' => 'checkbox', 'id' => 'fapp')
         );
         $output .= html_writer::end_tag('div'); // .form-check
 
@@ -502,6 +518,11 @@ class local_amos_renderer extends plugin_renderer_base {
                    'info info-greylisted');
             }
 
+            $infoapp = '';
+            if ($string->app) {
+                $infoapp = html_writer::tag('i', "", array('class' => 'fa fa-mobile', 'title' => get_string('filtermisfapp_help', 'local_amos', $string->app)));
+            }
+
             $infolanguage = html_writer::span($listlanguages[$string->language], 'info info-language');
 
             $infotimeline = html_writer::span(html_writer::tag('a', get_string('timeline', 'local_amos'), array(
@@ -591,6 +612,10 @@ class local_amos_renderer extends plugin_renderer_base {
 
             if ($infoplaceholder) {
                 $infoline1 .= ' | '.$infoplaceholder;
+            }
+
+            if ($infoapp) {
+                $infoline1 .= ' | '.$infoapp;
             }
 
             $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
