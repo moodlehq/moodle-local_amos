@@ -319,13 +319,23 @@ class local_amos_filter implements renderable {
             }
         }
 
+        $data->app = false;
+
         $data->component = array();
         $fcmp = optional_param('c', '', PARAM_RAW);
-        if ($fcmp == '*') {
-            // all components
-            foreach (mlang_tools::list_components() as $component => $undefined) {
-                $data->component[] = $component;
+        if ($fcmp == '*std') {
+            // standard components
+            $data->component = array();
+            foreach (local_amos_standard_plugins() as $plugins) {
+                $data->component = array_merge($data->component, array_keys($plugins));
             }
+        } else if ($fcmp == '*app') {
+            // app components
+            $data->component = array_keys(local_amos_app_plugins());
+            $data->app       = true;
+        } else if ($fcmp == '*') {
+            // all components
+            $data->component = array_keys(mlang_tools::list_components());
         } else {
             $fcmp = explode(',', $fcmp);
             $fcmp = clean_param_array($fcmp, PARAM_FILE);
@@ -354,7 +364,7 @@ class local_amos_filter implements renderable {
         $data->stagedonly           = optional_param('g', false, PARAM_BOOL);
         $data->greylistedonly       = optional_param('o', false, PARAM_BOOL);
         $data->withoutgreylisted    = optional_param('w', false, PARAM_BOOL);
-        $data->app                  = optional_param('a', false, PARAM_BOOL);
+        $data->app                  = optional_param('a', $data->app, PARAM_BOOL);
 
         // reset the paginator to the first page for permalinks
         $data->page = 1;
@@ -388,11 +398,18 @@ class local_amos_filter implements renderable {
 
         // list of components or '*' if all are selected
         $all = mlang_tools::list_components();
+        $app = array_keys(local_amos_app_plugins());
+        $app = array_combine($app, $app);
         foreach ($fdata->component as $selected) {
             unset($all[$selected]);
+            unset($app[$selected]);
         }
+
+        // *std cannot be preselected because it depends on version.
         if (empty($all)) {
             $this->permalink->param('c', '*');
+        } else if (empty($app)) {
+            $this->permalink->param('c', '*app');
         } else {
             $this->permalink->param('c', implode(',', $fdata->component));
         }

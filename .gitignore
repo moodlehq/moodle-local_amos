@@ -3,3 +3,4 @@
 /.patches/
 /phpunit.xml
 /cli/config.php
+.DS_Store
