@@ -82,8 +82,8 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 filter.one('#fapp input').set('checked', true);
                 filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
                 filter.one('#fapp').ancestor().removeClass('collapse');
-                filter.all('.amosfilter_version input').set('checked', false);
-                filter.one('.amosfilter_version .current').set('checked', true);
+                filter.all('#amosfilter_fver .fver').set('disabled', true);
+                filter.one('#amosfilter_fver #flast').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
@@ -102,6 +102,12 @@ YUI.add('moodle-local_amos-filter', function(Y) {
 
             fcmp.all('tr input').on('click', function(e) {
                 filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+            });
+
+            var flast = filter.one('#flast');
+            flast.on('change', function(e) {
+                e.preventDefault();
+                filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
             });
 
             // search for components
