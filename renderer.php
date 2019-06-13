@@ -207,7 +207,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $fver = html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
-            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, array('class' => 'form-check-input '. ($version->current ? 'current' : "")));
+            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, array('disabled' => $filterdata->last, 'class' => 'fver form-check-input '. ($version->current ? 'current' : "")));
             $fver .= html_writer::end_tag('div'); // .form-check
 
             if (isset($version->supported) && $version->supported) {
@@ -224,13 +224,18 @@ class local_amos_renderer extends plugin_renderer_base {
             $extraclass = '';
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$extraclass));
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
         $output .= html_writer::tag('label',
             get_string('filterver', 'local_amos') . html_writer::tag('small', get_string('filterver_desc', 'local_amos'), array('class' => 'help-block')),
             array('class' => 'control-label', 'for' => 'amosfilter_fver')
         );
 
         $output .= html_writer::start_tag('div', array('id' => 'amosfilter_fver', 'class' => 'controls'));
+
+        $output .= html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_flast'));
+        $output .= html_writer::checkbox('flast', 1, $filterdata->last, get_string('lastavailable', 'local_amos'), array('class' => 'form-check-input', 'id' => 'flast'));
+        $output .= html_writer::end_tag('div'); // .form-check
+
         $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_supported'));
         $output .= $supported;
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_supported
@@ -238,6 +243,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= $unsupported;
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_unsupported
         $output .= html_writer::end_tag('div'); // .controls
+
         $output .= html_writer::end_tag('div'); // .control-group
 
         // other filter settings

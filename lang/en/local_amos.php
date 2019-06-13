@@ -252,6 +252,7 @@ $string['language'] = 'Language';
 $string['languages'] = 'Languages';
 $string['languagesall'] = 'All';
 $string['languagesnone'] = 'None';
+$string['lastavailable'] = 'Last available component version (except DEV)';
 $string['log'] = 'Log';
 $string['logfilterbranch'] = 'Versions';
 $string['logfiltercommithash'] = 'git hash';
