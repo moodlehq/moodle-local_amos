@@ -4,3 +4,4 @@
 /phpunit.xml
 /cli/config.php
 .DS_Store
+/node_modules/
