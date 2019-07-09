@@ -1806,7 +1806,7 @@ class mlang_version {
                 'dir'           => '3.4',
                 'translatable'  => true,
                 'current'       => false,
-                'supported'     => true,
+                'supported'     => false,
             ),
             array(
                 'code'          => self::MOODLE_33,
