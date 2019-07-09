@@ -556,9 +556,8 @@ class local_amos_translator implements renderable {
 
         if ($last) {
             $allversions = mlang_version::list_all();
-            $devversion = reset($allversions);
-            $params = array('devbranch' => $devversion->code);
-            $comp_branch = $DB->get_records_select_menu('amos_snapshot',  "component $sqlcomponents AND branch < :devbranch GROUP BY component",  array_merge($params, $paramcomponents),  '', 'component, MAX(branch) as branch');
+            $comp_branch = $DB->get_records_select_menu('amos_snapshot',  "component $sqlcomponents GROUP BY component",
+                $paramcomponents,  '', 'component, MAX(branch) as branch');
 
             $sql_comps = array();
             foreach ($comp_branch as $component => $branch) {
