@@ -1,7 +1,10 @@
 // Strings filter at the translator page
 
-.path-local-amos {
+#page-local-amos-view #region-main {
+    overflow-x: auto;
+}
 
+.path-local-amos {
 
     .string-control-label .fa-mobile {
         font-size: 1.7em;
@@ -53,7 +56,9 @@
         color: gray;
     }
 
-
+    #amosfilter_fver label {
+        padding-right: 0.3em;
+    }
 
     #amosfilter_submitted_icon {
         display: inline-block;
