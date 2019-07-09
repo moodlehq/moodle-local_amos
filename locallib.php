@@ -560,7 +560,7 @@ class local_amos_translator implements renderable {
             $comp_branch = $DB->get_records_select_menu('amos_snapshot',  "component $sqlcomponents GROUP BY component",
                 $paramcomponents,  '', 'component, MAX(branch) as branch');
 
-            $sql_comps = array();
+            $sql_comps = array('1 = 0');
             $parcounter = 0;
 
             foreach ($comp_branch as $component => $branch) {
