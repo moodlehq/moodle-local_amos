@@ -293,7 +293,7 @@ class local_amos_filter implements renderable {
 
         $data->version = array();
         $fver = optional_param('v', '', PARAM_RAW);
-        if ($fver == 'l') {
+        if ($fver !== 'l') {
             $fver = explode(',', $fver);
             $fver = clean_param_array($fver, PARAM_INT);
             if (!empty($fver) and is_array($fver)) {
