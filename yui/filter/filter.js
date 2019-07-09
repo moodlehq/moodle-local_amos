@@ -83,6 +83,7 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
                 filter.one('#fapp').ancestor().removeClass('collapse');
                 filter.all('#amosfilter_fver .fver').set('disabled', true);
+                filter.one('#amosfilter_fver_versions').addClass('hidden');
                 filter.one('#amosfilter_fver #flast').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
@@ -108,6 +109,11 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             flast.on('change', function(e) {
                 e.preventDefault();
                 filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
+                if (e.currentTarget.get('checked')) {
+                    filter.one('#amosfilter_fver_versions').addClass('hidden');
+                } else {
+                    filter.one('#amosfilter_fver_versions').removeClass('hidden');
+                }
             });
 
             // search for components

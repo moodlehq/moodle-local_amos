@@ -238,7 +238,11 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $fver = html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
-            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, array('disabled' => $filterdata->last, 'class' => 'fver form-check-input '. ($version->current ? 'current' : "")));
+            $fverprops = array('class' => 'fver form-check-input '. ($version->current ? 'current' : ""));
+            if ($filterdata->last) {
+                $fverprops['disabled'] = 'disabled';
+            }
+            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, $fverprops);
             $fver .= html_writer::end_tag('div'); // .form-check
 
             if (isset($version->supported) && $version->supported) {
@@ -267,12 +271,18 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::checkbox('flast', 1, $filterdata->last, get_string('lastavailable', 'local_amos'), array('class' => 'form-check-input', 'id' => 'flast'));
         $output .= html_writer::end_tag('div'); // .form-check
 
+        if ($filterdata->last) {
+            $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_versions', 'class' => 'hidden'));
+        } else {
+            $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_versions'));
+        }
         $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_supported'));
         $output .= $supported;
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_supported
         $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_unsupported'));
         $output .= $unsupported;
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_unsupported
+        $output .= html_writer::end_tag('div'); // #amosfilter_fver_versions
         $output .= html_writer::end_tag('div'); // .controls
 
         $output .= html_writer::end_tag('div'); // .control-group
