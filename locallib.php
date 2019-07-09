@@ -551,6 +551,7 @@ class local_amos_translator implements renderable {
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
         $app                = $filter->get_data()->app;
 
+        $params = array();
         list($sqllanguages, $paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'lang00000');
         list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'comp00000');
 
@@ -560,26 +561,34 @@ class local_amos_translator implements renderable {
                 $paramcomponents,  '', 'component, MAX(branch) as branch');
 
             $sql_comps = array();
+            $parcounter = 0;
+
             foreach ($comp_branch as $component => $branch) {
-                $sql_comps[] = "(s.component = '$component' AND s.branch = $branch)";
+                $paramcomponent = 'component000'.$parcounter;
+                $parambranch = 'branch000'.$parcounter;
+                $sql_comps[] = "(s.component = :".$paramcomponent." AND s.branch = :".$parambranch.")";
+                $params[$paramcomponent] = $component;
+                $params[$parambranch] = $branch;
+                $parcounter++;
             }
+
             $sql_comps = implode(' OR ', $sql_comps);
 
             // get the greylisted strings first
             $sql = "SELECT branch, component, stringid
                       FROM {amos_greylist} AS s
                      WHERE {$sql_comps}";
+
             if ($stringid) {
                 if ($stringidpartial) {
                     $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
                 } else {
                     $sql .= " AND stringid = :stringid";
-                    $params = array('stringid' => $stringid);
+                    $params['stringid'] = $stringid;
                 }
-            } else {
-                $params = array();
             }
+
         } else {
             list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'branch00000');
 
@@ -588,17 +597,17 @@ class local_amos_translator implements renderable {
                       FROM {amos_greylist}
                      WHERE branch $sqlbranches
                        AND component $sqlcomponents";
+
             if ($stringid) {
                 if ($stringidpartial) {
                     $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
                 } else {
                     $sql .= " AND stringid = :stringid";
-                    $params = array('stringid' => $stringid);
+                    $params['stringid'] = $stringid;
                 }
-            } else {
-                $params = array();
             }
+
             $params = array_merge($params, $paramsbranches, $paramcomponents);
         }
 
@@ -619,17 +628,17 @@ class local_amos_translator implements renderable {
                       JOIN {amos_repository} r ON s.repoid = r.id
                       JOIN {amos_texts} t ON r.textid = t.id
                      WHERE s.lang {$sqllanguages} AND ({$sql_comps})";
+
             if ($stringid) {
                 if ($stringidpartial) {
                     $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
                 } else {
                     $sql .= " AND s.stringid = :stringid";
-                    $params = array('stringid' => $stringid);
+                    $params['stringid'] = $stringid;
                 }
-            } else {
-                $params = array();
             }
+
             if ($helps) {
                 $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
                 $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
@@ -639,6 +648,7 @@ class local_amos_translator implements renderable {
             }
 
             $params = array_merge($params, $paramslanguages, $paramcomponents);
+
         } else {
             // get all the strings for the translator
             $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
@@ -648,20 +658,22 @@ class local_amos_translator implements renderable {
                      WHERE s.branch {$sqlbranches}
                            AND s.lang {$sqllanguages}
                            AND s.component {$sqlcomponents}";
+
             if ($stringid) {
                 if ($stringidpartial) {
                     $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params = array('stringid' => '%'.$DB->sql_like_escape($stringid).'%');
+                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
+
                 } else {
                     $sql .= " AND s.stringid = :stringid";
-                    $params = array('stringid' => $stringid);
+                    $params['stringid'] = $stringid;
                 }
-            } else {
-                $params = array();
             }
+
             if ($helps) {
                 $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
                 $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
+
             } else {
                 $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
                 $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
@@ -669,6 +681,7 @@ class local_amos_translator implements renderable {
 
             $params = array_merge($params, $paramsbranches, $paramslanguages, $paramcomponents);
         }
+
         $sql .= " ORDER BY s.component, s.stringid, s.lang, s.branch, r.id DESC";
 
         $rs = $DB->get_recordset_sql($sql, $params);
