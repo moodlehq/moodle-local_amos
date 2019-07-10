@@ -74,6 +74,11 @@
         overflow-y: scroll;
         background-color: white;
     }
+
+    #amosfilter_fcmp.hiddenversions .version {
+        display: none;
+    }
+
     .error #amosfilter_fcmp {
         border-color: #b94a48;
         color: #b94a48;

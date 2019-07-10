@@ -111,8 +111,10 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
                 if (e.currentTarget.get('checked')) {
                     filter.one('#amosfilter_fver_versions').addClass('hidden');
+                    filter.all('#amosfilter_fcmp').addClass('hiddenversions');
                 } else {
                     filter.one('#amosfilter_fver_versions').removeClass('hidden');
+                    filter.all('#amosfilter_fcmp').removeClass('hiddenversions');
                 }
             });
 

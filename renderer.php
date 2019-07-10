@@ -189,9 +189,14 @@ class local_amos_renderer extends plugin_renderer_base {
         );
 
         $output .= html_writer::start_tag('div', array('class' => 'controls'));
+        if ($filterdata->last) {
+            $extraclass = 'hiddenversions';
+        } else {
+            $extraclass = '';
+        }
         $output .= html_writer::div(
             html_writer::tag('table', $table, array('border' => '0')),
-            '', array('id' => 'amosfilter_fcmp')
+            '', array('id' => 'amosfilter_fcmp', 'class' => $extraclass)
         );
 
 
@@ -259,7 +264,13 @@ class local_amos_renderer extends plugin_renderer_base {
             $extraclass = '';
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'control-group'));
+        if ($filterdata->last) {
+            $collapsible = ' collapse';
+        } else {
+            $collapsible = '';
+        }
+
+        $output .= html_writer::start_tag('div', array('class' => 'control-group'.$collapsible));
         $output .= html_writer::tag('label',
             get_string('filterver', 'local_amos') . html_writer::tag('small', get_string('filterver_desc', 'local_amos'), array('class' => 'help-block')),
             array('class' => 'control-label', 'for' => 'amosfilter_fver')
