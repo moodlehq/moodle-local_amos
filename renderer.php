@@ -1203,7 +1203,7 @@ class local_amos_renderer extends plugin_renderer_base {
         if ($expanded) {
             $attr = array('aria-expanded' => 'true');
             $collapsed = '';
-            $collapse = ' show';
+            $collapse = ' in';
         } else {
             $attr = array('aria-expanded' => 'false');
             $collapsed = ' collapsed';
