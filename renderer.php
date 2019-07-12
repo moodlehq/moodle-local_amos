@@ -1025,12 +1025,12 @@ class local_amos_renderer extends plugin_renderer_base {
                     $propagateform .= html_writer::checkbox('ver[]', $version->code, true, $version->label, array('class' => 'form-check-input'));
                     $propagateform .= html_writer::end_tag('div'); // .form-check
                 }
-                $propagateform .= html_writer::tag('button', '<i class="fa fa-bullhorn"></i> '.get_string('propagaterun', 'local_amos'),
+                $propagateform .= html_writer::div(html_writer::tag('button', get_string('propagaterun', 'local_amos'),
                     array(
                         'type' => 'submit',
                         'class' => 'btn btn-light'
                     )
-                );
+                ), 'm-t-1');
                 $propagateform  = html_writer::tag('div', $propagateform);
                 $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
                 $output .= $this->collapsible_stage_tool(
