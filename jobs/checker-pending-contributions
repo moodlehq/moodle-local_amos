@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+# Execute the AMOS pending contributions checker
+# periodically: @weekly
+
+php $AMOSCLIROOT/checker.php --task=pending_contributions

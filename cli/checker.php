@@ -30,6 +30,7 @@
 define('CLI_SCRIPT', true);
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -41,12 +42,31 @@ class amos_checker {
 
     const RESULT_SUCCESS = 0;
     const RESULT_FAILURE = 1;
+    const RESULT_PARAMS = 2;
+
+    /** @var string checker task to execute via $this->check_{task} call */
+    protected $task = null;
 
     /** @var null|array used for caching the list of maintainers of a lang pack */
     protected $maintainers = null;
 
     /** @var null|stdClass the user record for the AMOS bot */
     protected $amosbot = null;
+
+    /**
+     * Prepare an instance of the given task checker.
+     *
+     * @param string $taskname Name of the check task to execute.
+     */
+    public function __construct(string $taskname) {
+
+        if (!method_exists($this, 'check_'.$taskname)) {
+            fputs(STDERR, "Error: Unknown checker task: ".$taskname."\n");
+            exit(amos_checker::RESULT_PARAMS);
+        }
+
+        $this->task = $taskname;
+    }
 
     /**
      * Checks the decsep, thousandssep and listsep config strings are set correctly
@@ -188,21 +208,6 @@ class amos_checker {
     }
 
     /**
-     * Returns the list of check methods to execute
-     *
-     * @return array of strings - method names
-     */
-    protected function get_checkers() {
-        $methods = array();
-        foreach (get_class_methods($this) as $method) {
-            if (substr($method, 0, 6) === 'check_') {
-                $methods[] = $method;
-            }
-        }
-        return $methods;
-    }
-
-    /**
      * Outputs the given message to the stdout or to the stderr
      *
      * @param string $message text to display
@@ -287,25 +292,41 @@ class amos_checker {
      * @return int 0 for success, >0 if some checks fail
      */
     public function execute() {
-        $this->output('START AMOS checks report');
-        $result = 0;
-        foreach ($this->get_checkers() as $method) {
-            $this->output(' RUNNING ' . $method);
-            $status = $this->$method();
-            if ($status === self::RESULT_FAILURE) {
-                $this->output(' FAILED ' . $method, true);
-                $result = 1;
-            } else if ($status === self::RESULT_SUCCESS) {
-                $this->output(' OK ' . $method);
-            } else {
-                $this->output(' ERROR ' . $method . ' returned unexpected value', true);
-            }
+
+        $this->output('START AMOS checker task '.$this->task);
+        $method = 'check_'.$this->task;
+        $this->output(' RUNNING ' . $method);
+        $status = $this->$method();
+
+        if ($status === self::RESULT_FAILURE) {
+            $this->output(' FAILED ' . $method, true);
+
+        } else if ($status === self::RESULT_SUCCESS) {
+            $this->output(' OK ' . $method);
+
+        } else {
+            $this->output(' ERROR ' . $method . ' returned unexpected value', true);
         }
-        $this->output('END AMOS checks report');
-        return $result;
+
+        $this->output('END AMOS checker task '.$this->task);
+
+        return $status;
     }
 
 }
 
-$checker = new amos_checker();
+list($options, $unrecognized) = cli_get_params(array('task' => ''));
+
+if (empty($options['task']) || is_numeric((string)$options['task'])) {
+    fputs(STDERR, "Error: Please run with the --task=name parameter to specify the checker task to perform.\n");
+    exit(amos_checker::RESULT_PARAMS);
+}
+
+if (!empty($unrecognized)) {
+    fputs(STDERR, "Error: Unrecognized parameter detected: ".implode($unrecognized)."\n");
+    exit(amos_checker::RESULT_PARAMS);
+}
+
+$checker = new amos_checker($options['task']);
+
 exit($checker->execute());
