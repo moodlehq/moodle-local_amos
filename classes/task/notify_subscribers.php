@@ -15,42 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Scheduled tasks provided by AMOS are declared here.
+ * Provides the {@link \local_amos\task\notify_subscribers} class.
  *
  * @package     local_amos
  * @category    task
- * @copyright   2019 David Mudrák <david@moodle.com>
+ * @copyright   2019 Tobias Reischmann <tobias.reischmann@wi.uni-muenster.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_amos\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = [
-    [
-        'classname' => '\local_amos\task\import_workplace_plugins',
-        'blocking' => 0,
-        'minute' => 'R',
-        'hour' => 'R',
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-    ],
-    [
-        'classname' => '\local_amos\task\import_app_strings',
-        'blocking' => 0,
-        'minute' => 'R',
-        'hour' => 'R',
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-    ],
-    [
-        'classname' => '\local_amos\task\notify_subscribers',
-        'blocking' => 0,
-        'minute' => '0',
-        'hour' => '0',
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-    ],
-];
+/**
+ * Sends notifications about changes of the language packs to the respective subsrcibers.
+ *
+ * @copyright 2019 Tobias Reischmann <tobias.reischmann@wi.uni-muenster.de>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class notify_subscribers extends \core\task\scheduled_task {
+
+    /**
+     * Return the task name.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('tasknotifysubscribers', 'local_amos');
+    }
+
+    /**
+     * Execute the task.
+     */
+    public function execute() {
+
+    }
+
+}
