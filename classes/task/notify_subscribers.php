@@ -27,6 +27,8 @@ namespace local_amos\task;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+
 /**
  * Sends notifications about changes of the language packs to the respective subsrcibers.
  *
@@ -48,7 +50,29 @@ class notify_subscribers extends \core\task\scheduled_task {
      * Execute the task.
      */
     public function execute() {
+        global $DB, $PAGE;
+        $subject = 'Subscription Notification';
+        $content = 'Subscription Content';
+        $lasttimerun = get_config('local_amos', 'timesubnotified');
+        $getsql     = "SELECT distinct s.userid
+                         FROM {amos_commits} c
+                         JOIN {amos_repository} r ON (c.id = r.commitid)
+                         JOIN {amos_texts} t ON (r.textid = t.id)
+                         JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
+                        WHERE timecommitted > $lasttimerun";
 
+        $users = $DB->get_records_sql($getsql);
+        $output = $PAGE->get_renderer('local_amos');
+        foreach ($users as $user) {
+            $user = \core_user::get_user($user->userid);
+            if ($user) {
+                $notification = new \local_amos_sub_notification($user);
+
+                $content = $output->render($notification);
+                email_to_user($user, \core_user::get_noreply_user(), $subject, $content);
+            }
+        }
+        set_config('timesubnotified', time(), 'local_amos');
     }
 
 }

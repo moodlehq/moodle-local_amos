@@ -1528,6 +1528,43 @@ class local_amos_contribution implements renderable {
 }
 
 /**
+ * Represents a collection changes to be sent to subscribers
+ */
+class local_amos_sub_notification implements renderable, templatable {
+
+    /** @var array of changes to be included in the mail*/
+    public $changes = array();
+
+    /** @var stdClass user */
+    public $user;
+
+    /**
+     * Fetches the required commits from the repository
+     *
+     * @param stdClass $user id of the subscriber
+     */
+    public function __construct($user) {
+        global $DB;
+
+        $time = time() - 86400;
+        $getsql     = "SELECT t.text, r.stringid, r.component, r.lang
+                         FROM {amos_commits} co
+                         JOIN {amos_repository} r ON (co.id = r.commitid)
+                         JOIN {amos_texts} t ON (r.textid = t.id)
+                         JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
+                        WHERE timecommitted > $time";
+        $records = $DB->get_records_sql($getsql);
+        $this->changes = array_values($records);
+
+        $this->user = $user;
+    }
+
+    public function export_for_template(renderer_base $output) {
+        return $this;
+    }
+}
+
+/**
  * Returns the list of standard components
  *
  * @return array (string)version => (string)legacyname => (string)frankenstylename

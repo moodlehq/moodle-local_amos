@@ -1633,6 +1633,18 @@ print_footer();
     }
 
     /**
+     * Render repository records
+     *
+     * @param param local_amos_sub_notification $records of stdclass amos changes
+     * @return string HTML
+     */
+    protected function render_local_amos_sub_notification(local_amos_sub_notification $notification) {
+        global $OUTPUT;
+        return $OUTPUT->render_from_template('local_amos/subscription_notification',
+            $notification->export_for_template($OUTPUT));
+    }
+
+    /**
      * Renders the AMOS credits page
      *
      * The $editmode is interpreted as follows:
