@@ -192,5 +192,19 @@
         <INDEX NAME="component" UNIQUE="false" FIELDS="component" COMMENT="Allows to quickly search by the component."/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="amos_app_strings" COMMENT="Defines the strings that are being used in the Moodle apps.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier"/>
+        <FIELD NAME="appid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier in the app"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uq_appid" UNIQUE="true" FIELDS="appid"/>
+      </INDEXES>
+    </TABLE>
   </TABLES>
 </XMLDB>

@@ -1,6 +1,0 @@
-#!/bin/bash -e
-
-# Execute the AMOS checker
-# periodically: @daily
-
-php $AMOSCLIROOT/checker.php

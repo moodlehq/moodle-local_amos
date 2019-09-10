@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+# Execute the AMOS misconfigured separators checker
+# periodically: @daily
+
+php $AMOSCLIROOT/checker.php --task=separators

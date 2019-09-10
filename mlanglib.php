@@ -1770,6 +1770,7 @@ class mlang_version {
                 'dir'           => '3.8',
                 'translatable'  => true,
                 'current'       => false,
+                'supported'     => true,
             ),
             array(
                 'code'          => self::MOODLE_37,
@@ -1778,6 +1779,7 @@ class mlang_version {
                 'dir'           => '3.7',
                 'translatable'  => true,
                 'current'       => true,
+                'supported'     => true,
             ),
             array(
                 'code'          => self::MOODLE_36,
@@ -1786,6 +1788,7 @@ class mlang_version {
                 'dir'           => '3.6',
                 'translatable'  => true,
                 'current'       => false,
+                'supported'     => true,
             ),
             array(
                 'code'          => self::MOODLE_35,
@@ -1794,6 +1797,7 @@ class mlang_version {
                 'dir'           => '3.5',
                 'translatable'  => true,
                 'current'       => false,
+                'supported'     => true,
             ),
             array(
                 'code'          => self::MOODLE_34,
@@ -1802,6 +1806,7 @@ class mlang_version {
                 'dir'           => '3.4',
                 'translatable'  => true,
                 'current'       => false,
+                'supported'     => false,
             ),
             array(
                 'code'          => self::MOODLE_33,

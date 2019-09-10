@@ -53,8 +53,6 @@ if (!is_null($id)) {
 navigation_node::override_active_url(new moodle_url('/local/amos/contrib.php'));
 $PAGE->set_title('AMOS ' . get_string('contributions', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('contributions', 'local_amos'));
-//$PAGE->requires->yui_module('moodle-local_amos-contrib', 'M.local_amos.init_contrib');
-//$PAGE->requires->strings_for_js(array('confirmaction'), 'local_amos');
 
 if ($assign) {
     require_capability('local/amos:commit', context_system::instance());

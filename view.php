@@ -35,11 +35,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
-$PAGE->requires->string_for_js('search', 'core');
-$PAGE->requires->strings_for_js(array(
-    'languagesall', 'languagesnone', 'componentsenlarge', 'componentsall', 'componentsnone', 'componentsstandard',
-    'processing', 'googletranslate', 'morefilteringoptions'), 'local_amos');
-$PAGE->requires->yui_module('moodle-theme_moodleorgcleaned-finesses', 'M.theme_moodleorgcleaned.finesses.gridRowsEqualHeight', array('#amostranslator .string-text'));
+$PAGE->requires->strings_for_js(array('processing', 'googletranslate'), 'local_amos');
 $PAGE->requires->yui_module('moodle-local_amos-filter', 'M.local_amos.init_filter', null, null, true);
 $PAGE->requires->yui_module('moodle-local_amos-translator', 'M.local_amos.init_translator', null, null, true);
 $PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_timeline', null, null, true);

@@ -42,6 +42,7 @@ list($options, $unrecognized) = cli_get_params(array(
     'message'       => '',
     'userinfo'      => 'David Mudrak <david@moodle.com>',
     'commithash'    => null,
+    'yes'         => false,
     'help'          => false
 
     ), array('h' => 'help'));
@@ -61,6 +62,7 @@ Options:
     --format        Format of the file, defaults to 2 (Moodle 2.x)
     --userinfo      Committer information, defaults to 'David Mudrak <david@moodle.com>'
     --commithash    Allows to specify the git commit hash
+    --yes           It won't ask to continue
     --help          Show this usage
 
 The file is directly included into the PHP processor. Make sure to review the file
@@ -112,10 +114,12 @@ foreach ($stage->get_iterator() as $component) {
 }
 
 echo PHP_EOL;
-$continue = cli_input('Continue? [y/n]', 'n', array('y', 'n'));
-if ($continue !== 'y') {
-    echo 'Import aborted' . PHP_EOL;
-    exit(5);
+if (!$options['yes']) {
+    $continue = cli_input('Continue? [y/n]', 'n', array('y', 'n'));
+    if ($continue !== 'y') {
+        echo 'Import aborted' . PHP_EOL;
+        exit(5);
+    }
 }
 
 $meta = array('source' => 'import', 'userinfo' => $options['userinfo']);

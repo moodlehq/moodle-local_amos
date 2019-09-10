@@ -37,30 +37,27 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             // add select All / None links to the filter languages selector field
             var flng        = filter.one('#amosfilter_flng');
             var flngactions = filter.one('#amosfilter_flng_actions');
-            var flnghtml    = '<a href="#" id="amosfilter_flng_actions_all">' +
-                              M.util.get_string('languagesall', 'local_amos') + '</a>' +
-                              ' / <a href="#" id="amosfilter_flng_actions_none">' +
-                              M.util.get_string('languagesnone', 'local_amos') + '</a>';
-            flngactions.set('innerHTML', flnghtml);
+            flngactions.set('style', '');
             var flngselectall = filter.one('#amosfilter_flng_actions_all');
-            flngselectall.on('click', function(e) { e.preventDefault(); flng.all('option').set('selected', true); });
+            flngselectall.on('click', function(e) {
+                e.preventDefault();
+                filter.all('.amosfilter_flng_actions_select').removeClass('active');
+                flng.all('option').set('selected', true);
+            });
             var flngselectnone = filter.one('#amosfilter_flng_actions_none');
-            flngselectnone.on('click', function(e) { e.preventDefault(); flng.all('option').set('selected', false); });
+            flngselectnone.on('click', function(e) {
+                e.preventDefault();
+                filter.all('.amosfilter_flng_actions_select').removeClass('active');
+                flng.all('option').set('selected', false);
+            });
+            flng.all('option').on('click', function(e) {
+                filter.all('.amosfilter_flng_actions_select').removeClass('active');
+            });
 
             // add select All / None links to the filter components selector field
             var fcmp        = filter.one('#amosfilter_fcmp');
             var fcmpactions = filter.one('#amosfilter_fcmp_actions');
-            var fcmphtml    = '<a href="#" id="amosfilter_fcmp_actions_enlarge">' +
-                              M.util.get_string('componentsenlarge', 'local_amos') + '</a>' +
-                              ' / <a href="#" id="amosfilter_fcmp_actions_allstandard">' +
-                              M.util.get_string('componentsstandard', 'local_amos') + '</a>' +
-                              ' / <a href="#" id="amosfilter_fcmp_actions_all">' +
-                              M.util.get_string('componentsall', 'local_amos') + '</a>' +
-                              ' / <a href="#" id="amosfilter_fcmp_actions_none">' +
-                              M.util.get_string('componentsnone', 'local_amos') + '</a>' +
-                              ' <input type="text" size="8" maxlength="20" placeholder="' + M.util.get_string('search', 'core') +
-                                '" name="amosfilter_fcmp_actions_search" class="search-query" id="amosfilter_fcmp_actions_search" />';
-            fcmpactions.set('innerHTML', fcmphtml);
+            fcmpactions.set('style', '');
             var fcmpenlarge = filter.one('#amosfilter_fcmp_actions_enlarge');
             fcmpenlarge.on('click', function(e) {
                 // Enlarge the components selection box.
@@ -71,19 +68,54 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             fcmpselectallstandard.on('click', function(e) {
                 // Check all displayed standard components.
                 e.preventDefault();
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+                fcmp.all('tr:not(.hidden) input').set('checked', false);
                 fcmp.all('tr.standard:not(.hidden) input').set('checked', true);
+            });
+            var fcmpselectallapp = filter.one('#amosfilter_fcmp_actions_allapp');
+            fcmpselectallapp.on('click', function(e) {
+                // Check all displayed standard components.
+                e.preventDefault();
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+                fcmp.all('tr:not(.hidden) input').set('checked', false);
+                fcmp.all('tr.app:not(.hidden) input').set('checked', true);
+                filter.one('#fapp input').set('checked', true);
+                filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
+                filter.one('#fapp').ancestor().removeClass('collapse');
+                filter.all('#amosfilter_fver .fver').set('disabled', true);
+                filter.one('#amosfilter_fver_versions').addClass('hidden');
+                filter.one('#amosfilter_fver #flast').set('checked', true);
             });
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
                 // Check all displayed components.
                 e.preventDefault();
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
                 fcmp.all('tr:not(.hidden) input').set('checked', true);
             });
             var fcmpselectnone = filter.one('#amosfilter_fcmp_actions_none');
             fcmpselectnone.on('click', function(e) {
                 // Uncheck all components (even those not displayed).
                 e.preventDefault();
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
                 fcmp.all('tr input').set('checked', false);
+            });
+
+            fcmp.all('tr input').on('click', function(e) {
+                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+            });
+
+            var flast = filter.one('#flast');
+            flast.on('change', function(e) {
+                e.preventDefault();
+                filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
+                if (e.currentTarget.get('checked')) {
+                    filter.one('#amosfilter_fver_versions').addClass('hidden');
+                    filter.all('#amosfilter_fcmp').addClass('hiddenversions');
+                } else {
+                    filter.one('#amosfilter_fver_versions').removeClass('hidden');
+                    filter.all('#amosfilter_fcmp').removeClass('hiddenversions');
+                }
             });
 
             // search for components
@@ -116,18 +148,6 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                     fglo.set('checked', false);
                 }
             });
-
-            // set up collapsible fields
-            if (filter.one('.collapsible.collapsed')) {
-                var collapsibleControl = Y.Node.create('<button class="btn">' + M.util.get_string('morefilteringoptions', 'local_amos') + '</button>');
-                filter.one('.collapsible-control').replace(collapsibleControl);
-
-                collapsibleControl.on('click', function(e) {
-                    e.preventDefault();
-                    filter.all('.collapsible.collapsed').removeClass('collapsed');
-                    collapsibleControl.remove(true);
-                });
-            }
 
             // display the "loading" icon after the filter button is pressed
             var fform       = Y.one('#amosfilter_form');
