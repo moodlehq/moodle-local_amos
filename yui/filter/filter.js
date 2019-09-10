@@ -73,19 +73,21 @@ YUI.add('moodle-local_amos-filter', function(Y) {
                 fcmp.all('tr.standard:not(.hidden) input').set('checked', true);
             });
             var fcmpselectallapp = filter.one('#amosfilter_fcmp_actions_allapp');
-            fcmpselectallapp.on('click', function(e) {
-                // Check all displayed standard components.
-                e.preventDefault();
-                filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
-                fcmp.all('tr:not(.hidden) input').set('checked', false);
-                fcmp.all('tr.app:not(.hidden) input').set('checked', true);
-                filter.one('#fapp input').set('checked', true);
-                filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
-                filter.one('#fapp').ancestor().removeClass('collapse');
-                filter.all('#amosfilter_fver .fver').set('disabled', true);
-                filter.one('#amosfilter_fver_versions').addClass('hidden');
-                filter.one('#amosfilter_fver #flast').set('checked', true);
-            });
+            if (fcmpselectallapp) {
+                fcmpselectallapp.on('click', function (e) {
+                    // Check all displayed standard components.
+                    e.preventDefault();
+                    filter.all('.amosfilter_fcmp_actions_select').removeClass('active');
+                    fcmp.all('tr:not(.hidden) input').set('checked', false);
+                    fcmp.all('tr.app:not(.hidden) input').set('checked', true);
+                    filter.one('#fapp input').set('checked', true);
+                    filter.one('#amosfilter_fmis_collapse').removeClass('collapse');
+                    filter.one('#fapp').ancestor().removeClass('collapse');
+                    filter.all('#amosfilter_fver .fver').set('disabled', true);
+                    filter.one('#amosfilter_fver_versions').addClass('hidden');
+                    filter.one('#amosfilter_fver #flast').set('checked', true);
+                });
+            }
             var fcmpselectall = filter.one('#amosfilter_fcmp_actions_all');
             fcmpselectall.on('click', function(e) {
                 // Check all displayed components.
@@ -106,17 +108,19 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             });
 
             var flast = filter.one('#flast');
-            flast.on('change', function(e) {
-                e.preventDefault();
-                filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
-                if (e.currentTarget.get('checked')) {
-                    filter.one('#amosfilter_fver_versions').addClass('hidden');
-                    filter.all('#amosfilter_fcmp').addClass('hiddenversions');
-                } else {
-                    filter.one('#amosfilter_fver_versions').removeClass('hidden');
-                    filter.all('#amosfilter_fcmp').removeClass('hiddenversions');
-                }
-            });
+            if (flast) {
+                flast.on('change', function (e) {
+                    e.preventDefault();
+                    filter.all('.fver').set('disabled', e.currentTarget.get('checked'));
+                    if (e.currentTarget.get('checked')) {
+                        filter.one('#amosfilter_fver_versions').addClass('hidden');
+                        filter.all('#amosfilter_fcmp').addClass('hiddenversions');
+                    } else {
+                        filter.one('#amosfilter_fver_versions').removeClass('hidden');
+                        filter.all('#amosfilter_fcmp').removeClass('hiddenversions');
+                    }
+                });
+            }
 
             // search for components
             var fcmpsearch = filter.one('#amosfilter_fcmp_actions_search');
@@ -138,16 +142,18 @@ YUI.add('moodle-local_amos-filter', function(Y) {
             // make greylist related checkboxed mutally exclusive
             var fglo = filter.one('#amosfilter_fglo');
             var fwog = filter.one('#amosfilter_fwog');
-            fglo.on('change', function(e) {
-                if (fglo.get('checked')) {
-                    fwog.set('checked', false);
-                }
-            });
-            fwog.on('change', function(e) {
-                if (fwog.get('checked')) {
-                    fglo.set('checked', false);
-                }
-            });
+            if (fglo && fwog) {
+                fglo.on('change', function (e) {
+                    if (fglo.get('checked')) {
+                        fwog.set('checked', false);
+                    }
+                });
+                fwog.on('change', function (e) {
+                    if (fwog.get('checked')) {
+                        fglo.set('checked', false);
+                    }
+                });
+            }
 
             // display the "loading" icon after the filter button is pressed
             var fform       = Y.one('#amosfilter_form');

@@ -30,21 +30,46 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_amos_renderer extends plugin_renderer_base {
 
+    protected function render_local_amos_subscription_filter(local_amos_subscription_filter $filter) {
+        // initialize
+        $output = '';
+        $formattributes = [
+            'action' => $filter->handler,
+            'method' => 'post',
+            'id' => 'amosfilter_form'
+        ];
+
+        // start form
+        $output .= html_writer::start_div('filterwrapper');
+        $output .= html_writer::start_tag('form', $formattributes);
+        $output .= html_writer::start_tag('fieldset', ['id' => 'amosfilter']);
+
+        $alerts = [];
+        $defaults = (object) ['language' => [], 'component' => [], 'last' => true];
+        $output .= $this->render_local_amos_filter_basic($defaults, $alerts, false, false);
+
+        // close form
+        $output .= html_writer::end_tag('fieldset');
+        $button = '<input type="submit" value="' . get_string('add_subscription', 'local_amos') . '" />';
+        $output .= html_writer::div($button, 'form-actions');
+        $output .= html_writer::end_tag('form');
+        $output .= html_writer::end_div();
+
+        return $output;
+    }
+
     /**
-     * Renders the filter form
+     * Renders basic filter of the filter form
      *
-     * @param local_amos_filter $filter
+     * @param object $filterdata
      * @return string
      */
-    protected function render_local_amos_filter(local_amos_filter $filter) {
+    protected function render_local_amos_filter_basic($filterdata, &$alerts, $showappfilterbutton = true, $showselectionerror = true) {
         $output = '';
-        $alerts = array();
-
-        $filterdata = $filter->get_data();
 
         // language selector
         $current = $filterdata->language;
-        $someselected = false;
+        $someselected = !$showselectionerror;
         $options = mlang_tools::list_languages(false);
         foreach ($options as $langcode => $langname) {
             if (!$someselected and in_array($langcode, $current)) {
@@ -68,7 +93,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $output .= html_writer::start_tag('div', array('class' => 'controls'));
         $output .= html_writer::select($options, 'flng[]', $current, '',
-                    array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 3));
+            array('id' => 'amosfilter_flng', 'multiple' => 'multiple', 'size' => 3));
 
 
         $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_flng_actions', 'autocomplete' => 'off'));
@@ -129,7 +154,7 @@ class local_amos_renderer extends plugin_renderer_base {
         asort($optionscontrib);
 
         $current = $filterdata->component;
-        $someselected = false;
+        $someselected = !$showselectionerror;
 
         $app_plugins = local_amos_app_plugins();
 
@@ -203,8 +228,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
         $fcmpactions = html_writer::tag('label', $radio.' '.get_string('componentsstandard', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_allstandard', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
 
-        $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
-        $fcmpactions .= html_writer::tag('label', $radio.' '.get_string('componentsapp', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_allapp', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
+        if ($showappfilterbutton) {
+            $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
+            $fcmpactions .= html_writer::tag('label', $radio . ' ' . get_string('componentsapp', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_allapp', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
+        }
 
         $radio = html_writer::empty_tag('input', array('type' => 'radio', 'name' => 'amosfilter_fcmp_actions', 'autocomplete' => 'off'));
         $fcmpactions .= html_writer::tag('label', $radio.' '.get_string('componentsall', 'local_amos'), array('id' => 'amosfilter_fcmp_actions_all', 'class' => 'btn btn-light amosfilter_fcmp_actions_select'));
@@ -225,6 +252,24 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $output .= html_writer::end_tag('div'); // .controls
         $output .= html_writer::end_tag('div'); // .control-group
+
+        return $output;
+    }
+
+    /**
+     * Renders the filter form
+     *
+     * @param local_amos_filter $filter
+     * @return string
+     */
+    protected function render_local_amos_filter(local_amos_filter $filter) {
+        $output = '';
+        $alerts = array();
+
+        $filterdata = $filter->get_data();
+
+        // render language and component filter
+        $output .= $this->render_local_amos_filter_basic($filterdata, $alerts);
 
         // version checkboxes
         $current = $filterdata->version;

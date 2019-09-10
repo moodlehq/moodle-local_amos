@@ -451,6 +451,7 @@ $string['stringhistory'] = 'History';
 $string['strings'] = 'Strings';
 $string['submitting'] = 'Submitting a contribution';
 $string['submitting_help'] = 'This will send translated strings to official language maintainers. They will be able to apply your work into their stage, review it and eventually commit. Please provide a message for them describing your work and why you would like to see your contribution included.';
+$string['subscription'] = 'Subscription';
 $string['targetversion'] = 'Target version';
 $string['timeline'] = 'timeline';
 $string['translatortool'] = 'Translator';

@@ -1767,3 +1767,13 @@ function local_amos_simplediff(array $old, array $new) {
         array_slice($new, $nmax, $maxlen),
         local_amos_simplediff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
 }
+
+class local_amos_subscription_filter extends local_amos_filter {
+
+    public function __construct(moodle_url $handler)
+    {
+        parent::__construct($handler);
+        $this->fields = ['component', 'language'];
+    }
+
+}
