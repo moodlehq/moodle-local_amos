@@ -38,76 +38,238 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 class local_amos_notify_subscribers_testcase extends advanced_testcase {
 
     /**
-     * Test the permission check for the update_strings_file external function.
+     * Test notifications only print most recent changes.
      */
-    public function test_notifications() {
+    public function test_notifications_only_most_recent() {
         global $DB;
         $this->resetAfterTest(true);
 
         $generator = self::getDataGenerator();
 
-        $user1 = $generator->create_user();
-        $user2 = $generator->create_user();
-        $user3 = $generator->create_user();
+        $user1 = $generator->create_user(array('mailformat' => 2));
 
-        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_36_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'Čeština'));
-        $component->add_string(new mlang_string('thislanguageint', 'Czech'));
-        $stage = new mlang_stage();
-        $stage->add($component);
-        $stage->commit('Registering the Czech language', array('source' => 'bot'), true);
-        $component->clear();
-
-        $component = new mlang_component('langconfig', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'German'));
-        $component->add_string(new mlang_string('thislanguageint', 'DE'));
-        $stage = new mlang_stage();
-        $stage->add($component);
-        $stage->commit('Registering the German language', array('source' => 'amos'), true);
-        $component->clear();
+        $today = strtotime('12:00:00');
+        $alsotoday = strtotime('11:00:00');
+        $past = strtotime('-12 day', $today);
 
         $component = new mlang_component('admin', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
-        $component->add_string(new mlang_string('accounts', 'Kontos'));
+        $component->add_string(new mlang_string('pluginname', 'OldString', $past));
         $stage = new mlang_stage();
         $stage->add($component);
-        $stage->commit('Registering the German string form accounts', array('source' => 'amos'), true);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'IntermediateString',$alsotoday));
+        $stage->add($component);
+        $stage->commit('Alter pluginname', array('source' => 'amos'));
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
         $component->clear();
-
-        // Add a subscription.
-        $record = new stdClass();
-        $record->userid = $user1->id;
-        $record->lang = 'cs';
-        $record->component = 'langconfig';
-        $DB->insert_record('amos_subscription', $record);
 
         // Add a subscription.
         $record = new stdClass();
         $record->userid = $user1->id;
         $record->lang = 'de';
-        $record->component = 'langconfig';
+        $record->component = 'admin';
+        $DB->insert_record('amos_subscription', $record);
+
+        $sink = $this->redirectEmails();
+        $task = new \local_amos\task\notify_subscribers();
+        $task->execute();
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertContains("OldString", $sink->get_messages()[0]->body);
+        $this->assertContains("NewString", $sink->get_messages()[0]->body);
+        $this->assertNotContains("IntermediateString", $sink->get_messages()[0]->body);
+        $sink->close();
+    }
+
+    /**
+     * Test that multiple changes can be displayed in the notification.
+     */
+    public function test_multiple_subscriptions_one_user() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = self::getDataGenerator();
+
+        // Print plain format, since htmlformat creates linebreaks within strings.
+        $user1 = $generator->create_user(array('mailformat' => 2));
+
+        $today = strtotime('12:00:00');
+        $past = strtotime('-12 day', $today);
+
+        $component = new mlang_component('admin', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        $component = new mlang_component('theme_boost', 'cs', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldThemeString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewThemeString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'de';
+        $record->component = 'admin';
+        $DB->insert_record('amos_subscription', $record);
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'cs';
+        $record->component = 'theme_boost';
+        $DB->insert_record('amos_subscription', $record);
+
+        $sink = $this->redirectEmails();
+        $task = new \local_amos\task\notify_subscribers();
+        $task->execute();
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertContains("OldThemeString", $sink->get_messages()[0]->body);
+        $this->assertContains("NewThemeString", $sink->get_messages()[0]->body);
+        $sink->close();
+    }
+
+    /**
+     * Test that multiple subscriptions to multiple users work.
+     */
+    public function test_multiple_subscriptions_multiple_users() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = self::getDataGenerator();
+
+        // Print plain format, since htmlformat creates linebreaks within strings.
+        $user1 = $generator->create_user(array('mailformat' => 2));
+        $user2 = $generator->create_user(array('mailformat' => 2));
+
+        $today = strtotime('12:00:00');
+        $past = strtotime('-12 day', $today);
+
+        $component = new mlang_component('admin', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        $component = new mlang_component('theme_boost', 'cs', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldThemeString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewThemeString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'de';
+        $record->component = 'admin';
         $DB->insert_record('amos_subscription', $record);
 
         // Add a subscription.
         $record = new stdClass();
         $record->userid = $user2->id;
-        $record->lang = 'de';
-        $record->component = 'admin';
-        $DB->insert_record('amos_subscription', $record);
-
-        // Add a subscription, which has not changes.
-        $record = new stdClass();
-        $record->userid = $user3->id;
         $record->lang = 'cs';
-        $record->component = 'admin';
+        $record->component = 'theme_boost';
         $DB->insert_record('amos_subscription', $record);
-
-        set_config('timesubnotified', time() - 86400, 'local_amos');
 
         $sink = $this->redirectEmails();
         $task = new \local_amos\task\notify_subscribers();
         $task->execute();
         $this->assertCount(2, $sink->get_messages());
-        $this->assertContains("thislanguage", $sink->get_messages()[0]->body);
+        $sink->close();
+    }
+
+    /**
+     * Test that old and unsubscribed changes do not cause notification.
+     */
+    public function test_no_matching_subscription() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = self::getDataGenerator();
+
+        // Print plain format, since htmlformat creates linebreaks within strings.
+        $user1 = $generator->create_user(array('mailformat' => 2));
+        $user2 = $generator->create_user(array('mailformat' => 2));
+
+        $today = strtotime('12:00:00');
+        $past = strtotime('-12 day', $today);
+        $past2 = strtotime('-12 day', $today);
+
+        // This change is old.
+        $component = new mlang_component('admin', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewString', $past2));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        // This change is new but not subscribed.
+        $component = new mlang_component('theme_boost', 'cs', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldThemeString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewThemeString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'cs';
+        $record->component = 'admin';
+        $DB->insert_record('amos_subscription', $record);
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'de';
+        $record->component = 'admin';
+        $DB->insert_record('amos_subscription', $record);
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user2->id;
+        $record->lang = 'cs';
+        $record->component = 'theme_boost_campus';
+        $DB->insert_record('amos_subscription', $record);
+
+        $sink = $this->redirectEmails();
+        $task = new \local_amos\task\notify_subscribers();
+        $task->execute();
+        // There should be no
+        $this->assertCount(0, $sink->get_messages());
         $sink->close();
     }
 }
