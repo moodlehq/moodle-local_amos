@@ -86,6 +86,13 @@ class local_amos_subscription_manager_test extends advanced_testcase {
         $this->assertTrue(in_array('fr', $subs['langconfig']));
         $this->assertTrue(in_array('cz', $subs['langconfig']));
         $this->assertFalse(in_array('aa', $subs['langconfig']));
+        $this->assertEquals(3, count($subs['langconfig']));
+
+        // Try to add one language again.
+        $manager->add_subscription('langconfig', 'de');
+        $manager->apply_changes();
+        $subs = $manager->fetch_subscriptions();
+        $this->assertEquals(3, count($subs['langconfig']));
 
         // Remove one language.
         $manager->remove_subscription('langconfig', 'de');
