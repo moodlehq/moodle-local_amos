@@ -43,18 +43,17 @@
 }}
 
 
-<p>Dear {{user.firstname}} {{user.lastname}},<br/>
-    the following string changes were made in AMOS for your subscripted plugins:<br/><br/></p>
+<p>{{# str }} stringidentifier, local_amos, { "firstname": {{user.firstname}}, "lastname": {{user.lastname}} }{{/ str }}<br/><br/></p>
 
 <div>
     {{#components}}
         <h2>{{{name}}} ({{{lang}}}):</h2>
     <table>
         <tr>
-            <th style="padding: 12px; border: 1px solid #ddd;">String identifier</th>
-            <th style="padding: 12px; border: 1px solid #ddd;">Version</th>
-            <th style="padding: 12px; border: 1px solid #ddd;">Old value</th>
-            <th style="padding: 12px; border: 1px solid #ddd;">New value</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">{{# str }} stringidentifier, local_amos {{/ str }}</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">{{# str }} version, local_amos {{/ str }}</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">{{# str }} oldstring, local_amos {{/ str }}</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">{{# str }} newstring, local_amos {{/ str }}</th>
         </tr>
         {{#changes}}
         <tr>
@@ -75,4 +74,3 @@
     </table>
     {{/components}}
 </div>
-
