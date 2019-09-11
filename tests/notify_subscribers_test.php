@@ -272,4 +272,62 @@ class local_amos_notify_subscribers_testcase extends advanced_testcase {
         $this->assertCount(0, $sink->get_messages());
         $sink->close();
     }
+
+    /**
+     * Test that old and unsubscribed changes do not cause notification.
+     */
+    public function test_only_subscriptions_since_lastrun() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        $generator = self::getDataGenerator();
+
+        // Print plain format, since htmlformat creates linebreaks within strings.
+        $user1 = $generator->create_user(array('mailformat' => 2));
+
+        $today = strtotime('12:00:00');
+        $yesterday = strtotime('-1 day', $today);
+        $past = strtotime('-12 day', $today);
+
+        // This change is old.
+        $component = new mlang_component('admin', 'de', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'OldPluginString', $past));
+        $stage = new mlang_stage();
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'bot'), true);
+        $component->unlink_string('pluginname');
+        $component->add_string(new mlang_string('pluginname', 'NewPluginString', $yesterday));
+        $component->add_string(new mlang_string('mystring', 'NewString', $today));
+        $stage->add($component);
+        $stage->commit('Add pluginname', array('source' => 'amos'));
+        $component->clear();
+
+        // Add a subscription.
+        $record = new stdClass();
+        $record->userid = $user1->id;
+        $record->lang = 'de';
+        $record->component = 'admin';
+        $DB->insert_record('amos_subscription', $record);
+
+        $sink = $this->redirectEmails();
+        $task = new \local_amos\task\notify_subscribers();
+        $task->execute();
+        // There should be no
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertContains("NewString", $sink->get_messages()[0]->body);
+        $this->assertNotContains("NewPluginString", $sink->get_messages()[0]->body);
+        $sink->close();
+
+        $daybeforeyesterday = strtotime('-2 day', $today);
+        set_config('timesubnotified', $daybeforeyesterday, 'local_amos');
+
+        $sink = $this->redirectEmails();
+        $task = new \local_amos\task\notify_subscribers();
+        $task->execute();
+        // There should be no
+        $this->assertCount(1, $sink->get_messages());
+        $this->assertContains("NewString", $sink->get_messages()[0]->body);
+        $this->assertContains("NewPluginString", $sink->get_messages()[0]->body);
+        $sink->close();
+    }
 }
