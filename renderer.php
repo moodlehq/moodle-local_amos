@@ -1641,12 +1641,11 @@ print_footer();
     protected function render_local_amos_sub_notification(local_amos_sub_notification $notification) {
         global $OUTPUT;
         if ($notification->html) {
-            $template = 'local_amos/subscription_notification+html';
+            $template = 'local_amos/subscription_notification_html';
         } else {
             $template = 'local_amos/subscription_notification';
         }
-        return $OUTPUT->render_from_template($template,
-            $notification->export_for_template($OUTPUT));
+        return $OUTPUT->render_from_template($template, $notification->export_for_template($OUTPUT));
 
     }
 
