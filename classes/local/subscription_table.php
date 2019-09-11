@@ -20,6 +20,7 @@
  * View your subscription and change settings
  *
  * @package   local_amos
+ * @tags MoodleMootDACH2019
  * @copyright 2019 Tobias Reischmann <tobias.reischmann@wi.uni-muenster.de>
  * @copyright 2019 Martin Gauk <gauk@math.tu-berlin.de>
  * @copyright 2019 Jan Eberhardt <eberhardt@tu-berlin.de>
@@ -39,49 +40,73 @@ require_once $CFG->libdir . DIRECTORY_SEPARATOR . 'tablelib.php';
 require_once $CFG->dirroot . '/local/amos/classes/subscription_manager.php';
 require_once $CFG->dirroot . '/local/amos/mlanglib.php';
 
-class subscription_table extends \table_sql {
+class subscription_table extends \flexible_table {
 
-    public function __construct($uniqueid)
-    {
-        global $USER;
-
-        parent::__construct($uniqueid);
-
-        $this->define_columns([
-            'component',
-            'lang'
-        ]);
-        $this->define_headers([
-            get_string('component', 'local_amos'),
-            get_string('languages', 'local_amos')
-        ]);
-
-    }
-
-    public function query_db($pagesize, $useinitialsbar = true)
+    public function init($baseurl, $pagesize = -1)
     {
         global $USER;
 
         $manager = new subscription_manager($USER->id);
         $subs = $manager->fetch_subscriptions();
 
-        $this->pagesize($pagesize, count($subs));
-        foreach ($subs as $component => $langarray) {
-            $this->rawdata[] = [
-                'component' => $component,
-                'lang' => $langarray
-            ];
+        $this->define_baseurl($baseurl);
+        $this->define_columns([
+            'component',
+            'language'
+        ]);
+        $this->define_headers([
+            get_string('component', 'local_amos'),
+            get_string('languages', 'local_amos')
+        ]);
+        $this->pagesize($pagesize > 0 ? $pagesize : $this->pagesize, count($subs));
+        $this->sortable(true, 'component');
+        $this->no_sorting('language');
+        $this->setup();
+    }
+
+    public function out() {
+        global $USER;
+        $manager = new subscription_manager($USER->id);
+        $subs = $manager->fetch_subscriptions();
+        $sort = $this->get_sort_columns()['component'];
+        if ($sort === SORT_ASC) {
+            ksort($subs);
+        } else {
+            krsort($subs);
         }
+        $this->start_output();
+        foreach ($subs as $component => $langarray) {
+            $row = $this->format_row([
+                'component' => $component,
+                'language' => $langarray
+            ]);
+            $this->add_data_keyed($row);
+        }
+        $this->finish_output();
+    }
+
+    public function __construct($uniqueid)
+    {
+        parent::__construct($uniqueid);
+
+
     }
 
     public function col_component($sub) {
-        return $sub->component;
+        global $PAGE;
+        $icon = $PAGE->get_renderer('local_amos')->pix_icon(
+            't/delete',
+            get_string('unsubscribe', 'local_amos')
+        );
+        $query_string = sprintf('?c=%s&m=unsubscribe', $sub->component);
+        $link = \html_writer::link($this->baseurl . $query_string, $icon, ['class' => 'unsubscribe']);
+        return sprintf('%s %s', $sub->component, $link);
     }
 
-    public function col_lang($sub) {
+    public function col_language($sub) {
         global $OUTPUT;
 
-        $inplace = self::get_lang_inplace_editable($sub->component, $sub->lang);
+        $inplace = self::get_lang_inplace_editable($sub->component, $sub->language);
         return $OUTPUT->render_from_template('core/inplace_editable', $inplace->export_for_template($OUTPUT));
     }
 
@@ -90,7 +115,9 @@ class subscription_table extends \table_sql {
 
         $values = json_encode($langs);
         $displayvalues = implode(', ', array_map(function($lang) use ($options) {
-            return (isset($options[$lang])) ? $options[$lang] : '';
+            return (isset($options[$lang]))
+                ? $options[$lang]
+                : get_string('unknown_language', 'local_amos', $lang);
         }, $langs));
 
         $inplace = new \core\output\inplace_editable('local_amos', 'subscription', $component,

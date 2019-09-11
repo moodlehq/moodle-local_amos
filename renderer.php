@@ -47,6 +47,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $alerts = [];
         $defaults = (object) ['language' => [], 'component' => [], 'last' => true];
         $output .= $this->render_local_amos_filter_basic($defaults, $alerts, false, false);
+        $output .= html_writer::empty_tag('input', ['type' => 'hidden', 'value' => 'subscribe', 'name' => 'm']);
 
         // close form
         $output .= html_writer::end_tag('fieldset');
