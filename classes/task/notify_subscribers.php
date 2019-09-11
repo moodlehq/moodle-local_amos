@@ -51,8 +51,7 @@ class notify_subscribers extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB, $PAGE;
-        $subject = 'Subscription Notification';
-        $content = 'Subscription Content';
+        $subject = get_string('subscription_mail_subject', 'local_amos');
         $lasttimerun = get_config('local_amos', 'timesubnotified');
         $getsql     = "SELECT distinct s.userid
                          FROM {amos_commits} c
