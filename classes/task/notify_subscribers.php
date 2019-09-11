@@ -60,11 +60,10 @@ class notify_subscribers extends \core\task\scheduled_task {
             $lasttimerun          = strtotime('-1 day', $today);
         }
         $getsql     = "SELECT distinct s.userid
-                         FROM {amos_commits} c
-                         JOIN {amos_repository} r ON (c.id = r.commitid)
+                         FROM {amos_repository} r
                          JOIN {amos_texts} t ON (r.textid = t.id)
                          JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
-                        WHERE timecommitted > $lasttimerun";
+                        WHERE r.timemodified > $lasttimerun";
 
         $users = $DB->get_records_sql($getsql);
         $output = $PAGE->get_renderer('local_amos');
