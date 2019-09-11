@@ -210,3 +210,13 @@ function local_amos_inplace_editable($itemtype, $itemid, $newvalue) {
         return \local_amos\local\subscription_table::get_lang_inplace_editable($component, $newlangs);
     }
 }
+
+/**
+ * Callback to remove user subscriptions when user will be deleted.
+ *
+ * @param $user
+ */
+function local_amos_pre_user_delete($user) {
+    $manager = new \local_amos\subscription_manager($user->id);
+    $manager->remove_all_subscriptions();
+}
