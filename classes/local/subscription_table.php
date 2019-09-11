@@ -55,6 +55,7 @@ class subscription_table extends \table_sql {
             get_string('component', 'local_amos'),
             get_string('languages', 'local_amos')
         ]);
+
     }
 
     public function query_db($pagesize, $useinitialsbar = true)
@@ -78,17 +79,26 @@ class subscription_table extends \table_sql {
     }
 
     public function col_lang($sub) {
-        $icons = [];
-        foreach ($sub->lang as $lc) {
-            $query_string = sprintf('c=%s&l=%s&m=0', $sub->component, $lc);
-            $attributes = ['class' => 'langcode'];
-            $icons[] = \html_writer::link(
-                $this->baseurl . '?' . $query_string,
-                $lc . ' &times;',
-                $attributes
-            );
-        }
-        return join(' ', $icons);
+        global $OUTPUT;
+
+        $inplace = self::get_lang_inplace_editable($sub->component, $sub->lang);
+        return $OUTPUT->render_from_template('core/inplace_editable', $inplace->export_for_template($OUTPUT));
     }
 
+    static public function get_lang_inplace_editable(string $component, array $langs) {
+        $options = \mlang_tools::list_languages(false);
+
+        $values = json_encode($langs);
+        $displayvalues = implode(', ', array_map(function($lang) use ($options) {
+            return (isset($options[$lang])) ? $options[$lang] : '';
+        }, $langs));
+
+        $inplace = new \core\output\inplace_editable('local_amos', 'subscription', $component,
+            true, $displayvalues, $values);
+
+        $attributes = ['multiple' => true];
+        $inplace->set_type_autocomplete($options, $attributes);
+
+        return $inplace;
+    }
 }

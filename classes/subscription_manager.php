@@ -128,6 +128,24 @@ class subscription_manager {
         $langs = \mlang_tools::list_languages();
 
         $transaction = $DB->start_delegated_transaction();
+
+        // Remove subscriptions.
+        foreach ($this->remsubscriptions as $sub) {
+            if ($sub->lang !== null) {
+                $DB->delete_records('amos_subscription', [
+                    'userid' => $this->userid,
+                    'component' => $sub->component,
+                    'lang' => $sub->lang,
+                ]);
+            } else {
+                $DB->delete_records('amos_subscription', [
+                    'userid' => $this->userid,
+                    'component' => $sub->component,
+                ]);
+            }
+        }
+
+        // Refresh subscriptions to check for duplicates.
         $this->fetch_subscriptions();
 
         $inserts = [];
@@ -152,22 +170,6 @@ class subscription_manager {
             $this->subscriptions[$sub->component][] = $sub->lang;
         }
         $DB->insert_records('amos_subscription', $inserts);
-
-        // Remove subscriptions.
-        foreach ($this->remsubscriptions as $sub) {
-            if ($sub->lang !== null) {
-                $DB->delete_records('amos_subscription', [
-                    'userid' => $this->userid,
-                    'component' => $sub->component,
-                    'lang' => $sub->lang,
-                ]);
-            } else {
-                $DB->delete_records('amos_subscription', [
-                    'userid' => $this->userid,
-                    'component' => $sub->component,
-                ]);
-            }
-        }
 
         $transaction->allow_commit();
 

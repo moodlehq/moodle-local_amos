@@ -185,3 +185,28 @@ function local_amos_comment_template($params) {
 
     return $template;
 }
+
+function local_amos_inplace_editable($itemtype, $itemid, $newvalue) {
+    global $USER;
+
+    \external_api::validate_context(context_system::instance());
+
+    if ($itemtype === 'subscription') {
+        $component = clean_param($itemid, PARAM_ALPHANUMEXT);
+        $langs = json_decode($newvalue);
+
+        $manager = new \local_amos\subscription_manager($USER->id);
+        $manager->remove_component_subscription($component);
+
+        foreach ($langs as $lang) {
+            $lang = clean_param($lang, PARAM_ALPHANUMEXT);
+            $manager->add_subscription($component, $lang);
+        }
+
+        $manager->apply_changes();
+        $subs = $manager->fetch_subscriptions();
+        $newlangs = (isset($subs[$component])) ? $subs[$component] : [];
+
+        return \local_amos\local\subscription_table::get_lang_inplace_editable($component, $newlangs);
+    }
+}
