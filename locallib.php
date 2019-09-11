@@ -1548,37 +1548,46 @@ class local_amos_sub_notification implements renderable, templatable {
 
         $time = time() - 86400;
 
-        $getsqlrelevantstrings = "SELECT r.stringid, r.component, r.lang
+        // Get all unique combinations of stringid, component, lang and branch.
+        $getsqlrelevantstrings = "SELECT r.stringid, r.component, r.lang, r.branch
                          FROM {amos_commits} co
                          JOIN {amos_repository} r ON (co.id = r.commitid)
                          JOIN {amos_texts} t ON (r.textid = t.id)
                          JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
                         WHERE r.timemodified > ?
-                        GROUP BY r.stringid, r.component, r.lang";
+                        GROUP BY r.stringid, r.component, r.lang, r.branch";
 
+        // Query the newest and oldest repository ids for the respective relevant string combinations.
         $getsqlfortextids = "SELECT relevantstrings.stringid, 
                            relevantstrings.component,
                            relevantstrings.lang,
+                           relevantstrings.branch,
                            max(newtexts.id) newrid,
                            max(oldtexts.id) oldrid
                            FROM ($getsqlrelevantstrings) as relevantstrings JOIN
                         {amos_repository} newtexts ON 
                            relevantstrings.stringid = newtexts.stringid AND 
                            relevantstrings.component = newtexts.component AND
-                           relevantstrings.lang = newtexts.lang AND 
+                           relevantstrings.lang = newtexts.lang AND
+                           relevantstrings.branch = newtexts.branch AND 
                            newtexts.timemodified > ? LEFT JOIN
                         {amos_repository} oldtexts ON 
                           relevantstrings.stringid = oldtexts.stringid AND 
                            relevantstrings.component = oldtexts.component AND
                            relevantstrings.lang = oldtexts.lang AND 
+                           relevantstrings.branch = oldtexts.branch AND 
                            oldtexts.timemodified < ?
                            GROUP BY relevantstrings.stringid, 
                            relevantstrings.component,
-                           relevantstrings.lang";
+                           relevantstrings.lang,
+                           relevantstrings.branch";
 
+        // Actually query the result containing the identifiers of the unique combinaiton.
+        // And also the old and the new texts.
         $getsql = "SELECT newrepo.id, innersql.stringid, 
                            innersql.component,
                            innersql.lang,
+                           innersql.branch,
                            newtext.text newtext, 
                            oldtext.text oldtext FROM
                            ($getsqlfortextids) innersql JOIN
@@ -1592,6 +1601,7 @@ class local_amos_sub_notification implements renderable, templatable {
                               oldrepo.textid = oldtext.id";
         $records = $DB->get_records_sql($getsql, array($time,$time,$time));
 
+        // Build the data format for the mustach template.
         foreach ($records as $record) {
             if (!array_key_exists($record->component, $this->components)) {
                 $component = new stdClass();
@@ -1611,9 +1621,11 @@ class local_amos_sub_notification implements renderable, templatable {
             $change->newtext = $record->newtext;
             $change->oldtext = $record->oldtext;
             $change->stringid = $record->stringid;
+            $change->branch = mlang_version::by_code($record->branch)->label;
             $lang->changes [] = $change;
         }
 
+        // Remove the text keys and replace them by random ints in order for mustach to work.
         foreach ($this->components as $component) {
             $component->langs = array_values($component->langs);
         }
@@ -1622,6 +1634,9 @@ class local_amos_sub_notification implements renderable, templatable {
         $this->user = $user;
     }
 
+    /**
+     * The class already stores the data in the correct structure, so it returns itself.
+     */
     public function export_for_template(renderer_base $output) {
         return $this;
     }
