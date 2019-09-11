@@ -50,7 +50,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         // close form
         $output .= html_writer::end_tag('fieldset');
-        $button = '<input type="submit" value="' . get_string('add_subscription', 'local_amos') . '" />';
+        $button = '<input type="submit" value="' . get_string('addsubscription', 'local_amos') . '" />';
         $output .= html_writer::div($button, 'form-actions');
         $output .= html_writer::end_tag('form');
         $output .= html_writer::end_div();

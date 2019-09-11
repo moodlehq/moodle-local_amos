@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['about'] = '<p>AMOS is a central repository of Moodle strings and their history. It tracks the addition of English strings into Moodle code, gathers translations, handles common translation tasks and generates language packages to be deployed on Moodle servers.</p>
 <p>See <a href="https://docs.moodle.org/dev/AMOS_manual">AMOS documentation</a> for more information.</p>';
+$string['addsubscription'] = 'Add Subscription';
 $string['amos'] = 'AMOS translation toolkit';
 $string['amos:changecontriblang'] = 'Change language of contributed strings';
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
@@ -47,6 +48,7 @@ $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
 $string['committableall'] = 'all languages';
 $string['committablenone'] = 'no languages allowed - please contact AMOS manager';
+$string['component'] = 'Component';
 $string['componentsall'] = 'All';
 $string['componentsapp'] = 'Moodle App';
 $string['componentsenlarge'] = 'Enlarge';

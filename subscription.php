@@ -32,7 +32,9 @@ require_once(dirname(__FILE__).'/mlanglib.php');
 require_login(SITEID, false);
 
 #$name   = optional_param('name', null, PARAM_RAW);  // stash name
-$mode = optional_param('m', null, PARAM_ALPHA);
+$mode = optional_param('m', null, PARAM_INT);
+$component = optional_param('c', null, PARAM_ALPHAEXT);
+$lang = optional_param('l', null, PARAM_ALPHAEXT);
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/subscription.php');
@@ -45,6 +47,10 @@ $PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_tim
 
 $filter = new local_amos_subscription_filter($PAGE->url);
 $output = $PAGE->get_renderer('local_amos');
+$table = new local_amos\local\subscription_table('subscription_table');
+$table->define_baseurl($PAGE->url);
+
 echo $output->header();
 echo $output->render($filter);
+echo $table->out(40, true);
 echo $output->footer();
