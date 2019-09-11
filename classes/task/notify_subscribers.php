@@ -68,7 +68,7 @@ class notify_subscribers extends \core\task\scheduled_task {
                 $notification = new \local_amos_sub_notification($user);
 
                 $content = $output->render($notification);
-                email_to_user($user, \core_user::get_noreply_user(), $subject, $content);
+                email_to_user($user, \core_user::get_noreply_user(), $subject, $content, $content);
             }
         }
         set_config('timesubnotified', time(), 'local_amos');
