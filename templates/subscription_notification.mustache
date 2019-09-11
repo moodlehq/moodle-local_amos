@@ -28,12 +28,17 @@
         "firstname": "Mr",
         "lastname": "T",
         },
-      "changes": [
+      "components": [
         {
-            "component": "admin",
-            "stringid": "accounts",
-            "lang": "de",
-            "text": "Accounts"
+            "name": "admin",
+            "langs": [
+                name: "de"
+                changes: [
+                    branch: "3.7"
+                    oldtext: "Admin"
+                    newtext: "Admin Plugin"
+                ]
+            ],
         }
       ]
     }
@@ -43,7 +48,13 @@ Dear {{user.firstname}} {{user.lastname}},
 
 the following changes were made in AMOS:
 
+{{# components }}
+For the component {{name}}
+{{# langs }}
+For the lang {{name}}
 {{# changes }}
-{{component}} {{stringid}} {{lang}} {{text}}
+[{{branch}}/{{stringid}}]: {{oldtext}} => {{newtext}}
 {{/ changes }}
+{{/ langs}}
+{{/ components }}
 

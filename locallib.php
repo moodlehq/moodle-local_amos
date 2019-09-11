@@ -1532,8 +1532,8 @@ class local_amos_contribution implements renderable {
  */
 class local_amos_sub_notification implements renderable, templatable {
 
-    /** @var array of changes to be included in the mail*/
-    public $changes = array();
+    /** @var array of $components including the changes made for string od them*/
+    public $components = array();
 
     /** @var stdClass user */
     public $user;
@@ -1547,14 +1547,77 @@ class local_amos_sub_notification implements renderable, templatable {
         global $DB;
 
         $time = time() - 86400;
-        $getsql     = "SELECT t.text, r.stringid, r.component, r.lang
+
+        $getsqlrelevantstrings = "SELECT r.stringid, r.component, r.lang
                          FROM {amos_commits} co
                          JOIN {amos_repository} r ON (co.id = r.commitid)
                          JOIN {amos_texts} t ON (r.textid = t.id)
                          JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
-                        WHERE timecommitted > $time";
-        $records = $DB->get_records_sql($getsql);
-        $this->changes = array_values($records);
+                        WHERE r.timemodified > ?
+                        GROUP BY r.stringid, r.component, r.lang";
+
+        $getsqlfortextids = "SELECT relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           max(newtexts.id) newrid,
+                           max(oldtexts.id) oldrid
+                           FROM ($getsqlrelevantstrings) as relevantstrings JOIN
+                        {amos_repository} newtexts ON 
+                           relevantstrings.stringid = newtexts.stringid AND 
+                           relevantstrings.component = newtexts.component AND
+                           relevantstrings.lang = newtexts.lang AND 
+                           newtexts.timemodified > ? LEFT JOIN
+                        {amos_repository} oldtexts ON 
+                          relevantstrings.stringid = oldtexts.stringid AND 
+                           relevantstrings.component = oldtexts.component AND
+                           relevantstrings.lang = oldtexts.lang AND 
+                           oldtexts.timemodified < ?
+                           GROUP BY relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang";
+
+        $getsql = "SELECT newrepo.id, innersql.stringid, 
+                           innersql.component,
+                           innersql.lang,
+                           newtext.text newtext, 
+                           oldtext.text oldtext FROM
+                           ($getsqlfortextids) innersql JOIN
+                           {amos_repository} newrepo ON
+                              innersql.newrid = newrepo.id JOIN
+                           {amos_texts} newtext ON
+                              newrepo.textid = newtext.id  LEFT JOIN
+                           {amos_repository} oldrepo ON
+                              innersql.oldrid = oldrepo.id  LEFT JOIN
+                           {amos_texts} oldtext ON
+                              oldrepo.textid = oldtext.id";
+        $records = $DB->get_records_sql($getsql, array($time,$time,$time));
+
+        foreach ($records as $record) {
+            if (!array_key_exists($record->component, $this->components)) {
+                $component = new stdClass();
+                $component->name = $record->component;
+                $component->langs = [];
+                $this->components[$record->component] = $component;
+            }
+            $component = $this->components[$record->component];
+            if (!array_key_exists($record->lang, $component->langs)) {
+                $lang = new stdClass();
+                $lang->name = $record->lang;
+                $lang->changes = [];
+                $component->langs[$record->lang] = $lang;
+            }
+            $lang = $component->langs[$record->lang];
+            $change = new stdClass();
+            $change->newtext = $record->newtext;
+            $change->oldtext = $record->oldtext;
+            $change->stringid = $record->stringid;
+            $lang->changes [] = $change;
+        }
+
+        foreach ($this->components as $component) {
+            $component->langs = array_values($component->langs);
+        }
+        $this->components = array_values($this->components);
 
         $this->user = $user;
     }
