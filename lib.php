@@ -186,6 +186,13 @@ function local_amos_comment_template($params) {
     return $template;
 }
 
+/**
+ * Callback to update a value in an inplace_editable.
+ *
+ * @param $itemtype
+ * @param $itemid
+ * @param $newvalue
+ */
 function local_amos_inplace_editable($itemtype, $itemid, $newvalue) {
     global $USER;
 
