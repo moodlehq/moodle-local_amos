@@ -53,6 +53,12 @@ class notify_subscribers extends \core\task\scheduled_task {
         global $DB, $PAGE;
         $subject = get_string('subscription_mail_subject', 'local_amos');
         $lasttimerun = get_config('local_amos', 'timesubnotified');
+        // For the very first run, we do not want to send out everything that ever happend.
+        // So we initialize the config with the date from yesterday.
+        if (!$lasttimerun) {
+            $today              = strtotime('12:00:00');
+            $lasttimerun          = strtotime('-1 day', $today);
+        }
         $getsql     = "SELECT distinct s.userid
                          FROM {amos_commits} c
                          JOIN {amos_repository} r ON (c.id = r.commitid)
