@@ -1640,8 +1640,14 @@ print_footer();
      */
     protected function render_local_amos_sub_notification(local_amos_sub_notification $notification) {
         global $OUTPUT;
-        return $OUTPUT->render_from_template('local_amos/subscription_notification',
+        if ($notification->html) {
+            $template = 'local_amos/subscription_notification+html';
+        } else {
+            $template = 'local_amos/subscription_notification';
+        }
+        return $OUTPUT->render_from_template($template,
             $notification->export_for_template($OUTPUT));
+
     }
 
     /**

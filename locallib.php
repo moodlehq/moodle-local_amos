@@ -1538,12 +1538,16 @@ class local_amos_sub_notification implements renderable, templatable {
     /** @var stdClass user */
     public $user;
 
+    /** @var bool $html States if the notification should be */
+    public $html;
+
     /**
      * Fetches the required commits from the repository
      *
      * @param stdClass $user id of the subscriber
+     * @param bool $html States if the notification should be
      */
-    public function __construct($user) {
+    public function __construct($user, $html = false) {
         global $DB;
 
         $time = time() - 86400;
@@ -1624,6 +1628,8 @@ class local_amos_sub_notification implements renderable, templatable {
         $this->components = array_values($this->components);
 
         $this->user = $user;
+
+        $this->html = $html;
     }
 
     /**

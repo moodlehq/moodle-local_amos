@@ -65,10 +65,12 @@ class notify_subscribers extends \core\task\scheduled_task {
         foreach ($users as $user) {
             $user = \core_user::get_user($user->userid);
             if ($user) {
+                $notification_html = new \local_amos_sub_notification($user, true);
                 $notification = new \local_amos_sub_notification($user);
 
+                $content_html = $output->render($notification_html);
                 $content = $output->render($notification);
-                email_to_user($user, \core_user::get_noreply_user(), $subject, $content, $content);
+                email_to_user($user, \core_user::get_noreply_user(), $subject, $content, $content_html);
             }
         }
         set_config('timesubnotified', time(), 'local_amos');
