@@ -1553,7 +1553,11 @@ class local_amos_sub_notification implements renderable, templatable {
         $time = time() - 86400;
 
         // Get all unique combinations of stringid, component, lang and branch.
-        $getsqlrelevantstrings = "SELECT r.stringid, r.component, r.lang, r.branch
+        $getsqlrelevantstrings = "SELECT r.stringid,
+                                         r.component, 
+                                         r.lang, 
+                                         r.branch, 
+                                         max(r.timemodified) timemodified
                          FROM {amos_commits} co
                          JOIN {amos_repository} r ON (co.id = r.commitid)
                          JOIN {amos_texts} t ON (r.textid = t.id)
@@ -1562,21 +1566,15 @@ class local_amos_sub_notification implements renderable, templatable {
                         GROUP BY r.stringid, r.component, r.lang, r.branch";
 
         // Query the newest and oldest repository ids for the respective relevant string combinations.
-        $getsqlfortextids = "SELECT relevantstrings.stringid, 
+        $getsqlforoldmodified = "SELECT relevantstrings.stringid, 
                            relevantstrings.component,
                            relevantstrings.lang,
                            relevantstrings.branch,
-                           max(newtexts.id) newrid,
-                           max(oldtexts.id) oldrid
-                           FROM ($getsqlrelevantstrings) as relevantstrings JOIN
-                        {amos_repository} newtexts ON 
-                           relevantstrings.stringid = newtexts.stringid AND 
-                           relevantstrings.component = newtexts.component AND
-                           relevantstrings.lang = newtexts.lang AND
-                           relevantstrings.branch = newtexts.branch AND 
-                           newtexts.timemodified > ? LEFT JOIN
-                        {amos_repository} oldtexts ON 
-                          relevantstrings.stringid = oldtexts.stringid AND 
+                           relevantstrings.timemodified newmodified,
+                           max(oldtexts.timemodified) oldmodified
+                           FROM ($getsqlrelevantstrings) as relevantstrings LEFT JOIN
+                           {amos_repository} oldtexts ON 
+                           relevantstrings.stringid = oldtexts.stringid AND 
                            relevantstrings.component = oldtexts.component AND
                            relevantstrings.lang = oldtexts.lang AND 
                            relevantstrings.branch = oldtexts.branch AND 
@@ -1584,29 +1582,50 @@ class local_amos_sub_notification implements renderable, templatable {
                            GROUP BY relevantstrings.stringid, 
                            relevantstrings.component,
                            relevantstrings.lang,
+                           relevantstrings.branch,
+                           relevantstrings.timemodified";
+
+        $getrepoids = "SELECT relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           relevantstrings.branch,
+                           max(newrepo.textid) newtextid,
+                           max(oldrepo.textid) oldtextid
+                           FROM ($getsqlforoldmodified) as relevantstrings JOIN
+                           {amos_repository} newrepo ON 
+                           relevantstrings.stringid = newrepo.stringid AND 
+                           relevantstrings.component = newrepo.component AND
+                           relevantstrings.lang = newrepo.lang AND 
+                           relevantstrings.branch = newrepo.branch AND 
+                           relevantstrings.newmodified = newrepo.timemodified LEFT JOIN
+                           {amos_repository} oldrepo ON 
+                           relevantstrings.stringid = oldrepo.stringid AND 
+                           relevantstrings.component = oldrepo.component AND
+                           relevantstrings.lang = oldrepo.lang AND 
+                           relevantstrings.branch = oldrepo.branch AND 
+                           relevantstrings.oldmodified = oldrepo.timemodified
+                           GROUP BY relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
                            relevantstrings.branch";
 
         // Actually query the result containing the identifiers of the unique combinaiton.
         // And also the old and the new texts.
-        $getsql = "SELECT newrepo.id, innersql.stringid, 
+        $getsql = "SELECT innersql.stringid, 
                            innersql.component,
                            innersql.lang,
                            innersql.branch,
                            newtext.text newtext, 
                            oldtext.text oldtext FROM
-                           ($getsqlfortextids) innersql JOIN
-                           {amos_repository} newrepo ON
-                              innersql.newrid = newrepo.id JOIN
+                           ($getrepoids) as innersql JOIN
                            {amos_texts} newtext ON
-                              newrepo.textid = newtext.id  LEFT JOIN
-                           {amos_repository} oldrepo ON
-                              innersql.oldrid = oldrepo.id  LEFT JOIN
+                              innersql.newtextid = newtext.id  LEFT JOIN
                            {amos_texts} oldtext ON
-                              oldrepo.textid = oldtext.id";
-        $records = $DB->get_records_sql($getsql, array($time,$time,$time));
+                              innersql.oldtextid = oldtext.id";
+        $recordset = $DB->get_recordset_sql($getsql, array($time, $time));
 
         // Build the data format for the mustach template.
-        foreach ($records as $record) {
+        foreach ($recordset as $record) {
             $identifier = $record->component . '#' . $record->lang;
             if (!array_key_exists($identifier, $this->components)) {
                 $component = new stdClass();
