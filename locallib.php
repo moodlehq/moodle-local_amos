@@ -1603,32 +1603,24 @@ class local_amos_sub_notification implements renderable, templatable {
 
         // Build the data format for the mustach template.
         foreach ($records as $record) {
-            if (!array_key_exists($record->component, $this->components)) {
+            $identifier = $record->component . '#' . $record->lang;
+            if (!array_key_exists($identifier, $this->components)) {
                 $component = new stdClass();
                 $component->name = $record->component;
-                $component->langs = [];
-                $this->components[$record->component] = $component;
+                $component->lang = $record->lang;
+                $component->changes
+                $this->components[$identifier] = $component;
             }
-            $component = $this->components[$record->component];
-            if (!array_key_exists($record->lang, $component->langs)) {
-                $lang = new stdClass();
-                $lang->name = $record->lang;
-                $lang->changes = [];
-                $component->langs[$record->lang] = $lang;
-            }
-            $lang = $component->langs[$record->lang];
+            $component = $this->components[$identifier];
             $change = new stdClass();
             $change->newtext = $record->newtext;
             $change->oldtext = $record->oldtext;
             $change->stringid = $record->stringid;
             $change->branch = mlang_version::by_code($record->branch)->label;
-            $lang->changes [] = $change;
+            $component->changes [] = $change;
         }
 
         // Remove the text keys and replace them by random ints in order for mustach to work.
-        foreach ($this->components as $component) {
-            $component->langs = array_values($component->langs);
-        }
         $this->components = array_values($this->components);
 
         $this->user = $user;
