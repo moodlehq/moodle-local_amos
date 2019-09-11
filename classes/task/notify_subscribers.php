@@ -56,22 +56,21 @@ class notify_subscribers extends \core\task\scheduled_task {
         // For the very first run, we do not want to send out everything that ever happend.
         // So we initialize the config with the date from yesterday.
         if (!$lasttimerun) {
-            $today              = strtotime('12:00:00');
-            $lasttimerun          = strtotime('-1 day', $today);
+            $today = strtotime('12:00:00');
+            $lasttimerun = strtotime('-1 day', $today);
         }
         $getsql     = "SELECT distinct s.userid
                          FROM {amos_repository} r
-                         JOIN {amos_texts} t ON (r.textid = t.id)
                          JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
-                        WHERE r.timemodified > $lasttimerun";
+                        WHERE r.timemodified > ?";
 
-        $users = $DB->get_records_sql($getsql);
+        $users = $DB->get_records_sql($getsql, array($lasttimerun));
         $output = $PAGE->get_renderer('local_amos');
         foreach ($users as $user) {
             $user = \core_user::get_user($user->userid);
             if ($user) {
-                $notification_html = new \local_amos_sub_notification($user, true);
-                $notification = new \local_amos_sub_notification($user);
+                $notification_html = new \local_amos_sub_notification($user, $lasttimerun, true);
+                $notification = new \local_amos_sub_notification($user, $lasttimerun);
 
                 $content_html = $output->render($notification_html);
                 $content = $output->render($notification);

@@ -1545,12 +1545,11 @@ class local_amos_sub_notification implements renderable, templatable {
      * Fetches the required commits from the repository
      *
      * @param stdClass $user id of the subscriber
+     * @param int $since timestamp since when changes should be returned.
      * @param bool $html States if the notification should be
      */
-    public function __construct($user, $html = false) {
+    public function __construct($user, $since, $html = false) {
         global $DB;
-
-        $time = time() - 86400;
 
         // Get all unique combinations of stringid, component, lang and branch.
         $getsqlrelevantstrings = "SELECT r.stringid,
@@ -1622,7 +1621,7 @@ class local_amos_sub_notification implements renderable, templatable {
                               innersql.newtextid = newtext.id  LEFT JOIN
                            {amos_texts} oldtext ON
                               innersql.oldtextid = oldtext.id";
-        $recordset = $DB->get_recordset_sql($getsql, array($time, $time));
+        $recordset = $DB->get_recordset_sql($getsql, array($since, $since));
 
         // Build the data format for the mustach template.
         foreach ($recordset as $record) {
