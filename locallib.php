@@ -1608,7 +1608,7 @@ class local_amos_sub_notification implements renderable, templatable {
                 $component = new stdClass();
                 $component->name = $record->component;
                 $component->lang = $record->lang;
-                $component->changes
+                $component->changes = [];
                 $this->components[$identifier] = $component;
             }
             $component = $this->components[$identifier];
