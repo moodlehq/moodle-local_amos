@@ -84,7 +84,7 @@ if ($mode === 'subscribe') {
         $manager->apply_changes();
         if ($subscribed) {
             echo html_writer::div(
-                get_string('subscribed_info', 'amos_local'), 'alert alert-success', ['role' => 'alert']);
+                get_string('subscribe_info', 'amos_local'), 'alert alert-success', ['role' => 'alert']);
         }
     }
 }

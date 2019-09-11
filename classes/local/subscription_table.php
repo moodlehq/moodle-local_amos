@@ -85,13 +85,6 @@ class subscription_table extends \flexible_table {
         $this->finish_output();
     }
 
-    public function __construct($uniqueid)
-    {
-        parent::__construct($uniqueid);
-
-
-    }
-
     public function col_component($sub) {
         global $PAGE;
         $icon = $PAGE->get_renderer('local_amos')->pix_icon(
