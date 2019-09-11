@@ -69,12 +69,12 @@ if ($mode === 'subscribe') {
     if (!$error) {
         $subscribed = false;
         $manager = new subscription_manager($USER->id);
-        $clist = array_keys(mlang_tools::list_components());
-        $llist = array_keys(mlang_tools::list_languages());
+        $clist = mlang_tools::list_components();
+        $llist = mlang_tools::list_languages();
         foreach ($components as $cmp) {
-            if (in_array($cmp, $clist)) {
+            if (isset($clist[$cmp])) {
                 foreach ($languages as $lang) {
-                    if (in_array($lang, $llist)) {
+                    if (isset($llist[$lang])) {
                         $manager->add_subscription($cmp, $lang);
                         $subscribed = true;
                     }
@@ -84,7 +84,7 @@ if ($mode === 'subscribe') {
         $manager->apply_changes();
         if ($subscribed) {
             echo html_writer::div(
-                get_string('subscribe_info', 'amos_local'), 'alert alert-success', ['role' => 'alert']);
+                get_string('subscribe_info', 'local_amos'), 'alert alert-success', ['role' => 'alert']);
         }
     }
 }
