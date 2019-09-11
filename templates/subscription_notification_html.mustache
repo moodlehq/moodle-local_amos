@@ -43,19 +43,36 @@
 }}
 
 
-Dear {{user.firstname}} {{user.lastname}},
+<p>Dear {{user.firstname}} {{user.lastname}},<br/>
+    the following string changes were made in AMOS for your subscripted plugins:<br/><br/></p>
 
-the following string changes were made in AMOS for your subscripted plugins:
-
-{{#components}}
-    {{{name}}} ({{{lang}}}):
-
-    {{#changes}}
-        String identifier: {{{ stringid }}}
-        Version: {{{ branch }}}
-        Old string: {{{ oldtext }}}
-        New string: {{{ newtext }}}
-    {{/changes}}
-{{/components}}
-
+<div>
+    {{#components}}
+        <h2>{{{name}}} ({{{lang}}}):</h2>
+    <table>
+        <tr>
+            <th style="padding: 12px; border: 1px solid #ddd;">String identifier</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Version</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Old value</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">New value</th>
+        </tr>
+        {{#changes}}
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {{{ stringid }}}
+            </td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {{{ branch }}}
+            </td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {{{ oldtext }}}
+            </td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
+                {{{ newtext }}}
+            </td>
+        </tr><hr>
+        {{/changes}}
+    </table>
+    {{/components}}
+</div>
 
