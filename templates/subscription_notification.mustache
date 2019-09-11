@@ -42,46 +42,37 @@
     }
 }}
 
+
 <p>Dear {{user.firstname}} {{user.lastname}},<br/>
     the following string changes were made in AMOS for your subscripted plugins:<br/><br/></p>
 
 <div>
     {{#components}}
-        <h2>{{{name}}} {{{lang}}}:</h2>
+        <h2>{{{name}}} ({{{lang}}}):</h2>
     <table>
         <tr>
-            <th>String identifier</th>
-            <th>Version</th>
-            <th>Old value</th>
-            <th>New value</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">String identifier</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Version</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">Old value</th>
+            <th style="padding: 12px; border: 1px solid #ddd;">New value</th>
         </tr>
         {{#changes}}
         <tr>
-            <td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
                 {{{ stringid }}}
             </td>
-            <td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
                 {{{ branch }}}
             </td>
-            <td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
                 {{{ oldtext }}}
             </td>
-            <td>
+            <td style="padding: 8px; border: 1px solid #ddd;">
                 {{{ newtext }}}
             </td>
-        </tr>
+        </tr><hr>
         {{/changes}}
     </table>
     {{/components}}
 </div>
-
-{{# components }}
-For the component {{name}}
-{{# langs }}
-For the lang {{name}}
-{{# changes }}
-[{{branch}}/{{stringid}}]: {{oldtext}} => {{newtext}}
-{{/ changes }}
-{{/ langs}}
-{{/ components }}
 
