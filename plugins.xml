@@ -8601,6 +8601,7 @@
       <plugin>json</plugin>
       <plugin>excel</plugin>
       <plugin>ods</plugin>
+      <plugin>pdf</plugin>
     </plugins>
     <plugins type="profilefield">
       <plugin>checkbox</plugin>
@@ -8782,9 +8783,6 @@
     <plugins type="theme">
       <plugin>boost</plugin>
       <plugin>classic</plugin>
-      <plugin>bootstrapbase</plugin>
-      <plugin>clean</plugin>
-      <plugin>more</plugin>
     </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
@@ -8831,6 +8829,7 @@
       <plugin>profile</plugin>
       <plugin>toolproxy</plugin>
       <plugin>toolsettings</plugin>
+      <plugin>basicoutcomes</plugin>
     </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
