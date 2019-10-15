@@ -9100,7 +9100,6 @@
       <plugin>calendar_month</plugin>
       <plugin>calendar_upcoming</plugin>
       <plugin>comments</plugin>
-      <plugin>community</plugin>
       <plugin>completionstatus</plugin>
       <plugin>course_list</plugin>
       <plugin>course_summary</plugin>
@@ -9117,7 +9116,6 @@
       <plugin>navigation</plugin>
       <plugin>news_items</plugin>
       <plugin>online_users</plugin>
-      <plugin>participants</plugin>
       <plugin>private_files</plugin>
       <plugin>quiz_results</plugin>
       <plugin>recent_activity</plugin>
@@ -9150,6 +9148,7 @@
       <plugin>censor</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
+      <plugin>h5p</plugin>
       <plugin>mathjaxloader</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
@@ -9176,6 +9175,7 @@
       <plugin>json</plugin>
       <plugin>excel</plugin>
       <plugin>ods</plugin>
+      <plugin>pdf</plugin>
     </plugins>
     <plugins type="profilefield">
       <plugin>checkbox</plugin>
@@ -9357,9 +9357,6 @@
     <plugins type="theme">
       <plugin>boost</plugin>
       <plugin>classic</plugin>
-      <plugin>bootstrapbase</plugin>
-      <plugin>clean</plugin>
-      <plugin>more</plugin>
     </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>
@@ -9406,6 +9403,7 @@
       <plugin>profile</plugin>
       <plugin>toolproxy</plugin>
       <plugin>toolsettings</plugin>
+      <plugin>basicoutcomes</plugin>
     </plugins>
     <plugins type="quiz">
       <plugin>grading</plugin>
@@ -9475,6 +9473,7 @@
       <plugin>underline</plugin>
       <plugin>undo</plugin>
       <plugin>unorderedlist</plugin>
+      <plugin>h5p</plugin>
     </plugins>
     <plugins type="tinymce">
       <plugin>ctrlhelp</plugin>
