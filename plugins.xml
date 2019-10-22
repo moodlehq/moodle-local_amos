@@ -9147,7 +9147,7 @@
       <plugin>censor</plugin>
       <plugin>emailprotect</plugin>
       <plugin>emoticon</plugin>
-      <plugin>h5p</plugin>
+      <plugin>displayh5p</plugin>
       <plugin>mathjaxloader</plugin>
       <plugin>mediaplugin</plugin>
       <plugin>multilang</plugin>
