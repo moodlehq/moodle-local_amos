@@ -8957,6 +8957,7 @@
       <plugin>group</plugin>
       <plugin>help</plugin>
       <plugin>hub</plugin>
+      <plugin>h5p</plugin>
       <plugin>imscc</plugin>
       <plugin>install</plugin>
       <plugin>iso6392</plugin>
