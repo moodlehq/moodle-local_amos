@@ -9397,6 +9397,9 @@
     <plugins type="datapreset">
       <plugin>imagegallery</plugin>
     </plugins>
+    <plugins type="forumreport">
+      <plugin>summary</plugin>
+    </plugins>
     <plugins type="ltiservice">
       <plugin>gradebookservices</plugin>
       <plugin>memberships</plugin>
@@ -9474,6 +9477,7 @@
       <plugin>undo</plugin>
       <plugin>unorderedlist</plugin>
       <plugin>h5p</plugin>
+      <plugin>emojipicker</plugin>
     </plugins>
     <plugins type="tinymce">
       <plugin>ctrlhelp</plugin>
