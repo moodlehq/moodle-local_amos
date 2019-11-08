@@ -76,7 +76,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
         // very hacky way to get plugin basedirs for all versions
         // see core_component::fetch_plugintypes() in lib/classes/component.php
         // when adding a new one.
-        $basedirs = array(
+        $basedirs = [
             'mod'                   => 'mod',
             'auth'                  => 'auth',
             'enrol'                 => 'enrol',
@@ -131,7 +131,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'fileconverter'         => 'files/converter',
             'mlbackend'             => 'lib/mlbackend',
             'customfield'           => 'customfield/field',
-        );
+            'forumreport'           => 'mod/forum/report',
+        ];
 
         if ($version->code <= mlang_version::MOODLE_21) {
             // since 2.2 beta, reports have moved
