@@ -440,6 +440,8 @@ class amos_export_zip {
         foreach ($this->components[$version->code] as $componentname) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             $this->dump_component_into_temp($component);
+            $component->clear();
+            unset($component);
         }
 
         $this->make_zip_package($version, $langcode);

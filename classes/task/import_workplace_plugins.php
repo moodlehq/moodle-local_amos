@@ -56,7 +56,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
         global $CFG;
 
         $repo = $CFG->dataroot.'/amos/repos/moodle-workplace-pluginstrings';
-        $key = $CFG->dataroot.'/amos/repos/moodle-workplace-pluginstrings.key';
+        $key = '/var/www/.ssh/moodle-workplace-pluginstrings.key';
 
         $this->git = new \local_amos\local\git($repo, $key);
 
