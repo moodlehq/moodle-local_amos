@@ -184,9 +184,17 @@ class source_code {
             }
         }
 
-        $subpluginsfile = $this->basepath.'/db/subplugins.php';
-        if (is_readable($subpluginsfile)) {
-            $subplugins = static::get_subplugins_from_file($subpluginsfile);
+        $subplugins = [];
+        $subpluginsfilejson = $this->basepath.'/db/subplugins.json';
+        if (is_readable($subpluginsfilejson)) {
+            $subplugins = (array) json_decode(file_get_contents($subpluginsfilejson))->plugintypes;
+        } else {
+            $subpluginsfile = $this->basepath.'/db/subplugins.php';
+            if (is_readable($subpluginsfile)) {
+                $subplugins = static::get_subplugins_from_file($subpluginsfile);
+            }
+        }
+        if ($subplugins) {
             $parentpath = static::plugin_type_relative_path($plugintype);
 
             foreach ($subplugins as $subplugintype => $subpluginpath) {
