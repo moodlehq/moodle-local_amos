@@ -55,18 +55,21 @@ class local_amos_source_code_testcase extends advanced_testcase {
      * Test {@link \local_amos\local\source_code::get_included_string_files()}.
      */
     public function test_get_included_string_files() {
-        global $CFG;
 
-        $workshop = new \local_amos\local\source_code($CFG->dirroot.'/mod/workshop');
-        $stringfiles = $workshop->get_included_string_files();
+        // Admin tool with the old subplugins.php file.
+        $toolold = new \local_amos\local\source_code(__DIR__.'/fixtures/tool_old');
+        $files = $toolold->get_included_string_files();
 
-        // Because we use a standard module here, debugging is expected once for each subplugin type.
-        $msg = 'get_list_of_plugins() should not be used to list real plugins, use core_component::get_plugin_list() instead!';
-        $this->assertDebuggingCalledCount(3, array_fill(0, 3, $msg), array_fill(0, 3, DEBUG_DEVELOPER));
+        $this->assertStringStartsWith('// Just a test file', $files['tool_old']['lang/en/tool_old.php']);
+        $this->assertStringStartsWith('// Just a test file',
+            $files['oldsubtype_subplug']['subtype/subplug/lang/en/oldsubtype_subplug.php']);
 
-        // Check that we get both workshop's and its subplugins' files.
-        $this->assertStringStartsWith('<?php', $stringfiles['mod_workshop']['lang/en/workshop.php']);
-        $this->assertStringStartsWith('<?php',
-            $stringfiles['workshopform_accumulative']['form/accumulative/lang/en/workshopform_accumulative.php']);
+        // Activity module with the new subplugins.json file.
+        $foonew = new \local_amos\local\source_code(__DIR__.'/fixtures/mod_new');
+        $files = $foonew->get_included_string_files();
+
+        $this->assertStringStartsWith('// Just a test file', $files['mod_new']['lang/en/new.php']);
+        $this->assertStringStartsWith('// Just a test file',
+            $files['newsubtype_subplug']['subtype/subplug/lang/en/newsubtype_subplug.php']);
     }
 }
