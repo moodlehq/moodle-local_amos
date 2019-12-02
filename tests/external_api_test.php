@@ -46,7 +46,7 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $roleid = $this->assignUserCapability('local/amos:importstring', SYSCONTEXTID);
+        $roleid = $this->assignUserCapability('local/amos:importstrings', SYSCONTEXTID);
         $this->unassignUserCapability('local/amos:importstrings', SYSCONTEXTID, $roleid);
 
         $this->expectException(required_capability_exception::class);
