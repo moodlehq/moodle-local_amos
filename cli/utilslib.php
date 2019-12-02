@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,11 +27,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir  . '/filelib.php');
 require_once($CFG->libdir  . '/clilib.php');
-require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
+if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
+    require_once($CFG->dirroot . '/local/amos/cli/config.php');
+} else {
+    require_once($CFG->dirroot . '/local/amos/cli/config-dist.php');
+}
 
 /**
  * Provides logging facilities for AMOS cli jobs
