@@ -271,6 +271,7 @@ class amos_export_zip {
                 mlang_version::MOODLE_36,
                 mlang_version::MOODLE_37,
                 mlang_version::MOODLE_38,
+                mlang_version::MOODLE_39,
             );
             $versions = array();
             foreach ($codes as $code) {
