@@ -49,9 +49,12 @@ function local_amos_frontpage_contribution_stats() {
         $links[] = '<a href="'.$CFG->wwwroot.'/user/profile.php?id='.$contributor->id.'">'.s(fullname($contributor)).'</a>';
     }
 
-    $last = array_pop($links);
-
-    $links = implode(', ', $links) . ' and ' . $last;
+    $links = get_string('contributethankslist', 'local_amos', [
+        'contributor1' => $links[0],
+        'contributor2' => $links[1],
+        'contributor3' => $links[2],
+        'contributor4' => $links[3],
+    ]);
 
     return '<p>' . get_string('contributestats', 'local_amos', array('count' => $total)) . '</p>
         <div style="text-align:center; margin:1em;">

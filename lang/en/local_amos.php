@@ -170,6 +170,7 @@ $string['contribute'] = 'Contribute';
 $string['contributenow'] = 'Contribute now!';
 $string['contributestats'] = 'Total of <strong>{$a->count}</strong> strings translated by community members have been submitted into AMOS so far.';
 $string['contributethanks'] = 'Many thanks to {$a->listcontributors} for their recent contributions!';
+$string['contributethankslist'] = '{$a->contributor1}, {$a->contributor2}, {$a->contributor3} and {$a->contributor4}';
 $string['contributions'] = 'Contributions';
 $string['creditsaddmaintainer'] = 'Add maintainer';
 $string['creditsaddcontributor'] = 'Add contributor';
