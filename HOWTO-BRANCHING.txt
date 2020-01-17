@@ -36,7 +36,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 
         php cli/make-branch.php --from=MOODLE_XX_STABLE --to=MOODLE_YY_STABLE
 
-  and do not forget to reinitilize the snapshot table (took cca 2 hours)
+  and do not forget to reinitilize the snapshot table (took cca 6 hours)
 
         php cli/init-snapshot.php --branch=YY00
 
@@ -70,7 +70,7 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 
   Check that jobs/zip-packs-snapshot will process the new version.
 
-* Turn Jenkins on and let it re-generate all the ZIP packages (took cca 80 minutes)
+* Turn Jenkins on and let it re-generate all the ZIP packages (took 5 hours minutes)
 * Check http://download.moodle.org/langpack/
 * Clone greylisted strings
 
