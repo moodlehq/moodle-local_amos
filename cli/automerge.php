@@ -29,14 +29,48 @@ define('CLI_SCRIPT', true);
 require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
+require_once($CFG->libdir.'/clilib.php');
+
+$usage = <<<EOF
+Automatically fill missing translations from other branches.
+
+Usage:
+    php automerge.php [--component=<frankenstyle>]
+
+Options:
+    --component     Automerge just the given component. Defaults to all known components.
+
+EOF;
+
+list($options, $unrecognized) = cli_get_params([
+    'component' => null,
+    'help' => false,
+], [
+    'h' => 'help',
+]);
+
+if ($options['help'] || !empty($unrecognized)) {
+    echo $usage . PHP_EOL;
+    exit(1);
+}
 
 $logger = new amos_cli_logger();
 
 $logger->log('automerge', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
 
-$components = $DB->get_fieldset_sql("SELECT DISTINCT component
-                                      FROM {amos_snapshot}
-                                     WHERE lang='en'");
+$sql = "SELECT DISTINCT component
+          FROM {amos_snapshot}
+         WHERE lang = :lang";
+
+$params = ['lang' => 'en'];
+
+if (!empty($options['component'])) {
+    $sql .= " AND component = :component";
+    $params['component'] = $options['component'];
+}
+
+$components = $DB->get_fieldset_sql($sql, $params);
+
 $count = count($components);
 $i = 1;
 foreach ($components as $component) {
