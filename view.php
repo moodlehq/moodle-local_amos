@@ -31,7 +31,7 @@ require_once(dirname(__FILE__).'/locallib.php');
 require_login(SITEID, false);
 require_capability('local/amos:stage', context_system::instance());
 
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('translator');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
