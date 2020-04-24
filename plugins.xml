@@ -9515,6 +9515,7 @@
       <plugin>comment</plugin>
       <plugin>competency</plugin>
       <plugin>completion</plugin>
+      <plugin>contentbank</plugin>
       <plugin>countries</plugin>
       <plugin>course</plugin>
       <plugin>currencies</plugin>
@@ -9567,6 +9568,7 @@
       <plugin>user</plugin>
       <plugin>userkey</plugin>
       <plugin>webservice</plugin>
+      <plugin>xapi</plugin>
     </plugins>
     <plugins type="antivirus">
       <plugin>clamav</plugin>
@@ -9610,6 +9612,7 @@
       <plugin>folder</plugin>
       <plugin>forum</plugin>
       <plugin>glossary</plugin>
+      <plugin>h5pactivity</plugin>
       <plugin>imscp</plugin>
       <plugin>label</plugin>
       <plugin>lesson</plugin>
@@ -9933,9 +9936,15 @@
       <plugin>unoconv</plugin>
       <plugin>googledrive</plugin>
     </plugins>
+    <plugins type="contenttype">
+      <plugin>h5p</plugin>
+    </plugins>
     <plugins type="theme">
       <plugin>boost</plugin>
       <plugin>classic</plugin>
+    </plugins>
+    <plugins type="h5plib">
+      <plugin>v124</plugin>
     </plugins>
     <plugins type="assignsubmission">
       <plugin>comments</plugin>

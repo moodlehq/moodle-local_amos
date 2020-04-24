@@ -132,6 +132,8 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'mlbackend'             => 'lib/mlbackend',
             'customfield'           => 'customfield/field',
             'forumreport'           => 'mod/forum/report',
+            'h5plib'                => 'h5p/h5plib',
+            'contenttype'           => 'contentbank/contenttype',
         ];
 
         if ($version->code <= mlang_version::MOODLE_21) {
