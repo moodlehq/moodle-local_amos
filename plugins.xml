@@ -9782,6 +9782,7 @@
       <plugin>questioninstances</plugin>
       <plugin>security</plugin>
       <plugin>stats</plugin>
+      <plugin>status</plugin>
       <plugin>performance</plugin>
       <plugin>usersessions</plugin>
     </plugins>
@@ -10009,7 +10010,7 @@
       <plugin>offlineattempts</plugin>
       <plugin>openclosedate</plugin>
       <plugin>password</plugin>
-      <plugin>safebrowser</plugin>
+      <plugin>seb</plugin>
       <plugin>securewindow</plugin>
       <plugin>timelimit</plugin>
     </plugins>
