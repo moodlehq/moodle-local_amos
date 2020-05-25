@@ -9824,6 +9824,7 @@
     <plugins type="repository">
       <plugin>areafiles</plugin>
       <plugin>boxnet</plugin>
+      <plugin>contentbank</plugin>
       <plugin>coursefiles</plugin>
       <plugin>dropbox</plugin>
       <plugin>equella</plugin>
