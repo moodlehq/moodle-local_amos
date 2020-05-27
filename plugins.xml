@@ -9899,6 +9899,7 @@
       <plugin>innodb</plugin>
       <plugin>installaddon</plugin>
       <plugin>langimport</plugin>
+      <plugin>licensemanager</plugin>
       <plugin>log</plugin>
       <plugin>lp</plugin>
       <plugin>lpimportcsv</plugin>
