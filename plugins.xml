@@ -9906,6 +9906,7 @@
       <plugin>lpmigrate</plugin>
       <plugin>messageinbound</plugin>
       <plugin>mobile</plugin>
+      <plugin>moodlenet</plugin>
       <plugin>multilangupgrade</plugin>
       <plugin>monitor</plugin>
       <plugin>oauth2</plugin>
