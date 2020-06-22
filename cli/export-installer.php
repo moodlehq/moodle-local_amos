@@ -40,6 +40,7 @@ $branches = array(
     'MOODLE_37_STABLE',
     'MOODLE_38_STABLE',
     'MOODLE_39_STABLE',
+    'MOODLE_40_STABLE',
 );
 
 fputs(STDOUT, "*****************************************\n");
@@ -50,7 +51,7 @@ remove_dir(AMOS_EXPORT_INSTALLER_DIR, true);
 
 foreach ($branches as $branch) {
     fputs(STDOUT, "BRANCH {$branch}\n");
-    if ($branch == 'MOODLE_39_STABLE') {
+    if ($branch == 'MOODLE_40_STABLE') {
         $gitbranch = 'origin/master';
     } else {
         $gitbranch = 'origin/' . $branch;
