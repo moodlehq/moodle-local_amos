@@ -46,7 +46,7 @@ function update_branch {
 }
 
 update_branch install_master master 4.0
-update_branch install_38_STABLE MOODLE_39_STABLE 3.9
+update_branch install_39_STABLE MOODLE_39_STABLE 3.9
 update_branch install_38_STABLE MOODLE_38_STABLE 3.8
 update_branch install_37_STABLE MOODLE_37_STABLE 3.7
 update_branch install_36_STABLE MOODLE_36_STABLE 3.6
