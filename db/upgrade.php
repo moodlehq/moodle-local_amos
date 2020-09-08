@@ -345,5 +345,12 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019040901, 'local', 'amos');
     }
 
+    if ($oldversion < 2019040902) {
+        // Create the new tables to store the English strings and their translations.
+        $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_strings');
+        $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_translations');
+        upgrade_plugin_savepoint(true, 2019040902, 'local', 'amos');
+    }
+
     return $result;
 }

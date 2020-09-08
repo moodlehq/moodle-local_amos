@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/amos/db" VERSION="20190206" COMMENT="XMLDB file for Moodle local/amos"
+<XMLDB PATH="local/amos/db" VERSION="20200908" COMMENT="XMLDB file for Moodle local/amos"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -204,6 +204,43 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="uq_appid" UNIQUE="true" FIELDS="appid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_strings" COMMENT="English strings and their history">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Frankenstyle component holding the string"/>
+        <FIELD NAME="strname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="String identifier"/>
+        <FIELD NAME="strtext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Value of the string, NULL if the record represents the string removal"/>
+        <FIELD NAME="since" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The STABLE branch code e.g. 20, 21, ..., 35, 36, 39, 310, 400 etc where this string and value first appeared"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the change happened allowing to find the most recent one on the given branch"/>
+        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the commit that introduced this change"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_commits" TYPE="foreign" FIELDS="commitid" REFTABLE="amos_commits" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_component_strname" UNIQUE="false" FIELDS="component, strname" COMMENT="Allows to locate strings easily by their component and identifier"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="amos_translations" COMMENT="Translated strings and their history">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Frankenstyle component holding the string"/>
+        <FIELD NAME="strname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="String identifier"/>
+        <FIELD NAME="strtext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Value of the string, NULL if the record represents the string removal"/>
+        <FIELD NAME="since" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The STABLE branch code e.g. 20, 21, ..., 35, 36 where the string first appeared"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the change happened allowing to find the most recent one on the given branch"/>
+        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the commit that introduced this change"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_commits" TYPE="foreign" FIELDS="commitid" REFTABLE="amos_commits" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="ix_component_strname_lang" UNIQUE="false" FIELDS="component, strname, lang" COMMENT="Allows to locate strings easily by their component, identifier and lang"/>
       </INDEXES>
     </TABLE>
   </TABLES>
