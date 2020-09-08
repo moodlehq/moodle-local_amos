@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,6 +25,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Base exception thrown by low level language manipulation operations
  */
@@ -34,7 +35,7 @@ class mlang_exception extends moodle_exception {
      * @param string $hint short description of problem
      * @param string $debuginfo detailed information how to fix problem
      */
-    function __construct($hint, $debuginfo=null) {
+    public function __construct($hint, $debuginfo=null) {
         parent::__construct('err_exception', 'local_amos', '', $hint, $debuginfo);
     }
 }
@@ -53,23 +54,23 @@ class mlang_iterator implements iterator {
         $this->iterator = new ArrayIterator($items);
     }
 
-    public function current(){
+    public function current() {
         return $this->iterator->current();
     }
 
-    public function key(){
+    public function key() {
         return $this->iterator->key();
     }
 
-    public function next(){
+    public function next() {
         return $this->iterator->next();
     }
 
-    public function rewind(){
+    public function rewind() {
         return $this->iterator->rewind();
     }
 
-    public function valid(){
+    public function valid() {
         return $this->iterator->valid();
     }
 }
