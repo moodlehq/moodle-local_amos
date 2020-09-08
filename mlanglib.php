@@ -176,89 +176,119 @@ class mlang_component {
     /**
      * Get a snapshot of all strings in the given component
      *
-     * @param string $name
-     * @param string $lang
-     * @param mlang_version $version
-     * @param int $timestamp time of the snapshot, empty for the most recent
-     * @param bool $deleted shall deleted strings be included?
-     * @param bool $fullinfo shall full information about the string (commit messages, source etc) be returned?
-     * @return mlang_component component with the strings from the snapshot
+     * @param string $name The component name.
+     * @param string $lang The language code.
+     * @param mlang_version $version Version of the component.
+     * @param int $timestamp Time of the snapshot, defaults to the most recent one.
+     * @param bool $deleted Shall deleted strings be included?
+     * @param bool $fullinfo Shall full information about the string (commit messages, source etc.) be returned?
+     * @return mlang_component Component with the strings from the snapshot.
      */
-    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false,
-                                         $fullinfo=false, array $stringids=null) {
+    public static function from_snapshot(string $name, string $lang, mlang_version $version, ?int $timestamp = null,
+            bool $deleted=false, bool $fullinfo = false, ?array $stringids = null): mlang_component {
         global $DB;
 
-        $params = array(
-            'inner_branch' => $version->code, 'inner_lang' => $lang, 'inner_component' => $name,
-            'outer_branch' => $version->code, 'outer_lang' => $lang, 'outer_component' => $name,
-            );
-        if (!empty($stringids)) {
-            list($inner_strsql, $inner_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'innerstringid000000');
-            list($outer_strsql, $outer_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'outerstringid000000');
-            $params = array_merge($params, $inner_strparams, $outer_strparams);
-        }
+        $sql = "SELECT r.id, r.strname, r.strtext, r.since, r.timemodified";
+
         if ($fullinfo) {
-            $sql = "SELECT r.id, r.commitid, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.deleted,
-                           c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
+            $sql .= ", c.id AS commitid, c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
+        }
+
+        $params = [
+            'component' => $name,
+            'version' => $version->code,
+        ];
+
+        if ($lang === 'en') {
+            $table = 'amos_strings';
+            $langsql = '';
+
         } else {
-            $sql = "SELECT r.stringid, t.text, r.timemodified, r.deleted";
+            $table = 'amos_translations';
+            $langsql = " AND lang = :lang ";
+            $params['lang'] = $lang;
         }
-        $sql .= " FROM {amos_repository} r
-                  JOIN {amos_texts} t ON r.textid = t.id
-                  JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
-                          FROM {amos_repository}
-                         WHERE branch=:inner_branch
-                           AND lang=:inner_lang
-                           AND component=:inner_component";
-        if (!empty($stringids)) {
-            $sql .= "      AND stringid $inner_strsql";
-        }
-        if (!empty($timestamp)) {
-            $sql .= "      AND timemodified <= :timemodified";
-            $params = array_merge($params, array('timemodified' => $timestamp));
-        }
-        $sql .="         GROUP BY branch,lang,component,stringid) j
-                    ON (r.branch = j.branch
-                       AND r.lang = j.lang
-                       AND r.component = j.component
-                       AND r.stringid = j.stringid
-                       AND r.timemodified = j.timemodified)";
+
+        $sql .= " FROM {" . $table . "} r";
+
         if ($fullinfo) {
-            $sql .= "
-             LEFT JOIN {amos_commits} c
-                    ON (r.commitid = c.id)";
+            $sql .= " LEFT JOIN {amos_commits} c ON (r.commitid = c.id)";
         }
-        $sql.= " WHERE r.branch=:outer_branch
-                       AND r.lang=:outer_lang
-                       AND r.component=:outer_component";
+
+        $sql .= "   WHERE component = :component
+                      $langsql
+                      AND since <= :version";
+
         if (!empty($stringids)) {
-            $sql .= "  AND r.stringid $outer_strsql";
+            list($strsql, $strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'stringid000000');
+            $sql .= " AND stringid $strsql";
+            $params += $strparams;
         }
-        $sql.= " ORDER BY r.stringid, r.id";
+
+        if (!empty($timestamp)) {
+            $sql .= " AND timemodified <= :timemodified";
+            $params['timemodified'] = $timestamp;
+        }
+
         $rs = $DB->get_recordset_sql($sql, $params);
-        $component = new mlang_component($name, $lang, $version);
+
+        $latest = [];
+
         foreach ($rs as $r) {
-            if (empty($deleted) and $r->deleted) {
-                // we do not want to include deleted strings - note that this must be checked here and not
-                // in SQL above so that the same string can be deleted and re-added again
-                $component->unlink_string($r->stringid);    // this is needed because there can be two strings with
-                                                            // the same timemodified, one deleted, one not
-                continue;
+            if (!isset($latest[$r->strname])) {
+                $latest[$r->strname] = $r;
+
+            } else {
+                $s = $latest[$r->strname];
+
+                if ($r->since < $s->since) {
+                    continue;
+                }
+
+                if (($r->since == $s->since) && ($r->timemodified < $s->timemodified)) {
+                    continue;
+                }
+
+                if (($r->since == $s->since) && ($r->timemodified == $s->timemodified) && ($r->id < $s->id)) {
+                    continue;
+                }
+
+                $latest[$r->strname] = $r;
             }
+        }
+
+        $rs->close();
+
+        if (!$deleted) {
+            // Prune the deleted strings. Keep in mind to do it only this late here and not in SQL.
+            // The string could have been added, deleted and re-added again. We need to know what the latest one is.
+            foreach ($latest as $strname => $str) {
+                if ($str->strtext === null) {
+                    unset($latest[$strname]);
+                }
+            }
+        }
+
+        ksort($latest);
+
+        $component = new mlang_component($name, $lang, $version);
+
+        foreach ($latest as $str) {
+            $extra = null;
+
             if ($fullinfo) {
-                $extra = new stdclass();
-                foreach ($r as $property => $value) {
-                    if (!in_array($property, array('stringid', 'text', 'timemodified', 'deleted'))) {
+                $extra = (object)[];
+
+                foreach ($str as $property => $value) {
+                    if (!in_array($property, ['strname', 'strtext', 'timemodified'])) {
                         $extra->{$property} = $value;
                     }
                 }
-            } else {
-                $extra = null;
             }
-            // we force here so in case of two string with the same timemodified, the higher id wins
-            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted, $extra), true);
+
+            $component->add_string(new mlang_string($str->strname, $str->strtext, $str->timemodified,
+                $str->strtext === null, $extra), true);
         }
-        $rs->close();
 
         return $component;
     }
