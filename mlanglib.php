@@ -1670,340 +1670,121 @@ class mlang_stash {
  * Do not modify the returned instances, they are not cloned during coponent copying.
  */
 class mlang_version {
-    /** internal version codes stored in database */
-    const MOODLE_16 = 1600;
-    const MOODLE_17 = 1700;
-    const MOODLE_18 = 1800;
-    const MOODLE_19 = 1900;
-    const MOODLE_20 = 2000;
-    const MOODLE_21 = 2100;
-    const MOODLE_22 = 2200;
-    const MOODLE_23 = 2300;
-    const MOODLE_24 = 2400;
-    const MOODLE_25 = 2500;
-    const MOODLE_26 = 2600;
-    const MOODLE_27 = 2700;
-    const MOODLE_28 = 2800;
-    const MOODLE_29 = 2900;
-    const MOODLE_30 = 3000;
-    const MOODLE_31 = 3100;
-    const MOODLE_32 = 3200;
-    const MOODLE_33 = 3300;
-    const MOODLE_34 = 3400;
-    const MOODLE_35 = 3500;
-    const MOODLE_36 = 3600;
-    const MOODLE_37 = 3700;
-    const MOODLE_38 = 3800;
-    const MOODLE_39 = 3900;
-    const MOODLE_40 = 4000;
 
-    /** @var int internal code of the version */
+    /** @var int Branch code of the version: 20, 21, ... 39, 310, 311, 400, ... */
     public $code;
 
-    /** @var string  human-readable label of the version */
+    /** @var string Human-readable label of the version: 2.0, 3.9, 3.10, 3.11, 4.0dev, DEV, ... */
     public $label;
 
-    /** @var string the name of the corresponding CVS/git branch */
+    /** @var string Name of the corresponding Git branch: MOODLE_39_STABLE, MOODLE_310_STABLE, ... */
     public $branch;
 
-    /** @var string the name of the directory under http://download.moodle.org/langpack/ */
+    /** @var string Name of the directory under https://download.moodle.org/langpack/ - 3.8, 3.9, 3.10, ... */
     public $dir;
 
-    /** @var bool allow translations of strings on this branch? */
+    /** @var bool Allow translations of strings on this branch? */
     public $translatable;
 
-    /** @var bool is this a version that translators should focus on? */
+    /** @var bool Is this a version that translators should focus on? */
     public $current;
 
     /**
-     * Factory method
+     * Get instance by the branch code.
      *
-     * @param int $code
-     * @return mlang_version|null
+     * @param int code Branch code of the version: 20, 21, ... 39, 310, 311, 400, ...
+     * @return mlang_version
      */
     public static function by_code($code) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['code'] == $code) {
-                return new mlang_version($ver);
-            }
+
+        if (preg_match('/^(\d)(\d)$/', $code, $m)) {
+            return new mlang_version((int) $code, (string) ($m[1] . '.' . $m[2]));
+
+        } else if (preg_match('/^(\d){3,}$/', $code)) {
+            $x = floor($code / 100);
+            $y = $code - $x * 100;
+            return new mlang_version((int) $code, (string) ($x . '.' . $y));
+
+        } else {
+            throw new mlang_exception('Unexpected version code');
         }
-        return null;
     }
 
     /**
-     * Factory method
+     * Get instance by branch name.
      *
-     * @param string $branch like 'MOODLE_20_STABLE'
-     * @return mlang_version|null
+     * @param string $branch Branch name like 'MOODLE_310_STABLE'
+     * @return mlang_version
      */
     public static function by_branch($branch) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['branch'] == $branch) {
-                return new mlang_version($ver);
-            }
+
+        if (preg_match('/^MOODLE_(\d{2,})_STABLE$/', $branch, $m)) {
+            return self::by_code($m[1]);
+
+        } else {
+            throw new mlang_exception('Unexpected branch name');
         }
-        return null;
     }
 
     /**
-     * Factory method
+     * Get instance by directory name (which mostly matches the label, too).
      *
-     * @param string $dir like '2.1'
+     * @param string $dir like '3.1' or '3.10'
      * @return mlang_version|null
      */
     public static function by_dir($dir) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['dir'] == $dir) {
-                return new mlang_version($ver);
+
+        if (preg_match('/^(\d+)\.(\d+)$/', $dir, $m)) {
+            if (version_compare($dir, '3.9', '<=')) {
+                return self::by_code($m[1] * 10 + $m[2]);
+
+            } else {
+                return self::by_code($m[1] * 100 + $m[2]);
             }
+
+        } else {
+            throw new mlang_exception('Unexpected dir name');
         }
-        return null;
     }
 
     /**
-     * Get a list of all known versions and information about them
+     * Get a list of all known versions and information about them.
      *
      * @return array of mlang_version
      */
     public static function list_all() {
-        $list = array();
-        foreach (self::versions_info() as $ver) {
-            $list[$ver['code']] = new mlang_version($ver);
+
+        $codes = get_config('local_amos', 'brancheslist');
+
+        if (empty($codes)) {
+            $codes = '20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,310,400';
         }
+
+        $codes = array_filter(array_map('trim', explode(',', $codes)));
+        sort($codes, SORT_NUMERIC);
+        $list = [];
+
+        foreach ($codes as $code) {
+            $list[$code] = self::by_code($code);
+        }
+
         return $list;
     }
 
     /**
-     * Used by factory methods to create instances of this class
+     * Used by factory methods to create instances of this class.
+     *
+     * @param int $code
+     * @param string $dir
      */
-    protected function __construct(array $info) {
-        foreach ($info as $property => $value) {
-            $this->{$property} = $value;
-        }
-    }
+    protected function __construct(int $code, string $dir) {
 
-    /**
-     * Holds the information about Moodle branches
-     *
-     * code         - internal integer code to be stored in database
-     * label        - human readable version number
-     * branch       - the name of the branch in git
-     * dir          - the name of the directory under http://download.moodle.org/langpack/
-     * translatable - allow commits into the AMOS repository on this branch
-     * current      - use the version by default in the translator
-     *
-     * @return array of array
-     */
-    protected static function versions_info() {
-        return array(
-            array(
-                'code'          => self::MOODLE_40,
-                'label'         => 'DEV',
-                'branch'        => 'MOODLE_40_STABLE',
-                'dir'           => '4.0',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_39,
-                'label'         => '3.9',
-                'branch'        => 'MOODLE_39_STABLE',
-                'dir'           => '3.9',
-                'translatable'  => true,
-                'current'       => true,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_38,
-                'label'         => '3.8',
-                'branch'        => 'MOODLE_38_STABLE',
-                'dir'           => '3.8',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_37,
-                'label'         => '3.7',
-                'branch'        => 'MOODLE_37_STABLE',
-                'dir'           => '3.7',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_36,
-                'label'         => '3.6',
-                'branch'        => 'MOODLE_36_STABLE',
-                'dir'           => '3.6',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_35,
-                'label'         => '3.5',
-                'branch'        => 'MOODLE_35_STABLE',
-                'dir'           => '3.5',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_34,
-                'label'         => '3.4',
-                'branch'        => 'MOODLE_34_STABLE',
-                'dir'           => '3.4',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => false,
-            ),
-            array(
-                'code'          => self::MOODLE_33,
-                'label'         => '3.3',
-                'branch'        => 'MOODLE_33_STABLE',
-                'dir'           => '3.3',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_32,
-                'label'         => '3.2',
-                'branch'        => 'MOODLE_32_STABLE',
-                'dir'           => '3.2',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_31,
-                'label'         => '3.1',
-                'branch'        => 'MOODLE_31_STABLE',
-                'dir'           => '3.1',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_30,
-                'label'         => '3.0',
-                'branch'        => 'MOODLE_30_STABLE',
-                'dir'           => '3.0',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_29,
-                'label'         => '2.9',
-                'branch'        => 'MOODLE_29_STABLE',
-                'dir'           => '2.9',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_28,
-                'label'         => '2.8',
-                'branch'        => 'MOODLE_28_STABLE',
-                'dir'           => '2.8',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_27,
-                'label'         => '2.7',
-                'branch'        => 'MOODLE_27_STABLE',
-                'dir'           => '2.7',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_26,
-                'label'         => '2.6',
-                'branch'        => 'MOODLE_26_STABLE',
-                'dir'           => '2.6',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_25,
-                'label'         => '2.5',
-                'branch'        => 'MOODLE_25_STABLE',
-                'dir'           => '2.5',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_24,
-                'label'         => '2.4',
-                'branch'        => 'MOODLE_24_STABLE',
-                'dir'           => '2.4',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_23,
-                'label'         => '2.3',
-                'branch'        => 'MOODLE_23_STABLE',
-                'dir'           => '2.3',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_22,
-                'label'         => '2.2',
-                'branch'        => 'MOODLE_22_STABLE',
-                'dir'           => '2.2',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_21,
-                'label'         => '2.1',
-                'branch'        => 'MOODLE_21_STABLE',
-                'dir'           => '2.1',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_20,
-                'label'         => '2.0',
-                'branch'        => 'MOODLE_20_STABLE',
-                'dir'           => '2.0',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_19,
-                'label'         => '1.9',
-                'branch'        => 'MOODLE_19_STABLE',
-                'dir'           => '1.9',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_18,
-                'label'         => '1.8',
-                'branch'        => 'MOODLE_18_STABLE',
-                'dir'           => '1.8',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_17,
-                'label'         => '1.7',
-                'branch'        => 'MOODLE_17_STABLE',
-                'dir'           => '1.7',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_16,
-                'label'         => '1.6',
-                'branch'        => 'MOODLE_16_STABLE',
-                'dir'           => '1.6',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-        );
+        $this->code = $code;
+        $this->dir = $dir;
+        $this->label = $dir;
+        $this->branch = 'MOODLE_' . $code . '_STABLE';
+        $this->translatable = ($code >= 20);
+        $this->current = false;
     }
 }
 
