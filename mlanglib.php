@@ -985,7 +985,6 @@ class mlang_stage {
             $this->rebase();
         }
         if (empty($this->components)) {
-            // nothing to commit
             return;
         }
         try {
@@ -1005,73 +1004,35 @@ class mlang_stage {
 
             foreach ($this->components as $cx => $component) {
                 foreach ($component->get_iterator() as $string) {
+                    $record = [
+                        'component' => $component->name,
+                        'strname' => $string->id,
+                        'strtext' => ($string->deleted ? null : $string->text),
+                        'since' => $component->version->code,
+                        'timemodified' => $string->timemodified,
+                        'commitid' => $commit->id,
+                    ];
 
-                    // Make sure the string text itself is stored.
-                    $texthash = sha1($string->text);
-                    $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), IGNORE_MISSING);
+                    if ($component->lang === 'en') {
+                        $table = 'amos_strings';
 
-                    if ($textid === false) {
-                        try {
-                            $textid = $DB->insert_record('amos_texts', array('texthash' => $texthash, 'text' => $string->text), true);
-                        } catch (dml_write_exception $e) {
-                            // Chances are the race conditions just happened.
-                            $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), MUST_EXIST);
-                        }
+                    } else {
+                        $table = 'amos_translations';
+                        $record['lang'] = $component->lang;
                     }
 
-                    $record = new stdclass();
-                    $record->commitid   = $commit->id;
-                    $record->branch     = $component->version->code;
-                    $record->lang       = $component->lang;
-                    $record->component  = $component->name;
-                    $record->stringid   = $string->id;
-                    $record->textid     = $textid;
-                    $record->timemodified = $string->timemodified;
-                    $record->deleted    = $string->deleted;
-
-                    $repoid = $DB->insert_record('amos_repository', $record);
-
-                    // If the new record is the most recent version of the string,
-                    // register it in the amos_snapshot table. To minimise race
-                    // conditions risk, try to insert first and update on write
-                    // exception (the exception will be thrown due to unique index
-                    // configured for the amos_snapshot table).
-                    try {
-                        $DB->insert_record('amos_snapshot', (object)array(
-                            'branch' => $record->branch,
-                            'lang' => $record->lang,
-                            'component' => $record->component,
-                            'stringid' => $record->stringid,
-                            'repoid' => $repoid,
-                        ));
-                    } catch (dml_write_exception $e) {
-                        $snapshot = $DB->get_record_sql(
-                            "SELECT s.id, s.repoid, r.timemodified
-                               FROM {amos_snapshot} s
-                          LEFT JOIN {amos_repository} r ON s.repoid = r.id
-                              WHERE s.branch = :branch
-                                    AND s.lang = :lang
-                                    AND s.component = :component
-                                    AND s.stringid = :stringid",
-                            array(
-                                'branch' => $record->branch,
-                                'lang' => $record->lang,
-                                'component' => $record->component,
-                                'stringid' => $record->stringid
-                            ), MUST_EXIST);
-                        if (is_null($snapshot->timemodified) or ($record->timemodified >= $snapshot->timemodified)) {
-                            // The newly created record in the repository should be considered the most recent one.
-                            $DB->set_field('amos_snapshot', 'repoid', $repoid, array('id' => $snapshot->id));
-                        }
-                    }
+                    $DB->insert_record($table, $record);
                 }
             }
+
             $transaction->allow_commit();
+
             if ($clear) {
                 $this->clear();
             }
+
         } catch (Exception $e) {
-            // this is here in order not to clear the stage, just re-throw the exception
+            // This is here in order not to clear the stage, just re-throw the exception.
             $transaction->rollback($e);
         }
     }
