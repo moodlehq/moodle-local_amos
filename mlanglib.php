@@ -1772,30 +1772,36 @@ class mlang_tools {
      */
     public static function list_languages($english=true, $usecache=true, $showcode=true) {
         global $DB;
-        static $cache = null;
 
-        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
-            $cache = array();
-            $sql = "SELECT r.lang AS code, t.text AS name
-                      FROM {amos_repository} r
-                      JOIN {amos_texts} t ON r.textid = t.id
-                      JOIN {amos_snapshot} s ON s.repoid = r.id
-                     WHERE s.component = ?
-                       AND (s.stringid = ? OR s.stringid = ?)
-                       AND r.deleted   = 0
-                  ORDER BY s.branch DESC, s.stringid DESC, r.timemodified DESC, t.text";
-            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
-            foreach ($rs as $lang) {
-                if (!isset($cache[$lang->code])) {
-                    // use the first returned value, all others are historical records
-                    $cache[$lang->code] = $lang->name;
-                }
-            }
-            $rs->close();
-            asort($cache);
+        $cache = cache::make('local_amos', 'listlanguages');
+        $langs = false;
+
+        if ($usecache) {
+            $langs = $cache->get('langs');
         }
 
-        $langs = $cache;
+        if ($langs === false) {
+            $langs = [];
+            $sql = "SELECT lang AS code, strtext AS name
+                      FROM {amos_translations}
+                     WHERE component = ?
+                       AND (strname = ? OR strname = ?)
+                       AND strtext IS NOT NULL
+                  ORDER BY since DESC, strname DESC, timemodified DESC, strtext";
+
+            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
+
+            foreach ($rs as $lang) {
+                if (!isset($langs[$lang->code])) {
+                    // Use the first returned value, all others are historical records.
+                    $langs[$lang->code] = $lang->name;
+                }
+            }
+
+            $rs->close();
+            asort($langs);
+            $cache->set('langs', $langs);
+        }
 
         if ($showcode) {
             foreach (array_keys($langs) as $code) {

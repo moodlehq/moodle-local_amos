@@ -39,6 +39,7 @@ $string['amos:stash'] = 'Store the current stage into the persistent stash';
 $string['amos:usegoogle'] = 'Use Google Translate services';
 $string['applangindexfile'] = 'Moodle App LangIndex file location';
 $string['applangindexfile_desc'] = 'Complete Url where to download the file. It will be done by a cron task.';
+$string['cachedef_listlanguages'] = 'List of all languages and their names known in AMOS';
 $string['commitbutton'] = 'Commit';
 $string['commitkeepstaged'] = 'Keep strings staged';
 $string['commitmessage'] = 'Commit message';
