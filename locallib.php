@@ -527,15 +527,15 @@ class local_amos_translator implements renderable {
     public function __construct(local_amos_filter $filter, stdclass $user) {
         global $DB;
 
-        // get the list of strings to display according the current filter values
+        // Get the list of strings to display according the current filter values.
         $last       = $filter->get_data()->last;
         $branches   = $filter->get_data()->version;
         $languages  = $filter->get_data()->language;
         $components = $filter->get_data()->component;
-        if (empty($branches) or empty($components) or empty($languages)) {
+
+        if ((!$last && empty($branches)) || empty($components) || empty($languages)) {
             return;
         }
-        $languages  = array_merge(array('en'), $languages);
 
         $missing            = $filter->get_data()->missing;
         $outdated           = $filter->get_data()->outdated;
@@ -547,172 +547,144 @@ class local_amos_translator implements renderable {
         $stringid           = $filter->get_data()->stringid;
         $stringidpartial    = $filter->get_data()->stringidpartial;
         $stagedonly         = $filter->get_data()->stagedonly;
-        $greylistedonly     = $filter->get_data()->greylistedonly;
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
         $app                = $filter->get_data()->app;
 
-        $params = array();
-        list($sqllanguages, $paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'lang00000');
-        list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'comp00000');
+        // Prepare the SQL queries to load all the filtered strings and their translations.
+        $params = [];
+
+        list($sqllanguages, $paramlanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
+        list($sqlcomponents1, $paramcomponents1) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+        list($sqlcomponents2, $paramcomponents2) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+
+        $params += $paramlanguages;
+        $params += $paramcomponents1;
+        $params += $paramcomponents2;
 
         if ($last) {
-            $allversions = mlang_version::list_all();
-            $comp_branch = $DB->get_records_select_menu('amos_snapshot',  "lang = 'en' AND component $sqlcomponents GROUP BY component",
-                $paramcomponents,  '', 'component, MAX(branch) as branch');
-
-            $sql_comps = array('1 = 0');
-            $parcounter = 0;
-
-            foreach ($comp_branch as $component => $branch) {
-                $paramcomponent = 'component000'.$parcounter;
-                $parambranch = 'branch000'.$parcounter;
-                $sql_comps[] = "(s.component = :".$paramcomponent." AND s.branch = :".$parambranch.")";
-                $params[$paramcomponent] = $component;
-                $params[$parambranch] = $branch;
-                $parcounter++;
-            }
-
-            $sql_comps = implode(' OR ', $sql_comps);
-
-            // get the greylisted strings first
-            $sql = "SELECT branch, component, stringid
-                      FROM {amos_greylist} AS s
-                     WHERE {$sql_comps}";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-        } else {
-            list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'branch00000');
-
-            // get the greylisted strings first
-            $sql = "SELECT branch, component, stringid
-                      FROM {amos_greylist}
-                     WHERE branch $sqlbranches
-                       AND component $sqlcomponents";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            $params = array_merge($params, $paramsbranches, $paramcomponents);
+            // Get know the most recent branch for every component.
+            $latestcomponentbranch = $DB->get_records_select_menu('amos_strings',  "component $sqlcomponents1 GROUP BY component",
+                $paramcomponents1,  '', "component, MAX(since) as branch");
         }
 
-        $greylist = array();
-        $rs = $DB->get_recordset_sql($sql, $params);
-        foreach ($rs as $s) {
-            $greylist[$s->branch][$s->component][$s->stringid] = true;
-        }
-        $rs->close();
+        // Get all the English strings and translations for the translator.
 
-        // get the app strings
-        $applist = local_amos_applist_strings();
+        $sql1 = "SELECT id, since, 'en' AS lang, component, strname, strtext, timemodified
+                   FROM {amos_strings}
+                  WHERE component $sqlcomponents1";
 
-        if ($last) {
-            // get all the strings for the translator
-            $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
-                      FROM {amos_snapshot} s
-                      JOIN {amos_repository} r ON s.repoid = r.id
-                      JOIN {amos_texts} t ON r.textid = t.id
-                     WHERE s.lang {$sqllanguages} AND ({$sql_comps})";
+        $sql2 = "SELECT id, since, lang, component, strname, strtext, timemodified
+                   FROM {amos_translations}
+                  WHERE component $sqlcomponents2
+                    AND lang $sqllanguages";
 
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND s.stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            if ($helps) {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
-                $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
-            } else {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
-                $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
-            }
-
-            $params = array_merge($params, $paramslanguages, $paramcomponents);
-
-        } else {
-            // get all the strings for the translator
-            $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
-                      FROM {amos_snapshot} s
-                      JOIN {amos_repository} r ON s.repoid = r.id
-                      JOIN {amos_texts} t ON r.textid = t.id
-                     WHERE s.branch {$sqlbranches}
-                           AND s.lang {$sqllanguages}
-                           AND s.component {$sqlcomponents}";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-
-                } else {
-                    $sql .= " AND s.stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            if ($helps) {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
-                $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
+        if ($stringid) {
+            if ($stringidpartial) {
+                $sql1 .= " AND " . $DB->sql_like("strname", ":strname1", false);
+                $sql2 .= " AND " . $DB->sql_like("strname", ":strname2", false);
+                $params['strname1'] = '%' . $DB->sql_like_escape($stringid) . '%';
+                $params['strname2'] = '%' . $DB->sql_like_escape($stringid) . '%';
 
             } else {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
-                $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
-            }
-
-            $params = array_merge($params, $paramsbranches, $paramslanguages, $paramcomponents);
-        }
-
-        $sql .= " ORDER BY s.component, s.stringid, s.lang, s.branch, r.id DESC";
-
-        $rs = $DB->get_recordset_sql($sql, $params);
-        $s = array(); // tree of strings grouped by lang, component, stringid and branch
-        $d = array(); // same tree - but containing deleted strings only
-
-        foreach($rs as $r) {
-            // if the most recent record is a deletion record, do not add the string to $s tree
-            // this filtering can not be done in SQL because there can be two records with
-            // the same timemodified, one changing the string and one removing it
-            if ($r->deleted) {
-                $d[$r->lang][$r->component][$r->stringid][$r->branch] = true;
-            }
-            if (isset($d[$r->lang][$r->component][$r->stringid][$r->branch])) {
-                // the more recent record of this string removes it
-                continue;
-            }
-            if (!isset($s[$r->lang][$r->component][$r->stringid][$r->branch])) {
-                // store the most recent record in the $s tree
-                $string = new stdclass();
-                $string->amosid = $r->id;
-                $string->text = $r->text;
-                $string->timemodified = $r->timemodified;
-                $string->timeupdated = $r->timeupdated;
-                $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
+                $sql1 .= " AND strname = :strname1";
+                $sql2 .= " AND strname = :strname1";
+                $params['strname1'] = $stringid;
+                $params['strname2'] = $stringid;
             }
         }
-        unset($d);
-        $rs->close();
 
-        // replace the loaded values with those already staged
+        if ($helps) {
+            $sql1 .= " AND " . $DB->sql_like("strname", ":helpstrname1", false);
+            $sql2 .= " AND " . $DB->sql_like("strname", ":helpstrname2", false);
+            $params['helpstrname1'] = '%' . $DB->sql_like_escape('_help');
+            $params['helpstrname2'] = '%' . $DB->sql_like_escape('_help');
+
+        } else {
+            $sql1 .= " AND " . $DB->sql_like("strname", ":linkstrname1", false, true, true);
+            $sql2 .= " AND " . $DB->sql_like("strname", ":linkstrname2", false, true, true);
+            $params['linkstrname1'] = '%' . $DB->sql_like_escape('_link');
+            $params['linkstrname2'] = '%' . $DB->sql_like_escape('_link');
+        }
+
+        $sql = "SELECT id, since, lang, component, strname, strtext, timemodified
+                  FROM ($sql1 UNION $sql2) s";
+
+        $recordset = $DB->get_recordset_sql($sql, $params);
+
+        // Iterate over the results and pick the most recent string value for each selected branch.
+        $tree = [];
+        $newer = [];
+
+        foreach ($recordset as $record) {
+            if ($last) {
+                $compbranches = [$latestcomponentbranch[$record->component]];
+            } else {
+                $compbranches = $branches;
+            }
+
+            foreach ($compbranches as $compbranch) {
+                if ($record->since > $compbranch) {
+                    // Make a note that more recent version exists.
+                    $newer[$record->lang][$record->component][$record->strname][$compbranch] = true;
+                    continue;
+                }
+                if (!isset($tree[$record->lang][$record->component][$record->strname][$compbranch])) {
+                    $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
+
+                } else {
+                    $current = $tree[$record->lang][$record->component][$record->strname][$compbranch];
+
+                    if ($record->since < $current->since) {
+                        continue;
+                    }
+
+                    if (($record->since == $current->since) && ($record->timemodified < $current->timemodified)) {
+                        continue;
+                    }
+
+                    if (($record->since == $current->since) && ($record->timemodified == $current->timemodified)
+                            && ($record->id < $current->id)) {
+                        continue;
+                    }
+
+                    $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
+                }
+            }
+        }
+
+        $recordset->close();
+
+        // Convert the tree into a new one containing only non-deletions.
+        $s = [];
+
+        foreach($tree as $xlang => $xcomps) {
+            foreach ($xcomps as $xcomp => $xstrnames) {
+                foreach ($xstrnames as $xstrname => $xbranches) {
+                    foreach ($xbranches as $xbranch => $record) {
+                        if ($record->strtext !== null) {
+                            $s[$xlang][$xcomp][$xstrname][$xbranch] = (object) [
+                                'amosid' => $record->id,
+                                'text' => $record->strtext,
+                                'since' => $record->since,
+                                'timemodified' => $record->timemodified,
+                                'islatest' => empty($newer[$xlang][$xcomp][$xstrname][$xbranch]),
+                            ];
+                        }
+                        unset($tree[$xlang][$xcomp][$xstrname][$xbranch]);
+                    }
+                }
+            }
+        }
+        unset($tree);
+
+        foreach($s as $xlang => &$xcomps) {
+            ksort($xcomps);
+            foreach ($xcomps as $xcomp => &$xstrnames) {
+                ksort($xstrnames);
+            }
+        }
+
+        // Replace the loaded values with those already staged.
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
         foreach($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {
@@ -720,7 +692,6 @@ class local_amos_translator implements renderable {
                 $string->amosid = null;
                 $string->text = $staged->text;
                 $string->timemodified = $staged->timemodified;
-                $string->timeupdated = $staged->timemodified;
                 $string->class = 'staged';
                 $string->nocleaning = $staged->nocleaning;
                 $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
@@ -740,9 +711,15 @@ class local_amos_translator implements renderable {
                                 continue;
                             }
                             $string = new stdclass();
-                            $string->branchdir = mlang_version::by_code($branchcode)->dir;
-                            $string->branchcode = mlang_version::by_code($branchcode)->code;
-                            $string->branchlabel = mlang_version::by_code($branchcode)->label;
+                            $verbranch = mlang_version::by_code($branchcode);
+                            $string->branchdir = $verbranch->dir;
+                            $string->branchcode = $verbranch->code;
+                            $string->branchlabel = $verbranch->label;
+                            $versince = mlang_version::by_code($english->since);
+                            $string->sincedir = $versince->dir;
+                            $string->sincecode = $versince->code;
+                            $string->sincelabel = $versince->label;
+                            $string->islatest = $english->islatest;
                             $string->language = $lang;
                             $string->component = $component;
                             $string->stringid = $stringid;
@@ -755,13 +732,12 @@ class local_amos_translator implements renderable {
                                 $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
                                 $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
                                 $string->timemodified = $s[$lang][$component][$stringid][$branchcode]->timemodified;
-                                $string->timeupdated = $s[$lang][$component][$stringid][$branchcode]->timeupdated;
                                 if (isset($s[$lang][$component][$stringid][$branchcode]->class)) {
                                     $string->class = $s[$lang][$component][$stringid][$branchcode]->class;
                                 } else {
                                     $string->class = 'translated';
                                 }
-                                if ($string->originalmodified > max($string->timemodified, $string->timeupdated)) {
+                                if ($string->originalmodified > $string->timemodified) {
                                     $string->outdated = true;
                                 } else {
                                     $string->outdated = false;
@@ -775,7 +751,6 @@ class local_amos_translator implements renderable {
                                 $string->translation = null;
                                 $string->translationid = null;
                                 $string->timemodified = null;
-                                $string->timeupdated = null;
                                 $string->class = 'missing';
                                 $string->outdated = false;
                                 $string->nocleaning = false;
@@ -785,6 +760,8 @@ class local_amos_translator implements renderable {
                             } else {
                                 $string->greylisted = false;
                             }
+
+                            $applist = local_amos_applist_strings();
 
                             if ($component == 'local_moodlemobileapp') {
                                 $string->app = $stringid;
@@ -800,12 +777,6 @@ class local_amos_translator implements renderable {
                                 continue;
                             }
                             if ($stagedonly and $string->class != 'staged') {
-                                continue;   // do not display this string
-                            }
-                            if ($greylistedonly and !$string->greylisted) {
-                                continue;   // do not display this string
-                            }
-                            if ($withoutgreylisted and $string->greylisted) {
                                 continue;   // do not display this string
                             }
                             if ($app and !$string->app) {
@@ -905,9 +876,9 @@ class local_amos_translator implements renderable {
             $maintainedlangscache->set('maintainedlangs', $maintainedlangs);
         }
 
-		$langnames = mlang_tools::list_languages();
+        $langnames = mlang_tools::list_languages();
 
-		foreach ($this->strings as $string) {
+        foreach ($this->strings as $string) {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
                 $string->translatable = false;
                 $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
