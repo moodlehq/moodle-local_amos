@@ -88,8 +88,13 @@ while (!$done) {
             unset($r->deleted);
         }
 
-        // In the new storage, branches read like 35 or 36, not 3500 or 3600.
+        // In the new storage, branches read like 38, 39, 310, 311, 400 and not 3800 or 4000 like before.
         $r->branch = $r->branch / 100;
+
+        // What used to be 4.0 string should be mapped to 3.10.
+        if ($r->branch == 40) {
+            $r->branch = 310;
+        }
 
         if (empty($revs)) {
             // If it's a new string, register it.
