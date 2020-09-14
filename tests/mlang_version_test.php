@@ -167,4 +167,18 @@ class local_amos_mlang_version_test extends advanced_testcase {
         $this->assertSame('3.9', $list[39]->dir);
         $this->assertSame('MOODLE_310_STABLE', $list[310]->branch);
     }
+
+    /**
+     * Test obtaining the most recent version
+     */
+    public function test_latest_version() {
+
+        $this->resetAfterTest();
+
+        set_config('brancheslist', '38,39,310', 'local_amos');
+
+        $latest = mlang_version::latest_version();
+
+        $this->assertSame('3.10', $latest->dir);
+    }
 }
