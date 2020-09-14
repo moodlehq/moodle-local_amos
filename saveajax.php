@@ -50,14 +50,14 @@ if (is_null($lang) or is_null($originalid) or is_null($text)) {
     die();
 }
 
-$record = $DB->get_record('amos_repository', array('id' => $originalid), 'id,stringid,component,branch', MUST_EXIST);
-$version = mlang_version::by_code($record->branch);
+$record = $DB->get_record('amos_strings', array('id' => $originalid), 'id,strname,component,since', MUST_EXIST);
+$version = mlang_version::by_code($record->since);
 $component = new mlang_component($record->component, $lang, $version);
-if ($version->code < mlang_version::MOODLE_20) {
+if (!$version->translatable) {
     header('HTTP/1.1 400 Bad Request');
     die();
 }
-$string = new mlang_string($record->stringid, $text);
+$string = new mlang_string($record->strname, $text);
 $string->nocleaning = $nocleaning;
 $string->clean_text();
 $component->add_string($string);
