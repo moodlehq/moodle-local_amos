@@ -513,7 +513,10 @@ class local_amos_renderer extends plugin_renderer_base {
             $infoversion = html_writer::span($string->sincelabel . '+', 'info info-version');
 
             if (!$string->islatest) {
-                $infoversion .= ' ' . html_writer::tag('i', '', ['class' => 'fa fa-warning', 'title' => 'LOCALIZEME']);
+                $infoversion .= ' ' . html_writer::tag('i', '', [
+                    'class' => 'fa fa-warning',
+                    'title' => get_string('stringversionnotlatest', 'local_amos'),
+                ]);
             }
 
             $infostringid = html_writer::span($string->stringid, 'info info-stringid');
