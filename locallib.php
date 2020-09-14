@@ -587,7 +587,7 @@ class local_amos_translator implements renderable {
 
             } else {
                 $sql1 .= " AND strname = :strname1";
-                $sql2 .= " AND strname = :strname1";
+                $sql2 .= " AND strname = :strname2";
                 $params['strname1'] = $stringid;
                 $params['strname2'] = $stringid;
             }
