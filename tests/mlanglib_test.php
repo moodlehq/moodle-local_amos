@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/amos/mlanglib.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Makes protected method accessible for testing purposes
@@ -98,7 +97,7 @@ class mlang_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        // basic operations
+        // Basic operations.
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->assertFalse($component->has_string());
         $this->assertFalse($component->has_string('nonexisting'));
@@ -120,7 +119,7 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        // commit a single string
+        // Commit a single string.
         $now = time();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $component->add_string(new mlang_string('welcome', 'Welcome', $now));
@@ -130,19 +129,12 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(1, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now)));
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $this->assertTrue($DB->record_exists('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome')));
-        $repo = $DB->get_record('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now), '*');
-        $snapshot = $DB->get_record('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
-        $this->assertEquals($repo->id, $snapshot->repoid);
 
-        // add two other strings
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('welcome'));
+        $component->clear();
+
+        // Add two other strings.
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -153,14 +145,14 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(3, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'hello', 'timemodified' => $now)));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'world', 'timemodified' => $now)));
-        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
 
-        // delete a string
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('welcome'));
+        $this->assertTrue($component->has_string('hello'));
+        $this->assertTrue($component->has_string('world'));
+        $component->clear();
+
+        // Delete a string.
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -170,10 +162,12 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(4, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
-        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
+
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string('welcome'));
+        $this->assertTrue($component->has_string('hello'));
+        $this->assertTrue($component->has_string('world'));
+        $component->clear();
     }
 
     public function test_add_existing_string() {
@@ -219,13 +213,8 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        $this->assertEquals(2, $DB->count_records('amos_repository'));
-        $repo = $DB->get_record('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1), '*');
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
-        $this->assertEquals($repo->id, $snapshot->repoid);
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string());
     }
 
     public function test_more_recently_inserted_wins() {
@@ -272,10 +261,10 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array());
-        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid), '*', MUST_EXIST);
-        $this->assertEquals(1, $repo->deleted);
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'), null, true);
+        $this->assertTrue($component->get_string('welcome')->deleted);
+        $component->clear();
+        unset($component);
     }
 
     public function test_component_from_phpfile_same_timestamp() {
@@ -324,12 +313,10 @@ EOF;
         $component->clear();
         unset($component);
 
-        $this->assertEquals(2, $DB->count_records('amos_repository'));
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array());
-        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid));
-        $textid = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Welcome!')), MUST_EXIST);
-        $this->assertEquals($textid, $repo->textid);
+        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEquals($component->get_string('welcome')->text, 'Welcome!');
+        $component->clear();
+        unset($component);
     }
 
     public function test_component_from_phpfile_legacy_format() {
@@ -487,11 +474,6 @@ EOF;
         $component->clear();
         unset($component);
         unset($stage);
-        $textid_tree = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Tree')), MUST_EXIST);
-        $textid_three = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Three')), MUST_EXIST);
-        $where = "component = 'numbers' AND lang = 'en' AND stringid = 'three'";
-        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_tree)));
-        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_three)));
 
         // get the most recent version (so called "cap") of the component
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
@@ -1019,19 +1001,23 @@ EOF;
     }
 
     public function test_list_components() {
+
         $this->resetAfterTest();
+
+        set_config('brancheslist', '38,39,310,400', 'local_amos');
+
         $stage = new mlang_stage();
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_38_STABLE'));
         $component->add_string(new mlang_string('modulename', 'Workshop'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_39_STABLE'));
         $component->add_string(new mlang_string('modulename', 'Workshop 2.x'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_310_STABLE'));
         $component->add_string(new mlang_string('foo', 'Bar'));
         $stage->add($component);
         $component->clear();
@@ -1048,8 +1034,14 @@ EOF;
         $this->assertEquals(count($comps), 2);
         $this->assertTrue(array_key_exists('workshop', $comps));
         $this->assertTrue(array_key_exists('auth', $comps));
-        $this->assertSame(array('1900','2000'), $comps['workshop']);
-        $this->assertSame(array('2000'), $comps['auth']);
+        $this->assertEquals(count($comps['auth']), 2);
+        $this->assertEquals(count($comps['workshop']), 4);
+        $this->assertContains('38', $comps['workshop']);
+        $this->assertContains('39', $comps['workshop']);
+        $this->assertContains('310', $comps['workshop']);
+        $this->assertContains('400', $comps['workshop']);
+        $this->assertContains('310', $comps['auth']);
+        $this->assertContains('400', $comps['auth']);
     }
 
     public function test_execution_strings() {

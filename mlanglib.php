@@ -1785,23 +1785,33 @@ class mlang_tools {
     public static function list_languages($english=true, $usecache=true, $showcode=true) {
         global $DB;
 
-        $cache = cache::make('local_amos', 'listlanguages');
+        $cache = cache::make('local_amos', 'lists');
         $langs = false;
 
         if ($usecache) {
-            $langs = $cache->get('langs');
+            $langs = $cache->get('languages');
         }
 
         if ($langs === false) {
             $langs = [];
-            $sql = "SELECT lang AS code, strtext AS name
-                      FROM {amos_translations}
-                     WHERE component = ?
-                       AND (strname = ? OR strname = ?)
+            $sql = "
+                    SELECT 'en' AS code, strname, strtext AS name, since, timemodified
+                      FROM {amos_strings}
+                     WHERE component = 'langconfig'
+                       AND (strname = 'thislanguageint' OR strname = 'thislanguage')
                        AND strtext IS NOT NULL
-                  ORDER BY since DESC, strname DESC, timemodified DESC, strtext";
 
-            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
+                     UNION
+
+                    SELECT lang AS code, strname, strtext AS name, since, timemodified
+                      FROM {amos_translations}
+                     WHERE component = 'langconfig'
+                       AND (strname = 'thislanguageint' OR strname = 'thislanguage')
+                       AND strtext IS NOT NULL
+
+                  ORDER BY since DESC, strname DESC, timemodified DESC, name";
+
+            $rs = $DB->get_recordset_sql($sql);
 
             foreach ($rs as $lang) {
                 if (!isset($langs[$lang->code])) {
@@ -1812,7 +1822,7 @@ class mlang_tools {
 
             $rs->close();
             asort($langs);
-            $cache->set('langs', $langs);
+            $cache->set('languages', $langs);
         }
 
         if ($showcode) {
@@ -1838,25 +1848,42 @@ class mlang_tools {
      */
     public static function list_components($usecache=true) {
         global $DB;
-        static $cache = null;
 
-        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
-            $cache = array();
-            $sql = "SELECT DISTINCT component,branch
-                      FROM {amos_snapshot}
-                     WHERE lang = 'en'
-                  ORDER BY component,branch";
-            $rs = $DB->get_recordset_sql($sql);
-            foreach ($rs as $record) {
-                if (!isset($cache[$record->component])) {
-                    $cache[$record->component] = array();
-                }
-                $cache[$record->component][] = $record->branch;
-            }
-            $rs->close();
+        $cache = cache::make('local_amos', 'lists');
+        $components = false;
+
+        if ($usecache) {
+            $components = $cache->get('components');
         }
 
-        return $cache;
+        if ($components === false) {
+            $allversions = mlang_version::list_all();
+            $components = [];
+
+            $sql = "SELECT component, MIN(since) AS since
+                      FROM {amos_strings}
+                  GROUP BY component
+                  ORDER BY component";
+
+            $rs = $DB->get_recordset_sql($sql);
+
+            foreach ($rs as $record) {
+                if (!isset($components[$record->component])) {
+                    $components[$record->component] = [];
+                    foreach ($allversions as $ver) {
+                        if ($ver->code >= $record->since) {
+                            $components[$record->component][] = $ver->code;
+                        }
+                    }
+                }
+            }
+
+            $rs->close();
+
+            $cache->set('components', $components);
+        }
+
+        return $components;
     }
 
     /**
