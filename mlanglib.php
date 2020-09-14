@@ -1647,7 +1647,7 @@ class mlang_version {
     /** @var bool Allow translations of strings on this branch? */
     public $translatable;
 
-    /** @var bool Is this a version that translators should focus on? */
+    /** @var bool Is this a version that translators should focus on? Deprecated - use {@see self::latest_version()} instead. */
     public $current;
 
     /**

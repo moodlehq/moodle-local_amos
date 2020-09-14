@@ -105,13 +105,9 @@ class local_amos_filter implements renderable {
             $data->page = $page;
         }
 
-        // if the user did not check any version, use the default instead of none
+        // If the user did not check any version, use the latest one instead of none.
         if (empty($data->version)) {
-            foreach (mlang_version::list_all() as $version) {
-                if ($version->current) {
-                    $data->version[] = $version->code;
-                }
-            }
+            $data->version = mlang_version::latest_version()->code;
         }
 
         return $data;
@@ -1587,11 +1583,9 @@ function local_amos_importfile_options() {
     foreach (mlang_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
-            if ($version->current) {
-                $options['versioncurrent'] = $version->code;
-            }
         }
     }
+    $options['versioncurrent'] = mlang_version::latest_version()->code;
     $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
     $currentlanguage = current_language();
     if ($currentlanguage === 'en') {
@@ -1616,14 +1610,15 @@ function local_amos_merge_options() {
     $options['targetversions'] = array();
     $options['defaultsourceversion'] = null;
     $options['defaulttargetversion'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         $options['sourceversions'][$version->code] = $version->label;
-        if (!$version->current and is_null($options['defaultsourceversion'])) {
+        if ($version->code != $latestversioncode && $options['defaultsourceversion'] === null) {
             $options['defaultsourceversion'] = $version->code;
         }
         if ($version->translatable) {
             $options['targetversions'][$version->code] = $version->label;
-            if ($version->current) {
+            if ($version->code == $latestversioncode) {
                 $options['defaulttargetversion'] = $version->code;
             }
         }
@@ -1657,9 +1652,10 @@ function local_amos_diff_options() {
 
     $options['versions'] = array();
     $options['defaultversion'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         $options['versions'][$version->code] = $version->label;
-        if ($version->current) {
+        if ($version->code == $latestversioncode) {
             $options['defaultversion'] = $version->code;
         }
     }
@@ -1686,10 +1682,11 @@ function local_amos_execute_options() {
 
     $options['versions'] = array();
     $options['versioncurrent'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
-            if ($version->current) {
+            if ($version->code == $latestversioncode) {
                 $options['versioncurrent'] = $version->code;
             }
         }

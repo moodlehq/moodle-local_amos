@@ -229,6 +229,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $current = $filterdata->version;
         $someselected = false;
         $fver = '';
+        $latestversioncode = mlang_version::latest_version()->code;
         foreach (mlang_version::list_all() as $version) {
             if (!$version->translatable) {
                 continue;
@@ -241,7 +242,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $fver .= html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
-            $fverprops = array('class' => 'fver form-check-input '. ($version->current ? 'current' : ""));
+            $fverprops = array('class' => 'fver form-check-input '. ($version->code == $latestversioncode ? 'current' : ""));
             if ($filterdata->last) {
                 $fverprops['disabled'] = 'disabled';
             }

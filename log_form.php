@@ -95,11 +95,7 @@ class local_amos_log_form extends moodleform {
             $branchgrp[] = $mform->createElement('checkbox', $version->code, '', $version->label);
         }
         $mform->addGroup($branchgrp, 'branch', get_string('logfilterbranch', 'local_amos'), ' ');
-        foreach (mlang_version::list_all() as $version) {
-            if ($version->current) {
-                $mform->setDefault('branch['.$version->code.']', 1);
-            }
-        }
+        $mform->setDefault('branch[' . mlang_version::latest_version()->code . ']', 1);
 
         // Lang
         $langgrp = array();
