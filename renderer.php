@@ -225,44 +225,25 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div'); // .controls
         $output .= html_writer::end_tag('div'); // .control-group
 
-        // version checkboxes
+        // Version selector.
         $current = $filterdata->version;
-        $someselected = false;
-        $fver = '';
-        $latestversioncode = mlang_version::latest_version()->code;
+        $selected = mlang_version::latest_version()->code;
+        $fveroptions = [];
         foreach (mlang_version::list_all() as $version) {
-            if (!$version->translatable) {
-                continue;
+            if ($version->translatable) {
+                $fveroptions[$version->code] = $version->label;
+                if ($current == $version->code) {
+                    $selected = $version->code;
+                }
             }
-            if (in_array($version->code, $current)) {
-                $someselected = true;
-                $thisselected = true;
-            } else {
-                $thisselected = false;
-            }
-
-            $fver .= html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
-            $fverprops = array('class' => 'fver form-check-input '. ($version->code == $latestversioncode ? 'current' : ""));
-            if ($filterdata->last) {
-                $fverprops['disabled'] = 'disabled';
-            }
-            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, $fverprops);
-            $fver .= html_writer::end_tag('div'); // .form-check
         }
+        $fver = html_writer::select($fveroptions, 'fver', $selected);
 
         if ($filterdata->last) {
             $collapsible = ' collapse';
         } else {
             $collapsible = '';
         }
-
-        if (!$someselected && !$filterdata->last) {
-            $extraclass = ' error';
-            $alerts[] = get_string('filtervernothingselected', 'local_amos');
-        } else {
-            $extraclass = '';
-        }
-
 
         $output .= html_writer::start_tag('div', array('class' => 'control-group'.$collapsible));
         $output .= html_writer::tag('label',
@@ -281,7 +262,7 @@ class local_amos_renderer extends plugin_renderer_base {
         } else {
             $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_versions'));
         }
-        $output .= html_writer::div($fver, '', array('id' => 'amosfilter_fver'));
+        $output .= html_writer::div($fver, 'm-t-1', array('id' => 'amosfilter_fver'));
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_versions
         $output .= html_writer::end_tag('div'); // .controls
 
@@ -751,7 +732,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells = array();
 
             // string identification
-            $infoversion = html_writer::span($string->version, 'info info-version');
+            $infoversion = html_writer::span($string->version . '+', 'info info-version');
 
             $infostringid = html_writer::span($string->stringid, 'info info-stringid');
 
@@ -1107,11 +1088,8 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'btn')
             );
 
-            $i = 0;
-            foreach ($stage->filterfields->fver as $fver) {
-                $params['fver['.$i.']'] = $fver;
-                $i++;
-            }
+            $params['fver'] = $stage->filterfields->fver;
+
             $i = 0;
             foreach ($stage->filterfields->flng as $flng) {
                 $params['flng['.$i.']'] = $flng;

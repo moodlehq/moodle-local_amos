@@ -133,10 +133,9 @@ class local_amos_filter implements renderable {
         }
 
         if (empty($data->version)) {
-            foreach (mlang_version::list_all() as $version) {
-                $data->version[] = $version->code;
-            }
+            $data->version = mlang_version::latest_version()->code;
         }
+
         if (is_null($data->language)) {
             $currentlanguage = current_language();
             if ($currentlanguage === 'en') {
@@ -212,14 +211,14 @@ class local_amos_filter implements renderable {
         require_sesskey();
         $data = new stdclass();
 
-        $data->version = array();
+        $data->version = null;
         $data->last = optional_param('flast', false, PARAM_BOOL);
         if (!$data->last) {
-            $fver = optional_param_array('fver', null, PARAM_INT);
-            if (is_array($fver)) {
+            $fver = optional_param('fver', null, PARAM_INT);
+            if ($fver !== null) {
                 foreach (mlang_version::list_all() as $version) {
-                    if (in_array($version->code, $fver)) {
-                        $data->version[] = $version->code;
+                    if ($version->code == $fver) {
+                        $data->version = $version->code;
                     }
                 }
             }
@@ -287,15 +286,16 @@ class local_amos_filter implements renderable {
         }
         $data = new stdclass();
 
-        $data->version = array();
+        $data->version = [];
         $fver = optional_param('v', '', PARAM_RAW);
         if ($fver !== 'l') {
             $fver = explode(',', $fver);
             $fver = clean_param_array($fver, PARAM_INT);
-            if (!empty($fver) and is_array($fver)) {
+            if (!empty($fver) && is_array($fver)) {
+                $fver = max($fver);
                 foreach (mlang_version::list_all() as $version) {
-                    if (in_array($version->code, $fver)) {
-                        $data->version[] = $version->code;
+                    if ($version->code == $fver) {
+                        $data->version = $version->code;
                     }
                 }
             }
@@ -391,7 +391,7 @@ class local_amos_filter implements renderable {
         if ($fdata->last) {
             $this->permalink->param('v', 'l');
         } else {
-            $this->permalink->param('v', implode(',', $fdata->version));
+            $this->permalink->param('v', $fdata->version);
         }
 
 
@@ -472,7 +472,7 @@ class local_amos_filter implements renderable {
             'ismaintainer' => has_capability('local/amos:commit', context_system::instance()),
             'usesdefaultversion' => (int)($submitted->version === $default->version),
             'usesdefaultlang' => (int)($submitted->language === $default->language),
-            'numofversions' => count($submitted->version),
+            'numofversions' => (int)isset($submitted->version),
             'numoflanguages' => count($submitted->language),
             'numofcomponents' => count($submitted->component),
             'showmissingonly' => (int)$submitted->missing,
@@ -525,11 +525,11 @@ class local_amos_translator implements renderable {
 
         // Get the list of strings to display according the current filter values.
         $last       = $filter->get_data()->last;
-        $branches   = $filter->get_data()->version;
+        $version    = $filter->get_data()->version;
         $languages  = $filter->get_data()->language;
         $components = $filter->get_data()->component;
 
-        if ((!$last && empty($branches)) || empty($components) || empty($languages)) {
+        if ((!$last && empty($version)) || empty($components) || empty($languages)) {
             return;
         }
 
@@ -613,38 +613,36 @@ class local_amos_translator implements renderable {
 
         foreach ($recordset as $record) {
             if ($last) {
-                $compbranches = [$latestcomponentbranch[$record->component]];
+                $compbranch = $latestcomponentbranch[$record->component];
             } else {
-                $compbranches = $branches;
+                $compbranch = $version;
             }
 
-            foreach ($compbranches as $compbranch) {
-                if ($record->since > $compbranch) {
-                    // Make a note that more recent version exists.
-                    $newer[$record->lang][$record->component][$record->strname][$compbranch] = true;
+            if ($record->since > $compbranch) {
+                // Make a note that more recent version exists.
+                $newer[$record->lang][$record->component][$record->strname][$compbranch] = true;
+                continue;
+            }
+            if (!isset($tree[$record->lang][$record->component][$record->strname][$compbranch])) {
+                $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
+
+            } else {
+                $current = $tree[$record->lang][$record->component][$record->strname][$compbranch];
+
+                if ($record->since < $current->since) {
                     continue;
                 }
-                if (!isset($tree[$record->lang][$record->component][$record->strname][$compbranch])) {
-                    $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
 
-                } else {
-                    $current = $tree[$record->lang][$record->component][$record->strname][$compbranch];
-
-                    if ($record->since < $current->since) {
-                        continue;
-                    }
-
-                    if (($record->since == $current->since) && ($record->timemodified < $current->timemodified)) {
-                        continue;
-                    }
-
-                    if (($record->since == $current->since) && ($record->timemodified == $current->timemodified)
-                            && ($record->id < $current->id)) {
-                        continue;
-                    }
-
-                    $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
+                if (($record->since == $current->since) && ($record->timemodified < $current->timemodified)) {
+                    continue;
                 }
+
+                if (($record->since == $current->since) && ($record->timemodified == $current->timemodified)
+                        && ($record->id < $current->id)) {
+                    continue;
+                }
+
+                $tree[$record->lang][$record->component][$record->strname][$compbranch] = $record;
             }
         }
 
@@ -673,24 +671,30 @@ class local_amos_translator implements renderable {
         }
         unset($tree);
 
-        foreach($s as $xlang => &$xcomps) {
+        foreach ($s as $xlang => &$xcomps) {
             ksort($xcomps);
             foreach ($xcomps as $xcomp => &$xstrnames) {
                 ksort($xstrnames);
+                foreach ($xstrnames as $xtraname => &$xstrbranches) {
+                    ksort($xstrbranches);
+                }
             }
         }
 
         // Replace the loaded values with those already staged.
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
-        foreach($stage->get_iterator() as $component) {
+        foreach ($stage->get_iterator() as $component) {
             foreach ($component->get_iterator() as $staged) {
+                if ($staged->component->version->code > $compbranch) {
+                    continue;
+                }
                 $string = new stdclass();
                 $string->amosid = null;
                 $string->text = $staged->text;
                 $string->timemodified = $staged->timemodified;
                 $string->class = 'staged';
                 $string->nocleaning = $staged->nocleaning;
-                $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
+                $s[$component->lang][$component->name][$staged->id][$compbranch] = $string;
             }
         }
 
@@ -1016,7 +1020,7 @@ class local_amos_stage implements renderable {
             }
         }
         $this->filterfields = new stdClass();
-        $this->filterfields->fver = array_keys($fver);
+        $this->filterfields->fver = max(array_keys($fver));
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
         $allowedlangs = mlang_tools::list_allowed_languages($user->id);
