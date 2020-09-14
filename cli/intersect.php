@@ -49,7 +49,7 @@ $cliresult = 0;
 
 $tree = mlang_tools::components_tree();
 foreach ($tree as $vercode => $languages) {
-    if ($vercode < mlang_version::MOODLE_20) {
+    if ($vercode <= 19) {
         continue;
     }
     $version = mlang_version::by_code($vercode);

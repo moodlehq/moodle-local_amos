@@ -1020,7 +1020,10 @@ class local_amos_stage implements renderable {
             }
         }
         $this->filterfields = new stdClass();
-        $this->filterfields->fver = max(array_keys($fver));
+        $this->filterfields->fver = null;
+        if (!empty($fver) && is_array($fver)) {
+            $this->filterfields->fver = max(array_keys($fver));
+        }
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
         $allowedlangs = mlang_tools::list_allowed_languages($user->id);

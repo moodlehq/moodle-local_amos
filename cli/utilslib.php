@@ -251,29 +251,30 @@ class amos_export_zip {
     protected function get_versions() {
 
         if (!isset($this->stash['versions'])) {
-            $codes = array(
-                mlang_version::MOODLE_20,
-                mlang_version::MOODLE_21,
-                mlang_version::MOODLE_22,
-                mlang_version::MOODLE_23,
-                mlang_version::MOODLE_24,
-                mlang_version::MOODLE_25,
-                mlang_version::MOODLE_26,
-                mlang_version::MOODLE_27,
-                mlang_version::MOODLE_28,
-                mlang_version::MOODLE_29,
-                mlang_version::MOODLE_30,
-                mlang_version::MOODLE_31,
-                mlang_version::MOODLE_32,
-                mlang_version::MOODLE_33,
-                mlang_version::MOODLE_34,
-                mlang_version::MOODLE_35,
-                mlang_version::MOODLE_36,
-                mlang_version::MOODLE_37,
-                mlang_version::MOODLE_38,
-                mlang_version::MOODLE_39,
-                mlang_version::MOODLE_40,
-            );
+            $codes = [
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34,
+                35,
+                36,
+                37,
+                38,
+                39,
+                310,
+                400,
+            ];
             $versions = array();
             foreach ($codes as $code) {
                 $versions[$code] = mlang_version::by_code($code);

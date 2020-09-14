@@ -1055,8 +1055,8 @@ EOF;
     public function test_execution_strings() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_20);
-        $this->register_language('cs', mlang_version::MOODLE_20);
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
@@ -1111,8 +1111,8 @@ EOF;
     public function test_execution_strings_move() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_20);
-        $this->register_language('cs', mlang_version::MOODLE_20);
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
@@ -1153,7 +1153,7 @@ AMOS END';
         unset($component);
 
         // execute AMOS script if the commit message contains some
-        if ($version->code >= mlang_version::MOODLE_20) {
+        if ($version->code >= 20) {
             $instructions = mlang_tools::extract_script_from_text($commitmsg);
             if (!empty($instructions)) {
                 foreach ($instructions as $instruction) {
@@ -1484,8 +1484,8 @@ AMOS END';
     public function test_execution_forced_copy() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_22);
-        $this->register_language('cs', mlang_version::MOODLE_22);
+        $this->register_language('en', 22);
+        $this->register_language('cs', 22);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_22_STABLE');
@@ -1660,9 +1660,9 @@ AMOS END';
     public function test_auto_merge() {
         $this->resetAfterTest();
 
-        $this->register_language('en', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
-        $this->register_language('cs', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
-        $this->register_language('en_fix', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
+        $this->register_language('en', array(23, 24, 25));
+        $this->register_language('cs', array(23, 24, 25));
+        $this->register_language('en_fix', array(23, 24, 25));
 
         $stage = new mlang_stage();
         $version19 = mlang_version::by_branch('MOODLE_19_STABLE');

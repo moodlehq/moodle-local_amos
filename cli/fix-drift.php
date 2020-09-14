@@ -136,7 +136,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'contenttype'           => 'contentbank/contenttype',
         ];
 
-        if ($version->code <= mlang_version::MOODLE_21) {
+        if ($version->code <= 21) {
             // since 2.2 beta, reports have moved
             $basedirs['report'] = 'admin/report';
         }

@@ -43,7 +43,7 @@ while (($string = fgets($greylist, 514)) !== false) {
     $matches = array();
     if (preg_match('/^\[(.+),(.+)\]$/', $string, $matches)) {
         $item = new stdClass();
-        $item->branch = mlang_version::MOODLE_20;
+        $item->branch = 20;
         $item->stringid = $matches[1];
         $item->component = $matches[2];
         try {

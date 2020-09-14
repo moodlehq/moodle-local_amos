@@ -141,7 +141,7 @@ class mlang_component {
         } else {
             throw new Exception('Strings definition file ' . $filepath . ' not readable');
         }
-        if ($version->code <= mlang_version::MOODLE_19) {
+        if ($version->code <= 19) {
             // we are going to import strings for 1.x branch
             $target = 1;
             if (is_null($format)) {
@@ -504,7 +504,7 @@ EOF
     public function get_phpfile_location($treeish=true) {
         global $CFG;
 
-        if ($this->version->code <= mlang_version::MOODLE_19) {
+        if ($this->version->code <= 19) {
             // Moodle 1.x
             return 'lang/' . $this->lang . '_utf8/' . $this->name . '.php';
 
@@ -614,7 +614,7 @@ EOF
      */
     public function clean_texts() {
 
-        if ($this->version->code < mlang_version::MOODLE_20) {
+        if ($this->version->code <= 19) {
             $format = 1;
         } else {
             $format = 2;
@@ -2078,13 +2078,13 @@ class mlang_tools {
      */
     public static function merge(mlang_component $source, mlang_component $target) {
 
-        if ($source->version->code <= mlang_version::MOODLE_19) {
+        if ($source->version->code <= 19) {
             $sourceformat = 1;
         } else {
             $sourceformat = 2;
         }
 
-        if ($target->version->code <= mlang_version::MOODLE_19) {
+        if ($target->version->code <= 19) {
             throw new mlang_exception('Can not merge into Moodle 1.x branches');
         } else {
             $targetformat = 2;
@@ -2140,7 +2140,7 @@ class mlang_tools {
 
         // Keep only those >= 2.0 (merge not supported for lower versions).
         foreach ($branchcodes as $index => $branchcode) {
-            if ($branchcode < mlang_version::MOODLE_20) {
+            if ($branchcode <= 19) {
                 unset($branchcodes[$index]);
             }
         }
@@ -2182,8 +2182,8 @@ class mlang_tools {
      * Auto-merge helper method for merging between two branches.
      *
      * @param string $componentname the name of the component
-     * @param int $from version code to merge from (e.g. {@link mlang_version::MOODLE_25})
-     * @param int $to version code to merge to (e.g. {@link mlang_version::MOODLE_24})
+     * @param int $from version code to merge from (e.g. 39, 310, 400)})
+     * @param int $to version code to merge to (e.g. 39, 310, 400)
      * @param array $languages optional list of language codes (defaults to all languages)
      */
     protected static function auto_merge_helper($componentname, $from, $to, array $languages = array()) {

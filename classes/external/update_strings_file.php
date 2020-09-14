@@ -99,7 +99,7 @@ trait update_strings_file {
             $componentlanguage = $component['language'];
 
             $componentversion = \mlang_version::by_dir($component['moodlebranch']);
-            if (is_null($componentversion) or $componentversion->code < \mlang_version::MOODLE_20) {
+            if (is_null($componentversion) || $componentversion->code <= 19) {
                 throw new \invalid_parameter_exception('Unsupported Moodle branch');
             }
 
