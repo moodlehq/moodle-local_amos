@@ -185,7 +185,7 @@ class mlang_component {
      * @return mlang_component Component with the strings from the snapshot.
      */
     public static function from_snapshot(string $name, string $lang, mlang_version $version, ?int $timestamp = null,
-            bool $deleted=false, bool $fullinfo = false, ?array $stringids = null): mlang_component {
+            bool $deleted=false, bool $fullinfo = false, ?array $strnames = null): mlang_component {
         global $DB;
 
         $sql = "SELECT r.id, r.strname, r.strtext, r.since, r.timemodified";
@@ -220,8 +220,8 @@ class mlang_component {
                       AND since <= :version";
 
         if (!empty($stringids)) {
-            list($strsql, $strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'stringid000000');
-            $sql .= " AND stringid $strsql";
+            list($strsql, $strparams) = $DB->get_in_or_equal($strnames, SQL_PARAMS_NAMED);
+            $sql .= " AND strname $strsql";
             $params += $strparams;
         }
 
