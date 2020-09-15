@@ -1907,54 +1907,101 @@ class mlang_tools {
     }
 
     /**
-     * Returns the tree of all known components
+     * Returns the tree of all known components.
      *
-     * @param array $conditions can specify branch, lang and component to filter
+     * @param array $conditions Specific branch (code), lang (code) and component to filter.
+     * @param bool $usecache Allow to use the cached version of the full tree.
      * @return array [branch][language][component] => true
      */
-    public static function components_tree(array $conditions=null) {
+    public static function components_tree(?array $conditions = null, bool $usecache = true): array {
         global $DB;
 
-        $where = array();
-        $params = array();
-        if (!empty($conditions['branch'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['branch']);
-            $where[] = "branch $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($conditions['lang'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['lang']);
-            $where[] = "lang $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($conditions['component'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['component']);
-            $where[] = "component $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($where)) {
-            $where = " WHERE " . implode(" AND ", $where);
-        }
-        $sql = "SELECT DISTINCT branch,lang,component
-                  FROM {amos_snapshot}";
-        if (!empty($where)) {
-            $sql .= $where;
-        }
-        $sql .= " ORDER BY branch,lang,component";
-        $rs = $DB->get_recordset_sql($sql, $params);
-        $tree = array();
-        foreach ($rs as $record) {
-            if (!isset($tree[$record->branch])) {
-                $tree[$record->branch] = array();
-            }
-            if (!isset($tree[$record->branch][$record->lang])) {
-                $tree[$record->branch][$record->lang] = array();
-            }
-            $tree[$record->branch][$record->lang][$record->component] = true;
-        }
-        $rs->close();
+        $cache = cache::make('local_amos', 'lists');
+        $fulltree = false;
 
-        return $tree;
+        if ($usecache) {
+            $fulltree = $cache->get('componentstree');
+        }
+
+        if ($fulltree === false) {
+            $allversions = mlang_version::list_all();
+            $fulltree = [];
+            $sql = "SELECT DISTINCT 'en' AS lang, component, since
+                      FROM {amos_strings}
+
+                     UNION
+
+                    SELECT DISTINCT lang, component, since
+                      FROM {amos_translations}
+
+                  ORDER BY since, lang, component";
+
+            $recordset = $DB->get_recordset_sql($sql);
+
+            foreach ($recordset as $record) {
+                foreach ($allversions as $version) {
+                    if ($version->code >= $record->since) {
+                        $fulltree[$version->code][$record->lang][$record->component] = true;
+                    }
+                }
+            }
+
+            $recordset->close();
+
+            $cache->set('componentstree', $fulltree);
+        }
+
+        if (empty($conditions)) {
+            return $fulltree;
+
+        } else {
+            $result = [];
+            foreach ($fulltree as $branch => $languages) {
+                if (!empty($conditions['branch'])) {
+                    if (is_array($conditions['branch'])) {
+                        if (!in_array($branch, $conditions['branch'])) {
+                            continue;
+                        }
+                    } else {
+                        if ($branch != $conditions['branch']) {
+                            continue;
+                        }
+                    }
+                }
+
+                foreach ($languages as $language => $components) {
+                    if (!empty($conditions['lang'])) {
+                        if (is_array($conditions['lang'])) {
+                            if (!in_array($language, $conditions['lang'])) {
+                                continue;
+                            }
+                        } else {
+                            if ($language !== $conditions['lang']) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    foreach ($components as $component => $ignored) {
+                        if (!empty($conditions['component'])) {
+                            if (is_array($conditions['component'])) {
+                                if (!in_array($component, $conditions['component'])) {
+                                    continue;
+                                }
+                            } else {
+                                if ($component !== $conditions['component']) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        $result[$branch][$language][$component] = true;
+                    }
+                }
+            }
+
+            return $result;
+        }
     }
 
     /**
