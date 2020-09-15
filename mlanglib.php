@@ -182,6 +182,7 @@ class mlang_component {
      * @param int $timestamp Time of the snapshot, defaults to the most recent one.
      * @param bool $deleted Shall deleted strings be included?
      * @param bool $fullinfo Shall full information about the string (commit messages, source etc.) be returned?
+     * @param array $strnames Limit the list of loaded strings to ones in this list only.
      * @return mlang_component Component with the strings from the snapshot.
      */
     public static function from_snapshot(string $name, string $lang, mlang_version $version, ?int $timestamp = null,
@@ -219,7 +220,7 @@ class mlang_component {
                       $langsql
                       AND since <= :version";
 
-        if (!empty($stringids)) {
+        if (!empty($strnames)) {
             list($strsql, $strparams) = $DB->get_in_or_equal($strnames, SQL_PARAMS_NAMED);
             $sql .= " AND strname $strsql";
             $params += $strparams;

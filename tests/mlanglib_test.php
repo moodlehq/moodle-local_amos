@@ -376,7 +376,7 @@ EOF;
         $component->add_string(new mlang_string('two', 'Two'));
         $component->add_string(new mlang_string('three', 'Tree')); // typo here
         $stage->add($component);
-        $stage->commit('Initial commit', array('source' => 'unittest'), true);
+        $stage->commit('Initial commit', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
@@ -402,6 +402,27 @@ EOF;
         unset($component);
         unset($stage);
 
+        // Rebasing on a higher branch.
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('one', 'One')); // same as the current
+        $component->add_string(new mlang_string('two', 'Two')); // same as the current
+        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $stage->add($component);
+        $stage->rebase();
+        $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($rebased instanceof mlang_component);
+        $this->assertFalse($rebased->has_string('one'));
+        $this->assertFalse($rebased->has_string('two'));
+        $this->assertTrue($rebased->has_string('three'));
+        $s = $rebased->get_string('three');
+        $this->assertEquals('Three', $s->text);
+        $stage->clear();
+        $component->clear();
+        unset($component);
+        unset($stage);
+
         // rebasing with string removal - the stage is considered to be the full snapshot of the state
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
@@ -412,6 +433,29 @@ EOF;
         $stage->add($component);
         $stage->rebase(null, true);
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertTrue($rebased instanceof mlang_component);
+        $this->assertFalse($rebased->has_string('one'));
+        $this->assertTrue($rebased->has_string('two'));
+        $this->assertTrue($rebased->has_string('three'));
+        $s = $rebased->get_string('two');
+        $this->assertTrue($s->deleted);
+        $s = $rebased->get_string('three');
+        $this->assertEquals('Three', $s->text);
+        $stage->clear();
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        // Rebasing with string removal on a higher branch.
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
+        $component->add_string(new mlang_string('one', 'One')); // same as the current
+        // Rtring 'two' is missing and we want it to be removed from repository.
+        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $stage->add($component);
+        $stage->rebase(null, true);
+        $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
         $this->assertTrue($rebased instanceof mlang_component);
         $this->assertFalse($rebased->has_string('one'));
         $this->assertTrue($rebased->has_string('two'));
