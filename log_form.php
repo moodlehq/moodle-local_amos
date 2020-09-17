@@ -115,7 +115,7 @@ class local_amos_log_form extends moodleform {
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
-        foreach (mlang_tools::list_components() as $componentname => $undefined) {
+        foreach (mlang_tools::list_components() as $componentname => $since) {
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
                     $optionscore[$componentname] = $standard[$componentname];

@@ -92,15 +92,7 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
-        $allversions = mlang_version::list_all();
-        foreach ($allversions as $key => $version) {
-            if (!$version->translatable) {
-                unset($allversions[$key]);
-            }
-        }
-        $colspan = count($allversions) + 1;
-        $listversions = array();
-        foreach (mlang_tools::list_components() as $componentname => $branches) {
+        foreach (mlang_tools::list_components() as $componentname => $since) {
             // Categorize the component into Core, Standard or Add-ons.
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
@@ -111,16 +103,8 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $optionscontrib[$componentname] = $componentname;
             }
-            // Prepare the list of versions the component strings are available at.
-            $componentversions = array();
-            foreach ($allversions as $version) {
-                if (in_array($version->code, $branches)) {
-                    $componentversions[$version->code] = html_writer::tag('td', html_writer::tag('span', $version->label), array('class' => 'version'));
-                } else {
-                    $componentversions[$version->code] = html_writer::tag('td', '', array('class' => 'version'));
-                }
-            }
-            $listversions[$componentname] = implode('', $componentversions);
+            $listversions[$componentname] = html_writer::tag('td', mlang_version::by_code($since)->label . '+',
+                ['class' => 'version']);
         }
 
         asort($optionscore);
@@ -132,7 +116,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $app_plugins = local_amos_app_plugins();
 
-        $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
+        $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => 2)));
         foreach ($optionscore as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';
@@ -146,7 +130,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'standard core'.$isapp));
         }
 
-        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => 2)));
         foreach ($optionsstandard as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';
@@ -160,7 +144,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'standard plugin'.$isapp));
         }
 
-        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => 2)));
         foreach ($optionscontrib as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';

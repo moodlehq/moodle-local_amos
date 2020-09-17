@@ -1042,8 +1042,6 @@ EOF;
 
         $this->resetAfterTest();
 
-        set_config('brancheslist', '38,39,310,400', 'local_amos');
-
         $stage = new mlang_stage();
         $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_38_STABLE'));
         $component->add_string(new mlang_string('modulename', 'Workshop'));
@@ -1060,26 +1058,20 @@ EOF;
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'CS'));
+        // This will play no role as there is no English original.
+        $component = new mlang_component('assign', 'cs', mlang_version::by_branch('MOODLE_38_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'Úkol'));
         $stage->add($component);
         $component->clear();
 
-        $stage->commit('Registering two English components', array('source' => 'unittest'));
+        $stage->commit('Registering component strings', array('source' => 'unittest'));
 
         $comps = mlang_tools::list_components();
+
         $this->assertEquals(gettype($comps), 'array');
         $this->assertEquals(count($comps), 2);
-        $this->assertTrue(array_key_exists('workshop', $comps));
-        $this->assertTrue(array_key_exists('auth', $comps));
-        $this->assertEquals(count($comps['auth']), 2);
-        $this->assertEquals(count($comps['workshop']), 4);
-        $this->assertContains('38', $comps['workshop']);
-        $this->assertContains('39', $comps['workshop']);
-        $this->assertContains('310', $comps['workshop']);
-        $this->assertContains('400', $comps['workshop']);
-        $this->assertContains('310', $comps['auth']);
-        $this->assertContains('400', $comps['auth']);
+        $this->assertEquals($comps['auth'], 310);
+        $this->assertEquals($comps['workshop'], 38);
     }
 
     public function test_execution_strings() {
@@ -1269,116 +1261,6 @@ AMOS END';
         $this->assertTrue(in_array('nodefaultuserrolelists', $affected));
         $this->assertTrue(in_array('nolangupdateneeded', $affected));
         $this->assertTrue(in_array('mod/something:really_nasty-like0098187.this', $affected));
-    }
-
-    public function test_components_tree() {
-
-        $this->resetAfterTest();
-
-        set_config('brancheslist', '38,39,310,400', 'local_amos');
-
-        $stage = new mlang_stage();
-        $component = new mlang_component('moodle', 'en',  mlang_version::by_code(38));
-        $component->add_string(new mlang_string('foo', 'Bar'));
-        $stage->add($component);
-        $stage->commit('Committing test strings');
-        $component->clear();
-
-        // Call it fore the first time.
-        $tree = mlang_tools::components_tree();
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(4, count($tree));
-        $this->assertEquals(1, count($tree[38]));
-        $this->assertEquals(1, count($tree[39]));
-        $this->assertTrue($tree[38]['en']['moodle']);
-        $this->assertTrue($tree[39]['en']['moodle']);
-
-        foreach (['en', 'cs'] as $lang) {
-            $component = new mlang_component('auth_mnet', $lang,  mlang_version::by_code(39));
-            $component->add_string(new mlang_string('foo', 'Bar'));
-            $stage->add($component);
-            $stage->commit('Committing test strings');
-            $component->clear();
-        }
-
-        // Call it for the second time.
-        // Even if the list is cached internally, it was repopulated on the commit.
-        $tree = mlang_tools::components_tree();
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(4, count($tree));
-        $this->assertEquals(1, count($tree[38]));
-        $this->assertEquals(2, count($tree[39]));
-        $this->assertTrue($tree[38]['en']['moodle']);
-        $this->assertTrue($tree[39]['en']['moodle']);
-        $this->assertTrue($tree[39]['en']['auth_mnet']);
-
-        foreach (['en', 'cs', 'es'] as $lang) {
-            $component = new mlang_component('workshop', $lang,  mlang_version::by_code(400));
-            $component->add_string(new mlang_string('foo', 'Bar'));
-            $stage->add($component);
-            $component->clear();
-        }
-
-        $stage->commit('Committing test strings');
-
-        $tree = mlang_tools::components_tree();
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(4, count($tree));
-        $this->assertEquals(1, count($tree[38]));
-        $this->assertEquals(2, count($tree[39]));
-        $this->assertEquals(2, count($tree[310]));
-        $this->assertEquals(3, count($tree[400]));
-        $this->assertTrue($tree[38]['en']['moodle']);
-        $this->assertTrue($tree[39]['en']['moodle']);
-        $this->assertTrue($tree[39]['cs']['auth_mnet']);
-        $this->assertTrue($tree[310]['cs']['auth_mnet']);
-        $this->assertTrue($tree[400]['cs']['auth_mnet']);
-        $this->assertTrue($tree[400]['cs']['workshop']);
-        $this->assertArrayNotHasKey('cs', $tree[38]);
-        $this->assertArrayNotHasKey('moodle', $tree[39]['cs']);
-
-        // Empty trees.
-        $tree = mlang_tools::components_tree(['branch' => 37]);
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertTrue(empty($tree));
-
-        $tree = mlang_tools::components_tree(['component' => 'book']);
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertTrue(empty($tree));
-
-        // Single value filter.
-        $tree = mlang_tools::components_tree(['branch' => 39, 'lang' => 'cs']);
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(1, count($tree));
-        $this->assertEquals(1, count($tree[39]));
-        $this->assertEquals(1, count($tree[39]['cs']));
-        $this->assertTrue($tree[39]['cs']['auth_mnet']);
-
-        // Yet another single value filter.
-        $tree = mlang_tools::components_tree(['component' => 'auth_mnet']);
-        $this->assertEquals(3, count($tree));
-        $this->assertEquals(2, count($tree[39]));
-        $this->assertEquals(2, count($tree[310]));
-        $this->assertEquals(2, count($tree[400]));
-
-        // Multivalues filter.
-        $tree = mlang_tools::components_tree([
-            'branch' => [
-                39,
-                400,
-            ],
-            'lang' => [
-                'en',
-            ],
-            'component' => [
-                'foobar',
-                'workshop'
-            ],
-        ]);
-        $this->assertEquals(1, count($tree));
-        $this->assertEquals(1, count($tree[400]));
-        $this->assertEquals(1, count($tree[400]['en']));
-        $this->assertTrue($tree[400]['en']['workshop']);
     }
 
     public function test_stage_propagate() {

@@ -1843,26 +1843,19 @@ class mlang_tools {
     }
 
     /**
-     * Returns the list of all known components and the branches they are registered at
+     * Returns the list of all known components and the first version in which they have a string.
      *
-     * The component must exist in English on at least one branch to be returned.
+     * The component must exist in English to be returned.
      *
-     * @param bool $usecache can the internal cache be used?
-     * @return array (string)componentname => (array)branches
+     * @return array (string)component name => (int)since branch code
      */
-    public static function list_components($usecache=true) {
+    public static function list_components() {
         global $DB;
 
         $cache = cache::make('local_amos', 'lists');
-        $components = false;
-
-        if ($usecache) {
-            $components = $cache->get('components');
-        }
+        $components = $cache->get('components');
 
         if ($components === false) {
-            $allversions = mlang_version::list_all();
-            $components = [];
 
             $sql = "SELECT component, MIN(since) AS since
                       FROM {amos_strings}
@@ -1870,20 +1863,13 @@ class mlang_tools {
                   ORDER BY component";
 
             $rs = $DB->get_recordset_sql($sql);
+            $components = [];
 
             foreach ($rs as $record) {
-                if (!isset($components[$record->component])) {
-                    $components[$record->component] = [];
-                    foreach ($allversions as $ver) {
-                        if ($ver->code >= $record->since) {
-                            $components[$record->component][] = $ver->code;
-                        }
-                    }
-                }
+                $components[$record->component] = $record->since;
             }
 
             $rs->close();
-
             $cache->set('components', $components);
         }
 
@@ -1908,104 +1894,6 @@ class mlang_tools {
             $langs[$record->lang] = $record->lang;
         }
         return $langs;
-    }
-
-    /**
-     * Returns the tree of all known components.
-     *
-     * @param array $conditions Specific branch (code), lang (code) and component to filter.
-     * @param bool $usecache Allow to use the cached version of the full tree.
-     * @return array [branch][language][component] => true
-     */
-    public static function components_tree(?array $conditions = null, bool $usecache = true): array {
-        global $DB;
-
-        $cache = cache::make('local_amos', 'lists');
-        $fulltree = false;
-
-        if ($usecache) {
-            $fulltree = $cache->get('componentstree');
-        }
-
-        if ($fulltree === false) {
-            $allversions = mlang_version::list_all();
-            $fulltree = [];
-            $sql = "SELECT DISTINCT 'en' AS lang, component, since
-                      FROM {amos_strings}
-
-                     UNION
-
-                    SELECT DISTINCT lang, component, since
-                      FROM {amos_translations}
-
-                  ORDER BY since, lang, component";
-
-            $recordset = $DB->get_recordset_sql($sql);
-
-            foreach ($recordset as $record) {
-                foreach ($allversions as $version) {
-                    if ($version->code >= $record->since) {
-                        $fulltree[$version->code][$record->lang][$record->component] = true;
-                    }
-                }
-            }
-
-            $recordset->close();
-
-            $cache->set('componentstree', $fulltree);
-        }
-
-        if (empty($conditions)) {
-            return $fulltree;
-
-        } else {
-            $result = [];
-            foreach ($fulltree as $branch => $languages) {
-                if (!empty($conditions['branch'])) {
-                    if (is_array($conditions['branch'])) {
-                        if (!in_array($branch, $conditions['branch'])) {
-                            continue;
-                        }
-                    } else {
-                        if ($branch != $conditions['branch']) {
-                            continue;
-                        }
-                    }
-                }
-
-                foreach ($languages as $language => $components) {
-                    if (!empty($conditions['lang'])) {
-                        if (is_array($conditions['lang'])) {
-                            if (!in_array($language, $conditions['lang'])) {
-                                continue;
-                            }
-                        } else {
-                            if ($language !== $conditions['lang']) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    foreach ($components as $component => $ignored) {
-                        if (!empty($conditions['component'])) {
-                            if (is_array($conditions['component'])) {
-                                if (!in_array($component, $conditions['component'])) {
-                                    continue;
-                                }
-                            } else {
-                                if ($component !== $conditions['component']) {
-                                    continue;
-                                }
-                            }
-                        }
-
-                        $result[$branch][$language][$component] = true;
-                    }
-                }
-            }
-
-            return $result;
-        }
     }
 
     /**
