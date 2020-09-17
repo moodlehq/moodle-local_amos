@@ -1609,27 +1609,22 @@ AMOS END';
         $this->assertEquals(1, $DB->count_records('amos_snapshot'));
     }
 
-    public function test_auto_merge() {
+    public function test_backport_translations() {
         $this->resetAfterTest();
 
-        $this->register_language('en', array(23, 24, 25));
-        $this->register_language('cs', array(23, 24, 25));
-        $this->register_language('en_fix', array(23, 24, 25));
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
+        $this->register_language('en_fix', 20);
 
         $stage = new mlang_stage();
-        $version19 = mlang_version::by_branch('MOODLE_19_STABLE');
+        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
+        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
         $version23 = mlang_version::by_branch('MOODLE_23_STABLE');
         $version24 = mlang_version::by_branch('MOODLE_24_STABLE');
         $version25 = mlang_version::by_branch('MOODLE_25_STABLE');
         $time = time();
 
-        // Make some 1.9, 2.3 and 2.4 strings
-        $component = new mlang_component('foo', 'en', $version19);
-        $component->add_string(new mlang_string('modulename', 'Foo', $time - 500 * DAYSECS));
-        $stage->add($component);
-        $component->clear();
-        $stage->commit('Add Foo 1.9 strings', array('source' => 'unittest'));
-
+        // Register Foo plugin English strings for Moodle 2.3 and higher (pretend that happened 180 days ago).
         $component = new mlang_component('foo', 'en', $version23);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 180 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Done', $time - 180 * DAYSECS));
@@ -1639,14 +1634,15 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.3 strings', array('source' => 'unittest'));
 
+        // Translate only some of the strings into Czech on 2.3.
         $component = new mlang_component('foo', 'cs', $version23);
         $component->add_string(new mlang_string('modulename', 'Fu', $time - 179 * DAYSECS));
-        $component->add_string(new mlang_string('done', 'Hotovo', $time - 179 * DAYSECS));
         $component->add_string(new mlang_string('aaa', 'AAA', $time - 179 * DAYSECS));
         $stage->add($component);
         $component->clear();
         $stage->commit('Translate some Foo 2.3 strings into Czech', array('source' => 'unittest'));
 
+        // Change one and add one string in 2.4.
         $component = new mlang_component('foo', 'en', $version24);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 90 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Finished', $time - 90 * DAYSECS)); // Changed in 2.4
@@ -1657,8 +1653,10 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.4 strings', array('source' => 'unittest'));
 
+        // Update 2.3 Czech translation.
         $component = new mlang_component('foo', 'cs', $version24);
         $component->add_string(new mlang_string('modulename', 'Fu', $time - 45 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Ukončeno', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('end', 'Konec', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('bbb', 'BBB', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('orphan', 'Orphan', $time - 45 * DAYSECS));
@@ -1672,21 +1670,28 @@ AMOS END';
         $component->clear();
         $stage->commit('Since 2.4, the module name is different', array('source' => 'unittest'));
 
-        testable_mlang_tools::auto_merge('foo');
+        testable_mlang_tools::backport_translations('foo');
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version23);
+        // The modulename translation on 2.3 was not affected by the 2.4 version because the value is identical.
         $this->assertTrue($component->has_string('modulename'));
         $this->assertEquals('Fu', $component->get_string('modulename')->text);
         $this->assertEquals($time - 179 * DAYSECS, $component->get_string('modulename')->timemodified);
-        $this->assertTrue($component->has_string('done'));
+        // This was already present.
         $this->assertTrue($component->has_string('aaa'));
-        $this->assertTrue($component->has_string('bbb')); // This has been auto-merged from 2.4
+        // The bbb translation was backported from 2.4 with the current timestamp.
+        $this->assertTrue($component->has_string('bbb'));
         $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
-        $this->assertFalse($component->has_string('end')); // Because it's 2.4 only
-        $this->assertFalse($component->has_string('orphan')); // Because it's not in 2.3 English
+        // The end string is introduced in 2.4 only so it was not backported.
+        $this->assertFalse($component->has_string('end'));
+        // Same reason, the orphan string is not in English is it is not backported.
+        $this->assertFalse($component->has_string('orphan'));
+        // The 2.4 English original of "done" is different from 2.3, so 2.4 translation is not backported.
+        $this->assertFalse($component->has_string('done'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'en_fix', $version23);
+        // The en_fix strings are exception and not backported.
         $this->assertFalse($component->has_string('modulename'));
         $component->clear();
 
@@ -1695,26 +1700,44 @@ AMOS END';
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'en_fix', $version25);
-        $this->assertFalse($component->has_string('modulename'));
+        // The string exists on 2.5 implicitly (as it exists since 2.4), not as a result of backporting.
+        $this->assertTrue($component->has_string('modulename'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version24);
+        // There was no change committed for 2.4 and the original 2.3 version is used.
         $this->assertTrue($component->has_string('modulename'));
-        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('modulename')->timemodified);
-        $this->assertTrue($component->has_string('aaa')); // This has been auto-merged from 2.3
-        $this->assertTrue($component->get_string('aaa')->timemodified >= $time);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
+        $this->assertEquals($time - 179 * DAYSECS, $component->get_string('modulename')->timemodified);
+        $this->assertTrue($component->has_string('aaa'));
+        $this->assertEquals($time - 179 * DAYSECS, $component->get_string('aaa')->timemodified);
+        // This was committed in 2.4.
         $this->assertTrue($component->has_string('bbb'));
-        $this->assertFalse($component->has_string('done')); // Because it has changed in English
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('bbb')->timemodified);
+        $this->assertTrue($component->has_string('done'));
+        $this->assertEquals('Ukončeno', $component->get_string('done')->text);
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('done')->timemodified);
         $component->clear();
 
-        $component = new mlang_component('foo', 'cs', $version24);
-        $component->add_string(new mlang_string('done', 'Ukončeno', $time - 40 * DAYSECS));
+        // Translate the missing "done" string in 2.3 cs.
+        $component = new mlang_component('foo', 'cs', $version23);
+        $component->add_string(new mlang_string('done', 'Hotovo', $time - 40 * DAYSECS));
         $stage->add($component);
         $component->clear();
-        $stage->commit('Add missing 2.4 string', array('source' => 'unittest'));
+        $stage->commit('Add missing 2.3 string', array('source' => 'unittest'));
 
-        // New version of the Foo is released, strings have not changed.
+        // The added translation is valid for 2.3 only as the 2.4 version still applies even if was committed earlier.
+        $component = mlang_component::from_snapshot('foo', 'cs', $version23);
+        $this->assertEquals('Hotovo', $component->get_string('done')->text);
+        $this->assertEquals($time - 40 * DAYSECS, $component->get_string('done')->timemodified);
+        $component->clear();
 
+        $component = mlang_component::from_snapshot('foo', 'cs', $version24);
+        $this->assertEquals('Ukončeno', $component->get_string('done')->text);
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('done')->timemodified);
+        $component->clear();
+
+        // New version of the Foo for Moodle 2.5 is released, strings have not changed.
         $component = new mlang_component('foo', 'en', $version25);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 20 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Finished', $time - 20 * DAYSECS));
@@ -1725,14 +1748,47 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.5 strings', array('source' => 'unittest'));
 
-        testable_mlang_tools::auto_merge('foo', array('en', 'cs')); // 'en' is to be ignored.
+        testable_mlang_tools::backport_translations('foo', ['en', 'cs']);
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version25);
         $this->assertTrue($component->has_string('modulename'));
-        $this->assertTrue($component->get_string('modulename')->timemodified >= $time);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
         $this->assertTrue($component->has_string('aaa'));
         $this->assertTrue($component->has_string('bbb'));
         $this->assertTrue($component->has_string('done'));
+        $component->clear();
+
+        // Foo plugin is released for 2.1 too (marked as supporting 2.1 in the plugins directory).
+        $component = new mlang_component('foo', 'en', $version21);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Done', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 15 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 2.1 strings', array('source' => 'unittest'));
+
+        // Without backporting, there would be no 2.1 Czech translation.
+        $component = mlang_component::from_snapshot('foo', 'cs', $version21);
+        $this->assertFalse($component->has_string());
+
+        // Backport the Czech translations.
+        testable_mlang_tools::backport_translations('foo');
+
+        $component = mlang_component::from_snapshot('foo', 'cs', $version21);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
+        $this->assertTrue($component->get_string('modulename')->timemodified >= $time);
+        $this->assertEquals('AAA', $component->get_string('aaa')->text);
+        $this->assertTrue($component->get_string('aaa')->timemodified >= $time);
+        $this->assertTrue($component->has_string('bbb'));
+        $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
+        // The end string is introduced in 2.4 only so it was not backported.
+        $this->assertFalse($component->has_string('end'));
+        // Same reason, the orphan string is not in English is it is not backported.
+        $this->assertFalse($component->has_string('orphan'));
+        // The 2.3 English original of "done" is backported even if it is changed again in 2.4.
+        $this->assertEquals('Hotovo', $component->get_string('done')->text);
+        $this->assertTrue($component->get_string('done')->timemodified >= $time);
         $component->clear();
     }
 

@@ -173,7 +173,7 @@ trait update_strings_file {
 
         // Auto-merge updated components.
         foreach ($componentnames as $componentname) {
-            \mlang_tools::auto_merge($componentname);
+            \mlang_tools::backport_translations($componentname);
         }
 
         // Done! Thank you for calling this web service.

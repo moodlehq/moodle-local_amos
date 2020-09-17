@@ -2089,128 +2089,88 @@ class mlang_tools {
     }
 
     /**
-     * Automatically fill missing translations from other branches.
+     * Automatically backport translations to lower versions if they apply.
+     *
+     * A typical use case is when plugin English strings are registered on version X and translated. And then the X - 1
+     * version is registered. Without backporting, that translations would exist since X only. But we want the
+     * translations of identical strings be backported from X to X -1 automatically.
+     *
+     * Backporting does not happen on 'en' and 'en_fix' languages.
      *
      * @param string $componentname the name of the component
      * @param array $languages optional list of language codes (defaults to all languages)
      */
-    public static function auto_merge($componentname, array $languages = array()) {
+    public static function backport_translations($componentname, array $languages = []) {
 
         $tree = self::list_components();
 
         if (!isset($tree[$componentname])) {
-            throw new mlang_exception('Unknow component '.$componentname);
+            throw new mlang_exception('Unknow component ' . $componentname);
         }
 
-        $branchcodes = $tree[$componentname];
-
-        // Keep only those >= 2.0 (merge not supported for lower versions).
-        foreach ($branchcodes as $index => $branchcode) {
-            if ($branchcode <= 19) {
-                unset($branchcodes[$index]);
-            }
+        if (empty($languages)) {
+            $languages = array_keys(self::list_languages(false));
         }
 
-        $branchcodesasc = $branchcodes;
-        sort($branchcodesasc);
+        $languages = array_diff($languages, ['en', 'en_fix']);
+        $allversions = mlang_version::list_all();
 
-        $branchcodesdesc = $branchcodes;
-        rsort($branchcodesdesc);
+        foreach ($allversions as $branchto) {
+            foreach ($languages as $language) {
+                // Get the snapshot of the English strings on the version we are backporting to.
+                $englishto = mlang_component::from_snapshot($componentname, 'en', $branchto);
 
-        // Merge strings from top to bottom first (e.g. 2.5 > 2.4 > 2.3)
-        $from = null;
-        foreach ($branchcodesdesc as $to) {
-            if (is_null($from)) {
-                $from = $to;
-                continue;
+                if (!$englishto->has_string()) {
+                    // There is no English string on this version yet. Go higher.
+                    continue;
+                }
+
+                $transto = mlang_component::from_snapshot($componentname, $language, $branchto);
+
+                // Seek for all higher versions to see if there is some translation we can backport from.
+                foreach ($allversions as $branchfrom) {
+                    if ($branchfrom->code <= $branchto->code) {
+                        continue;
+                    }
+
+                    $englishfrom = mlang_component::from_snapshot($componentname, 'en', $branchfrom);
+                    $transfrom = mlang_component::from_snapshot($componentname, $language, $branchfrom);
+
+                    self::merge($transfrom, $transto);
+                    $transto->intersect($englishto);
+
+                    // Make sure that the English originals are equal.
+                    foreach ($transto->get_iterator() as $transtostring) {
+                        $englishfromstring = $englishfrom->get_string($transtostring->id);
+                        $englishtostring = $englishto->get_string($transtostring->id);
+                        if ($englishfromstring === null
+                                || $englishtostring === null
+                                || mlang_string::differ($englishfromstring, $englishtostring)) {
+                            $transto->unlink_string($transtostring->id);
+                        }
+                    }
+
+                    // If we have something to commit, do it now.
+                    if ($transto->has_string()) {
+                        $stage = new mlang_stage();
+                        $stage->add($transto);
+                        $stage->commit('Backport ' . $language . '/' . $componentname . ' translations from ' .
+                            $branchfrom->label . ' to ' . $branchto->label,
+                            ['source' => 'backport', 'userinfo' => 'AMOS-bot <amos@moodle.org>']);
+                        $transto->clear();
+                        $transto = mlang_component::from_snapshot($componentname, $language, $branchto);
+                    }
+
+                    $englishfrom->clear();
+                    $transfrom->clear();
+                }
             }
-            self::auto_merge_helper($componentname, $from, $to, $languages);
-            $from = $to;
-        }
-
-        // Merge strings from bottom to top then (e.g. 2.3 > 2.4 > 2.5)
-        $from = null;
-        foreach ($branchcodesasc as $to) {
-            if (is_null($from)) {
-                $from = $to;
-                continue;
-            }
-            self::auto_merge_helper($componentname, $from, $to, $languages);
-            $from = $to;
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Internal implementation
     ////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Auto-merge helper method for merging between two branches.
-     *
-     * @param string $componentname the name of the component
-     * @param int $from version code to merge from (e.g. 39, 310, 400)})
-     * @param int $to version code to merge to (e.g. 39, 310, 400)
-     * @param array $languages optional list of language codes (defaults to all languages)
-     */
-    protected static function auto_merge_helper($componentname, $from, $to, array $languages = array()) {
-
-        $english_from = mlang_component::from_snapshot($componentname, 'en', mlang_version::by_code($from));
-        $english_to = mlang_component::from_snapshot($componentname, 'en', mlang_version::by_code($to));
-
-        if (!$english_from->has_string() or !$english_to->has_string()) {
-            $english_from->clear();
-            $english_to->clear();
-            return;
-        }
-
-        // Get the list of all languages to auto merge to.
-        if (empty($languages)) {
-            $tree = self::components_tree(array('branch' => $from, 'component' => $componentname));
-            $languages = array_keys($tree[$from]);
-        }
-
-        // Exclude English and English fixes from the list.
-        foreach ($languages as $index => $value) {
-            if ($value === 'en' or $value === 'en_fix') {
-                unset($languages[$index]);
-            }
-        }
-
-        if (empty($languages)) {
-            $english_from->clear();
-            $english_to->clear();
-            return;
-        }
-
-        $version_from = mlang_version::by_code($from);
-        $version_to = mlang_version::by_code($to);
-
-        $stage = new mlang_stage();
-
-        foreach ($languages as $language) {
-            $other_from = mlang_component::from_snapshot($componentname, $language, $version_from);
-            $other_to = mlang_component::from_snapshot($componentname, $language, $version_to);
-
-            self::merge($other_from, $other_to);
-            $other_to->intersect($english_to);
-
-            // Make sure that the English originals are equal.
-            foreach ($other_to->get_iterator() as $other_to_string) {
-                $english_from_string = $english_from->get_string($other_to_string->id);
-                $english_to_string = $english_to->get_string($other_to_string->id);
-                if (is_null($english_from_string) or is_null($english_to_string) or mlang_string::differ($english_from_string, $english_to_string)) {
-                    $other_to->unlink_string($other_to_string->id);
-                }
-            }
-
-            $stage->add($other_to);
-            $other_from->clear();
-            $other_to->clear();
-        }
-
-        $stage->commit('Auto-merge '.$componentname.' strings from '.$version_from->label.' to '.$version_to->label,
-            array('source' => 'automerge', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
-    }
 
     /**
      * Copy one string to another at the given version branch for all languages in the repository

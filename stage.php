@@ -67,11 +67,11 @@ if (!empty($message)) {
     $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'),
         false, null, $clear);
     $stage->store();
-    // Execute auto-merge
+    // Automatically backport translations to lower versions if they apply.
     $listlanguages = array_filter(explode('/', $listlanguages));
     $listcomponents = array_filter(explode('/', $listcomponents));
     foreach ($listcomponents as $componentname) {
-        mlang_tools::auto_merge($componentname, $listlanguages);
+        mlang_tools::backport_translations($componentname, $listlanguages);
     }
     if ($clear) {
         if (empty($SESSION->local_amos->stagedcontribution)) {
