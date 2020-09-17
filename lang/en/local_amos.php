@@ -386,14 +386,6 @@ $string['privacy:metadata:subsystem:comment'] = 'Describe how the comment subsys
 $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
 $string['processing'] = 'Processing ...';
-$string['propagate'] = 'Propagate translations';
-$string['propagate_help'] = 'Staged translations can be propagated to selected branches. AMOS iterates over the list of staged translations and tries to apply them to each selected target branch. Propagation is not possible if:
-
-* the English originals of the string are different on the source and target branches,
-* the string is staged several times with different translation';
-$string['propagatednone'] = 'No translations propagated';
-$string['propagatedsome'] = '{$a} staged translations propagated';
-$string['propagaterun'] = 'Propagate';
 $string['quicklinks'] = 'Quick links';
 $string['quicklinks_amos'] = 'AMOS translator';
 $string['quicklinks_forum'] = 'Translation forum';

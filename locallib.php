@@ -923,9 +923,6 @@ class local_amos_stage implements renderable {
     /** @var bool */
     public $canstash = false;
 
-    /** @var bool */
-    public $canpropagate = false;
-
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -943,7 +940,6 @@ class local_amos_stage implements renderable {
 
         if (has_capability('local/amos:commit', context_system::instance(), $user)) {
             $this->cancommit = true;
-            $this->canpropagate = true;
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
             $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }

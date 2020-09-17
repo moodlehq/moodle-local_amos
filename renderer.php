@@ -962,47 +962,6 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             unset($a);
 
-            // Propagate translations
-            if ($stage->canpropagate and count($stage->strings) == $committable) {
-                $justpropagated = optional_param('justpropagated', null, PARAM_INT);
-                if (is_null($justpropagated)) {
-                    $expandpropagate = true;
-                } else {
-                    $expandpropagate = false;
-                    if ($justpropagated == 0) {
-                        $output .= $this->heading(get_string('propagatednone', 'local_amos'));
-                    } else {
-                        $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
-                    }
-                }
-
-                $propagateform  = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-                $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
-                foreach (mlang_version::list_all() as $version) {
-                    if (!$version->translatable) {
-                        continue;
-                    }
-                    $propagateform .= html_writer::start_tag('div', array('class' => 'form-check form-check-inline'));
-                    $propagateform .= html_writer::checkbox('ver[]', $version->code, true, $version->label, array('class' => 'form-check-input'));
-                    $propagateform .= html_writer::end_tag('div'); // .form-check
-                }
-                $propagateform .= html_writer::div(html_writer::tag('button', get_string('propagaterun', 'local_amos'),
-                    array(
-                        'type' => 'submit',
-                        'class' => 'btn btn-light'
-                    )
-                ), 'm-t-1');
-                $propagateform  = html_writer::tag('div', $propagateform);
-                $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-                $output .= $this->collapsible_stage_tool(
-                    get_string('propagate', 'local_amos'),
-                    $propagateform,
-                    $this->help_icon('propagate', 'local_amos'),
-                    $expandpropagate,
-                    'protected propagate'
-                );
-            }
-
             if ($committable and $stage->cancommit) {
                 $commitform = html_writer::div(
                     html_writer::tag('textarea', s($stage->presetmessage), array(

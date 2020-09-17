@@ -48,21 +48,9 @@ $collapsible-padding: 20px;
             }
         }
 
-        .stagetool.commit, .stagetool.propagate, .stagetool.stageactions, .stagetool.stashactions {
+        .stagetool.commit, .stagetool.stageactions, .stagetool.stashactions {
             .stagetool-content {
                 text-align: center;
-            }
-        }
-
-        .stagetool.propagate {
-
-            input[type="submit"] {
-                margin: 5px 20px;
-            }
-
-            label.checkbox input[type="checkbox"] {
-                margin-top: 4px; // Undo the dodgy hack from theme/bootstrapbase/less/moodle/forms.less
-                margin-right: 0;
             }
         }
 
