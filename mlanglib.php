@@ -625,6 +625,19 @@ EOF
             $string->clean_text($format);
         }
     }
+
+    /**
+     * Fix the mlang_version after waking up from the serialization.
+     */
+    public function __wakeup() {
+
+        if ($this->version->code >= 1600) {
+            $this->version = mlang_version::by_code($this->version->code / 100);
+
+        } else {
+            $this->version = mlang_version::by_code($this->version->code);
+        }
+    }
 }
 
 /**
