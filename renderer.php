@@ -535,7 +535,8 @@ class local_amos_renderer extends plugin_renderer_base {
                     'href' => new moodle_url('/local/amos/untranslate.php', array(
                         'component' => $string->component,
                         'language'  => $string->language,
-                        'stringid' => $string->stringid
+                        'stringid' => $string->stringid,
+                        'since' => $string->sincecode,
                     ))
                 )), 'info info-untranslate');
             } else {

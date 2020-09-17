@@ -26,6 +26,7 @@
 require(__DIR__.'/../../config.php');
 require_once($CFG->dirroot.'/local/amos/mlanglib.php');
 
+$since = required_param('since', PARAM_INT);
 $component = required_param('component', PARAM_ALPHANUMEXT);
 $language = required_param('language', PARAM_ALPHANUMEXT);
 $stringid = required_param('stringid', PARAM_STRINGID);
@@ -41,40 +42,45 @@ if (empty($allowedlangs['X']) and empty($allowedlangs[$language])) {
 }
 
 $PAGE->set_pagelayout('standard');
-$PAGE->set_url(new moodle_url('/local/amos/untranslate.php', array(
-    'component' => $component, 'language' => $language, 'stringid' => $stringid
-)));
+$PAGE->set_url(new moodle_url('/local/amos/untranslate.php', [
+    'component' => $component,
+    'language' => $language,
+    'stringid' => $stringid,
+    'since' => $since,
+]));
 $PAGE->set_title('AMOS '.get_string('untranslating', 'local_amos'));
 $PAGE->navbar->add(get_string('untranslating', 'local_amos'));
 
 navigation_node::override_active_url(new moodle_url('/local/amos/view.php'));
 
+$mversion = mlang_version::by_code($since);
+
+if (!$mversion->translatable) {
+    throw new moodle_exception('err_nontranslatable_version', 'local_amos');
+}
+
 if ($confirm) {
     require_sesskey();
+
     $mstage = new mlang_stage();
-    $mversions = mlang_version::list_all();
-    foreach ($mversions as $mversion) {
-        if (!$mversion->translatable) {
-            continue;
-        }
-        $mcomponent = mlang_component::from_snapshot($component, $language, $mversion, null, false, false, array($stringid));
-        $cstring = $mcomponent->get_string($stringid);
-        if ($cstring === null) {
-            continue;
-        }
+    $mcomponent = mlang_component::from_snapshot($component, $language, $mversion, null, false, false, [$stringid]);
+    $cstring = $mcomponent->get_string($stringid);
+
+    if ($cstring !== null) {
         $mstring = new mlang_string($cstring->id, $cstring->text, null, true);
         $mcomponent->add_string($mstring, true);
         $mstage->add($mcomponent);
+
+        $message = 'Untranslate the string '.$stringid;
+        $meta = [
+            'source' => 'amos',
+            'userid' => $USER->id,
+            'userinfo' => fullname($USER) . ' <' . $USER->email . '>',
+        ];
+        $mstage->commit($message, $meta);
     }
-    $message = 'Untranslate the string '.$stringid;
-    $meta = array(
-        'source' => 'amos',
-        'userid' => $USER->id,
-        'userinfo' => fullname($USER) . ' <' . $USER->email . '>',
-    );
-    $mstage->commit($message, $meta);
+
     redirect(new moodle_url('/local/amos/view.php'));
-    die();
 }
 
 $output = $PAGE->get_renderer('local_amos');
@@ -82,15 +88,16 @@ $output = $PAGE->get_renderer('local_amos');
 echo $output->header();
 echo $output->heading(get_string('untranslatetitle', 'local_amos'));
 
-$a = array(
+$a = [
     'component' => $component,
     'language' => $language,
     'stringid' => $stringid,
-);
+    'since' => $mversion->label,
+];
 
 echo $output->confirm(
     get_string('untranslateconfirm', 'local_amos', $a),
-    new moodle_url($PAGE->url, array('sesskey' => sesskey(), 'confirm' => true)),
+    new moodle_url($PAGE->url, ['sesskey' => sesskey(), 'confirm' => true]),
     new moodle_url('/local/amos/view.php')
 );
 
