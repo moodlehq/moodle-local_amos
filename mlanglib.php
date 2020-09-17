@@ -1026,6 +1026,9 @@ class mlang_stage {
                 }
             }
 
+            $cache = cache::make('local_amos', 'lists');
+            $cache->purge();
+
             $transaction->allow_commit();
 
             if ($clear) {

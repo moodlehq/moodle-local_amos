@@ -1287,14 +1287,36 @@ AMOS END';
         $component = new mlang_component('moodle', 'en',  mlang_version::by_code(38));
         $component->add_string(new mlang_string('foo', 'Bar'));
         $stage->add($component);
+        $stage->commit('Committing test strings');
         $component->clear();
+
+        // Call it fore the first time.
+        $tree = mlang_tools::components_tree();
+        $this->assertEquals(gettype($tree), 'array');
+        $this->assertEquals(4, count($tree));
+        $this->assertEquals(1, count($tree[38]));
+        $this->assertEquals(1, count($tree[39]));
+        $this->assertTrue($tree[38]['en']['moodle']);
+        $this->assertTrue($tree[39]['en']['moodle']);
 
         foreach (['en', 'cs'] as $lang) {
             $component = new mlang_component('auth_mnet', $lang,  mlang_version::by_code(39));
             $component->add_string(new mlang_string('foo', 'Bar'));
             $stage->add($component);
+            $stage->commit('Committing test strings');
             $component->clear();
         }
+
+        // Call it for the second time.
+        // Even if the list is cached internally, it was repopulated on the commit.
+        $tree = mlang_tools::components_tree();
+        $this->assertEquals(gettype($tree), 'array');
+        $this->assertEquals(4, count($tree));
+        $this->assertEquals(1, count($tree[38]));
+        $this->assertEquals(2, count($tree[39]));
+        $this->assertTrue($tree[38]['en']['moodle']);
+        $this->assertTrue($tree[39]['en']['moodle']);
+        $this->assertTrue($tree[39]['en']['auth_mnet']);
 
         foreach (['en', 'cs', 'es'] as $lang) {
             $component = new mlang_component('workshop', $lang,  mlang_version::by_code(400));
@@ -1305,7 +1327,6 @@ AMOS END';
 
         $stage->commit('Committing test strings');
 
-        // Fetch the full components tree.
         $tree = mlang_tools::components_tree();
         $this->assertEquals(gettype($tree), 'array');
         $this->assertEquals(4, count($tree));
