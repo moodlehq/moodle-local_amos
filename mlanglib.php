@@ -988,6 +988,9 @@ class mlang_stage {
         if (empty($this->components)) {
             return;
         }
+
+        $purgecaches = false;
+
         try {
             $transaction = $DB->start_delegated_transaction();
             $commit = new stdclass();
@@ -1004,6 +1007,11 @@ class mlang_stage {
             $commit->id = $DB->insert_record('amos_commits', $commit);
 
             foreach ($this->components as $cx => $component) {
+                if ($component->lang === 'en' || $component->name === 'langconfig') {
+                    // There is a chance that a new component or a new language (or language name) is introduced by the commit.
+                    $purgecaches = true;
+                }
+
                 foreach ($component->get_iterator() as $string) {
                     $record = [
                         'component' => $component->name,
@@ -1026,10 +1034,12 @@ class mlang_stage {
                 }
             }
 
-            $cache = cache::make('local_amos', 'lists');
-            $cache->purge();
-
             $transaction->allow_commit();
+
+            if ($purgecaches) {
+                $cache = cache::make('local_amos', 'lists');
+                $cache->purge();
+            }
 
             if ($clear) {
                 $this->clear();
