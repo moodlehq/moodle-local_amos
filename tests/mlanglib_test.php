@@ -46,23 +46,17 @@ class mlang_test extends advanced_testcase {
      * Helper method to quickly register a language on the given branch(-es)
      *
      * @param string $langcode the code of the language, such as 'en'
-     * @param int|array $branchcodes the code of the branch or a list of them
+     * @param int $since the code of the branch to register the language at.
      */
-    protected function register_language($langcode, $branchcodes) {
-
-        if (!is_array($branchcodes)) {
-            $branchcodes = array($branchcodes);
-        }
+    protected function register_language($langcode, $since) {
 
         $stage = new mlang_stage();
 
-        foreach ($branchcodes as $branchcode) {
-            $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($branchcode));
-            $component->add_string(new mlang_string('thislanguage', $langcode));
-            $component->add_string(new mlang_string('thislanguageint', $langcode));
-            $stage->add($component);
-            $component->clear();
-        }
+        $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($since));
+        $component->add_string(new mlang_string('thislanguage', $langcode));
+        $component->add_string(new mlang_string('thislanguageint', $langcode));
+        $stage->add($component);
+        $component->clear();
 
         $stage->commit('Register language '.$langcode, array('source' => 'unittest'));
     }
