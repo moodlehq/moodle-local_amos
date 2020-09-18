@@ -125,6 +125,18 @@ class local_amos_mlang_version_test extends advanced_testcase {
                 'dir' => '4.0',
                 'translatable' => true,
             ],
+            'Moodle 4.1' => [
+                'code' => 401,
+                'label' => '4.1',
+                'dir' => '4.1',
+                'translatable' => true,
+            ],
+            'Moodle 4.10' => [
+                'code' => 410,
+                'label' => '4.10',
+                'dir' => '4.10',
+                'translatable' => true,
+            ],
             'Moodle 9.99' => [
                 'code' => 999,
                 'label' => '9.99',
@@ -180,5 +192,36 @@ class local_amos_mlang_version_test extends advanced_testcase {
         $latest = mlang_version::latest_version();
 
         $this->assertSame('3.10', $latest->dir);
+    }
+
+    /**
+     * Test obtaining a range of versions.
+     */
+    public function test_list_range() {
+
+        $this->resetAfterTest();
+
+        set_config('brancheslist', '38,39,310,311,400,401', 'local_amos');
+
+        $range = mlang_version::list_range(400);
+
+        $this->assertEquals(2, count($range));
+        $this->assertSame('4.0', $range[400]->dir);
+        $this->assertSame('4.1', $range[401]->dir);
+
+        $range = mlang_version::list_range(39 + 1, 311 + 1);
+
+        $this->assertEquals(2, count($range));
+        $this->assertSame('3.10', $range[310]->dir);
+        $this->assertSame('3.11', $range[311]->dir);
+
+        $range = mlang_version::list_range(401, 401);
+
+        $this->assertEquals(1, count($range));
+        $this->assertSame('4.1', $range[401]->dir);
+
+        $range = mlang_version::list_range(401, 400);
+
+        $this->assertEquals(0, count($range));
     }
 }

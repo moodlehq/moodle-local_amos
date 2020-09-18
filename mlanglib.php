@@ -1654,7 +1654,7 @@ class mlang_version {
      *
      * @return array of mlang_version
      */
-    public static function list_all() {
+    public static function list_all(): array {
 
         $codes = get_config('local_amos', 'brancheslist');
 
@@ -1671,6 +1671,32 @@ class mlang_version {
         }
 
         return $list;
+    }
+
+    /**
+     * List of versions starting since the given branch code, optionally up to the given end (inclusive).
+     *
+     * @param int $start The branch code of the first version in the returned list.
+     * @param ?int $end Optional branch code of the last version in the returned list
+     * @return array mlang_version[]
+     */
+    public static function list_range(int $start, ?int $end = null): array {
+
+        $result = [];
+
+        foreach (self::list_all() as $mver) {
+            if ($mver->code < $start) {
+                continue;
+            }
+
+            if ($end !== null && $mver->code > $end) {
+                break;
+            }
+
+            $result[$mver->code] = $mver;
+        }
+
+        return $result;
     }
 
     /**
