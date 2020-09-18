@@ -2064,40 +2064,67 @@ class mlang_tools {
      * @param array $languages optional list of language codes (defaults to all languages)
      */
     public static function backport_translations($componentname, array $languages = []) {
+        global $DB;
 
-        $tree = self::list_components();
-
-        if (!isset($tree[$componentname])) {
-            throw new mlang_exception('Unknow component ' . $componentname);
-        }
+        // Find all the candidate strings for backporting. That is strings available in English since version X but with
+        // translation available only since X + n.
+        $params = [
+            'component' => $componentname,
+        ];
 
         if (empty($languages)) {
-            $languages = array_keys(self::list_languages(false));
+            $langsql = "<> :excludelang0";
+            $langparams = ['excludelang0' => 'en_fix'];
+        } else {
+            $languages = array_diff($languages, ['en', 'en_fix']);
+            [$langsql, $langparams] = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
         }
 
-        $languages = array_diff($languages, ['en', 'en_fix']);
-        $allversions = mlang_version::list_all();
+        $params += $langparams;
 
-        foreach ($allversions as $branchto) {
-            foreach ($languages as $language) {
+        $sql = "SELECT t.lang, s.strname, s.englishsince, MIN(t.since) AS translatedsince
+                  FROM (
+                           SELECT component, strname, MIN(since) AS englishsince
+                             FROM {amos_strings}
+                            WHERE component = :component
+                         GROUP BY component, strname
+                       ) s
+             LEFT JOIN {amos_translations} t
+                    ON s.component = t.component
+                   AND s.strname = t.strname
+                 WHERE t.lang $langsql
+              GROUP BY t.lang, s.component, s.strname, s.englishsince
+                HAVING s.englishsince < MIN(t.since)";
+
+        $candidates = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+
+        foreach ($rs as $r) {
+            $candidates[] = $r;
+        }
+
+        $rs->close();
+
+        foreach ($candidates as $candidate) {
+            foreach (mlang_version::list_range($candidate->englishsince, $candidate->translatedsince) as $branchto) {
                 // Get the snapshot of the English strings on the version we are backporting to.
-                $englishto = mlang_component::from_snapshot($componentname, 'en', $branchto);
+                $englishto = mlang_component::from_snapshot($componentname, 'en', $branchto, null, false, false,
+                    [$candidate->strname]);
 
                 if (!$englishto->has_string()) {
-                    // There is no English string on this version yet. Go higher.
+                    // There is no non-deleted English string on this version yet. Go higher.
                     continue;
                 }
 
-                $transto = mlang_component::from_snapshot($componentname, $language, $branchto);
+                $transto = mlang_component::from_snapshot($componentname, $candidate->lang, $branchto, null, false, false,
+                    [$candidate->strname]);
 
-                // Seek for all higher versions to see if there is some translation we can backport from.
-                foreach ($allversions as $branchfrom) {
-                    if ($branchfrom->code <= $branchto->code) {
-                        continue;
-                    }
-
-                    $englishfrom = mlang_component::from_snapshot($componentname, 'en', $branchfrom);
-                    $transfrom = mlang_component::from_snapshot($componentname, $language, $branchfrom);
+                // Seek for higher versions to see if there is some translation we can backport from.
+                foreach (mlang_version::list_range($branchto->code + 1, $candidate->translatedsince) as $branchfrom) {
+                    $englishfrom = mlang_component::from_snapshot($componentname, 'en', $branchfrom,
+                        null, false, false, [$candidate->strname]);
+                    $transfrom = mlang_component::from_snapshot($componentname, $candidate->lang, $branchfrom,
+                        null, false, false, [$candidate->strname]);
 
                     self::merge($transfrom, $transto);
                     $transto->intersect($englishto);
@@ -2113,15 +2140,18 @@ class mlang_tools {
                         }
                     }
 
-                    // If we have something to commit, do it now.
+                    // If there is something, commit it now and reload the snapshot.
                     if ($transto->has_string()) {
                         $stage = new mlang_stage();
                         $stage->add($transto);
-                        $stage->commit('Backport ' . $language . '/' . $componentname . ' translations from ' .
-                            $branchfrom->label . ' to ' . $branchto->label,
-                            ['source' => 'backport', 'userinfo' => 'AMOS-bot <amos@moodle.org>']);
+                        $stage->commit(sprintf('Backport %s/%s/%s translation from %s to %s', $candidate->lang, $componentname,
+                            $candidate->strname, $branchfrom->dir, $branchto->dir), [
+                                'source' => 'backport',
+                                'userinfo' => 'AMOS-bot <amos@moodle.org>',
+                            ]);
                         $transto->clear();
-                        $transto = mlang_component::from_snapshot($componentname, $language, $branchto);
+                        $transto = mlang_component::from_snapshot($componentname, $candidate->lang, $branchto, null, false, false,
+                            [$candidate->strname]);
                     }
 
                     $englishfrom->clear();
