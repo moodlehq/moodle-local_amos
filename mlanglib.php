@@ -1639,7 +1639,7 @@ class mlang_version {
     /**
      * Get a list of all known versions and information about them.
      *
-     * @return array of mlang_version
+     * @return array of mlang_version indexed by version code
      */
     public static function list_all(): array {
 
@@ -1665,7 +1665,7 @@ class mlang_version {
      *
      * @param int $start The branch code of the first version in the returned list.
      * @param ?int $end Optional branch code of the last version in the returned list
-     * @return array mlang_version[]
+     * @return array mlang_version[] indexed by version code
      */
     public static function list_range(int $start, ?int $end = null): array {
 
