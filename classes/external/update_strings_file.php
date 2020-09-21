@@ -162,7 +162,7 @@ trait update_strings_file {
 
         // Populate the list of staged components for later auto-merge.
         $componentnames = array();
-        foreach ($stage->get_iterator() as $component) {
+        foreach ($stage as $component) {
             $componentnames[] = $component->name;
         }
 

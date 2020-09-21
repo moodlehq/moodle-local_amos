@@ -62,7 +62,7 @@ function xmldb_local_amos_upgrade($oldversion) {
             $stage = new mlang_stage();
             $langstages = array();  // (string)langcode => (mlang_stage)
             $stash->apply($stage);
-            foreach ($stage->get_iterator() as $component) {
+            foreach ($stage as $component) {
                 $lang = $component->lang;
                 if (!isset($langstages[$lang])) {
                     $langstages[$lang] = new mlang_stage();
@@ -79,7 +79,7 @@ function xmldb_local_amos_upgrade($oldversion) {
                     continue;
                 }
                 $copy = new mlang_stage();
-                foreach ($stage->get_iterator() as $component) {
+                foreach ($stage as $component) {
                     $copy->add($component);
                 }
                 $copy->rebase();

@@ -683,8 +683,8 @@ class local_amos_translator implements renderable {
 
         // Replace the loaded values with those already staged.
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
-        foreach ($stage->get_iterator() as $component) {
-            foreach ($component->get_iterator() as $staged) {
+        foreach ($stage as $component) {
+            foreach ($component as $staged) {
                 if ($staged->component->version->code > $compbranch) {
                     continue;
                 }
@@ -952,8 +952,8 @@ class local_amos_stage implements renderable {
             $this->executeform = new local_amos_execute_form(new moodle_url('/local/amos/execute.php'), local_amos_execute_options());
         }
 
-        foreach($stage->get_iterator() as $component) {
-            foreach ($component->get_iterator() as $staged) {
+        foreach($stage as $component) {
+            foreach ($component as $staged) {
                 if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
                     $needed[$component->version->code][$component->lang][$component->name] = array();
                 }

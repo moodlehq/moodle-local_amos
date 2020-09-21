@@ -59,7 +59,7 @@ $rs->close();
 
 foreach (array_keys($components) as $componentname) {
     $component = mlang_component::from_snapshot($componentname, 'en', $version);
-    foreach ($component->get_iterator() as $string) {
+    foreach ($component as $string) {
         echo '['.$string->id.','.$component->name.']'.PHP_EOL;
     }
     $component->clear();

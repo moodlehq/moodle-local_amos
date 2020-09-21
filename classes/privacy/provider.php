@@ -301,8 +301,8 @@ class provider implements
 
             $strings = [];
 
-            foreach ($stage->get_iterator() as $component) {
-                foreach ($component->get_iterator() as $string) {
+            foreach ($stage as $component) {
+                foreach ($component as $string) {
                     $strings[] = [
                         'branch' => $string->component->version->code,
                         'lang' => $string->component->lang,
@@ -392,8 +392,8 @@ class provider implements
 
             $strings = [];
 
-            foreach ($stage->get_iterator() as $component) {
-                foreach ($component->get_iterator() as $string) {
+            foreach ($stage as $component) {
+                foreach ($component as $string) {
                     $strings[] = [
                         'branch' => $string->component->version->code,
                         'lang' => $string->component->lang,

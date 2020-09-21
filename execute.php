@@ -49,7 +49,7 @@ if ($data = $executeform->get_data()) {
         foreach ($instructions as $instruction) {
             $changes = mlang_tools::execute($instruction, $version);
             if ($changes instanceof mlang_stage) {
-                foreach ($changes->get_iterator() as $component) {
+                foreach ($changes as $component) {
                     $stage->add($component, true);
                 }
                 $changes->clear();

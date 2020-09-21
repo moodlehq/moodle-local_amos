@@ -82,7 +82,7 @@ if ($data = $diffform->get_data()) {
         $worka       = new mlang_component($componentname, $data->language, $versiona);
         $workb       = new mlang_component($componentname, $data->language, $versionb);
 
-        foreach ($englisha->get_iterator() as $strenglisha) {
+        foreach ($englisha as $strenglisha) {
 
             $strenglishb    = $englishb->get_string($strenglisha->id);
             $strtranslateda = $translateda->get_string($strenglisha->id);

@@ -41,44 +41,9 @@ class mlang_exception extends moodle_exception {
 }
 
 /**
- * Provides iteration features for mlang classes
- *
- * This class just forwards all iteration related calls to the aggregated iterator
- */
-class mlang_iterator implements iterator {
-
-    /** @var iterator instance */
-    protected $iterator;
-
-    public function __construct(array $items) {
-        $this->iterator = new ArrayIterator($items);
-    }
-
-    public function current() {
-        return $this->iterator->current();
-    }
-
-    public function key() {
-        return $this->iterator->key();
-    }
-
-    public function next() {
-        return $this->iterator->next();
-    }
-
-    public function rewind() {
-        return $this->iterator->rewind();
-    }
-
-    public function valid() {
-        return $this->iterator->valid();
-    }
-}
-
-/**
  * Represents a collection of strings for a given component
  */
-class mlang_component {
+class mlang_component implements IteratorAggregate, Countable {
 
     /** @var the name of the component, what {@link string_manager::get_string()} uses as the second param */
     public $name;
@@ -321,10 +286,21 @@ class mlang_component {
     }
 
     /**
-     * Returns the iterator over strings
+     * Returns an external iterator over strings in the component.
+     *
+     * @return ArrayIterator
      */
-    public function get_iterator() {
-        return new mlang_iterator($this->strings);
+    public function getIterator() {
+        return new ArrayIterator($this->strings);
+    }
+
+    /**
+     * Return the number of strings in the component.
+     *
+     * @return int
+     */
+    public function count() {
+        return count($this->strings);
     }
 
     /**
@@ -479,7 +455,7 @@ EOF
             fwrite($f, $phpdoc);
         }
         fwrite($f, "defined('MOODLE_INTERNAL') || die();\n\n");
-        foreach ($this->get_iterator() as $string) {
+        foreach ($this as $string) {
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));
             fwrite($f, ";\n");
@@ -600,7 +576,7 @@ EOF
      */
     public function get_recent_timemodified() {
         $recent = 0;
-        foreach ($this->get_iterator() as $string) {
+        foreach ($this as $string) {
             if ($string->timemodified > $recent) {
                 $recent = $string->timemodified;
             }
@@ -621,7 +597,7 @@ EOF
             $format = 2;
         }
 
-        foreach ($this->get_iterator() as $string) {
+        foreach ($this as $string) {
             $string->clean_text($format);
         }
     }
@@ -889,7 +865,7 @@ class mlang_string {
  * or clear(). Otherwise, the copies of staged strings remain in PHP memory and they are not
  * garbage collected because of the circular reference component-string.
  */
-class mlang_stage {
+class mlang_stage implements IteratorAggregate, Countable {
 
     /** @var array of mlang_component */
     protected $components = array();
@@ -906,7 +882,7 @@ class mlang_stage {
         if (!isset($this->components[$cid])) {
             $this->components[$cid] = new mlang_component($component->name, $component->lang, $component->version);
         }
-        foreach ($component->get_iterator() as $string) {
+        foreach ($component as $string) {
             $this->components[$cid]->add_string(clone($string), $force);
         }
     }
@@ -938,7 +914,7 @@ class mlang_stage {
                 if (empty($deletetimestamp)) {
                     $deletetimestamp = time();
                 }
-                foreach ($cap->get_iterator() as $existing) {
+                foreach ($cap as $existing) {
                     $stagedstring = $component->get_string($existing->id);
                     if (is_null($stagedstring)) {
                         $tobedeleted = clone($existing);
@@ -948,7 +924,7 @@ class mlang_stage {
                     }
                 }
             }
-            foreach ($component->get_iterator() as $stagedstring) {
+            foreach ($component as $stagedstring) {
                 $capstring = $cap->get_string($stagedstring->id);
                 if (is_null($capstring)) {
                     // the staged string does not exist in the repository yet - will be committed
@@ -1025,7 +1001,7 @@ class mlang_stage {
                     $purgecaches = true;
                 }
 
-                foreach ($component->get_iterator() as $string) {
+                foreach ($component as $string) {
                     $record = [
                         'component' => $component->name,
                         'strname' => $string->id,
@@ -1086,10 +1062,21 @@ class mlang_stage {
     }
 
     /**
-     * Returns the iterator over components
+     * Returns an external iterator over components in the stage.
+     *
+     * @return ArrayIterator
      */
-    public function get_iterator() {
-        return new mlang_iterator($this->components);
+    public function getIterator() {
+        return new ArrayIterator($this->components);
+    }
+
+    /**
+     * Return the count of components in the stage.
+     *
+     * @return int
+     */
+    public function count() {
+        return count($this->components);
     }
 
     /**
@@ -1138,7 +1125,7 @@ class mlang_stage {
         $languages = array();
         $components = array();
 
-        foreach ($stage->get_iterator() as $component) {
+        foreach ($stage as $component) {
             if ($s = $component->get_number_of_strings()) {
                 $strings += $s;
                 if (!isset($components[$component->name])) {
@@ -1184,7 +1171,7 @@ class mlang_stage {
         check_dir_exists($tmpdir);
 
         $files = array();
-        foreach($this->get_iterator() as $component) {
+        foreach($this as $component) {
             if ($component->get_number_of_strings() > 0) {
                 $zipfilepath = $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
                 $realfilepath = $tmpdir . '/' . $zipfilepath;
@@ -1434,7 +1421,7 @@ class mlang_stash {
      */
     public function apply(mlang_stage $stage) {
 
-        foreach ($this->stage->get_iterator() as $component) {
+        foreach ($this->stage as $component) {
             $stage->add($component, true);
         }
     }
@@ -2019,7 +2006,7 @@ class mlang_tools {
             $targetformat = 2;
         }
 
-        foreach ($source->get_iterator() as $string) {
+        foreach ($source as $string) {
             $stringid = clean_param($string->id, PARAM_STRINGID);
             if (empty($stringid)) {
                 throw new mlang_exception('Invalid string identifier '.s($string->id));
@@ -2130,7 +2117,7 @@ class mlang_tools {
                     $transto->intersect($englishto);
 
                     // Make sure that the English originals are equal.
-                    foreach ($transto->get_iterator() as $transtostring) {
+                    foreach ($transto as $transtostring) {
                         $englishfromstring = $englishfrom->get_string($transtostring->id);
                         $englishtostring = $englishto->get_string($transtostring->id);
                         if ($englishfromstring === null

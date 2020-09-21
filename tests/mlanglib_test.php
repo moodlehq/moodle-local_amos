@@ -84,6 +84,61 @@ class mlang_test extends advanced_testcase {
     }
 
     /**
+     * Test that components and stages are iterable and countable.
+     */
+    public function test_iterable_and_countable() {
+
+        $this->resetAfterTest();
+
+        $component = new mlang_component('test', 'en', mlang_version::by_code(310));
+
+        $this->assertSame(0, count($component));
+        foreach ($component as $string) {
+            $this->assertTrue(false);
+        }
+
+        $component->add_string(new mlang_string('foo', 'Foo'));
+        $this->assertEquals(1, count($component));
+        $i = 0;
+        foreach ($component as $string) {
+            $this->assertInstanceOf(mlang_string::class, $string);
+            $i++;
+        }
+        $this->assertSame(1, $i);
+
+        $component->add_string(new mlang_string('bar', 'Bar'));
+        $this->assertEquals(2, count($component));
+        $i = 0;
+        foreach ($component as $string) {
+            $this->assertInstanceOf(mlang_string::class, $string);
+            $i++;
+        }
+        $this->assertSame(2, $i);
+
+        $stage = new mlang_stage();
+        $this->assertSame(0, count($stage));
+        foreach ($stage as $component) {
+            $this->assertTrue(false);
+        }
+
+        $stage->add($component);
+        $this->assertSame(1, count($stage));
+        $i = 0;
+        foreach ($stage as $component) {
+            $this->assertInstanceOf(mlang_component::class, $component);
+            $i++;
+        }
+        $this->assertSame(1, $i);
+
+        $stage->commit('Test', ['source' => 'unittest']);
+
+        $this->assertSame(0, count($stage));
+        foreach ($stage as $component) {
+            $this->assertTrue(false);
+        }
+    }
+
+    /**
      * Standard procedure to add strings into AMOS repository
      */
     public function test_simple_string_lifecycle() {
@@ -516,7 +571,7 @@ EOF;
         // get the most recent version (so called "cap") of the component
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $concat = '';
-        foreach ($cap->get_iterator() as $s) {
+        foreach ($cap as $s) {
             $concat .= $s->text;
         }
         // strings in the cap shall be ordered by stringid

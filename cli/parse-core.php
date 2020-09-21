@@ -80,8 +80,8 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
 
     $standardplugins = local_amos_standard_plugins();
 
-    foreach ($stage->get_iterator() as $component) {
-        foreach ($component->get_iterator() as $string) {
+    foreach ($stage as $component) {
+        foreach ($component as $string) {
             if ($string->deleted) {
                 $sign = '-  ';
             } else {
@@ -143,8 +143,8 @@ function amos_parse_core_commit() {
     $stage->rebase($timemodified, true, $timemodified);
 
     // make sure that the strings to be removed are really affected by the commit
-    foreach ($stage->get_iterator() as $component) {
-        foreach ($component->get_iterator() as $string) {
+    foreach ($stage as $component) {
+        foreach ($component as $string) {
             if (!isset($affected[$component->name][$string->id])) {
                 $component->unlink_string($string->id);
             }
