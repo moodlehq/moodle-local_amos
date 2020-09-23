@@ -476,7 +476,7 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach ($translator->strings as $string) {
 
             // string information
-            $infoversion = html_writer::span($string->sincelabel . '+', 'info info-version');
+            $infoversion = html_writer::span($string->englishsincelabel . '+', 'info info-version');
 
             if (!$string->islatest) {
                 $infoversion .= ' ' . html_writer::tag('i', '', [
@@ -500,12 +500,6 @@ class local_amos_renderer extends plugin_renderer_base {
                     'info info-placeholder');
             }
 
-            $infogreylisted = '';
-            if ($string->greylisted) {
-                $infogreylisted = html_writer::span($this->help_icon('greylisted', 'local_amos', get_string('greylistedwarning', 'local_amos')),
-                   'info info-greylisted');
-            }
-
             $infoapp = '';
             if ($string->app) {
                 $infoapp = html_writer::tag('i', "", array('class' => 'fa fa-mobile', 'title' => get_string('filtermisfapp_help', 'local_amos', $string->app)));
@@ -519,7 +513,6 @@ class local_amos_renderer extends plugin_renderer_base {
                 'href' => new moodle_url('/local/amos/timeline.php', array(
                     'component' => $string->component,
                     'language'  => $string->language,
-                    'branch'    => $string->branchcode,
                     'stringid'  => $string->stringid
                 ))
             )), 'info info-timeline');
@@ -536,7 +529,7 @@ class local_amos_renderer extends plugin_renderer_base {
                         'component' => $string->component,
                         'language'  => $string->language,
                         'stringid' => $string->stringid,
-                        'since' => $string->sincecode,
+                        'since' => $string->translationsincecode,
                     ))
                 )), 'info info-untranslate');
             } else {
@@ -595,10 +588,6 @@ class local_amos_renderer extends plugin_renderer_base {
             // info lines
             $infoline1 = $infoversion.' | '.$infostringid.' | '.$infocomponent;
 
-            if ($infogreylisted) {
-                $infoline1 .= ' | '.$infogreylisted;
-            }
-
             if ($infoplaceholder) {
                 $infoline1 .= ' | '.$infoplaceholder;
             }
@@ -608,6 +597,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
+            $infoline2 .= ' | ' . html_writer::span($string->translationsincelabel . '+', 'info info-version');
             $infoline2 .= ' | '.$infotimeline;
             $infoline2 .= ' '.$infountranslate;
             $infoline2 .= ' '.$infogoogle;

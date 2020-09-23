@@ -455,6 +455,7 @@ EOF
             fwrite($f, $phpdoc);
         }
         fwrite($f, "defined('MOODLE_INTERNAL') || die();\n\n");
+        ksort($this->strings);
         foreach ($this as $string) {
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));

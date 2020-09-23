@@ -34,7 +34,6 @@ require_capability('local/amos:stage', context_system::instance());
 
 $component  = required_param('component', PARAM_ALPHANUMEXT);
 $language   = required_param('language', PARAM_ALPHANUMEXT);
-$branch     = required_param('branch', PARAM_INT);
 $stringid   = required_param('stringid', PARAM_STRINGID);
 $ajax       = optional_param('ajax', 0, PARAM_BOOL);
 
