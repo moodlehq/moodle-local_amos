@@ -228,6 +228,7 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var ctrlgrp = cell.ancestor('.string-control-group');
             var lang = ctrlgrp.getData('amos-lang');
             var originalid = ctrlgrp.getData('amos-originalid');
+            var translationid = ctrlgrp.getData('amos-translationid');
 
             if (! Y.Lang.isValue(originalid) || ! Y.Lang.isString(lang)) {
                 alert('Error - Unable to stage the translation!');
@@ -237,7 +238,14 @@ YUI.add('moodle-local_amos-translator', function(Y) {
             var uri = M.cfg.wwwroot + '/local/amos/saveajax.php';
             var cfg = {
                 method: 'POST',
-                data: build_querystring({'lang': lang, 'originalid': originalid, 'text': editor.get('value'), 'sesskey': M.cfg.sesskey, 'nocleaning': nocleaning}),
+                data: build_querystring({
+                    'lang': lang,
+                    'originalid': originalid,
+                    'translationid': translationid,
+                    'text': editor.get('value'),
+                    'sesskey': M.cfg.sesskey,
+                    'nocleaning': nocleaning
+                }),
                 on: {
                     success : this.submit_success,
                     failure : this.submit_failure,

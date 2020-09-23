@@ -686,6 +686,7 @@ class local_amos_translator implements renderable {
                 $string = new stdclass();
                 $string->amosid = null;
                 $string->text = $staged->text;
+                $string->since = $staged->component->version->code;
                 $string->timemodified = $staged->timemodified;
                 $string->class = 'staged';
                 $string->nocleaning = $staged->nocleaning;

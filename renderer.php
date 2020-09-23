@@ -597,7 +597,11 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
-            $infoline2 .= ' | ' . html_writer::span($string->translationsincelabel . '+', 'info info-version');
+
+            if ($string->translationsincelabel !== null) {
+                $infoline2 .= ' | ' . html_writer::span($string->translationsincelabel . '+', 'info info-version');
+            }
+
             $infoline2 .= ' | '.$infotimeline;
             $infoline2 .= ' '.$infountranslate;
             $infoline2 .= ' '.$infogoogle;
@@ -609,6 +613,8 @@ class local_amos_renderer extends plugin_renderer_base {
 
             if (!empty($string->translationid)) {
                 $data['data-amos-translationid'] = $string->translationid;
+            } else {
+                $data['data-amos-translationid'] = 0;
             }
 
             $trout .= html_writer::start_div('string-control-group', $data);

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -40,26 +39,63 @@ if (!confirm_sesskey()) {
     die();
 }
 
-$lang = optional_param('lang', null, PARAM_SAFEDIR);
 $originalid = optional_param('originalid', null, PARAM_INT);
+$translationid = optional_param('translationid', null, PARAM_INT);
+$lang = optional_param('lang', null, PARAM_SAFEDIR);
 $text = optional_param('text', null, PARAM_RAW);
 $nocleaning = optional_param('nocleaning', false, PARAM_BOOL);
 
-if (is_null($lang) or is_null($originalid) or is_null($text)) {
+if ($originalid === null || $lang === null || $text === null) {
+    // These are actually required but we want a better HTTP response handling than Moodle core provides.
     header('HTTP/1.1 400 Bad Request');
+    echo(json_encode(['error' => 'Required value missing']));
     die();
 }
 
-$record = $DB->get_record('amos_strings', array('id' => $originalid), 'id,strname,component,since', MUST_EXIST);
-$version = mlang_version::by_code($record->since);
-$component = new mlang_component($record->component, $lang, $version);
-if (!$version->translatable) {
+$english = $DB->get_record('amos_strings', array('id' => $originalid), 'id,strname,component,since', IGNORE_MISSING);
+
+if (empty($english)) {
     header('HTTP/1.1 400 Bad Request');
+    echo(json_encode(['error' => 'Invalid original identifier']));
     die();
 }
-$string = new mlang_string($record->strname, $text);
+
+if (empty($translationid)) {
+    $since = $english->since;
+} else {
+    $current = $DB->get_record('amos_translations', [
+        'id' => $translationid,
+        'component' => $english->component,
+        'strname' => $english->strname,
+    ], 'id, since', IGNORE_MISSING);
+
+    if (empty($current)) {
+        header('HTTP/1.1 400 Bad Request');
+        echo(json_encode(['error' => 'Invalid translation identifier']));
+        die();
+    }
+
+    if ($english->since > $current->since) {
+        $since = $english->since;
+
+    } else {
+        $since = $current->since;
+    }
+}
+
+$version = mlang_version::by_code($since);
+
+if (!$version->translatable) {
+    header('HTTP/1.1 400 Bad Request');
+    echo(json_encode(['error' => 'Target version not translatable']));
+    die();
+}
+
+$string = new mlang_string($english->strname, $text);
 $string->nocleaning = $nocleaning;
 $string->clean_text();
+
+$component = new mlang_component($english->component, $lang, $version);
 $component->add_string($string);
 
 $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
