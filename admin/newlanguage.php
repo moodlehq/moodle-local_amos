@@ -30,6 +30,9 @@ require_once(dirname(__FILE__).'/newlanguage_form.php');
 require_login(SITEID, false);
 require_capability('local/amos:manage', context_system::instance());
 
+$cache = cache::make('local_amos', 'listlanguages');
+$cache->delete('langs');
+
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/newlanguage.php');
 $PAGE->set_title('AMOS ' . get_string('newlanguage', 'local_amos'));
@@ -38,7 +41,7 @@ $PAGE->set_heading('AMOS ' . get_string('newlanguage', 'local_amos'));
 $form = new local_amos_newlanguage_form();
 
 if ($data = $form->get_data()) {
-    $component = new mlang_component('langconfig', $data->langcode, mlang_version::by_code(mlang_version::MOODLE_40));
+    $component = new mlang_component('langconfig', $data->langcode, mlang_version::latest_version());
     $data->langname = mlang_string::fix_syntax($data->langname);
     $data->langnameint = mlang_string::fix_syntax($data->langnameint);
     $component->add_string(new mlang_string('thislanguage', $data->langname));

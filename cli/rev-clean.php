@@ -61,7 +61,7 @@ foreach ($tree as $vercode => $languages) {
         $memdiff = $memprev < $mem ? '+' : '-';
         $memdiff = $memdiff . abs($mem - $memprev);
         $english = mlang_component::from_snapshot($componentname, 'en', $version, null, true, true);
-        foreach ($english->get_iterator() as $string) {
+        foreach ($english as $string) {
             if (empty($options['full']) and $string->timemodified < time() - DAYSECS) {
                 continue;
             }

@@ -136,7 +136,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             'contenttype'           => 'contentbank/contenttype',
         ];
 
-        if ($version->code <= mlang_version::MOODLE_21) {
+        if ($version->code <= 21) {
             // since 2.2 beta, reports have moved
             $basedirs['report'] = 'admin/report';
         }
@@ -162,7 +162,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             // the $filepath does not exist in the $gitbranch
             if ($amoscomponent->has_string()) {
                 fputs(STDERR, "-- '{$filepath}' does not exist in {$gitbranch}\n");
-                foreach ($amoscomponent->get_iterator() as $string) {
+                foreach ($amoscomponent as $string) {
                     $string->deleted = true;
                     $string->timemodified = time();
                 }
@@ -184,7 +184,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
 
         $gitcomponent = mlang_component::from_phpfile($dumpfile, 'en', $version, time());
 
-        foreach ($amoscomponent->get_iterator() as $amosstring) {
+        foreach ($amoscomponent as $amosstring) {
             $gitstring = $gitcomponent->get_string($amosstring->id);
 
             if (is_null($gitstring)) {
@@ -204,7 +204,7 @@ foreach ($plugins as $versionnumber => $plugintypes) {
             }
         }
 
-        foreach ($gitcomponent->get_iterator() as $gitstring) {
+        foreach ($gitcomponent as $gitstring) {
             $amosstring = $amoscomponent->get_string($gitstring->id);
 
             if (is_null($amosstring)) {

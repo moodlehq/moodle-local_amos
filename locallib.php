@@ -105,13 +105,9 @@ class local_amos_filter implements renderable {
             $data->page = $page;
         }
 
-        // if the user did not check any version, use the default instead of none
+        // If the user did not check any version, use the latest one instead of none.
         if (empty($data->version)) {
-            foreach (mlang_version::list_all() as $version) {
-                if ($version->current) {
-                    $data->version[] = $version->code;
-                }
-            }
+            $data->version = mlang_version::latest_version()->code;
         }
 
         return $data;
@@ -137,10 +133,9 @@ class local_amos_filter implements renderable {
         }
 
         if (empty($data->version)) {
-            foreach (mlang_version::list_all() as $version) {
-                $data->version[] = $version->code;
-            }
+            $data->version = mlang_version::latest_version()->code;
         }
+
         if (is_null($data->language)) {
             $currentlanguage = current_language();
             if ($currentlanguage === 'en') {
@@ -216,14 +211,14 @@ class local_amos_filter implements renderable {
         require_sesskey();
         $data = new stdclass();
 
-        $data->version = array();
+        $data->version = null;
         $data->last = optional_param('flast', false, PARAM_BOOL);
         if (!$data->last) {
-            $fver = optional_param_array('fver', null, PARAM_INT);
-            if (is_array($fver)) {
+            $fver = optional_param('fver', null, PARAM_INT);
+            if ($fver !== null) {
                 foreach (mlang_version::list_all() as $version) {
-                    if (in_array($version->code, $fver)) {
-                        $data->version[] = $version->code;
+                    if ($version->code == $fver) {
+                        $data->version = $version->code;
                     }
                 }
             }
@@ -291,15 +286,16 @@ class local_amos_filter implements renderable {
         }
         $data = new stdclass();
 
-        $data->version = array();
+        $data->version = [];
         $fver = optional_param('v', '', PARAM_RAW);
         if ($fver !== 'l') {
             $fver = explode(',', $fver);
             $fver = clean_param_array($fver, PARAM_INT);
-            if (!empty($fver) and is_array($fver)) {
+            if (!empty($fver) && is_array($fver)) {
+                $fver = max($fver);
                 foreach (mlang_version::list_all() as $version) {
-                    if (in_array($version->code, $fver)) {
-                        $data->version[] = $version->code;
+                    if ($version->code == $fver) {
+                        $data->version = $version->code;
                     }
                 }
             }
@@ -395,7 +391,7 @@ class local_amos_filter implements renderable {
         if ($fdata->last) {
             $this->permalink->param('v', 'l');
         } else {
-            $this->permalink->param('v', implode(',', $fdata->version));
+            $this->permalink->param('v', $fdata->version);
         }
 
 
@@ -476,7 +472,7 @@ class local_amos_filter implements renderable {
             'ismaintainer' => has_capability('local/amos:commit', context_system::instance()),
             'usesdefaultversion' => (int)($submitted->version === $default->version),
             'usesdefaultlang' => (int)($submitted->language === $default->language),
-            'numofversions' => count($submitted->version),
+            'numofversions' => (int)isset($submitted->version),
             'numoflanguages' => count($submitted->language),
             'numofcomponents' => count($submitted->component),
             'showmissingonly' => (int)$submitted->missing,
@@ -527,15 +523,15 @@ class local_amos_translator implements renderable {
     public function __construct(local_amos_filter $filter, stdclass $user) {
         global $DB;
 
-        // get the list of strings to display according the current filter values
+        // Get the list of strings to display according the current filter values.
         $last       = $filter->get_data()->last;
-        $branches   = $filter->get_data()->version;
+        $version    = $filter->get_data()->version;
         $languages  = $filter->get_data()->language;
         $components = $filter->get_data()->component;
-        if (empty($branches) or empty($components) or empty($languages)) {
+
+        if ((!$last && empty($version)) || empty($components) || empty($languages)) {
             return;
         }
-        $languages  = array_merge(array('en'), $languages);
 
         $missing            = $filter->get_data()->missing;
         $outdated           = $filter->get_data()->outdated;
@@ -547,183 +543,154 @@ class local_amos_translator implements renderable {
         $stringid           = $filter->get_data()->stringid;
         $stringidpartial    = $filter->get_data()->stringidpartial;
         $stagedonly         = $filter->get_data()->stagedonly;
-        $greylistedonly     = $filter->get_data()->greylistedonly;
         $withoutgreylisted  = $filter->get_data()->withoutgreylisted;
         $app                = $filter->get_data()->app;
 
-        $params = array();
-        list($sqllanguages, $paramslanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED, 'lang00000');
-        list($sqlcomponents, $paramcomponents) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED, 'comp00000');
+        // Prepare the SQL queries to load all the filtered strings and their translations.
+        $params = [];
+
+        list($sqllanguages, $paramlanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
+        list($sqlcomponents1, $paramcomponents1) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+        list($sqlcomponents2, $paramcomponents2) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+
+        $params += $paramlanguages;
+        $params += $paramcomponents1;
+        $params += $paramcomponents2;
 
         if ($last) {
-            $allversions = mlang_version::list_all();
-            $comp_branch = $DB->get_records_select_menu('amos_snapshot',  "lang = 'en' AND component $sqlcomponents GROUP BY component",
-                $paramcomponents,  '', 'component, MAX(branch) as branch');
-
-            $sql_comps = array('1 = 0');
-            $parcounter = 0;
-
-            foreach ($comp_branch as $component => $branch) {
-                $paramcomponent = 'component000'.$parcounter;
-                $parambranch = 'branch000'.$parcounter;
-                $sql_comps[] = "(s.component = :".$paramcomponent." AND s.branch = :".$parambranch.")";
-                $params[$paramcomponent] = $component;
-                $params[$parambranch] = $branch;
-                $parcounter++;
-            }
-
-            $sql_comps = implode(' OR ', $sql_comps);
-
-            // get the greylisted strings first
-            $sql = "SELECT branch, component, stringid
-                      FROM {amos_greylist} AS s
-                     WHERE {$sql_comps}";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-        } else {
-            list($sqlbranches, $paramsbranches) = $DB->get_in_or_equal($branches, SQL_PARAMS_NAMED, 'branch00000');
-
-            // get the greylisted strings first
-            $sql = "SELECT branch, component, stringid
-                      FROM {amos_greylist}
-                     WHERE branch $sqlbranches
-                       AND component $sqlcomponents";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like('stringid', ':stringid', false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            $params = array_merge($params, $paramsbranches, $paramcomponents);
+            // Get know the most recent branch for every component.
+            $latestcomponentbranch = $DB->get_records_select_menu('amos_strings',  "component $sqlcomponents1 GROUP BY component",
+                $paramcomponents1,  '', "component, MAX(since) as branch");
         }
 
-        $greylist = array();
-        $rs = $DB->get_recordset_sql($sql, $params);
-        foreach ($rs as $s) {
-            $greylist[$s->branch][$s->component][$s->stringid] = true;
-        }
-        $rs->close();
+        // Get all the English strings and translations for the translator.
 
-        // get the app strings
-        $applist = local_amos_applist_strings();
+        $sql1 = "SELECT id, since, 'en' AS lang, component, strname, strtext, timemodified
+                   FROM {amos_strings}
+                  WHERE component $sqlcomponents1";
 
-        if ($last) {
-            // get all the strings for the translator
-            $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
-                      FROM {amos_snapshot} s
-                      JOIN {amos_repository} r ON s.repoid = r.id
-                      JOIN {amos_texts} t ON r.textid = t.id
-                     WHERE s.lang {$sqllanguages} AND ({$sql_comps})";
+        $sql2 = "SELECT id, since, lang, component, strname, strtext, timemodified
+                   FROM {amos_translations}
+                  WHERE component $sqlcomponents2
+                    AND lang $sqllanguages";
 
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-                } else {
-                    $sql .= " AND s.stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            if ($helps) {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
-                $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
-            } else {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
-                $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
-            }
-
-            $params = array_merge($params, $paramslanguages, $paramcomponents);
-
-        } else {
-            // get all the strings for the translator
-            $sql = "SELECT r.id, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.timeupdated, r.deleted
-                      FROM {amos_snapshot} s
-                      JOIN {amos_repository} r ON s.repoid = r.id
-                      JOIN {amos_texts} t ON r.textid = t.id
-                     WHERE s.branch {$sqlbranches}
-                           AND s.lang {$sqllanguages}
-                           AND s.component {$sqlcomponents}";
-
-            if ($stringid) {
-                if ($stringidpartial) {
-                    $sql .= " AND ".$DB->sql_like("s.stringid", ":stringid", false);
-                    $params['stringid'] = '%'.$DB->sql_like_escape($stringid).'%';
-
-                } else {
-                    $sql .= " AND s.stringid = :stringid";
-                    $params['stringid'] = $stringid;
-                }
-            }
-
-            if ($helps) {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":helpstringid", false);
-                $params['helpstringid'] = '%'.$DB->sql_like_escape('_help');
+        if ($stringid) {
+            if ($stringidpartial) {
+                $sql1 .= " AND " . $DB->sql_like("strname", ":strname1", false);
+                $sql2 .= " AND " . $DB->sql_like("strname", ":strname2", false);
+                $params['strname1'] = '%' . $DB->sql_like_escape($stringid) . '%';
+                $params['strname2'] = '%' . $DB->sql_like_escape($stringid) . '%';
 
             } else {
-                $sql .= "     AND ".$DB->sql_like("s.stringid", ":linkstringid", false, true, true);
-                $params['linkstringid'] = '%'.$DB->sql_like_escape('_link');
+                $sql1 .= " AND strname = :strname1";
+                $sql2 .= " AND strname = :strname2";
+                $params['strname1'] = $stringid;
+                $params['strname2'] = $stringid;
             }
-
-            $params = array_merge($params, $paramsbranches, $paramslanguages, $paramcomponents);
         }
 
-        $sql .= " ORDER BY s.component, s.stringid, s.lang, s.branch, r.id DESC";
+        if ($helps) {
+            $sql1 .= " AND " . $DB->sql_like("strname", ":helpstrname1", false);
+            $sql2 .= " AND " . $DB->sql_like("strname", ":helpstrname2", false);
+            $params['helpstrname1'] = '%' . $DB->sql_like_escape('_help');
+            $params['helpstrname2'] = '%' . $DB->sql_like_escape('_help');
 
-        $rs = $DB->get_recordset_sql($sql, $params);
-        $s = array(); // tree of strings grouped by lang, component, stringid and branch
-        $d = array(); // same tree - but containing deleted strings only
+        } else {
+            $sql1 .= " AND " . $DB->sql_like("strname", ":linkstrname1", false, true, true);
+            $sql2 .= " AND " . $DB->sql_like("strname", ":linkstrname2", false, true, true);
+            $params['linkstrname1'] = '%' . $DB->sql_like_escape('_link');
+            $params['linkstrname2'] = '%' . $DB->sql_like_escape('_link');
+        }
 
-        foreach($rs as $r) {
-            // if the most recent record is a deletion record, do not add the string to $s tree
-            // this filtering can not be done in SQL because there can be two records with
-            // the same timemodified, one changing the string and one removing it
-            if ($r->deleted) {
-                $d[$r->lang][$r->component][$r->stringid][$r->branch] = true;
+        $sql = "SELECT id, since, lang, component, strname, strtext, timemodified
+                  FROM ($sql1 UNION $sql2) s";
+
+        $recordset = $DB->get_recordset_sql($sql, $params);
+
+        // Iterate over the results and pick the most recent string value for each selected branch.
+        $tree = [];
+        $newer = [];
+
+        foreach ($recordset as $record) {
+            if ($last) {
+                $compbranch = $latestcomponentbranch[$record->component];
+            } else {
+                $compbranch = $version;
             }
-            if (isset($d[$r->lang][$r->component][$r->stringid][$r->branch])) {
-                // the more recent record of this string removes it
+
+            if ($record->since > $compbranch) {
+                // Make a note that more recent version exists.
+                $newer[$record->lang][$record->component][$record->strname] = true;
                 continue;
             }
-            if (!isset($s[$r->lang][$r->component][$r->stringid][$r->branch])) {
-                // store the most recent record in the $s tree
-                $string = new stdclass();
-                $string->amosid = $r->id;
-                $string->text = $r->text;
-                $string->timemodified = $r->timemodified;
-                $string->timeupdated = $r->timeupdated;
-                $s[$r->lang][$r->component][$r->stringid][$r->branch] = $string;
+            if (!isset($tree[$record->lang][$record->component][$record->strname])) {
+                $tree[$record->lang][$record->component][$record->strname] = $record;
+
+            } else {
+                $current = $tree[$record->lang][$record->component][$record->strname];
+
+                if ($record->since < $current->since) {
+                    continue;
+                }
+
+                if (($record->since == $current->since) && ($record->timemodified < $current->timemodified)) {
+                    continue;
+                }
+
+                if (($record->since == $current->since) && ($record->timemodified == $current->timemodified)
+                        && ($record->id < $current->id)) {
+                    continue;
+                }
+
+                $tree[$record->lang][$record->component][$record->strname] = $record;
             }
         }
-        unset($d);
-        $rs->close();
 
-        // replace the loaded values with those already staged
+        $recordset->close();
+
+        // Convert the tree into a new one containing only non-deletions.
+        $s = [];
+
+        foreach($tree as $xlang => $xcomps) {
+            foreach ($xcomps as $xcomp => $xstrnames) {
+                foreach ($xstrnames as $xstrname => $record) {
+                    if ($record->strtext !== null) {
+                        $s[$xlang][$xcomp][$xstrname] = (object) [
+                            'amosid' => $record->id,
+                            'text' => $record->strtext,
+                            'since' => $record->since,
+                            'timemodified' => $record->timemodified,
+                            'islatest' => empty($newer[$xlang][$xcomp][$xstrname]),
+                        ];
+                    }
+                    unset($tree[$xlang][$xcomp][$xstrname]);
+                }
+            }
+        }
+        unset($tree);
+
+        foreach ($s as $xlang => &$xcomps) {
+            ksort($xcomps);
+            foreach ($xcomps as $xcomp => &$xstrnames) {
+                ksort($xstrnames);
+            }
+        }
+
+        // Replace the loaded values with those already staged.
         $stage = mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
-        foreach($stage->get_iterator() as $component) {
-            foreach ($component->get_iterator() as $staged) {
+        foreach ($stage as $component) {
+            foreach ($component as $staged) {
+                if ($staged->component->version->code > $compbranch) {
+                    continue;
+                }
                 $string = new stdclass();
                 $string->amosid = null;
                 $string->text = $staged->text;
+                $string->since = $staged->component->version->code;
                 $string->timemodified = $staged->timemodified;
-                $string->timeupdated = $staged->timemodified;
                 $string->class = 'staged';
                 $string->nocleaning = $staged->nocleaning;
-                $s[$component->lang][$component->name][$staged->id][$component->version->code] = $string;
+                $s[$component->lang][$component->name][$staged->id] = $string;
             }
         }
 
@@ -732,131 +699,127 @@ class local_amos_translator implements renderable {
         $to = $this->currentpage * self::PERPAGE;
         if (isset($s['en'])) {
             foreach ($s['en'] as $component => $t) {
-                foreach ($t as $stringid => $u) {
-                    foreach ($u as $branchcode => $english) {
-                        reset($languages);
-                        foreach ($languages as $lang) {
-                            if ($lang == 'en') {
-                                continue;
-                            }
-                            $string = new stdclass();
-                            $string->branchdir = mlang_version::by_code($branchcode)->dir;
-                            $string->branchcode = mlang_version::by_code($branchcode)->code;
-                            $string->branchlabel = mlang_version::by_code($branchcode)->label;
-                            $string->language = $lang;
-                            $string->component = $component;
-                            $string->stringid = $stringid;
-                            $string->metainfo = ''; // todo read metainfo from database
-                            $string->original = $english->text;
-                            $string->originalid = $english->amosid;
-                            $string->originalmodified = $english->timemodified;
-                            $string->committable = false;
-                            if (isset($s[$lang][$component][$stringid][$branchcode])) {
-                                $string->translation = $s[$lang][$component][$stringid][$branchcode]->text;
-                                $string->translationid = $s[$lang][$component][$stringid][$branchcode]->amosid;
-                                $string->timemodified = $s[$lang][$component][$stringid][$branchcode]->timemodified;
-                                $string->timeupdated = $s[$lang][$component][$stringid][$branchcode]->timeupdated;
-                                if (isset($s[$lang][$component][$stringid][$branchcode]->class)) {
-                                    $string->class = $s[$lang][$component][$stringid][$branchcode]->class;
-                                } else {
-                                    $string->class = 'translated';
-                                }
-                                if ($string->originalmodified > max($string->timemodified, $string->timeupdated)) {
-                                    $string->outdated = true;
-                                } else {
-                                    $string->outdated = false;
-                                }
-                                if (isset($s[$lang][$component][$stringid][$branchcode]->nocleaning)) {
-                                    $string->nocleaning = $s[$lang][$component][$stringid][$branchcode]->nocleaning;
-                                } else {
-                                    $string->nocleaning = false;
-                                }
+                foreach ($t as $stringid => $english) {
+                    reset($languages);
+                    foreach ($languages as $lang) {
+                        if ($lang == 'en') {
+                            continue;
+                        }
+                        $string = new stdclass();
+                        $versince = mlang_version::by_code($english->since);
+                        $string->englishsincedir = $versince->dir;
+                        $string->englishsincecode = $versince->code;
+                        $string->englishsincelabel = $versince->label;
+                        $string->islatest = $english->islatest;
+                        $string->language = $lang;
+                        $string->component = $component;
+                        $string->stringid = $stringid;
+                        $string->metainfo = ''; // todo read metainfo from database
+                        $string->original = $english->text;
+                        $string->originalid = $english->amosid;
+                        $string->originalmodified = $english->timemodified;
+                        $string->committable = false;
+                        if (isset($s[$lang][$component][$stringid])) {
+                            $string->translation = $s[$lang][$component][$stringid]->text;
+                            $string->translationid = $s[$lang][$component][$stringid]->amosid;
+                            $string->timemodified = $s[$lang][$component][$stringid]->timemodified;
+                            $versince = mlang_version::by_code($s[$lang][$component][$stringid]->since);
+                            $string->translationsincedir = $versince->dir;
+                            $string->translationsincecode = $versince->code;
+                            $string->translationsincelabel = $versince->label;
+                            if (isset($s[$lang][$component][$stringid]->class)) {
+                                $string->class = $s[$lang][$component][$stringid]->class;
                             } else {
-                                $string->translation = null;
-                                $string->translationid = null;
-                                $string->timemodified = null;
-                                $string->timeupdated = null;
-                                $string->class = 'missing';
+                                $string->class = 'translated';
+                            }
+                            if ($string->originalmodified > $string->timemodified) {
+                                $string->outdated = true;
+                            } else {
                                 $string->outdated = false;
+                            }
+                            if (isset($s[$lang][$component][$stringid]->nocleaning)) {
+                                $string->nocleaning = $s[$lang][$component][$stringid]->nocleaning;
+                            } else {
                                 $string->nocleaning = false;
                             }
-                            if (isset($greylist[$branchcode][$component][$stringid])) {
-                                $string->greylisted = true;
-                            } else {
-                                $string->greylisted = false;
-                            }
+                        } else {
+                            $string->translation = null;
+                            $string->translationid = null;
+                            $string->timemodified = null;
+                            $string->translationsincedir = null;
+                            $string->translationsincecode = null;
+                            $string->translationsincelabel = null;
+                            $string->class = 'missing';
+                            $string->outdated = false;
+                            $string->nocleaning = false;
+                        }
 
-                            if ($component == 'local_moodlemobileapp') {
-                                $string->app = $stringid;
-                            } else if (isset($applist[$component.'/'.$stringid])) {
-                                $string->app = $applist[$component.'/'.$stringid];
-                            } else {
-                                $string->app = false;
-                            }
+                        $applist = local_amos_applist_strings();
 
-                            unset($s[$lang][$component][$stringid][$branchcode]);
+                        if ($component == 'local_moodlemobileapp') {
+                            $string->app = $stringid;
+                        } else if (isset($applist[$component.'/'.$stringid])) {
+                            $string->app = $applist[$component.'/'.$stringid];
+                        } else {
+                            $string->app = false;
+                        }
 
-                            if ($has and is_null($string->translation)) {
-                                continue;
-                            }
-                            if ($stagedonly and $string->class != 'staged') {
-                                continue;   // do not display this string
-                            }
-                            if ($greylistedonly and !$string->greylisted) {
-                                continue;   // do not display this string
-                            }
-                            if ($withoutgreylisted and $string->greylisted) {
-                                continue;   // do not display this string
-                            }
-                            if ($app and !$string->app) {
-                                continue;   // do not display this string
-                            }
-                            if (!empty($substring)) {
-                                // if defined, then either English or the translation must contain the substring
-                                if (empty($substringregex)) {
-                                    if (empty($substringcs)) {
-                                        if (!stristr($string->original, trim($substring)) and !stristr($string->translation, trim($substring))) {
-                                            continue; // do not display this strings
-                                        }
-                                    } else {
-                                        if (!strstr($string->original, trim($substring)) and !strstr($string->translation, trim($substring))) {
-                                            continue; // do not display this strings
-                                        }
+                        unset($s[$lang][$component][$stringid]);
+
+                        if ($has and is_null($string->translation)) {
+                            continue;
+                        }
+                        if ($stagedonly and $string->class != 'staged') {
+                            continue;   // do not display this string
+                        }
+                        if ($app and !$string->app) {
+                            continue;   // do not display this string
+                        }
+                        if (!empty($substring)) {
+                            // if defined, then either English or the translation must contain the substring
+                            if (empty($substringregex)) {
+                                if (empty($substringcs)) {
+                                    if (!stristr($string->original, trim($substring)) and !stristr($string->translation, trim($substring))) {
+                                        continue; // do not display this strings
                                     }
                                 } else {
-                                    // considered substring a regular expression
-                                    if (empty($substringcs)) {
-                                        if (!preg_match("/$substring/i", $string->original) and !preg_match("/$substring/i", $string->translation)) {
-                                            continue;
-                                        }
-                                    } else {
-                                        if (!preg_match("/$substring/", $string->original) and !preg_match("/$substring/", $string->translation)) {
-                                            continue;
-                                        }
+                                    if (!strstr($string->original, trim($substring)) and !strstr($string->translation, trim($substring))) {
+                                        continue; // do not display this strings
+                                    }
+                                }
+                            } else {
+                                // considered substring a regular expression
+                                if (empty($substringcs)) {
+                                    if (!preg_match("/$substring/i", $string->original) and !preg_match("/$substring/i", $string->translation)) {
+                                        continue;
+                                    }
+                                } else {
+                                    if (!preg_match("/$substring/", $string->original) and !preg_match("/$substring/", $string->translation)) {
+                                        continue;
                                     }
                                 }
                             }
-                            if ($missing) {
-                                if ($string->class === 'translated' and !$string->outdated) {
-                                    continue;
-                                }
-                            }
-                            if ($outdated) {
-                                if (!$string->outdated) {
-                                    continue;
-                                }
-                            }
-                            $this->numofrows++;
-                            if (is_null($string->translation)) {
-                                $this->numofmissing++;
-                            }
-                            // keep just strings from the current page
-                            if ($this->numofrows < $from or $this->numofrows > $to) {
-                                unset($string);
+                        }
+                        if ($missing) {
+                            if ($string->class === 'translated' and !$string->outdated) {
                                 continue;
                             }
-                            $this->strings[] = $string;
                         }
+                        if ($outdated) {
+                            if (!$string->outdated) {
+                                continue;
+                            }
+                        }
+                        $this->numofrows++;
+                        if (is_null($string->translation)) {
+                            $this->numofmissing++;
+                        }
+                        // keep just strings from the current page
+                        if ($this->numofrows < $from or $this->numofrows > $to) {
+                            unset($string);
+                            continue;
+                        }
+                        $this->strings[] = $string;
                     }
                 }
             }
@@ -866,11 +829,7 @@ class local_amos_translator implements renderable {
             if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
-            if (empty(mlang_version::by_code($string->branchcode)->translatable)) {
-                $string->translatable = false;
-            } else {
-                $string->translatable = true;
-            }
+            $string->translatable = true;
         }
         $standard = local_amos_standard_plugins();
         foreach ($this->strings as $string) {
@@ -905,9 +864,9 @@ class local_amos_translator implements renderable {
             $maintainedlangscache->set('maintainedlangs', $maintainedlangs);
         }
 
-		$langnames = mlang_tools::list_languages();
+        $langnames = mlang_tools::list_languages();
 
-		foreach ($this->strings as $string) {
+        foreach ($this->strings as $string) {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
                 $string->translatable = false;
                 $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
@@ -952,9 +911,6 @@ class local_amos_stage implements renderable {
     /** @var bool */
     public $canstash = false;
 
-    /** @var bool */
-    public $canpropagate = false;
-
     /**
      * @param stdclass $user the owner of the stage
      */
@@ -972,7 +928,6 @@ class local_amos_stage implements renderable {
 
         if (has_capability('local/amos:commit', context_system::instance(), $user)) {
             $this->cancommit = true;
-            $this->canpropagate = true;
             $this->mergeform = new local_amos_merge_form(new moodle_url('/local/amos/merge.php'), local_amos_merge_options());
             $this->diffform = new local_amos_diff_form(new moodle_url('/local/amos/diff.php'), local_amos_diff_options());
         }
@@ -985,8 +940,8 @@ class local_amos_stage implements renderable {
             $this->executeform = new local_amos_execute_form(new moodle_url('/local/amos/execute.php'), local_amos_execute_options());
         }
 
-        foreach($stage->get_iterator() as $component) {
-            foreach ($component->get_iterator() as $staged) {
+        foreach($stage as $component) {
+            foreach ($component as $staged) {
                 if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
                     $needed[$component->version->code][$component->lang][$component->name] = array();
                 }
@@ -1049,7 +1004,10 @@ class local_amos_stage implements renderable {
             }
         }
         $this->filterfields = new stdClass();
-        $this->filterfields->fver = array_keys($fver);
+        $this->filterfields->fver = null;
+        if (!empty($fver) && is_array($fver)) {
+            $this->filterfields->fver = max(array_keys($fver));
+        }
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
         $allowedlangs = mlang_tools::list_allowed_languages($user->id);
@@ -1616,11 +1574,9 @@ function local_amos_importfile_options() {
     foreach (mlang_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
-            if ($version->current) {
-                $options['versioncurrent'] = $version->code;
-            }
         }
     }
+    $options['versioncurrent'] = mlang_version::latest_version()->code;
     $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
     $currentlanguage = current_language();
     if ($currentlanguage === 'en') {
@@ -1645,14 +1601,15 @@ function local_amos_merge_options() {
     $options['targetversions'] = array();
     $options['defaultsourceversion'] = null;
     $options['defaulttargetversion'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         $options['sourceversions'][$version->code] = $version->label;
-        if (!$version->current and is_null($options['defaultsourceversion'])) {
+        if ($version->code != $latestversioncode && $options['defaultsourceversion'] === null) {
             $options['defaultsourceversion'] = $version->code;
         }
         if ($version->translatable) {
             $options['targetversions'][$version->code] = $version->label;
-            if ($version->current) {
+            if ($version->code == $latestversioncode) {
                 $options['defaulttargetversion'] = $version->code;
             }
         }
@@ -1686,9 +1643,10 @@ function local_amos_diff_options() {
 
     $options['versions'] = array();
     $options['defaultversion'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         $options['versions'][$version->code] = $version->label;
-        if ($version->current) {
+        if ($version->code == $latestversioncode) {
             $options['defaultversion'] = $version->code;
         }
     }
@@ -1715,10 +1673,11 @@ function local_amos_execute_options() {
 
     $options['versions'] = array();
     $options['versioncurrent'] = null;
+    $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
-            if ($version->current) {
+            if ($version->code == $latestversioncode) {
                 $options['versioncurrent'] = $version->code;
             }
         }

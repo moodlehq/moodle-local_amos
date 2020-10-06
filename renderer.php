@@ -92,15 +92,7 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
-        $allversions = mlang_version::list_all();
-        foreach ($allversions as $key => $version) {
-            if ($version->code < 2000) {
-                unset($allversions[$key]);
-            }
-        }
-        $colspan = count($allversions) + 1;
-        $listversions = array();
-        foreach (mlang_tools::list_components() as $componentname => $branches) {
+        foreach (mlang_tools::list_components() as $componentname => $since) {
             // Categorize the component into Core, Standard or Add-ons.
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
@@ -111,17 +103,8 @@ class local_amos_renderer extends plugin_renderer_base {
             } else {
                 $optionscontrib[$componentname] = $componentname;
             }
-            // Prepare the list of versions the component strings are available at.
-            $componentversions = array();
-            foreach ($allversions as $version) {
-                if (in_array($version->code, $branches)) {
-                    $extraclass = isset($version->supported) && $version->supported ? ' supported' : ' unsupported';
-                    $componentversions[$version->code] = html_writer::tag('td', html_writer::tag('span', $version->label), array('class' => 'version'.$extraclass));
-                } else {
-                    $componentversions[$version->code] = html_writer::tag('td', '', array('class' => 'version'));
-                }
-            }
-            $listversions[$componentname] = implode('', $componentversions);
+            $listversions[$componentname] = html_writer::tag('td', mlang_version::by_code($since)->label . '+',
+                ['class' => 'version']);
         }
 
         asort($optionscore);
@@ -133,7 +116,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $app_plugins = local_amos_app_plugins();
 
-        $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => $colspan)));
+        $table = html_writer::tag('tr', html_writer::tag('th', get_string('typecore', 'local_amos'), array('colspan' => 2)));
         foreach ($optionscore as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';
@@ -147,7 +130,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'standard core'.$isapp));
         }
 
-        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typestandard', 'local_amos'), array('colspan' => 2)));
         foreach ($optionsstandard as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';
@@ -161,7 +144,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'standard plugin'.$isapp));
         }
 
-        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => $colspan)));
+        $table .= html_writer::tag('tr', html_writer::tag('th', get_string('typecontrib', 'local_amos'), array('colspan' => 2)));
         foreach ($optionscontrib as $key => $label) {
             $selected = in_array($key, $current);
             $cssclasses = 'labelled_checkbox';
@@ -226,43 +209,19 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('div'); // .controls
         $output .= html_writer::end_tag('div'); // .control-group
 
-        // version checkboxes
+        // Version selector.
         $current = $filterdata->version;
-        $someselected = false;
-        $supported = '';
-        $unsupported = '';
+        $selected = mlang_version::latest_version()->code;
+        $fveroptions = [];
         foreach (mlang_version::list_all() as $version) {
-            if ($version->code < 2000) {
-                continue;
-            }
-            if (in_array($version->code, $current)) {
-                $someselected = true;
-                $thisselected = true;
-            } else {
-                $thisselected = false;
-            }
-
-            $fver = html_writer::start_tag('div', array('class' => 'form-check form-check-inline amosfilter_version'));
-            $fverprops = array('class' => 'fver form-check-input '. ($version->current ? 'current' : ""));
-            if ($filterdata->last) {
-                $fverprops['disabled'] = 'disabled';
-            }
-            $fver .= html_writer::checkbox('fver[]', $version->code, $thisselected, $version->label, $fverprops);
-            $fver .= html_writer::end_tag('div'); // .form-check
-
-            if (isset($version->supported) && $version->supported) {
-                $supported .= $fver;
-            } else {
-                $unsupported .= $fver;
+            if ($version->translatable) {
+                $fveroptions[$version->code] = $version->label;
+                if ($current == $version->code) {
+                    $selected = $version->code;
+                }
             }
         }
-
-        if (!$someselected) {
-            $extraclass = ' error';
-            $alerts[] = get_string('filtervernothingselected', 'local_amos');
-        } else {
-            $extraclass = '';
-        }
+        $fver = html_writer::select($fveroptions, 'fver', $selected);
 
         if ($filterdata->last) {
             $collapsible = ' collapse';
@@ -287,12 +246,7 @@ class local_amos_renderer extends plugin_renderer_base {
         } else {
             $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_versions'));
         }
-        $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_supported'));
-        $output .= $supported;
-        $output .= html_writer::end_tag('div'); // #amosfilter_fver_supported
-        $output .= html_writer::start_tag('div' , array('id' => 'amosfilter_fver_unsupported'));
-        $output .= $unsupported;
-        $output .= html_writer::end_tag('div'); // #amosfilter_fver_unsupported
+        $output .= html_writer::div($fver, 'm-t-1', array('id' => 'amosfilter_fver'));
         $output .= html_writer::end_tag('div'); // #amosfilter_fver_versions
         $output .= html_writer::end_tag('div'); // .controls
 
@@ -522,7 +476,14 @@ class local_amos_renderer extends plugin_renderer_base {
         foreach ($translator->strings as $string) {
 
             // string information
-            $infoversion = html_writer::span($string->branchlabel, 'info info-version');
+            $infoversion = html_writer::span($string->englishsincelabel . '+', 'info info-version');
+
+            if (!$string->islatest) {
+                $infoversion .= ' ' . html_writer::tag('i', '', [
+                    'class' => 'fa fa-warning',
+                    'title' => get_string('stringversionnotlatest', 'local_amos'),
+                ]);
+            }
 
             $infostringid = html_writer::span($string->stringid, 'info info-stringid');
 
@@ -539,12 +500,6 @@ class local_amos_renderer extends plugin_renderer_base {
                     'info info-placeholder');
             }
 
-            $infogreylisted = '';
-            if ($string->greylisted) {
-                $infogreylisted = html_writer::span($this->help_icon('greylisted', 'local_amos', get_string('greylistedwarning', 'local_amos')),
-                   'info info-greylisted');
-            }
-
             $infoapp = '';
             if ($string->app) {
                 $infoapp = html_writer::tag('i', "", array('class' => 'fa fa-mobile', 'title' => get_string('filtermisfapp_help', 'local_amos', $string->app)));
@@ -558,7 +513,6 @@ class local_amos_renderer extends plugin_renderer_base {
                 'href' => new moodle_url('/local/amos/timeline.php', array(
                     'component' => $string->component,
                     'language'  => $string->language,
-                    'branch'    => $string->branchcode,
                     'stringid'  => $string->stringid
                 ))
             )), 'info info-timeline');
@@ -574,7 +528,8 @@ class local_amos_renderer extends plugin_renderer_base {
                     'href' => new moodle_url('/local/amos/untranslate.php', array(
                         'component' => $string->component,
                         'language'  => $string->language,
-                        'stringid' => $string->stringid
+                        'stringid' => $string->stringid,
+                        'since' => $string->translationsincecode,
                     ))
                 )), 'info info-untranslate');
             } else {
@@ -633,10 +588,6 @@ class local_amos_renderer extends plugin_renderer_base {
             // info lines
             $infoline1 = $infoversion.' | '.$infostringid.' | '.$infocomponent;
 
-            if ($infogreylisted) {
-                $infoline1 .= ' | '.$infogreylisted;
-            }
-
             if ($infoplaceholder) {
                 $infoline1 .= ' | '.$infoplaceholder;
             }
@@ -646,6 +597,11 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
+
+            if ($string->translationsincelabel !== null) {
+                $infoline2 .= ' | ' . html_writer::span($string->translationsincelabel . '+', 'info info-version');
+            }
+
             $infoline2 .= ' | '.$infotimeline;
             $infoline2 .= ' '.$infountranslate;
             $infoline2 .= ' '.$infogoogle;
@@ -657,6 +613,8 @@ class local_amos_renderer extends plugin_renderer_base {
 
             if (!empty($string->translationid)) {
                 $data['data-amos-translationid'] = $string->translationid;
+            } else {
+                $data['data-amos-translationid'] = 0;
             }
 
             $trout .= html_writer::start_div('string-control-group', $data);
@@ -755,7 +713,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $cells = array();
 
             // string identification
-            $infoversion = html_writer::span($string->version, 'info info-version');
+            $infoversion = html_writer::span($string->version . '+', 'info info-version');
 
             $infostringid = html_writer::span($string->stringid, 'info info-stringid');
 
@@ -1001,47 +959,6 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             unset($a);
 
-            // Propagate translations
-            if ($stage->canpropagate and count($stage->strings) == $committable) {
-                $justpropagated = optional_param('justpropagated', null, PARAM_INT);
-                if (is_null($justpropagated)) {
-                    $expandpropagate = true;
-                } else {
-                    $expandpropagate = false;
-                    if ($justpropagated == 0) {
-                        $output .= $this->heading(get_string('propagatednone', 'local_amos'));
-                    } else {
-                        $output .= $this->heading(get_string('propagatedsome', 'local_amos', $justpropagated));
-                    }
-                }
-
-                $propagateform  = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-                $propagateform .= html_writer::empty_tag('input', array('name' => 'propagate', 'value' => 1, 'type' => 'hidden'));
-                foreach (mlang_version::list_all() as $version) {
-                    if ($version->code < 2000) {
-                        continue;
-                    }
-                    $propagateform .= html_writer::start_tag('div', array('class' => 'form-check form-check-inline'));
-                    $propagateform .= html_writer::checkbox('ver[]', $version->code, true, $version->label, array('class' => 'form-check-input'));
-                    $propagateform .= html_writer::end_tag('div'); // .form-check
-                }
-                $propagateform .= html_writer::div(html_writer::tag('button', get_string('propagaterun', 'local_amos'),
-                    array(
-                        'type' => 'submit',
-                        'class' => 'btn btn-light'
-                    )
-                ), 'm-t-1');
-                $propagateform  = html_writer::tag('div', $propagateform);
-                $propagateform  = html_writer::tag('form', $propagateform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
-                $output .= $this->collapsible_stage_tool(
-                    get_string('propagate', 'local_amos'),
-                    $propagateform,
-                    $this->help_icon('propagate', 'local_amos'),
-                    $expandpropagate,
-                    'protected propagate'
-                );
-            }
-
             if ($committable and $stage->cancommit) {
                 $commitform = html_writer::div(
                     html_writer::tag('textarea', s($stage->presetmessage), array(
@@ -1111,11 +1028,8 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'btn')
             );
 
-            $i = 0;
-            foreach ($stage->filterfields->fver as $fver) {
-                $params['fver['.$i.']'] = $fver;
-                $i++;
-            }
+            $params['fver'] = $stage->filterfields->fver;
+
             $i = 0;
             foreach ($stage->filterfields->flng as $flng) {
                 $params['flng['.$i.']'] = $flng;

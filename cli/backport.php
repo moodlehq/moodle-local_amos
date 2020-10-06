@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,17 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Automerge components
+ * CLI utility to backport all translations for all components on all branches.
  *
  * @package     local_amos
- * @subpackage  cli
- * @copyright   2013 David Mudrak <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright   2020 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 require_once($CFG->libdir.'/clilib.php');
@@ -56,27 +54,17 @@ if ($options['help'] || !empty($unrecognized)) {
 
 $logger = new amos_cli_logger();
 
-$logger->log('automerge', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
+$logger->log('backport', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
 
-$sql = "SELECT DISTINCT component
-          FROM {amos_snapshot}
-         WHERE lang = :lang";
-
-$params = ['lang' => 'en'];
-
-if (!empty($options['component'])) {
-    $sql .= " AND component = :component";
-    $params['component'] = $options['component'];
-}
-
-$components = $DB->get_fieldset_sql($sql, $params);
-
+$components = array_keys(mlang_tools::list_components());
 $count = count($components);
 $i = 1;
+
 foreach ($components as $component) {
-    $logger->log('automerge', $i.'/'.$count.' automerging '.$component.' ...');
-    mlang_tools::auto_merge($component);
+    $logger->log('backport', sprintf('%d%% %d/%d backporting %s translations ...',
+        floor($i / $count * 100), $i, $count, $component));
+    mlang_tools::backport_translations($component);
     $i++;
 }
 
-$logger->log('automerge', 'Done!');
+$logger->log('backport', 'Done!');

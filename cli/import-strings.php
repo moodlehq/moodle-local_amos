@@ -102,8 +102,8 @@ if (!$stage->has_component()) {
     exit(4);
 }
 
-foreach ($stage->get_iterator() as $component) {
-    foreach ($component->get_iterator() as $string) {
+foreach ($stage as $component) {
+    foreach ($component as $string) {
         if ($string->deleted) {
             $sign = '-';
         } else {

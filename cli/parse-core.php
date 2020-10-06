@@ -80,8 +80,8 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
 
     $standardplugins = local_amos_standard_plugins();
 
-    foreach ($stage->get_iterator() as $component) {
-        foreach ($component->get_iterator() as $string) {
+    foreach ($stage as $component) {
+        foreach ($component as $string) {
             if ($string->deleted) {
                 $sign = '-  ';
             } else {
@@ -143,8 +143,8 @@ function amos_parse_core_commit() {
     $stage->rebase($timemodified, true, $timemodified);
 
     // make sure that the strings to be removed are really affected by the commit
-    foreach ($stage->get_iterator() as $component) {
-        foreach ($component->get_iterator() as $string) {
+    foreach ($stage as $component) {
+        foreach ($component as $string) {
             if (!isset($affected[$component->name][$string->id])) {
                 $component->unlink_string($string->id);
             }
@@ -174,7 +174,7 @@ function amos_parse_core_commit() {
     ), true, $timemodified);
 
     // execute AMOS script if the commit message contains some
-    if ($version->code >= mlang_version::MOODLE_20) {
+    if ($version->code >= 20) {
         $instructions = mlang_tools::extract_script_from_text($fullcommitmsg);
         if (!empty($instructions)) {
             foreach ($instructions as $instruction) {
@@ -357,7 +357,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         $file = $parts[1];
         $componentname = mlang_component::name_from_filename($file);
         // series of checks that the file is proper language pack
-        if (($version->code >= mlang_version::MOODLE_20) and ($committime >= 1270884296)) {
+        if (($version->code >= 20) and ($committime >= 1270884296)) {
             // since Petr's commit 3a915b066765efc3cc166ae8186405f67c04ec2c
             // on 10th April 2010, strings are in 'en' folder again
             $enfolder = 'en';
@@ -438,7 +438,7 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
         exec(AMOS_PATH_GIT . " show {$commithash}:{$file} > {$checkout}");
 
         // convert the php file into strings in the staging area
-        if ($version->code >= mlang_version::MOODLE_20) {
+        if ($version->code >= 20) {
             if ($committime >= 1270908105) {
                 // since David's commit 30c8dd34f70437b15bd7960eb056d8de0c5e0375
                 // on 10th April 2010, strings are in the new format

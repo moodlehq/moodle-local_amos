@@ -65,7 +65,7 @@ foreach ($tree as $vercode => $languages) {
             $removed = $enfix->complement($en);
 
             if ($options['aggresive']) {
-                foreach ($enfix->get_iterator() as $enfixstring) {
+                foreach ($enfix as $enfixstring) {
                     $enstring = $en->get_string($enfixstring->id);
                     if ($enstring === null) {
                         fputs(STDERR, 'orphaned string '.$enfixstring->id.' in '.$componentname.' '.$version->label.PHP_EOL);

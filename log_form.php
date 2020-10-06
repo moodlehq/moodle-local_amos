@@ -95,11 +95,7 @@ class local_amos_log_form extends moodleform {
             $branchgrp[] = $mform->createElement('checkbox', $version->code, '', $version->label);
         }
         $mform->addGroup($branchgrp, 'branch', get_string('logfilterbranch', 'local_amos'), ' ');
-        foreach (mlang_version::list_all() as $version) {
-            if ($version->current) {
-                $mform->setDefault('branch['.$version->code.']', 1);
-            }
-        }
+        $mform->setDefault('branch[' . mlang_version::latest_version()->code . ']', 1);
 
         // Lang
         $langgrp = array();
@@ -119,7 +115,7 @@ class local_amos_log_form extends moodleform {
         foreach (local_amos_standard_plugins() as $plugins) {
             $standard = array_merge($standard, $plugins);
         }
-        foreach (mlang_tools::list_components() as $componentname => $undefined) {
+        foreach (mlang_tools::list_components() as $componentname => $since) {
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' or substr($standard[$componentname], 0, 5) === 'core_') {
                     $optionscore[$componentname] = $standard[$componentname];

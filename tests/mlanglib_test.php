@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -27,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/amos/mlanglib.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Makes protected method accessible for testing purposes
@@ -47,23 +46,17 @@ class mlang_test extends advanced_testcase {
      * Helper method to quickly register a language on the given branch(-es)
      *
      * @param string $langcode the code of the language, such as 'en'
-     * @param int|array $branchcodes the code of the branch or a list of them
+     * @param int $since the code of the branch to register the language at.
      */
-    protected function register_language($langcode, $branchcodes) {
-
-        if (!is_array($branchcodes)) {
-            $branchcodes = array($branchcodes);
-        }
+    protected function register_language($langcode, $since) {
 
         $stage = new mlang_stage();
 
-        foreach ($branchcodes as $branchcode) {
-            $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($branchcode));
-            $component->add_string(new mlang_string('thislanguage', $langcode));
-            $component->add_string(new mlang_string('thislanguageint', $langcode));
-            $stage->add($component);
-            $component->clear();
-        }
+        $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($since));
+        $component->add_string(new mlang_string('thislanguage', $langcode));
+        $component->add_string(new mlang_string('thislanguageint', $langcode));
+        $stage->add($component);
+        $component->clear();
 
         $stage->commit('Register language '.$langcode, array('source' => 'unittest'));
     }
@@ -91,6 +84,61 @@ class mlang_test extends advanced_testcase {
     }
 
     /**
+     * Test that components and stages are iterable and countable.
+     */
+    public function test_iterable_and_countable() {
+
+        $this->resetAfterTest();
+
+        $component = new mlang_component('test', 'en', mlang_version::by_code(310));
+
+        $this->assertSame(0, count($component));
+        foreach ($component as $string) {
+            $this->assertTrue(false);
+        }
+
+        $component->add_string(new mlang_string('foo', 'Foo'));
+        $this->assertEquals(1, count($component));
+        $i = 0;
+        foreach ($component as $string) {
+            $this->assertInstanceOf(mlang_string::class, $string);
+            $i++;
+        }
+        $this->assertSame(1, $i);
+
+        $component->add_string(new mlang_string('bar', 'Bar'));
+        $this->assertEquals(2, count($component));
+        $i = 0;
+        foreach ($component as $string) {
+            $this->assertInstanceOf(mlang_string::class, $string);
+            $i++;
+        }
+        $this->assertSame(2, $i);
+
+        $stage = new mlang_stage();
+        $this->assertSame(0, count($stage));
+        foreach ($stage as $component) {
+            $this->assertTrue(false);
+        }
+
+        $stage->add($component);
+        $this->assertSame(1, count($stage));
+        $i = 0;
+        foreach ($stage as $component) {
+            $this->assertInstanceOf(mlang_component::class, $component);
+            $i++;
+        }
+        $this->assertSame(1, $i);
+
+        $stage->commit('Test', ['source' => 'unittest']);
+
+        $this->assertSame(0, count($stage));
+        foreach ($stage as $component) {
+            $this->assertTrue(false);
+        }
+    }
+
+    /**
      * Standard procedure to add strings into AMOS repository
      */
     public function test_simple_string_lifecycle() {
@@ -98,7 +146,7 @@ class mlang_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        // basic operations
+        // Basic operations.
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->assertFalse($component->has_string());
         $this->assertFalse($component->has_string('nonexisting'));
@@ -120,7 +168,7 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        // commit a single string
+        // Commit a single string.
         $now = time();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $component->add_string(new mlang_string('welcome', 'Welcome', $now));
@@ -130,19 +178,12 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(1, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now)));
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $this->assertTrue($DB->record_exists('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome')));
-        $repo = $DB->get_record('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now), '*');
-        $snapshot = $DB->get_record('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
-        $this->assertEquals($repo->id, $snapshot->repoid);
 
-        // add two other strings
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('welcome'));
+        $component->clear();
+
+        // Add two other strings.
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -153,14 +194,14 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(3, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'hello', 'timemodified' => $now)));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'world', 'timemodified' => $now)));
-        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
 
-        // delete a string
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($component->has_string('welcome'));
+        $this->assertTrue($component->has_string('hello'));
+        $this->assertTrue($component->has_string('world'));
+        $component->clear();
+
+        // Delete a string.
         $now = time();
         $stage = new mlang_stage();
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -170,10 +211,12 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
         unset($stage);
-        $this->assertEquals(4, $DB->count_records('amos_repository'));
-        $this->assertTrue($DB->record_exists('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1)));
-        $this->assertEquals(3, $DB->count_records('amos_snapshot'));
+
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string('welcome'));
+        $this->assertTrue($component->has_string('hello'));
+        $this->assertTrue($component->has_string('world'));
+        $component->clear();
     }
 
     public function test_add_existing_string() {
@@ -219,13 +262,8 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        $this->assertEquals(2, $DB->count_records('amos_repository'));
-        $repo = $DB->get_record('amos_repository', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome', 'timemodified' => $now, 'deleted' => 1), '*');
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array(
-                'component' => 'test', 'lang' => 'xx', 'branch' => 2000, 'stringid' => 'welcome'), '*');
-        $this->assertEquals($repo->id, $snapshot->repoid);
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertFalse($component->has_string());
     }
 
     public function test_more_recently_inserted_wins() {
@@ -272,10 +310,10 @@ class mlang_test extends advanced_testcase {
         $component->clear();
         unset($component);
 
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array());
-        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid), '*', MUST_EXIST);
-        $this->assertEquals(1, $repo->deleted);
+        $component = mlang_component::from_snapshot('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'), null, true);
+        $this->assertTrue($component->get_string('welcome')->deleted);
+        $component->clear();
+        unset($component);
     }
 
     public function test_component_from_phpfile_same_timestamp() {
@@ -324,12 +362,10 @@ EOF;
         $component->clear();
         unset($component);
 
-        $this->assertEquals(2, $DB->count_records('amos_repository'));
-        $this->assertEquals(1, $DB->count_records('amos_snapshot'));
-        $snapshot = $DB->get_record('amos_snapshot', array());
-        $repo = $DB->get_record('amos_repository', array('id' => $snapshot->repoid));
-        $textid = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Welcome!')), MUST_EXIST);
-        $this->assertEquals($textid, $repo->textid);
+        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertEquals($component->get_string('welcome')->text, 'Welcome!');
+        $component->clear();
+        unset($component);
     }
 
     public function test_component_from_phpfile_legacy_format() {
@@ -389,7 +425,7 @@ EOF;
         $component->add_string(new mlang_string('two', 'Two'));
         $component->add_string(new mlang_string('three', 'Tree')); // typo here
         $stage->add($component);
-        $stage->commit('Initial commit', array('source' => 'unittest'), true);
+        $stage->commit('Initial commit', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
@@ -415,6 +451,27 @@ EOF;
         unset($component);
         unset($stage);
 
+        // Rebasing on a higher branch.
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component->add_string(new mlang_string('one', 'One')); // same as the current
+        $component->add_string(new mlang_string('two', 'Two')); // same as the current
+        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $stage->add($component);
+        $stage->rebase();
+        $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $this->assertTrue($rebased instanceof mlang_component);
+        $this->assertFalse($rebased->has_string('one'));
+        $this->assertFalse($rebased->has_string('two'));
+        $this->assertTrue($rebased->has_string('three'));
+        $s = $rebased->get_string('three');
+        $this->assertEquals('Three', $s->text);
+        $stage->clear();
+        $component->clear();
+        unset($component);
+        unset($stage);
+
         // rebasing with string removal - the stage is considered to be the full snapshot of the state
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
@@ -425,6 +482,29 @@ EOF;
         $stage->add($component);
         $stage->rebase(null, true);
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $this->assertTrue($rebased instanceof mlang_component);
+        $this->assertFalse($rebased->has_string('one'));
+        $this->assertTrue($rebased->has_string('two'));
+        $this->assertTrue($rebased->has_string('three'));
+        $s = $rebased->get_string('two');
+        $this->assertTrue($s->deleted);
+        $s = $rebased->get_string('three');
+        $this->assertEquals('Three', $s->text);
+        $stage->clear();
+        $component->clear();
+        unset($component);
+        unset($stage);
+
+        // Rebasing with string removal on a higher branch.
+        $stage = new mlang_stage();
+        $this->assertFalse($stage->has_component());
+        $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
+        $component->add_string(new mlang_string('one', 'One')); // same as the current
+        // Rtring 'two' is missing and we want it to be removed from repository.
+        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $stage->add($component);
+        $stage->rebase(null, true);
+        $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
         $this->assertTrue($rebased instanceof mlang_component);
         $this->assertFalse($rebased->has_string('one'));
         $this->assertTrue($rebased->has_string('two'));
@@ -487,16 +567,11 @@ EOF;
         $component->clear();
         unset($component);
         unset($stage);
-        $textid_tree = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Tree')), MUST_EXIST);
-        $textid_three = $DB->get_field('amos_texts', 'id', array('texthash' => sha1('Three')), MUST_EXIST);
-        $where = "component = 'numbers' AND lang = 'en' AND stringid = 'three'";
-        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_tree)));
-        $this->assertTrue($DB->record_exists_select('amos_repository', "$where AND textid = ?", array($textid_three)));
 
         // get the most recent version (so called "cap") of the component
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $concat = '';
-        foreach ($cap->get_iterator() as $s) {
+        foreach ($cap as $s) {
             $concat .= $s->text;
         }
         // strings in the cap shall be ordered by stringid
@@ -1019,44 +1094,46 @@ EOF;
     }
 
     public function test_list_components() {
+
         $this->resetAfterTest();
+
         $stage = new mlang_stage();
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_38_STABLE'));
         $component->add_string(new mlang_string('modulename', 'Workshop'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_39_STABLE'));
         $component->add_string(new mlang_string('modulename', 'Workshop 2.x'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $component = new mlang_component('auth', 'en', mlang_version::by_branch('MOODLE_310_STABLE'));
         $component->add_string(new mlang_string('foo', 'Bar'));
         $stage->add($component);
         $component->clear();
 
-        $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('thislanguage', 'CS'));
+        // This will play no role as there is no English original.
+        $component = new mlang_component('assign', 'cs', mlang_version::by_branch('MOODLE_38_STABLE'));
+        $component->add_string(new mlang_string('pluginname', 'Úkol'));
         $stage->add($component);
         $component->clear();
 
-        $stage->commit('Registering two English components', array('source' => 'unittest'));
+        $stage->commit('Registering component strings', array('source' => 'unittest'));
 
         $comps = mlang_tools::list_components();
+
         $this->assertEquals(gettype($comps), 'array');
         $this->assertEquals(count($comps), 2);
-        $this->assertTrue(array_key_exists('workshop', $comps));
-        $this->assertTrue(array_key_exists('auth', $comps));
-        $this->assertSame(array('1900','2000'), $comps['workshop']);
-        $this->assertSame(array('2000'), $comps['auth']);
+        $this->assertEquals($comps['auth'], 310);
+        $this->assertEquals($comps['workshop'], 38);
     }
 
     public function test_execution_strings() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_20);
-        $this->register_language('cs', mlang_version::MOODLE_20);
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
@@ -1111,8 +1188,8 @@ EOF;
     public function test_execution_strings_move() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_20);
-        $this->register_language('cs', mlang_version::MOODLE_20);
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
@@ -1153,7 +1230,7 @@ AMOS END';
         unset($component);
 
         // execute AMOS script if the commit message contains some
-        if ($version->code >= mlang_version::MOODLE_20) {
+        if ($version->code >= 20) {
             $instructions = mlang_tools::extract_script_from_text($commitmsg);
             if (!empty($instructions)) {
                 foreach ($instructions as $instruction) {
@@ -1241,251 +1318,11 @@ AMOS END';
         $this->assertTrue(in_array('mod/something:really_nasty-like0098187.this', $affected));
     }
 
-    public function test_components_tree() {
-        $this->resetAfterTest();
-        // prepare a tree
-        $stage = new mlang_stage();
-        $components = array();
-        foreach (array('MOODLE_19_STABLE', 'MOODLE_20_STABLE', 'MOODLE_21_STABLE') as $branch) {
-            foreach (array('en', 'cs', 'es') as $language) {
-                foreach (array('moodle', 'auth_mnet', 'workshop') as $componentname) {
-                    $component = new mlang_component($componentname, $language, mlang_version::by_branch($branch));
-                    $component->add_string(new mlang_string('foo', 'Bar'));
-                    $stage->add($component);
-                    $component->clear();
-                }
-            }
-        }
-        $stage->commit('Committing test strings');
-
-        // full tree
-        $tree = mlang_tools::components_tree();
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(3, count($tree)); // 3 versions
-        $this->assertEquals(3, count($tree[1900])); // 3 languages
-        $this->assertEquals(3, count($tree[2000])); // 3 languages
-        $this->assertEquals(3, count($tree[2100])); // 3 languages
-        $this->assertEquals(3, count($tree[1900]['cs'])); // 3 components
-        $this->assertEquals(3, count($tree[2000]['en'])); // 3 components
-        $this->assertEquals(3, count($tree[2100]['es'])); // 3 components
-        $this->assertEquals(1, $tree[2100]['es']['moodle']); // 1 string
-
-        // empty trees
-        $tree = mlang_tools::components_tree(array('branch' => 1800));
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertTrue(empty($tree));
-
-        $tree = mlang_tools::components_tree(array('component' => 'book'));
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertTrue(empty($tree));
-
-        // single value filter
-        $tree = mlang_tools::components_tree(array('branch' => 2000, 'lang' => 'cs'));
-        $this->assertEquals(gettype($tree), 'array');
-        $this->assertEquals(1, count($tree));
-        $this->assertEquals(1, count($tree[2000]));
-        $this->assertEquals(3, count($tree[2000]['cs']));
-        $this->assertEquals(1, $tree[2000]['cs']['workshop']);
-
-        // yet another single value filter
-        $tree = mlang_tools::components_tree(array('component' => 'auth_mnet'));
-        $this->assertEquals(3, count($tree));
-        $this->assertEquals(3, count($tree[1900]));
-        $this->assertEquals(3, count($tree[2000]));
-        $this->assertEquals(3, count($tree[2100]));
-        $this->assertEquals(1, count($tree[1900]['cs']));
-        $this->assertEquals(1, count($tree[2000]['en']));
-        $this->assertEquals(1, count($tree[2100]['es']));
-        $this->assertEquals(1, $tree[2100]['en']['auth_mnet']);
-
-        // multivalues filter
-        $tree = mlang_tools::components_tree(array('branch' => array(2000, 2100), 'lang' => array('en'), 'component' => array('moodle', 'workshop')));
-        $this->assertEquals(2, count($tree));
-        $this->assertEquals(1, count($tree[2000]));
-        $this->assertEquals(1, count($tree[2100]));
-        $this->assertEquals(2, count($tree[2000]['en']));
-        $this->assertEquals(2, count($tree[2100]['en']));
-        $this->assertEquals(1, $tree[2000]['en']['moodle']);
-        $this->assertEquals(1, $tree[2000]['en']['workshop']);
-        $this->assertEquals(1, $tree[2100]['en']['moodle']);
-        $this->assertEquals(1, $tree[2100]['en']['workshop']);
-    }
-
-    public function test_stage_propagate() {
-        $this->resetAfterTest();
-
-        $version20 = mlang_version::by_branch('MOODLE_20_STABLE');
-        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
-        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
-
-        $component20en = new mlang_component('admin', 'en', $version20);
-        $component20en->add_string(new mlang_string('foo1', 'Bar1'));
-        $component20en->add_string(new mlang_string('foo2', 'Bar2'));
-
-        $component20cs = new mlang_component('admin', 'cs', $version20);
-        $component20cs->add_string(new mlang_string('foo1', 'TranslatedOldBar1'));
-
-        $component21en = new mlang_component('admin', 'en', $version21);
-        $component21en->add_string(new mlang_string('foo1', 'Bar1'));
-        $component21en->add_string(new mlang_string('foo2', 'Bar2'));
-        $component21en->add_string(new mlang_string('foo3', 'Bar3'));
-
-        $component22en = new mlang_component('admin', 'en', $version22);
-        $component22en->add_string(new mlang_string('foo1', 'Bar1'));
-        $component22en->add_string(new mlang_string('foo2', 'Bar2'));
-        $component22en->add_string(new mlang_string('foo3', 'NewBar3'));
-
-        $stage = new mlang_stage();
-        $stage->add($component20en);
-        $stage->add($component20cs);
-        $stage->add($component21en);
-        $stage->add($component22en);
-        $stage->commit('Initial strings', array('source' => 'unittest'), true);
-        $component20en->clear();
-        $component21en->clear();
-        $component22en->clear();
-        unset($stage);
-
-        // simple usage - the user translated a string on 2.1 and want it being applied to 2.2, too
-        $stage = new mlang_stage();
-        $component21cs = new mlang_component('admin', 'cs', $version21);
-        $component21cs->add_string(new mlang_string('foo1', 'TranslatedBar1'));
-        $stage->add($component21cs);
-        $component21cs->clear();
-
-        $this->assertEquals($stage->propagate(array($version22)), 1);
-
-        $propagatedcomponent = $stage->get_component('admin', 'cs', $version22);
-        $this->assertNotNull($propagatedcomponent, 'The component "admin" must exist on '.$version22->label);
-        $this->assertTrue($propagatedcomponent->has_string('foo1'));
-        $propagatedstring = $propagatedcomponent->get_string('foo1');
-        $this->assertEquals($propagatedstring->text, 'TranslatedBar1');
-        $stage->clear();
-
-        // the change is not propagated if the changed string is staged several times and the values
-        // are different
-        $stage = new mlang_stage();
-        $component20cs = new mlang_component('admin', 'cs', $version20);
-        $component20cs->add_string(new mlang_string('foo2', 'TranslatedOldBar2'));
-        $component21cs = new mlang_component('admin', 'cs', $version21);
-        $component21cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
-        $stage->add($component20cs);
-        $stage->add($component21cs);
-        $component20cs->clear();
-        $component21cs->clear();
-
-        $this->assertEquals($stage->propagate(array($version20, $version21, $version22)), 0);
-
-        $this->assertEquals($stage->get_component('admin', 'cs', $version20)->get_string('foo2')->text, 'TranslatedOldBar2');
-        $this->assertEquals($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
-        $this->assertNull($stage->get_component('admin', 'cs', $version22));
-        $stage->clear();
-
-        // but the change is propagated if the changed string is staged several times and the values
-        // are the same
-        $stage = new mlang_stage();
-        $component20cs = new mlang_component('admin', 'cs', $version20);
-        $component20cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
-        $component21cs = new mlang_component('admin', 'cs', $version21);
-        $component21cs->add_string(new mlang_string('foo2', 'TranslatedBar2'));
-        $stage->add($component20cs);
-        $stage->add($component21cs);
-        $component20cs->clear();
-        $component21cs->clear();
-
-        $this->assertEquals($stage->propagate(array($version20, $version21, $version22)), 1);
-
-        $this->assertEquals($stage->get_component('admin', 'cs', $version22)->get_string('foo2')->text, 'TranslatedBar2');
-        $this->assertEquals($stage->get_component('admin', 'cs', $version21)->get_string('foo2')->text, 'TranslatedBar2');
-        $this->assertEquals($stage->get_component('admin', 'cs', $version20)->get_string('foo2')->text, 'TranslatedBar2');
-        $stage->clear();
-
-        // the staged string is propagated to another branch only if the English originals match
-        // in the following test, the 2.1 translation of foo3 should not propagate to neither 2.0
-        // (because the string does not exist there) not 2.2 (because the English originals differ)
-        $stage = new mlang_stage();
-        $component21cs = new mlang_component('admin', 'cs', $version21);
-        $component21cs->add_string(new mlang_string('foo3', 'TranslatedBar3'));
-        $stage->add($component21cs);
-        $component21cs->clear();
-
-        $this->assertEquals($stage->propagate(array($version20, $version21, $version22)), 0);
-
-        $this->assertNull($stage->get_component('admin', 'cs', $version20));
-        $this->assertNull($stage->get_component('admin', 'cs', $version22));
-        $stage->clear();
-    }
-
-    public function test_stage_propagate_same_stringid_in_two_components() {
-        $this->resetAfterTest();
-
-        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
-        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
-
-        $blogmenu21en = new mlang_component('block_blog_menu', 'en', $version21);
-        $blogmenu21en->add_string(new mlang_string('pluginname', 'Blog menu'));
-
-        $blogmenu22en = new mlang_component('block_blog_menu', 'en', $version22);
-        $blogmenu22en->add_string(new mlang_string('pluginname', 'Blog menu'));
-
-        $blogtags21en = new mlang_component('block_blog_tags', 'en', $version21);
-        $blogtags21en->add_string(new mlang_string('pluginname', 'Blog tags'));
-
-        $blogtags22en = new mlang_component('block_blog_tags', 'en', $version22);
-        $blogtags22en->add_string(new mlang_string('pluginname', 'Blog tags'));
-
-        $blogmenu21cs = new mlang_component('block_blog_menu', 'cs', $version21);
-        $blogmenu21cs->add_string(new mlang_string('pluginname', 'Blog menu CZ'));
-
-        $blogmenu22cs = new mlang_component('block_blog_menu', 'cs', $version22);
-        $blogmenu22cs->add_string(new mlang_string('pluginname', 'Blog menu CZ'));
-
-        $blogtags21cs = new mlang_component('block_blog_tags', 'cs', $version21);
-        $blogtags21cs->add_string(new mlang_string('pluginname', 'Blog tags CZ'));
-
-        $blogtags22cs = new mlang_component('block_blog_tags', 'cs', $version22);
-        $blogtags22cs->add_string(new mlang_string('pluginname', 'Blog tags CZ'));
-
-        $stage = new mlang_stage();
-        $stage->add($blogmenu21en);
-        $stage->add($blogmenu22en);
-        $stage->add($blogtags21en);
-        $stage->add($blogtags22en);
-        $stage->add($blogmenu21cs);
-        $stage->add($blogmenu22cs);
-        $stage->add($blogtags21cs);
-        $stage->add($blogtags22cs);
-        $stage->commit('Initial plugin names equal on both branches', array('source' => 'unittest'), true);
-        $blogmenu21en->clear();
-        $blogmenu22en->clear();
-        $blogtags21en->clear();
-        $blogtags22en->clear();
-        $blogmenu21cs->clear();
-        $blogmenu22cs->clear();
-        $blogtags21cs->clear();
-        $blogtags22cs->clear();
-        unset($stage);
-
-        // modify the plugin names for both blocks at 2.2
-        $blogmenu22cs->add_string(new mlang_string('pluginname', 'Blog menu CZ 2'));
-        $blogtags22cs->add_string(new mlang_string('pluginname', 'Blog tags CZ 2'));
-        $stage = new mlang_stage();
-        $stage->add($blogmenu22cs);
-        $stage->add($blogtags22cs);
-
-        // make sure that the change is propagated to 2.1
-        $this->assertEquals($stage->propagate(array($version21, $version22)), 2);
-        $this->assertEquals($stage->get_component('block_blog_menu', 'cs', $version21)->get_string('pluginname')->text,
-            'Blog menu CZ 2');
-        $this->assertEquals($stage->get_component('block_blog_tags', 'cs', $version21)->get_string('pluginname')->text,
-            'Blog tags CZ 2');
-    }
-
     public function test_execution_forced_copy() {
         $this->resetAfterTest();
 
-        $this->register_language('en', mlang_version::MOODLE_22);
-        $this->register_language('cs', mlang_version::MOODLE_22);
+        $this->register_language('en', 22);
+        $this->register_language('cs', 22);
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_22_STABLE');
@@ -1657,27 +1494,22 @@ AMOS END';
         $this->assertEquals(1, $DB->count_records('amos_snapshot'));
     }
 
-    public function test_auto_merge() {
+    public function test_backport_translations() {
         $this->resetAfterTest();
 
-        $this->register_language('en', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
-        $this->register_language('cs', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
-        $this->register_language('en_fix', array(mlang_version::MOODLE_23, mlang_version::MOODLE_24, mlang_version::MOODLE_25));
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
+        $this->register_language('en_fix', 20);
 
         $stage = new mlang_stage();
-        $version19 = mlang_version::by_branch('MOODLE_19_STABLE');
+        $version21 = mlang_version::by_branch('MOODLE_21_STABLE');
+        $version22 = mlang_version::by_branch('MOODLE_22_STABLE');
         $version23 = mlang_version::by_branch('MOODLE_23_STABLE');
         $version24 = mlang_version::by_branch('MOODLE_24_STABLE');
         $version25 = mlang_version::by_branch('MOODLE_25_STABLE');
         $time = time();
 
-        // Make some 1.9, 2.3 and 2.4 strings
-        $component = new mlang_component('foo', 'en', $version19);
-        $component->add_string(new mlang_string('modulename', 'Foo', $time - 500 * DAYSECS));
-        $stage->add($component);
-        $component->clear();
-        $stage->commit('Add Foo 1.9 strings', array('source' => 'unittest'));
-
+        // Register Foo plugin English strings for Moodle 2.3 and higher (pretend that happened 180 days ago).
         $component = new mlang_component('foo', 'en', $version23);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 180 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Done', $time - 180 * DAYSECS));
@@ -1687,14 +1519,15 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.3 strings', array('source' => 'unittest'));
 
+        // Translate only some of the strings into Czech on 2.3.
         $component = new mlang_component('foo', 'cs', $version23);
         $component->add_string(new mlang_string('modulename', 'Fu', $time - 179 * DAYSECS));
-        $component->add_string(new mlang_string('done', 'Hotovo', $time - 179 * DAYSECS));
         $component->add_string(new mlang_string('aaa', 'AAA', $time - 179 * DAYSECS));
         $stage->add($component);
         $component->clear();
         $stage->commit('Translate some Foo 2.3 strings into Czech', array('source' => 'unittest'));
 
+        // Change one and add one string in 2.4.
         $component = new mlang_component('foo', 'en', $version24);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 90 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Finished', $time - 90 * DAYSECS)); // Changed in 2.4
@@ -1705,8 +1538,10 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.4 strings', array('source' => 'unittest'));
 
+        // Update 2.3 Czech translation.
         $component = new mlang_component('foo', 'cs', $version24);
         $component->add_string(new mlang_string('modulename', 'Fu', $time - 45 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Ukončeno', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('end', 'Konec', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('bbb', 'BBB', $time - 45 * DAYSECS));
         $component->add_string(new mlang_string('orphan', 'Orphan', $time - 45 * DAYSECS));
@@ -1720,21 +1555,28 @@ AMOS END';
         $component->clear();
         $stage->commit('Since 2.4, the module name is different', array('source' => 'unittest'));
 
-        testable_mlang_tools::auto_merge('foo');
+        testable_mlang_tools::backport_translations('foo');
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version23);
+        // The modulename translation on 2.3 was not affected by the 2.4 version because the value is identical.
         $this->assertTrue($component->has_string('modulename'));
         $this->assertEquals('Fu', $component->get_string('modulename')->text);
         $this->assertEquals($time - 179 * DAYSECS, $component->get_string('modulename')->timemodified);
-        $this->assertTrue($component->has_string('done'));
+        // This was already present.
         $this->assertTrue($component->has_string('aaa'));
-        $this->assertTrue($component->has_string('bbb')); // This has been auto-merged from 2.4
+        // The bbb translation was backported from 2.4 with the current timestamp.
+        $this->assertTrue($component->has_string('bbb'));
         $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
-        $this->assertFalse($component->has_string('end')); // Because it's 2.4 only
-        $this->assertFalse($component->has_string('orphan')); // Because it's not in 2.3 English
+        // The end string is introduced in 2.4 only so it was not backported.
+        $this->assertFalse($component->has_string('end'));
+        // Same reason, the orphan string is not in English is it is not backported.
+        $this->assertFalse($component->has_string('orphan'));
+        // The 2.4 English original of "done" is different from 2.3, so 2.4 translation is not backported.
+        $this->assertFalse($component->has_string('done'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'en_fix', $version23);
+        // The en_fix strings are exception and not backported.
         $this->assertFalse($component->has_string('modulename'));
         $component->clear();
 
@@ -1743,26 +1585,44 @@ AMOS END';
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'en_fix', $version25);
-        $this->assertFalse($component->has_string('modulename'));
+        // The string exists on 2.5 implicitly (as it exists since 2.4), not as a result of backporting.
+        $this->assertTrue($component->has_string('modulename'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version24);
+        // There was no change committed for 2.4 and the original 2.3 version is used.
         $this->assertTrue($component->has_string('modulename'));
-        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('modulename')->timemodified);
-        $this->assertTrue($component->has_string('aaa')); // This has been auto-merged from 2.3
-        $this->assertTrue($component->get_string('aaa')->timemodified >= $time);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
+        $this->assertEquals($time - 179 * DAYSECS, $component->get_string('modulename')->timemodified);
+        $this->assertTrue($component->has_string('aaa'));
+        $this->assertEquals($time - 179 * DAYSECS, $component->get_string('aaa')->timemodified);
+        // This was committed in 2.4.
         $this->assertTrue($component->has_string('bbb'));
-        $this->assertFalse($component->has_string('done')); // Because it has changed in English
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('bbb')->timemodified);
+        $this->assertTrue($component->has_string('done'));
+        $this->assertEquals('Ukončeno', $component->get_string('done')->text);
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('done')->timemodified);
         $component->clear();
 
-        $component = new mlang_component('foo', 'cs', $version24);
-        $component->add_string(new mlang_string('done', 'Ukončeno', $time - 40 * DAYSECS));
+        // Translate the missing "done" string in 2.3 cs.
+        $component = new mlang_component('foo', 'cs', $version23);
+        $component->add_string(new mlang_string('done', 'Hotovo', $time - 40 * DAYSECS));
         $stage->add($component);
         $component->clear();
-        $stage->commit('Add missing 2.4 string', array('source' => 'unittest'));
+        $stage->commit('Add missing 2.3 string', array('source' => 'unittest'));
 
-        // New version of the Foo is released, strings have not changed.
+        // The added translation is valid for 2.3 only as the 2.4 version still applies even if was committed earlier.
+        $component = mlang_component::from_snapshot('foo', 'cs', $version23);
+        $this->assertEquals('Hotovo', $component->get_string('done')->text);
+        $this->assertEquals($time - 40 * DAYSECS, $component->get_string('done')->timemodified);
+        $component->clear();
 
+        $component = mlang_component::from_snapshot('foo', 'cs', $version24);
+        $this->assertEquals('Ukončeno', $component->get_string('done')->text);
+        $this->assertEquals($time - 45 * DAYSECS, $component->get_string('done')->timemodified);
+        $component->clear();
+
+        // New version of the Foo for Moodle 2.5 is released, strings have not changed.
         $component = new mlang_component('foo', 'en', $version25);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 20 * DAYSECS));
         $component->add_string(new mlang_string('done', 'Finished', $time - 20 * DAYSECS));
@@ -1773,14 +1633,47 @@ AMOS END';
         $component->clear();
         $stage->commit('Add Foo 2.5 strings', array('source' => 'unittest'));
 
-        testable_mlang_tools::auto_merge('foo', array('en', 'cs')); // 'en' is to be ignored.
+        testable_mlang_tools::backport_translations('foo', ['en', 'cs']);
 
         $component = mlang_component::from_snapshot('foo', 'cs', $version25);
         $this->assertTrue($component->has_string('modulename'));
-        $this->assertTrue($component->get_string('modulename')->timemodified >= $time);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
         $this->assertTrue($component->has_string('aaa'));
         $this->assertTrue($component->has_string('bbb'));
         $this->assertTrue($component->has_string('done'));
+        $component->clear();
+
+        // Foo plugin is released for 2.1 too (marked as supporting 2.1 in the plugins directory).
+        $component = new mlang_component('foo', 'en', $version21);
+        $component->add_string(new mlang_string('modulename', 'Foo', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('done', 'Done', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('aaa', 'AAA', $time - 15 * DAYSECS));
+        $component->add_string(new mlang_string('bbb', 'BBB', $time - 15 * DAYSECS));
+        $stage->add($component);
+        $component->clear();
+        $stage->commit('Add Foo 2.1 strings', array('source' => 'unittest'));
+
+        // Without backporting, there would be no 2.1 Czech translation.
+        $component = mlang_component::from_snapshot('foo', 'cs', $version21);
+        $this->assertFalse($component->has_string());
+
+        // Backport the Czech translations.
+        testable_mlang_tools::backport_translations('foo');
+
+        $component = mlang_component::from_snapshot('foo', 'cs', $version21);
+        $this->assertEquals('Fu', $component->get_string('modulename')->text);
+        $this->assertTrue($component->get_string('modulename')->timemodified >= $time);
+        $this->assertEquals('AAA', $component->get_string('aaa')->text);
+        $this->assertTrue($component->get_string('aaa')->timemodified >= $time);
+        $this->assertTrue($component->has_string('bbb'));
+        $this->assertTrue($component->get_string('bbb')->timemodified >= $time);
+        // The end string is introduced in 2.4 only so it was not backported.
+        $this->assertFalse($component->has_string('end'));
+        // Same reason, the orphan string is not in English is it is not backported.
+        $this->assertFalse($component->has_string('orphan'));
+        // The 2.3 English original of "done" is backported even if it is changed again in 2.4.
+        $this->assertEquals('Hotovo', $component->get_string('done')->text);
+        $this->assertTrue($component->get_string('done')->timemodified >= $time);
         $component->clear();
     }
 

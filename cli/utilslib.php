@@ -140,9 +140,6 @@ class amos_export_zip {
     /** @var int the timestamp of the last execution of this job */
     protected $last;
 
-    /** @var list of components to be exported */
-    protected $components;
-
     /** @var array in-memory stash for caching various data for other steps of the execution */
     protected $stash = array();
 
@@ -186,7 +183,6 @@ class amos_export_zip {
         $this->init_timestamp_now();
         $this->init_timestamp_last();
         $this->init_temp_folders();
-        $this->init_components_list();
     }
 
     /**
@@ -195,11 +191,11 @@ class amos_export_zip {
     public function rebuild_zip_packages() {
         $this->log('== Rebuilding outdated ZIP language packs ==');
 
-        $needsupdate = $this->detect_packages_to_update();
-
-        foreach ($needsupdate as $vercode => $languages) {
-            $version = mlang_version::by_code($vercode);
-            foreach (array_keys($languages) as $langcode) {
+        foreach ($this->detect_recently_modified_languages() as $langcode => $since) {
+            foreach ($this->get_versions() as $version) {
+                if ($version->code < $since) {
+                    continue;
+                }
                 $this->rebuild_zip_package($version, $langcode);
                 $this->push_zip_package($version, $langcode);
                 $this->update_packinfo($version, $langcode);
@@ -251,35 +247,8 @@ class amos_export_zip {
     protected function get_versions() {
 
         if (!isset($this->stash['versions'])) {
-            $codes = array(
-                mlang_version::MOODLE_20,
-                mlang_version::MOODLE_21,
-                mlang_version::MOODLE_22,
-                mlang_version::MOODLE_23,
-                mlang_version::MOODLE_24,
-                mlang_version::MOODLE_25,
-                mlang_version::MOODLE_26,
-                mlang_version::MOODLE_27,
-                mlang_version::MOODLE_28,
-                mlang_version::MOODLE_29,
-                mlang_version::MOODLE_30,
-                mlang_version::MOODLE_31,
-                mlang_version::MOODLE_32,
-                mlang_version::MOODLE_33,
-                mlang_version::MOODLE_34,
-                mlang_version::MOODLE_35,
-                mlang_version::MOODLE_36,
-                mlang_version::MOODLE_37,
-                mlang_version::MOODLE_38,
-                mlang_version::MOODLE_39,
-                mlang_version::MOODLE_40,
-            );
-            $versions = array();
-            foreach ($codes as $code) {
-                $versions[$code] = mlang_version::by_code($code);
-            }
-            ksort($versions); // just in case
-            $this->stash['versions'] = $versions;
+            $this->stash['versions'] = mlang_version::list_range(20);
+            ksort($this->stash['versions']);
         }
 
         return $this->stash['versions'];
@@ -322,110 +291,52 @@ class amos_export_zip {
         $this->log('Preparing temporary folders', amos_cli_logger::LEVEL_DEBUG);
         fulldelete($this->tempdirroot);
         foreach($this->get_versions() as $version) {
-            mkdir($this->tempdirroot.'/'.$version->dir, 0755, true);
+            make_writable_directory($this->tempdirroot.'/'.$version->dir);
         }
-    }
-
-    /**
-     * Prepares the list of known components at individual branches
-     */
-    protected function init_components_list() {
-        global $DB;
-        $this->log('Loading the list of registered components', amos_cli_logger::LEVEL_DEBUG);
-
-        list($branchsql, $params) = $DB->get_in_or_equal(array_keys($this->get_versions()), SQL_PARAMS_NAMED);
-
-        $sql = "SELECT DISTINCT branch, component
-                  FROM {amos_repository}
-                 WHERE lang = 'en'
-                       AND deleted = 0
-                       AND branch $branchsql
-              ORDER BY branch, component";
-
-        $rs = $DB->get_recordset_sql($sql, $params);
-        foreach ($rs as $record) {
-            if (!isset($this->components[$record->branch])) {
-                $this->components[$record->branch] = array();
-            }
-            $this->components[$record->branch][] = $record->component;
-        }
-        $rs->close();
-    }
-
-    /**
-     * Returns a list of languages that need update
-     *
-     * The returned structure is a two-dimensional array indexed by the version code
-     * and the language code. The value is always "true" and has no special meaning.
-     *
-     * @return array of (int)vercode => array of (string)langcode => true
-     */
-    protected function detect_packages_to_update() {
-
-        $modified = $this->detect_recently_modified_languages();
-
-        $return = array();
-
-        // If a change is detected for language xx on version y,
-        // we need to update xx.zip at the version y as well as at all
-        // other higher versions.
-        // In fact, it turned out that we need to update that pack at all
-        // versions. This is because of the way how non-standard components
-        // are propagated. If there is a Czech translation of an additional
-        // component mod_foo defined for the 2.0 version, and we detect we
-        // need to rebuild the cs.zip for 2.8, we still need to start building
-        // all the versions so that the foo.php is included in all of them.
-        foreach ($this->get_versions() as $version) {
-            if (isset($modified[$version->code])) {
-                foreach ($modified[$version->code] as $lang) {
-                    foreach ($this->get_versions() as $tempversion) {
-                        $return[$tempversion->code][$lang] = true;
-                    }
-                }
-            }
-        }
-
-        return $return;
     }
 
     /**
      * Returns the list of languages that were modified since the last time we executed this job
      *
-     * @return array of (int)vercode => (string)langcode
+     * @return array of (string) lang => (int) since version code
      */
     protected function detect_recently_modified_languages() {
         global $DB;
 
-        list($branchsql, $params) = $DB->get_in_or_equal(array_keys($this->get_versions()), SQL_PARAMS_NAMED);
-        $params['lastexportzip'] = $this->last;
+        $params =[
+            'lastexportzip' => $this->last,
+            'enfix' => 'en_fix',
+        ];
 
-        $this->log('Looking for recent commits since '.date('Y-m-d H:i:s', $params['lastexportzip']), amos_cli_logger::LEVEL_DEBUG);
+        $this->log('Looking for recent commits since ' . date('Y-m-d H:i:s', $params['lastexportzip']),
+            amos_cli_logger::LEVEL_DEBUG);
 
-        $sql = "SELECT DISTINCT r.branch, r.lang
-                  FROM {amos_repository} r
-                  JOIN {amos_commits} c ON c.id = r.commitid
-                 WHERE r.deleted = 0
-                       AND r.branch $branchsql
-                       AND c.timecommitted >= :lastexportzip
-                       AND r.lang <> 'en_fix'
-              ORDER BY branch,lang";
+        $sql = "SELECT t.lang, MIN(t.since) AS since
+                  FROM {amos_translations} t
+                  JOIN {amos_commits} c ON c.id = t.commitid
+                 WHERE t.strtext IS NOT NULL
+                   AND c.timecommitted >= :lastexportzip
+                   AND t.lang <> :enfix
+              GROUP BY t.lang
+              ORDER BY MIN(t.since), lang";
 
         $rs = $DB->get_recordset_sql($sql, $params);
-        $return = array();
+
+        $result = [];
+
         foreach ($rs as $record) {
-            if (!isset($return[$record->branch])) {
-                $return[$record->branch] = array();
-            }
-            $return[$record->branch][] = $record->lang;
-            $this->log('Recent commit detected at '.$record->branch.'/'.$record->lang, amos_cli_logger::LEVEL_DEBUG);
+            $result[$record->lang] = $record->since;
+            $this->log(sprintf('Recent commit detected in language %s affecting branches since %d', $record->lang, $record->since),
+                amos_cli_logger::LEVEL_DEBUG);
         }
+
         $rs->close();
 
-        if (empty($return)) {
-            $this->log('No commit found, nothing to rebuild', amos_cli_logger::LEVEL_DEBUG);
+        if (empty($result)) {
+            $this->log('No recent changes found, nothing to rebuild', amos_cli_logger::LEVEL_DEBUG);
         }
 
-        return $return;
+        return $result;
     }
 
     /**
@@ -437,12 +348,7 @@ class amos_export_zip {
     protected function rebuild_zip_package(mlang_version $version, $langcode) {
         $this->log('Rebuilding temp/'.$version->dir.'/'.$langcode.'.zip', amos_cli_logger::LEVEL_DEBUG);
 
-        if (!isset($this->components[$version->code])) {
-            $this->log('No registered component at version '.$version->label, amos_cli_logger::LEVEL_WARNING);
-            return;
-        }
-
-        foreach ($this->components[$version->code] as $componentname) {
+        foreach (mlang_tools::list_components() as $componentname => $ignored) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
             $this->dump_component_into_temp($component);
             $component->clear();
@@ -469,7 +375,7 @@ class amos_export_zip {
         }
 
         if (!file_exists(dirname($target))) {
-            mkdir(dirname($target), 0755, true);
+            make_writable_directory(dirname($target));
         }
 
         rename($source, $target);
@@ -490,7 +396,7 @@ class amos_export_zip {
         } else {
             $packinfo = array();
             if (!file_exists(dirname($packinfofile))) {
-                mkdir(dirname($packinfofile), 0755, true);
+                make_writable_directory(dirname($packinfofile));
             }
         }
         if ($info = $this->generate_packinfo($version, $langcode)) {
@@ -597,8 +503,6 @@ class amos_export_zip {
     /**
      * Dumps the component into PHP file(s) in the temporary area
      *
-     * If the component is a non-standard one, it is also written into all higher versions.
-     *
      * @param mlang_component $component
      */
     protected function dump_component_into_temp(mlang_component $component) {
@@ -608,68 +512,27 @@ class amos_export_zip {
         }
 
         // Write the strings and stash some meta-information about the component for later usage
-        foreach ($this->target_versions_for_component($component) as $targetversion) {
-            $file = $this->tempdirroot.'/'.$targetversion->dir.'/'.$component->lang.'/'.$component->name.'.php';
-            if (!file_exists(dirname($file))) {
-                mkdir(dirname($file), 0755, true);
-            }
-            $component->export_phpfile($file);
-
-            $numberofstrings = $component->get_number_of_strings(true);
-            $this->stash['componentnumofstrings'][$targetversion->code][$component->lang][$component->name] = $numberofstrings;
-
-            $recentmodified = $component->get_recent_timemodified();
-            $this->stash['componentrecenttimemodified'][$targetversion->code][$component->lang][$component->name] = $recentmodified;
-
-            if ($component->name === 'langconfig') {
-                if ($component->has_string('thislanguage')) {
-                    $langname = $component->get_string('thislanguage')->text;
-                    $this->stash['langnames'][$component->lang] = $langname;
-                }
-                if ($component->has_string('parentlanguage')) {
-                    $parentlanguage = $component->get_string('parentlanguage')->text;
-                    $this->stash['langparents'][$component->lang] = $parentlanguage;
-                }
-            }
+        $file = $this->tempdirroot . '/' . $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
+        if (!file_exists(dirname($file))) {
+            make_writable_directory(dirname($file));
         }
-    }
+        $component->export_phpfile($file);
 
-    /**
-     * Returns a list of all versions this component should be exported to
-     *
-     * All components are always written into their base version's directory. Contributed
-     * plugins are additionally written into all higher version directories too.
-     *
-     * @param mlang_component $component
-     * @return array of {@link mlang_version} objects
-     */
-    protected function target_versions_for_component(mlang_component $component) {
+        $numberofstrings = $component->get_number_of_strings(true);
+        $this->stash['componentnumofstrings'][$component->version->code][$component->lang][$component->name] = $numberofstrings;
 
-        $targetversions = array($component->version);
+        $recentmodified = $component->get_recent_timemodified();
+        $this->stash['componentrecenttimemodified'][$component->version->code][$component->lang][$component->name] = $recentmodified;
 
-        if ($this->is_contrib_component($component)) {
-            foreach ($this->get_versions() as $targetversion) {
-                if ($targetversion->code > $component->version->code) {
-                    $targetversions[] = $targetversion;
-                }
+        if ($component->name === 'langconfig') {
+            if ($component->has_string('thislanguage')) {
+                $langname = $component->get_string('thislanguage')->text;
+                $this->stash['langnames'][$component->lang] = $langname;
             }
-        }
-
-        return $targetversions;
-    }
-
-    /**
-     * Is the give component contributed add-on?
-     *
-     * @param mlang_component $component
-     * @return boolean false if it is part of standard moodle distribution, true otherwise
-     */
-    protected function is_contrib_component(mlang_component $component) {
-        $standardplugins = local_amos_standard_plugins();
-        if (!isset($standardplugins[$component->version->dir][$component->name])) {
-            return true;
-        } else {
-            return false;
+            if ($component->has_string('parentlanguage')) {
+                $parentlanguage = $component->get_string('parentlanguage')->text;
+                $this->stash['langparents'][$component->lang] = $parentlanguage;
+            }
         }
     }
 

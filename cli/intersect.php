@@ -49,7 +49,7 @@ $cliresult = 0;
 
 $tree = mlang_tools::components_tree();
 foreach ($tree as $vercode => $languages) {
-    if ($vercode < mlang_version::MOODLE_20) {
+    if ($vercode <= 19) {
         continue;
     }
     $version = mlang_version::by_code($vercode);
@@ -76,8 +76,8 @@ foreach ($tree as $vercode => $languages) {
                 $action = 'would remove';
             }
 
-            foreach ($stage->get_iterator() as $xcomp) {
-                foreach ($xcomp->get_iterator() as $xstr) {
+            foreach ($stage as $xcomp) {
+                foreach ($xcomp as $xstr) {
                     fputs(STDERR, $action.' '.$xstr->id.' from '.$componentname.' '.$otherlang.' '.$version->label.PHP_EOL);
                     if (!$options['execute']) {
                         $cliresult = 1;

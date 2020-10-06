@@ -34,7 +34,6 @@ require_capability('local/amos:stage', context_system::instance());
 
 $component  = required_param('component', PARAM_ALPHANUMEXT);
 $language   = required_param('language', PARAM_ALPHANUMEXT);
-$branch     = required_param('branch', PARAM_INT);
 $stringid   = required_param('stringid', PARAM_STRINGID);
 $ajax       = optional_param('ajax', 0, PARAM_BOOL);
 
@@ -48,15 +47,32 @@ if ($ajax) {
     echo $OUTPUT->header();
 }
 
-$sql = "SELECT s.id, s.lang, t.text, s.timemodified, s.deleted,
+$sql = "SELECT -s.id AS id, 'en' AS lang, s.strtext, s.since, s.timemodified,
                c.userinfo, c.commitmsg, c.commithash
-          FROM {amos_repository} s
-          JOIN {amos_texts} t ON t.id = s.textid
+          FROM {amos_strings} s
           JOIN {amos_commits} c ON c.id = s.commitid
-         WHERE branch = ? AND (lang = 'en' OR lang = ?) AND component = ? AND stringid = ?
-      ORDER BY s.timemodified DESC, s.id DESC";
+         WHERE component = :component1
+           AND strname = :strname1
 
-$params = array($branch, $language, $component, $stringid);
+         UNION
+
+        SELECT s.id, s.lang, s.strtext, s.since, s.timemodified,
+               c.userinfo, c.commitmsg, c.commithash
+          FROM {amos_translations} s
+          JOIN {amos_commits} c ON c.id = s.commitid
+         WHERE component = :component2
+           AND lang = :lang
+           AND strname = :strname2
+
+      ORDER BY since, timemodified, id";
+
+$params = [
+    'component1' => $component,
+    'component2' => $component,
+    'lang' => $language,
+    'strname1' => $stringid,
+    'strname2' => $stringid,
+];
 
 $results = $DB->get_records_sql($sql, $params);
 
@@ -66,26 +82,30 @@ if (!$results) {
 
 $table = new html_table();
 $table->attributes['class'] = 'timelinetable';
+$preven = '';
+$prevtr = '';
 
 foreach ($results as $result) {
-
     $encell     = new html_table_cell();
     $langcell   = new html_table_cell();
     if ($result->lang == 'en') {
         $cell = $encell;
         $none = $langcell;
+        $prev = $preven;
     } else {
         $cell = $langcell;
         $none = $encell;
+        $prev = $prevtr;
     }
 
-    $date = html_writer::tag('div', local_amos_renderer::commit_datetime($result->timemodified), array('class' => 'timemodified'));
+    $since = html_writer::span(mlang_version::by_code($result->since)->label . '+', 'small since');
+    $date = html_writer::span(local_amos_renderer::commit_datetime($result->timemodified), 'timemodified');
     $userinfo = html_writer::tag('span', s($result->userinfo), array('class' => 'userinfo'));
     $commitmsg = html_writer::tag('span', s($result->commitmsg), array('class' => 'commitmsg'));
-    if ($result->deleted) {
-        $text = html_writer::tag('del', s($result->text));
+    if ($result->strtext === null) {
+        $text = html_writer::tag('del', s($prev));
     } else {
-        $text = s($result->text);
+        $text = s($result->strtext);
     }
     $text = local_amos_renderer::add_breaks($text);
     if ($result->commithash) {
@@ -99,14 +119,23 @@ foreach ($results as $result) {
     } else {
         $commithash = '';
     }
-    $text = html_writer::tag('div', $text, array('class' => 'text preformatted'));
+    $text = html_writer::div($text, 'text preformatted');
 
-    $cell->text = $date . html_writer::tag('div', $userinfo . ' ' . $commitmsg . $commithash, array('class' => 'usermessage')) . $text;
+    $cell->text = html_writer::div($since . ' | ' . $date) .
+        html_writer::div($userinfo . ' ' . $commitmsg . $commithash, 'usermessage') . $text;
     $none->text = '&nbsp;';
 
     $row = new html_table_row(array($encell, $langcell));
     $table->data[] = $row;
+
+    if ($result->lang == 'en') {
+        $preven = $result->strtext;
+    } else {
+        $prevtr = $result->strtext;
+    }
 }
+
+$table->data = array_reverse($table->data);
 
 echo html_writer::table($table);
 

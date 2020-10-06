@@ -62,7 +62,7 @@ function xmldb_local_amos_upgrade($oldversion) {
             $stage = new mlang_stage();
             $langstages = array();  // (string)langcode => (mlang_stage)
             $stash->apply($stage);
-            foreach ($stage->get_iterator() as $component) {
+            foreach ($stage as $component) {
                 $lang = $component->lang;
                 if (!isset($langstages[$lang])) {
                     $langstages[$lang] = new mlang_stage();
@@ -79,7 +79,7 @@ function xmldb_local_amos_upgrade($oldversion) {
                     continue;
                 }
                 $copy = new mlang_stage();
-                foreach ($stage->get_iterator() as $component) {
+                foreach ($stage as $component) {
                     $copy->add($component);
                 }
                 $copy->rebase();
@@ -343,6 +343,20 @@ function xmldb_local_amos_upgrade($oldversion) {
     if ($oldversion < 2019040901) {
         $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_app_strings');
         upgrade_plugin_savepoint(true, 2019040901, 'local', 'amos');
+    }
+
+    if ($oldversion < 2019040902) {
+        // Create the new tables to store the English strings and their translations.
+
+        if (!$dbman->table_exists(new xmldb_table('amos_strings'))) {
+            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_strings');
+        }
+
+        if (!$dbman->table_exists(new xmldb_table('amos_translations'))) {
+            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_translations');
+        }
+
+        upgrade_plugin_savepoint(true, 2019040902, 'local', 'amos');
     }
 
     return $result;

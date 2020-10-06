@@ -99,7 +99,7 @@ trait update_strings_file {
             $componentlanguage = $component['language'];
 
             $componentversion = \mlang_version::by_dir($component['moodlebranch']);
-            if (is_null($componentversion) or $componentversion->code < \mlang_version::MOODLE_20) {
+            if (is_null($componentversion) || $componentversion->code <= 19) {
                 throw new \invalid_parameter_exception('Unsupported Moodle branch');
             }
 
@@ -162,7 +162,7 @@ trait update_strings_file {
 
         // Populate the list of staged components for later auto-merge.
         $componentnames = array();
-        foreach ($stage->get_iterator() as $component) {
+        foreach ($stage as $component) {
             $componentnames[] = $component->name;
         }
 
@@ -171,12 +171,9 @@ trait update_strings_file {
         // The following will throw exception if the commit fails.
         $stage->commit($message, array('source' => 'import', 'userinfo' => $userinfo), true);
 
-        // The import might have introduce a new component, clear the caches.
-        \mlang_tools::list_components(false);
-
         // Auto-merge updated components.
         foreach ($componentnames as $componentname) {
-            \mlang_tools::auto_merge($componentname);
+            \mlang_tools::backport_translations($componentname);
         }
 
         // Done! Thank you for calling this web service.

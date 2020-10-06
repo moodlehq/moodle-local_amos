@@ -238,7 +238,7 @@ foreach ($gitout as $line) {
         // langconfig.php is not compared with English because it may contain extra string like parentlanguage.
         if ($component->name !== 'langconfig') {
             $component->intersect($encomponent);
-        } elseif ($version->code >= mlang_version::MOODLE_20) {
+        } elseif ($version->code >= 20) {
             if ($parentlanguage = $component->get_string('parentlanguage')) {
                 if (substr($parentlanguage->text, -5) == '_utf8') {
                     $parentlanguage->text = substr($parentlanguage->text, 0, -5);

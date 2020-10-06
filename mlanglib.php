@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,6 +25,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Base exception thrown by low level language manipulation operations
  */
@@ -34,50 +35,15 @@ class mlang_exception extends moodle_exception {
      * @param string $hint short description of problem
      * @param string $debuginfo detailed information how to fix problem
      */
-    function __construct($hint, $debuginfo=null) {
+    public function __construct($hint, $debuginfo=null) {
         parent::__construct('err_exception', 'local_amos', '', $hint, $debuginfo);
-    }
-}
-
-/**
- * Provides iteration features for mlang classes
- *
- * This class just forwards all iteration related calls to the aggregated iterator
- */
-class mlang_iterator implements iterator {
-
-    /** @var iterator instance */
-    protected $iterator;
-
-    public function __construct(array $items) {
-        $this->iterator = new ArrayIterator($items);
-    }
-
-    public function current(){
-        return $this->iterator->current();
-    }
-
-    public function key(){
-        return $this->iterator->key();
-    }
-
-    public function next(){
-        return $this->iterator->next();
-    }
-
-    public function rewind(){
-        return $this->iterator->rewind();
-    }
-
-    public function valid(){
-        return $this->iterator->valid();
     }
 }
 
 /**
  * Represents a collection of strings for a given component
  */
-class mlang_component {
+class mlang_component implements IteratorAggregate, Countable {
 
     /** @var the name of the component, what {@link string_manager::get_string()} uses as the second param */
     public $name;
@@ -140,7 +106,7 @@ class mlang_component {
         } else {
             throw new Exception('Strings definition file ' . $filepath . ' not readable');
         }
-        if ($version->code <= mlang_version::MOODLE_19) {
+        if ($version->code <= 19) {
             // we are going to import strings for 1.x branch
             $target = 1;
             if (is_null($format)) {
@@ -175,89 +141,120 @@ class mlang_component {
     /**
      * Get a snapshot of all strings in the given component
      *
-     * @param string $name
-     * @param string $lang
-     * @param mlang_version $version
-     * @param int $timestamp time of the snapshot, empty for the most recent
-     * @param bool $deleted shall deleted strings be included?
-     * @param bool $fullinfo shall full information about the string (commit messages, source etc) be returned?
-     * @return mlang_component component with the strings from the snapshot
+     * @param string $name The component name.
+     * @param string $lang The language code.
+     * @param mlang_version $version Version of the component.
+     * @param int $timestamp Time of the snapshot, defaults to the most recent one.
+     * @param bool $deleted Shall deleted strings be included?
+     * @param bool $fullinfo Shall full information about the string (commit messages, source etc.) be returned?
+     * @param array $strnames Limit the list of loaded strings to ones in this list only.
+     * @return mlang_component Component with the strings from the snapshot.
      */
-    public static function from_snapshot($name, $lang, mlang_version $version, $timestamp=null, $deleted=false,
-                                         $fullinfo=false, array $stringids=null) {
+    public static function from_snapshot(string $name, string $lang, mlang_version $version, ?int $timestamp = null,
+            bool $deleted=false, bool $fullinfo = false, ?array $strnames = null): mlang_component {
         global $DB;
 
-        $params = array(
-            'inner_branch' => $version->code, 'inner_lang' => $lang, 'inner_component' => $name,
-            'outer_branch' => $version->code, 'outer_lang' => $lang, 'outer_component' => $name,
-            );
-        if (!empty($stringids)) {
-            list($inner_strsql, $inner_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'innerstringid000000');
-            list($outer_strsql, $outer_strparams) = $DB->get_in_or_equal($stringids, SQL_PARAMS_NAMED, 'outerstringid000000');
-            $params = array_merge($params, $inner_strparams, $outer_strparams);
-        }
+        $sql = "SELECT r.id, r.strname, r.strtext, r.since, r.timemodified";
+
         if ($fullinfo) {
-            $sql = "SELECT r.id, r.commitid, r.branch, r.lang, r.component, r.stringid, t.text, r.timemodified, r.deleted,
-                           c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
+            $sql .= ", c.id AS commitid, c.source, c.timecommitted, c.commitmsg, c.commithash, c.userid, c.userinfo";
+        }
+
+        $params = [
+            'component' => $name,
+            'version' => $version->code,
+        ];
+
+        if ($lang === 'en') {
+            $table = 'amos_strings';
+            $langsql = '';
+
         } else {
-            $sql = "SELECT r.stringid, t.text, r.timemodified, r.deleted";
+            $table = 'amos_translations';
+            $langsql = " AND lang = :lang ";
+            $params['lang'] = $lang;
         }
-        $sql .= " FROM {amos_repository} r
-                  JOIN {amos_texts} t ON r.textid = t.id
-                  JOIN (SELECT branch, lang, component, stringid, MAX(timemodified) AS timemodified
-                          FROM {amos_repository}
-                         WHERE branch=:inner_branch
-                           AND lang=:inner_lang
-                           AND component=:inner_component";
-        if (!empty($stringids)) {
-            $sql .= "      AND stringid $inner_strsql";
-        }
-        if (!empty($timestamp)) {
-            $sql .= "      AND timemodified <= :timemodified";
-            $params = array_merge($params, array('timemodified' => $timestamp));
-        }
-        $sql .="         GROUP BY branch,lang,component,stringid) j
-                    ON (r.branch = j.branch
-                       AND r.lang = j.lang
-                       AND r.component = j.component
-                       AND r.stringid = j.stringid
-                       AND r.timemodified = j.timemodified)";
+
+        $sql .= " FROM {" . $table . "} r";
+
         if ($fullinfo) {
-            $sql .= "
-             LEFT JOIN {amos_commits} c
-                    ON (r.commitid = c.id)";
+            $sql .= " LEFT JOIN {amos_commits} c ON (r.commitid = c.id)";
         }
-        $sql.= " WHERE r.branch=:outer_branch
-                       AND r.lang=:outer_lang
-                       AND r.component=:outer_component";
-        if (!empty($stringids)) {
-            $sql .= "  AND r.stringid $outer_strsql";
+
+        $sql .= "   WHERE component = :component
+                      $langsql
+                      AND since <= :version";
+
+        if (!empty($strnames)) {
+            list($strsql, $strparams) = $DB->get_in_or_equal($strnames, SQL_PARAMS_NAMED);
+            $sql .= " AND strname $strsql";
+            $params += $strparams;
         }
-        $sql.= " ORDER BY r.stringid, r.id";
+
+        if (!empty($timestamp)) {
+            $sql .= " AND timemodified <= :timemodified";
+            $params['timemodified'] = $timestamp;
+        }
+
         $rs = $DB->get_recordset_sql($sql, $params);
-        $component = new mlang_component($name, $lang, $version);
+
+        $latest = [];
+
         foreach ($rs as $r) {
-            if (empty($deleted) and $r->deleted) {
-                // we do not want to include deleted strings - note that this must be checked here and not
-                // in SQL above so that the same string can be deleted and re-added again
-                $component->unlink_string($r->stringid);    // this is needed because there can be two strings with
-                                                            // the same timemodified, one deleted, one not
-                continue;
+            if (!isset($latest[$r->strname])) {
+                $latest[$r->strname] = $r;
+
+            } else {
+                $s = $latest[$r->strname];
+
+                if ($r->since < $s->since) {
+                    continue;
+                }
+
+                if (($r->since == $s->since) && ($r->timemodified < $s->timemodified)) {
+                    continue;
+                }
+
+                if (($r->since == $s->since) && ($r->timemodified == $s->timemodified) && ($r->id < $s->id)) {
+                    continue;
+                }
+
+                $latest[$r->strname] = $r;
             }
+        }
+
+        $rs->close();
+
+        if (!$deleted) {
+            // Prune the deleted strings. Keep in mind to do it only this late here and not in SQL.
+            // The string could have been added, deleted and re-added again. We need to know what the latest one is.
+            foreach ($latest as $strname => $str) {
+                if ($str->strtext === null) {
+                    unset($latest[$strname]);
+                }
+            }
+        }
+
+        ksort($latest);
+
+        $component = new mlang_component($name, $lang, $version);
+
+        foreach ($latest as $str) {
+            $extra = null;
+
             if ($fullinfo) {
-                $extra = new stdclass();
-                foreach ($r as $property => $value) {
-                    if (!in_array($property, array('stringid', 'text', 'timemodified', 'deleted'))) {
+                $extra = (object)[];
+
+                foreach ($str as $property => $value) {
+                    if (!in_array($property, ['strname', 'strtext', 'timemodified'])) {
                         $extra->{$property} = $value;
                     }
                 }
-            } else {
-                $extra = null;
             }
-            // we force here so in case of two string with the same timemodified, the higher id wins
-            $component->add_string(new mlang_string($r->stringid, $r->text, $r->timemodified, $r->deleted, $extra), true);
+
+            $component->add_string(new mlang_string($str->strname, $str->strtext, $str->timemodified,
+                $str->strtext === null, $extra), true);
         }
-        $rs->close();
 
         return $component;
     }
@@ -289,10 +286,21 @@ class mlang_component {
     }
 
     /**
-     * Returns the iterator over strings
+     * Returns an external iterator over strings in the component.
+     *
+     * @return ArrayIterator
      */
-    public function get_iterator() {
-        return new mlang_iterator($this->strings);
+    public function getIterator() {
+        return new ArrayIterator($this->strings);
+    }
+
+    /**
+     * Return the number of strings in the component.
+     *
+     * @return int
+     */
+    public function count() {
+        return count($this->strings);
     }
 
     /**
@@ -447,7 +455,8 @@ EOF
             fwrite($f, $phpdoc);
         }
         fwrite($f, "defined('MOODLE_INTERNAL') || die();\n\n");
-        foreach ($this->get_iterator() as $string) {
+        ksort($this->strings);
+        foreach ($this as $string) {
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));
             fwrite($f, ";\n");
@@ -473,7 +482,7 @@ EOF
     public function get_phpfile_location($treeish=true) {
         global $CFG;
 
-        if ($this->version->code <= mlang_version::MOODLE_19) {
+        if ($this->version->code <= 19) {
             // Moodle 1.x
             return 'lang/' . $this->lang . '_utf8/' . $this->name . '.php';
 
@@ -568,7 +577,7 @@ EOF
      */
     public function get_recent_timemodified() {
         $recent = 0;
-        foreach ($this->get_iterator() as $string) {
+        foreach ($this as $string) {
             if ($string->timemodified > $recent) {
                 $recent = $string->timemodified;
             }
@@ -583,14 +592,27 @@ EOF
      */
     public function clean_texts() {
 
-        if ($this->version->code < mlang_version::MOODLE_20) {
+        if ($this->version->code <= 19) {
             $format = 1;
         } else {
             $format = 2;
         }
 
-        foreach ($this->get_iterator() as $string) {
+        foreach ($this as $string) {
             $string->clean_text($format);
+        }
+    }
+
+    /**
+     * Fix the mlang_version after waking up from the serialization.
+     */
+    public function __wakeup() {
+
+        if ($this->version->code >= 1600) {
+            $this->version = mlang_version::by_code($this->version->code / 100);
+
+        } else {
+            $this->version = mlang_version::by_code($this->version->code);
         }
     }
 }
@@ -844,7 +866,7 @@ class mlang_string {
  * or clear(). Otherwise, the copies of staged strings remain in PHP memory and they are not
  * garbage collected because of the circular reference component-string.
  */
-class mlang_stage {
+class mlang_stage implements IteratorAggregate, Countable {
 
     /** @var array of mlang_component */
     protected $components = array();
@@ -861,7 +883,7 @@ class mlang_stage {
         if (!isset($this->components[$cid])) {
             $this->components[$cid] = new mlang_component($component->name, $component->lang, $component->version);
         }
-        foreach ($component->get_iterator() as $string) {
+        foreach ($component as $string) {
             $this->components[$cid]->add_string(clone($string), $force);
         }
     }
@@ -893,7 +915,7 @@ class mlang_stage {
                 if (empty($deletetimestamp)) {
                     $deletetimestamp = time();
                 }
-                foreach ($cap->get_iterator() as $existing) {
+                foreach ($cap as $existing) {
                     $stagedstring = $component->get_string($existing->id);
                     if (is_null($stagedstring)) {
                         $tobedeleted = clone($existing);
@@ -903,7 +925,7 @@ class mlang_stage {
                     }
                 }
             }
-            foreach ($component->get_iterator() as $stagedstring) {
+            foreach ($component as $stagedstring) {
                 $capstring = $cap->get_string($stagedstring->id);
                 if (is_null($capstring)) {
                     // the staged string does not exist in the repository yet - will be committed
@@ -954,9 +976,11 @@ class mlang_stage {
             $this->rebase();
         }
         if (empty($this->components)) {
-            // nothing to commit
             return;
         }
+
+        $purgecaches = false;
+
         try {
             $transaction = $DB->start_delegated_transaction();
             $commit = new stdclass();
@@ -973,74 +997,46 @@ class mlang_stage {
             $commit->id = $DB->insert_record('amos_commits', $commit);
 
             foreach ($this->components as $cx => $component) {
-                foreach ($component->get_iterator() as $string) {
+                if ($component->lang === 'en' || $component->name === 'langconfig') {
+                    // There is a chance that a new component or a new language (or language name) is introduced by the commit.
+                    $purgecaches = true;
+                }
 
-                    // Make sure the string text itself is stored.
-                    $texthash = sha1($string->text);
-                    $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), IGNORE_MISSING);
+                foreach ($component as $string) {
+                    $record = [
+                        'component' => $component->name,
+                        'strname' => $string->id,
+                        'strtext' => ($string->deleted ? null : $string->text),
+                        'since' => $component->version->code,
+                        'timemodified' => $string->timemodified,
+                        'commitid' => $commit->id,
+                    ];
 
-                    if ($textid === false) {
-                        try {
-                            $textid = $DB->insert_record('amos_texts', array('texthash' => $texthash, 'text' => $string->text), true);
-                        } catch (dml_write_exception $e) {
-                            // Chances are the race conditions just happened.
-                            $textid = $DB->get_field('amos_texts', 'id', array('texthash' => $texthash), MUST_EXIST);
-                        }
+                    if ($component->lang === 'en') {
+                        $table = 'amos_strings';
+
+                    } else {
+                        $table = 'amos_translations';
+                        $record['lang'] = $component->lang;
                     }
 
-                    $record = new stdclass();
-                    $record->commitid   = $commit->id;
-                    $record->branch     = $component->version->code;
-                    $record->lang       = $component->lang;
-                    $record->component  = $component->name;
-                    $record->stringid   = $string->id;
-                    $record->textid     = $textid;
-                    $record->timemodified = $string->timemodified;
-                    $record->deleted    = $string->deleted;
-
-                    $repoid = $DB->insert_record('amos_repository', $record);
-
-                    // If the new record is the most recent version of the string,
-                    // register it in the amos_snapshot table. To minimise race
-                    // conditions risk, try to insert first and update on write
-                    // exception (the exception will be thrown due to unique index
-                    // configured for the amos_snapshot table).
-                    try {
-                        $DB->insert_record('amos_snapshot', (object)array(
-                            'branch' => $record->branch,
-                            'lang' => $record->lang,
-                            'component' => $record->component,
-                            'stringid' => $record->stringid,
-                            'repoid' => $repoid,
-                        ));
-                    } catch (dml_write_exception $e) {
-                        $snapshot = $DB->get_record_sql(
-                            "SELECT s.id, s.repoid, r.timemodified
-                               FROM {amos_snapshot} s
-                          LEFT JOIN {amos_repository} r ON s.repoid = r.id
-                              WHERE s.branch = :branch
-                                    AND s.lang = :lang
-                                    AND s.component = :component
-                                    AND s.stringid = :stringid",
-                            array(
-                                'branch' => $record->branch,
-                                'lang' => $record->lang,
-                                'component' => $record->component,
-                                'stringid' => $record->stringid
-                            ), MUST_EXIST);
-                        if (is_null($snapshot->timemodified) or ($record->timemodified >= $snapshot->timemodified)) {
-                            // The newly created record in the repository should be considered the most recent one.
-                            $DB->set_field('amos_snapshot', 'repoid', $repoid, array('id' => $snapshot->id));
-                        }
-                    }
+                    $DB->insert_record($table, $record);
                 }
             }
+
             $transaction->allow_commit();
+
+            if ($purgecaches) {
+                $cache = cache::make('local_amos', 'lists');
+                $cache->purge();
+            }
+
             if ($clear) {
                 $this->clear();
             }
+
         } catch (Exception $e) {
-            // this is here in order not to clear the stage, just re-throw the exception
+            // This is here in order not to clear the stage, just re-throw the exception.
             $transaction->rollback($e);
         }
     }
@@ -1067,10 +1063,21 @@ class mlang_stage {
     }
 
     /**
-     * Returns the iterator over components
+     * Returns an external iterator over components in the stage.
+     *
+     * @return ArrayIterator
      */
-    public function get_iterator() {
-        return new mlang_iterator($this->components);
+    public function getIterator() {
+        return new ArrayIterator($this->components);
+    }
+
+    /**
+     * Return the count of components in the stage.
+     *
+     * @return int
+     */
+    public function count() {
+        return count($this->components);
     }
 
     /**
@@ -1119,7 +1126,7 @@ class mlang_stage {
         $languages = array();
         $components = array();
 
-        foreach ($stage->get_iterator() as $component) {
+        foreach ($stage as $component) {
             if ($s = $component->get_number_of_strings()) {
                 $strings += $s;
                 if (!isset($components[$component->name])) {
@@ -1134,92 +1141,6 @@ class mlang_stage {
         $components = '/'.implode('/', array_keys($components)).'/';
 
         return array($strings, $languages, $components);
-    }
-
-    /**
-     * Propagates staged changes to other branches
-     *
-     * @param array $versions the list of {@link mlang_version} instances
-     * @return int number of propagated changes
-     */
-    public function propagate(array $versions) {
-
-        $numofpropagated = 0;
-
-        // make sure the list of target branches is unique and indexed by version code
-        $xversions = array();
-        foreach ($versions as $version) {
-            $xversions[$version->code] = $version;
-        }
-        $versions = $xversions;
-
-        if (empty($versions)) {
-            return 0;
-        }
-
-        // iterate over all currently staged components
-        foreach ($this->components as $sourceidx => $source) {
-            $sourcecommittedenglish = mlang_component::from_snapshot($source->name, 'en', $source->version);
-
-            // propagate the source component into all other target branches
-            foreach ($versions as $version) {
-                if ($version->code == $source->version->code) {
-                    // does not make sense to propagate to itself
-                    continue;
-                }
-
-                $targetcommittedenglish = mlang_component::from_snapshot($source->name, 'en', $version);
-
-                // check if the target component is staged, too
-                $current = $this->get_component($source->name, $source->lang, $version);
-
-                // iterate over all strings in the source component
-                foreach ($source->get_iterator() as $string) {
-                    // if the string is already staged on the target branch, do not do anything
-                    if (!is_null($current) and $current->has_string($string->id)) {
-                        continue;
-                    }
-                    if ($string->deleted) {
-                        // should not happen via www but just in case
-                        continue;
-                    }
-
-                    // make sure there is no different translation of this string staged
-                    foreach ($this->components as $tempidx => $temp) {
-                        if ($tempidx == $sourceidx) {
-                            continue;
-                        }
-                        if ($temp->name === $source->name and $temp->has_string($string->id)) {
-                            if (mlang_string::differ($temp->get_string($string->id), $string)) {
-                                continue 2;
-                            }
-                        }
-                    }
-
-                    // make sure that the English originals match on both versions
-                    if (is_null($sourcecommittedenglish->get_string($string->id))) {
-                        debugging('Staged translation without the English string - this should not happed');
-                        continue;
-                    }
-                    if (is_null($targetcommittedenglish->get_string($string->id))) {
-                        // the English string does not exist on the target branch, do not propagate
-                        continue;
-                    }
-                    if (mlang_string::differ($targetcommittedenglish->get_string($string->id), $sourcecommittedenglish->get_string($string->id))) {
-                        continue;
-                    }
-
-                    // ok, now it should be safe to stage the source string onto the target branch
-                    $temp = new mlang_component($source->name, $source->lang, $version);
-                    $temp->add_string(new mlang_string($string->id, $string->text));
-                    $this->add($temp);
-                    $temp->clear();
-                    $numofpropagated++;
-                }
-            }
-        }
-
-        return $numofpropagated;
     }
 
     /**
@@ -1251,7 +1172,7 @@ class mlang_stage {
         check_dir_exists($tmpdir);
 
         $files = array();
-        foreach($this->get_iterator() as $component) {
+        foreach($this as $component) {
             if ($component->get_number_of_strings() > 0) {
                 $zipfilepath = $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
                 $realfilepath = $tmpdir . '/' . $zipfilepath;
@@ -1501,7 +1422,7 @@ class mlang_stash {
      */
     public function apply(mlang_stage $stage) {
 
-        foreach ($this->stage->get_iterator() as $component) {
+        foreach ($this->stage as $component) {
             $stage->add($component, true);
         }
     }
@@ -1639,340 +1560,159 @@ class mlang_stash {
  * Do not modify the returned instances, they are not cloned during coponent copying.
  */
 class mlang_version {
-    /** internal version codes stored in database */
-    const MOODLE_16 = 1600;
-    const MOODLE_17 = 1700;
-    const MOODLE_18 = 1800;
-    const MOODLE_19 = 1900;
-    const MOODLE_20 = 2000;
-    const MOODLE_21 = 2100;
-    const MOODLE_22 = 2200;
-    const MOODLE_23 = 2300;
-    const MOODLE_24 = 2400;
-    const MOODLE_25 = 2500;
-    const MOODLE_26 = 2600;
-    const MOODLE_27 = 2700;
-    const MOODLE_28 = 2800;
-    const MOODLE_29 = 2900;
-    const MOODLE_30 = 3000;
-    const MOODLE_31 = 3100;
-    const MOODLE_32 = 3200;
-    const MOODLE_33 = 3300;
-    const MOODLE_34 = 3400;
-    const MOODLE_35 = 3500;
-    const MOODLE_36 = 3600;
-    const MOODLE_37 = 3700;
-    const MOODLE_38 = 3800;
-    const MOODLE_39 = 3900;
-    const MOODLE_40 = 4000;
 
-    /** @var int internal code of the version */
+    /** @var int Branch code of the version: 20, 21, ... 39, 310, 311, 400, ... */
     public $code;
 
-    /** @var string  human-readable label of the version */
+    /** @var string Human-readable label of the version: 2.0, 3.9, 3.10, 3.11, 4.0dev, DEV, ... */
     public $label;
 
-    /** @var string the name of the corresponding CVS/git branch */
+    /** @var string Name of the corresponding Git branch: MOODLE_39_STABLE, MOODLE_310_STABLE, ... */
     public $branch;
 
-    /** @var string the name of the directory under http://download.moodle.org/langpack/ */
+    /** @var string Name of the directory under https://download.moodle.org/langpack/ - 3.8, 3.9, 3.10, ... */
     public $dir;
 
-    /** @var bool allow translations of strings on this branch? */
+    /** @var bool Allow translations of strings on this branch? */
     public $translatable;
 
-    /** @var bool is this a version that translators should focus on? */
+    /** @var bool Is this a version that translators should focus on? Deprecated - use {@see self::latest_version()} instead. */
     public $current;
 
     /**
-     * Factory method
+     * Get instance by the branch code.
      *
-     * @param int $code
-     * @return mlang_version|null
+     * @param int code Branch code of the version: 20, 21, ... 39, 310, 311, 400, ...
+     * @return mlang_version
      */
     public static function by_code($code) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['code'] == $code) {
-                return new mlang_version($ver);
-            }
+
+        if (preg_match('/^(\d)(\d)$/', $code, $m)) {
+            return new mlang_version((int) $code, (string) ($m[1] . '.' . $m[2]));
+
+        } else if (preg_match('/^(\d){3,}$/', $code)) {
+            $x = floor($code / 100);
+            $y = $code - $x * 100;
+            return new mlang_version((int) $code, (string) ($x . '.' . $y));
+
+        } else {
+            throw new mlang_exception('Unexpected version code');
         }
-        return null;
     }
 
     /**
-     * Factory method
+     * Get instance by branch name.
      *
-     * @param string $branch like 'MOODLE_20_STABLE'
-     * @return mlang_version|null
+     * @param string $branch Branch name like 'MOODLE_310_STABLE'
+     * @return mlang_version
      */
     public static function by_branch($branch) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['branch'] == $branch) {
-                return new mlang_version($ver);
-            }
+
+        if (preg_match('/^MOODLE_(\d{2,})_STABLE$/', $branch, $m)) {
+            return self::by_code($m[1]);
+
+        } else {
+            throw new mlang_exception('Unexpected branch name');
         }
-        return null;
     }
 
     /**
-     * Factory method
+     * Get instance by directory name (which mostly matches the label, too).
      *
-     * @param string $dir like '2.1'
+     * @param string $dir like '3.1' or '3.10'
      * @return mlang_version|null
      */
     public static function by_dir($dir) {
-        foreach (self::versions_info() as $ver) {
-            if ($ver['dir'] == $dir) {
-                return new mlang_version($ver);
+
+        if (preg_match('/^(\d+)\.(\d+)$/', $dir, $m)) {
+            if (version_compare($dir, '3.9', '<=')) {
+                return self::by_code($m[1] * 10 + $m[2]);
+
+            } else {
+                return self::by_code($m[1] * 100 + $m[2]);
             }
+
+        } else {
+            throw new mlang_exception('Unexpected dir name');
         }
-        return null;
     }
 
     /**
-     * Get a list of all known versions and information about them
+     * Get a list of all known versions and information about them.
      *
-     * @return array of mlang_version
+     * @return array of mlang_version indexed by version code
      */
-    public static function list_all() {
-        $list = array();
-        foreach (self::versions_info() as $ver) {
-            $list[$ver['code']] = new mlang_version($ver);
+    public static function list_all(): array {
+
+        $codes = get_config('local_amos', 'brancheslist');
+
+        if (empty($codes)) {
+            $codes = '20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,310,400';
         }
+
+        $codes = array_filter(array_map('trim', explode(',', $codes)));
+        sort($codes, SORT_NUMERIC);
+        $list = [];
+
+        foreach ($codes as $code) {
+            $list[$code] = self::by_code($code);
+        }
+
         return $list;
     }
 
     /**
-     * Used by factory methods to create instances of this class
+     * List of versions starting since the given branch code, optionally up to the given end (inclusive).
+     *
+     * @param int $start The branch code of the first version in the returned list.
+     * @param ?int $end Optional branch code of the last version in the returned list
+     * @return array mlang_version[] indexed by version code
      */
-    protected function __construct(array $info) {
-        foreach ($info as $property => $value) {
-            $this->{$property} = $value;
+    public static function list_range(int $start, ?int $end = null): array {
+
+        $result = [];
+
+        foreach (self::list_all() as $mver) {
+            if ($mver->code < $start) {
+                continue;
+            }
+
+            if ($end !== null && $mver->code > $end) {
+                break;
+            }
+
+            $result[$mver->code] = $mver;
         }
+
+        return $result;
     }
 
     /**
-     * Holds the information about Moodle branches
+     * Return the most recent known version.
      *
-     * code         - internal integer code to be stored in database
-     * label        - human readable version number
-     * branch       - the name of the branch in git
-     * dir          - the name of the directory under http://download.moodle.org/langpack/
-     * translatable - allow commits into the AMOS repository on this branch
-     * current      - use the version by default in the translator
-     *
-     * @return array of array
+     * @return mlang_version
      */
-    protected static function versions_info() {
-        return array(
-            array(
-                'code'          => self::MOODLE_40,
-                'label'         => 'DEV',
-                'branch'        => 'MOODLE_40_STABLE',
-                'dir'           => '4.0',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_39,
-                'label'         => '3.9',
-                'branch'        => 'MOODLE_39_STABLE',
-                'dir'           => '3.9',
-                'translatable'  => true,
-                'current'       => true,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_38,
-                'label'         => '3.8',
-                'branch'        => 'MOODLE_38_STABLE',
-                'dir'           => '3.8',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_37,
-                'label'         => '3.7',
-                'branch'        => 'MOODLE_37_STABLE',
-                'dir'           => '3.7',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_36,
-                'label'         => '3.6',
-                'branch'        => 'MOODLE_36_STABLE',
-                'dir'           => '3.6',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_35,
-                'label'         => '3.5',
-                'branch'        => 'MOODLE_35_STABLE',
-                'dir'           => '3.5',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => true,
-            ),
-            array(
-                'code'          => self::MOODLE_34,
-                'label'         => '3.4',
-                'branch'        => 'MOODLE_34_STABLE',
-                'dir'           => '3.4',
-                'translatable'  => true,
-                'current'       => false,
-                'supported'     => false,
-            ),
-            array(
-                'code'          => self::MOODLE_33,
-                'label'         => '3.3',
-                'branch'        => 'MOODLE_33_STABLE',
-                'dir'           => '3.3',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_32,
-                'label'         => '3.2',
-                'branch'        => 'MOODLE_32_STABLE',
-                'dir'           => '3.2',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_31,
-                'label'         => '3.1',
-                'branch'        => 'MOODLE_31_STABLE',
-                'dir'           => '3.1',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_30,
-                'label'         => '3.0',
-                'branch'        => 'MOODLE_30_STABLE',
-                'dir'           => '3.0',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_29,
-                'label'         => '2.9',
-                'branch'        => 'MOODLE_29_STABLE',
-                'dir'           => '2.9',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_28,
-                'label'         => '2.8',
-                'branch'        => 'MOODLE_28_STABLE',
-                'dir'           => '2.8',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_27,
-                'label'         => '2.7',
-                'branch'        => 'MOODLE_27_STABLE',
-                'dir'           => '2.7',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_26,
-                'label'         => '2.6',
-                'branch'        => 'MOODLE_26_STABLE',
-                'dir'           => '2.6',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_25,
-                'label'         => '2.5',
-                'branch'        => 'MOODLE_25_STABLE',
-                'dir'           => '2.5',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_24,
-                'label'         => '2.4',
-                'branch'        => 'MOODLE_24_STABLE',
-                'dir'           => '2.4',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_23,
-                'label'         => '2.3',
-                'branch'        => 'MOODLE_23_STABLE',
-                'dir'           => '2.3',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_22,
-                'label'         => '2.2',
-                'branch'        => 'MOODLE_22_STABLE',
-                'dir'           => '2.2',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_21,
-                'label'         => '2.1',
-                'branch'        => 'MOODLE_21_STABLE',
-                'dir'           => '2.1',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_20,
-                'label'         => '2.0',
-                'branch'        => 'MOODLE_20_STABLE',
-                'dir'           => '2.0',
-                'translatable'  => true,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_19,
-                'label'         => '1.9',
-                'branch'        => 'MOODLE_19_STABLE',
-                'dir'           => '1.9',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_18,
-                'label'         => '1.8',
-                'branch'        => 'MOODLE_18_STABLE',
-                'dir'           => '1.8',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_17,
-                'label'         => '1.7',
-                'branch'        => 'MOODLE_17_STABLE',
-                'dir'           => '1.7',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-            array(
-                'code'          => self::MOODLE_16,
-                'label'         => '1.6',
-                'branch'        => 'MOODLE_16_STABLE',
-                'dir'           => '1.6',
-                'translatable'  => false,
-                'current'       => false,
-            ),
-        );
+    public static function latest_version() {
+
+        $all = static::list_all();
+
+        return array_pop($all);
+    }
+
+    /**
+     * Used by factory methods to create instances of this class.
+     *
+     * @param int $code
+     * @param string $dir
+     */
+    protected function __construct(int $code, string $dir) {
+
+        $this->code = $code;
+        $this->dir = $dir;
+        $this->label = $dir;
+        $this->branch = 'MOODLE_' . $code . '_STABLE';
+        $this->translatable = ($code >= 20);
+        $this->current = false;
     }
 }
 
@@ -1999,30 +1739,46 @@ class mlang_tools {
      */
     public static function list_languages($english=true, $usecache=true, $showcode=true) {
         global $DB;
-        static $cache = null;
 
-        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
-            $cache = array();
-            $sql = "SELECT r.lang AS code, t.text AS name
-                      FROM {amos_repository} r
-                      JOIN {amos_texts} t ON r.textid = t.id
-                      JOIN {amos_snapshot} s ON s.repoid = r.id
-                     WHERE s.component = ?
-                       AND (s.stringid = ? OR s.stringid = ?)
-                       AND r.deleted   = 0
-                  ORDER BY s.branch DESC, s.stringid DESC, r.timemodified DESC, t.text";
-            $rs = $DB->get_recordset_sql($sql, array('langconfig', 'thislanguageint', 'thislanguage'));
-            foreach ($rs as $lang) {
-                if (!isset($cache[$lang->code])) {
-                    // use the first returned value, all others are historical records
-                    $cache[$lang->code] = $lang->name;
-                }
-            }
-            $rs->close();
-            asort($cache);
+        $cache = cache::make('local_amos', 'lists');
+        $langs = false;
+
+        if ($usecache) {
+            $langs = $cache->get('languages');
         }
 
-        $langs = $cache;
+        if ($langs === false) {
+            $langs = [];
+            $sql = "
+                    SELECT 'en' AS code, strname, strtext AS name, since, timemodified
+                      FROM {amos_strings}
+                     WHERE component = 'langconfig'
+                       AND (strname = 'thislanguageint' OR strname = 'thislanguage')
+                       AND strtext IS NOT NULL
+
+                     UNION
+
+                    SELECT lang AS code, strname, strtext AS name, since, timemodified
+                      FROM {amos_translations}
+                     WHERE component = 'langconfig'
+                       AND (strname = 'thislanguageint' OR strname = 'thislanguage')
+                       AND strtext IS NOT NULL
+
+                  ORDER BY since DESC, strname DESC, timemodified DESC, name";
+
+            $rs = $DB->get_recordset_sql($sql);
+
+            foreach ($rs as $lang) {
+                if (!isset($langs[$lang->code])) {
+                    // Use the first returned value, all others are historical records.
+                    $langs[$lang->code] = $lang->name;
+                }
+            }
+
+            $rs->close();
+            asort($langs);
+            $cache->set('languages', $langs);
+        }
 
         if ($showcode) {
             foreach (array_keys($langs) as $code) {
@@ -2038,34 +1794,37 @@ class mlang_tools {
     }
 
     /**
-     * Returns the list of all known components and the branches they are registered at
+     * Returns the list of all known components and the first version in which they have a string.
      *
-     * The component must exist in English on at least one branch to be returned.
+     * The component must exist in English to be returned.
      *
-     * @param bool $usecache can the internal cache be used?
-     * @return array (string)componentname => (array)branches
+     * @return array (string)component name => (int)since branch code
      */
-    public static function list_components($usecache=true) {
+    public static function list_components() {
         global $DB;
-        static $cache = null;
 
-        if (empty($usecache) or is_null($cache) or PHPUNIT_TEST) {
-            $cache = array();
-            $sql = "SELECT DISTINCT component,branch
-                      FROM {amos_snapshot}
-                     WHERE lang = 'en'
-                  ORDER BY component,branch";
+        $cache = cache::make('local_amos', 'lists');
+        $components = $cache->get('components');
+
+        if ($components === false) {
+
+            $sql = "SELECT component, MIN(since) AS since
+                      FROM {amos_strings}
+                  GROUP BY component
+                  ORDER BY component";
+
             $rs = $DB->get_recordset_sql($sql);
+            $components = [];
+
             foreach ($rs as $record) {
-                if (!isset($cache[$record->component])) {
-                    $cache[$record->component] = array();
-                }
-                $cache[$record->component][] = $record->branch;
+                $components[$record->component] = $record->since;
             }
+
             $rs->close();
+            $cache->set('components', $components);
         }
 
-        return $cache;
+        return $components;
     }
 
     /**
@@ -2086,57 +1845,6 @@ class mlang_tools {
             $langs[$record->lang] = $record->lang;
         }
         return $langs;
-    }
-
-    /**
-     * Returns the tree of all known components
-     *
-     * @param array $conditions can specify branch, lang and component to filter
-     * @return array [branch][language][component] => true
-     */
-    public static function components_tree(array $conditions=null) {
-        global $DB;
-
-        $where = array();
-        $params = array();
-        if (!empty($conditions['branch'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['branch']);
-            $where[] = "branch $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($conditions['lang'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['lang']);
-            $where[] = "lang $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($conditions['component'])) {
-            list($subsql, $subparams) = $DB->get_in_or_equal($conditions['component']);
-            $where[] = "component $subsql";
-            $params  = array_merge($params, $subparams);
-        }
-        if (!empty($where)) {
-            $where = " WHERE " . implode(" AND ", $where);
-        }
-        $sql = "SELECT DISTINCT branch,lang,component
-                  FROM {amos_snapshot}";
-        if (!empty($where)) {
-            $sql .= $where;
-        }
-        $sql .= " ORDER BY branch,lang,component";
-        $rs = $DB->get_recordset_sql($sql, $params);
-        $tree = array();
-        foreach ($rs as $record) {
-            if (!isset($tree[$record->branch])) {
-                $tree[$record->branch] = array();
-            }
-            if (!isset($tree[$record->branch][$record->lang])) {
-                $tree[$record->branch][$record->lang] = array();
-            }
-            $tree[$record->branch][$record->lang][$record->component] = true;
-        }
-        $rs->close();
-
-        return $tree;
     }
 
     /**
@@ -2287,19 +1995,19 @@ class mlang_tools {
      */
     public static function merge(mlang_component $source, mlang_component $target) {
 
-        if ($source->version->code <= mlang_version::MOODLE_19) {
+        if ($source->version->code <= 19) {
             $sourceformat = 1;
         } else {
             $sourceformat = 2;
         }
 
-        if ($target->version->code <= mlang_version::MOODLE_19) {
+        if ($target->version->code <= 19) {
             throw new mlang_exception('Can not merge into Moodle 1.x branches');
         } else {
             $targetformat = 2;
         }
 
-        foreach ($source->get_iterator() as $string) {
+        foreach ($source as $string) {
             $stringid = clean_param($string->id, PARAM_STRINGID);
             if (empty($stringid)) {
                 throw new mlang_exception('Invalid string identifier '.s($string->id));
@@ -2332,128 +2040,118 @@ class mlang_tools {
     }
 
     /**
-     * Automatically fill missing translations from other branches.
+     * Automatically backport translations to lower versions if they apply.
+     *
+     * A typical use case is when plugin English strings are registered on version X and translated. And then the X - 1
+     * version is registered. Without backporting, that translations would exist since X only. But we want the
+     * translations of identical strings be backported from X to X -1 automatically.
+     *
+     * Backporting does not happen on 'en' and 'en_fix' languages.
      *
      * @param string $componentname the name of the component
      * @param array $languages optional list of language codes (defaults to all languages)
      */
-    public static function auto_merge($componentname, array $languages = array()) {
+    public static function backport_translations($componentname, array $languages = []) {
+        global $DB;
 
-        $tree = self::list_components();
+        // Find all the candidate strings for backporting. That is strings available in English since version X but with
+        // translation available only since X + n.
+        $params = [
+            'component' => $componentname,
+        ];
 
-        if (!isset($tree[$componentname])) {
-            throw new mlang_exception('Unknow component '.$componentname);
+        if (empty($languages)) {
+            $langsql = "<> :excludelang0";
+            $langparams = ['excludelang0' => 'en_fix'];
+        } else {
+            $languages = array_diff($languages, ['en', 'en_fix']);
+            [$langsql, $langparams] = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
         }
 
-        $branchcodes = $tree[$componentname];
+        $params += $langparams;
 
-        // Keep only those >= 2.0 (merge not supported for lower versions).
-        foreach ($branchcodes as $index => $branchcode) {
-            if ($branchcode < mlang_version::MOODLE_20) {
-                unset($branchcodes[$index]);
-            }
+        $sql = "SELECT t.lang, s.strname, s.englishsince, MIN(t.since) AS translatedsince
+                  FROM (
+                           SELECT component, strname, MIN(since) AS englishsince
+                             FROM {amos_strings}
+                            WHERE component = :component
+                         GROUP BY component, strname
+                       ) s
+             LEFT JOIN {amos_translations} t
+                    ON s.component = t.component
+                   AND s.strname = t.strname
+                 WHERE t.lang $langsql
+              GROUP BY t.lang, s.component, s.strname, s.englishsince
+                HAVING s.englishsince < MIN(t.since)";
+
+        $candidates = [];
+        $rs = $DB->get_recordset_sql($sql, $params);
+
+        foreach ($rs as $r) {
+            $candidates[] = $r;
         }
 
-        $branchcodesasc = $branchcodes;
-        sort($branchcodesasc);
+        $rs->close();
 
-        $branchcodesdesc = $branchcodes;
-        rsort($branchcodesdesc);
+        foreach ($candidates as $candidate) {
+            foreach (mlang_version::list_range($candidate->englishsince, $candidate->translatedsince) as $branchto) {
+                // Get the snapshot of the English strings on the version we are backporting to.
+                $englishto = mlang_component::from_snapshot($componentname, 'en', $branchto, null, false, false,
+                    [$candidate->strname]);
 
-        // Merge strings from top to bottom first (e.g. 2.5 > 2.4 > 2.3)
-        $from = null;
-        foreach ($branchcodesdesc as $to) {
-            if (is_null($from)) {
-                $from = $to;
-                continue;
+                if (!$englishto->has_string()) {
+                    // There is no non-deleted English string on this version yet. Go higher.
+                    continue;
+                }
+
+                $transto = mlang_component::from_snapshot($componentname, $candidate->lang, $branchto, null, false, false,
+                    [$candidate->strname]);
+
+                // Seek for higher versions to see if there is some translation we can backport from.
+                foreach (mlang_version::list_range($branchto->code + 1, $candidate->translatedsince) as $branchfrom) {
+                    $englishfrom = mlang_component::from_snapshot($componentname, 'en', $branchfrom,
+                        null, false, false, [$candidate->strname]);
+                    $transfrom = mlang_component::from_snapshot($componentname, $candidate->lang, $branchfrom,
+                        null, false, false, [$candidate->strname]);
+
+                    self::merge($transfrom, $transto);
+                    $transto->intersect($englishto);
+
+                    // Make sure that the English originals are equal.
+                    foreach ($transto as $transtostring) {
+                        $englishfromstring = $englishfrom->get_string($transtostring->id);
+                        $englishtostring = $englishto->get_string($transtostring->id);
+                        if ($englishfromstring === null
+                                || $englishtostring === null
+                                || mlang_string::differ($englishfromstring, $englishtostring)) {
+                            $transto->unlink_string($transtostring->id);
+                        }
+                    }
+
+                    // If there is something, commit it now and reload the snapshot.
+                    if ($transto->has_string()) {
+                        $stage = new mlang_stage();
+                        $stage->add($transto);
+                        $stage->commit(sprintf('Backport %s/%s/%s translation from %s to %s', $candidate->lang, $componentname,
+                            $candidate->strname, $branchfrom->dir, $branchto->dir), [
+                                'source' => 'backport',
+                                'userinfo' => 'AMOS-bot <amos@moodle.org>',
+                            ]);
+                        $transto->clear();
+                        $transto = mlang_component::from_snapshot($componentname, $candidate->lang, $branchto, null, false, false,
+                            [$candidate->strname]);
+                    }
+
+                    $englishfrom->clear();
+                    $transfrom->clear();
+                }
             }
-            self::auto_merge_helper($componentname, $from, $to, $languages);
-            $from = $to;
-        }
-
-        // Merge strings from bottom to top then (e.g. 2.3 > 2.4 > 2.5)
-        $from = null;
-        foreach ($branchcodesasc as $to) {
-            if (is_null($from)) {
-                $from = $to;
-                continue;
-            }
-            self::auto_merge_helper($componentname, $from, $to, $languages);
-            $from = $to;
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Internal implementation
     ////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Auto-merge helper method for merging between two branches.
-     *
-     * @param string $componentname the name of the component
-     * @param int $from version code to merge from (e.g. {@link mlang_version::MOODLE_25})
-     * @param int $to version code to merge to (e.g. {@link mlang_version::MOODLE_24})
-     * @param array $languages optional list of language codes (defaults to all languages)
-     */
-    protected static function auto_merge_helper($componentname, $from, $to, array $languages = array()) {
-
-        $english_from = mlang_component::from_snapshot($componentname, 'en', mlang_version::by_code($from));
-        $english_to = mlang_component::from_snapshot($componentname, 'en', mlang_version::by_code($to));
-
-        if (!$english_from->has_string() or !$english_to->has_string()) {
-            $english_from->clear();
-            $english_to->clear();
-            return;
-        }
-
-        // Get the list of all languages to auto merge to.
-        if (empty($languages)) {
-            $tree = self::components_tree(array('branch' => $from, 'component' => $componentname));
-            $languages = array_keys($tree[$from]);
-        }
-
-        // Exclude English and English fixes from the list.
-        foreach ($languages as $index => $value) {
-            if ($value === 'en' or $value === 'en_fix') {
-                unset($languages[$index]);
-            }
-        }
-
-        if (empty($languages)) {
-            $english_from->clear();
-            $english_to->clear();
-            return;
-        }
-
-        $version_from = mlang_version::by_code($from);
-        $version_to = mlang_version::by_code($to);
-
-        $stage = new mlang_stage();
-
-        foreach ($languages as $language) {
-            $other_from = mlang_component::from_snapshot($componentname, $language, $version_from);
-            $other_to = mlang_component::from_snapshot($componentname, $language, $version_to);
-
-            self::merge($other_from, $other_to);
-            $other_to->intersect($english_to);
-
-            // Make sure that the English originals are equal.
-            foreach ($other_to->get_iterator() as $other_to_string) {
-                $english_from_string = $english_from->get_string($other_to_string->id);
-                $english_to_string = $english_to->get_string($other_to_string->id);
-                if (is_null($english_from_string) or is_null($english_to_string) or mlang_string::differ($english_from_string, $english_to_string)) {
-                    $other_to->unlink_string($other_to_string->id);
-                }
-            }
-
-            $stage->add($other_to);
-            $other_from->clear();
-            $other_to->clear();
-        }
-
-        $stage->commit('Auto-merge '.$componentname.' strings from '.$version_from->label.' to '.$version_to->label,
-            array('source' => 'automerge', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
-    }
 
     /**
      * Copy one string to another at the given version branch for all languages in the repository
