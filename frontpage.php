@@ -66,20 +66,20 @@ function local_amos_frontpage_contribution_stats() {
 ?>
 
 <div id="amos-custom-front-page" class="container-fluid">
-    <div class="row-fluid">
-        <div class="span4">
+    <div class="row">
+        <div class="col-lg-4">
             <div class="well frontpageblock">
                 <h2><?php print_string('amos', 'local_amos'); ?></h2>
                 <div><?php print_string('about', 'local_amos'); ?></div>
             </div>
         </div>
-        <div class="span4">
+        <div class="col-lg-4">
             <div class="well frontpageblock">
                 <h2><?php print_string('contribute', 'local_amos'); ?></h2>
                 <?php echo local_amos_frontpage_contribution_stats(); ?>
             </div>
         </div>
-        <div class="span4">
+        <div class="col-lg-4">
             <div class="well frontpageblock">
                 <h2><?php print_string('quicklinks', 'local_amos'); ?></h2>
                 <ul class="unstyled">
