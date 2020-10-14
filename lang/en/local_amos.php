@@ -226,9 +226,9 @@ $string['filtertxt'] = 'Substring';
 $string['filtertxt_desc'] = 'String must contain given text';
 $string['filtertxtcasesensitive'] = 'case-sensitive';
 $string['filtertxtregex'] = 'regex';
-$string['filterver'] = 'Versions';
+$string['filterver'] = 'Version';
 $string['filtervernothingselected'] = 'Please select some version';
-$string['filterver_desc'] = 'Show strings from these Moodle versions';
+$string['filterver_desc'] = 'Show strings for this Moodle version';
 $string['found'] = 'Found: {$a->found} &nbsp;&nbsp;&nbsp; Missing: {$a->missing} ({$a->missingonpage})';
 $string['foundinfo'] = 'Number of found strings';
 $string['foundinfo_help'] = 'Shows the total number of rows in the translator table, number of missing translations and number of missing translations at the current page.';
@@ -460,9 +460,12 @@ $string['translatortranslation_help'] = 'Click the cell to turn it into the inpu
 * Grey - AMOS can\'t be used to translate this string. For example strings for Moodle 1.9 must be edited via the legacy CVS access only.
 
 Language pack maintainers can see a small red symbol in the corner of the cells they are allowed to commit.';
-$string['typecontrib'] = 'Non-standard plugins';
+$string['typecontrib'] = 'Additional plugins';
+$string['typecontribbadge'] = 'Additional';
 $string['typecore'] = 'Core subsystems';
+$string['typecorebadge'] = 'Core';
 $string['typestandard'] = 'Standard plugins';
+$string['typestandardbadge'] = 'Standard';
 $string['unableenfixaddon'] = 'English fixes allowed for standard plugins only';
 $string['unableenfixcountries'] = 'Country names are copied from ISO 3166-1';
 $string['unableunmaintained'] = 'The language pack \'{$a}\' has no maintainer at the moment, so translation contributions cannot be accepted. Please consider volunteering to become \'{$a}\' language pack maintainer.';
