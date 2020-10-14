@@ -43,7 +43,7 @@ $PAGE->requires->yui_module('moodle-local_amos-timeline', 'M.local_amos.init_tim
 $output = $PAGE->get_renderer('local_amos');
 
 // create a renderable object that represents the filter form
-$filter = new local_amos_filter($PAGE->url);
+$filter = new \local_amos\output\filter($PAGE->url);
 // save the filter settings into the sesssion
 $fdata = $filter->get_data();
 foreach ($fdata as $setting => $value) {
