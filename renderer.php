@@ -36,7 +36,7 @@ class local_amos_renderer extends plugin_renderer_base {
      * @param local_amos_translator $translator
      * @return string
      */
-    protected function render_local_amos_translator(local_amos_translator $translator) {
+    protected function render_local_amos_translator2(local_amos_translator $translator) {
         global $PAGE;
 
         $listlanguages = mlang_tools::list_languages();

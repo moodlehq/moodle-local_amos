@@ -20,212 +20,214 @@
     Render the AMOS translator filter.
 }}
 
-<form class="form" action="{{formaction}}" method="post">
-    <div style="display: none">
-        <input type="hidden" name="__lazyform_{{lazyformname}}" value="1">
-        <input type="hidden" name="sesskey" value="{{config.sesskey}}">
-    </div>
-
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_fcmp" class="m-b-0">{{#str}} filtercmp, local_amos {{/str}}</label>
-            <small id="amosfilter_fcmp_desc" class="form-text text-muted">{{#str}} filtercmp_desc, local_amos {{/str}}</small>
+<div id="amosfilter" class="m-b-3">
+    <form class="form" action="{{formaction}}" method="post">
+        <div style="display: none">
+            <input type="hidden" name="__lazyform_{{lazyformname}}" value="1">
+            <input type="hidden" name="sesskey" value="{{config.sesskey}}">
         </div>
 
-        <div class="col-md-10">
-            <fieldset class="form-control {{^fcmp.someselected}}is-invalid{{/fcmp.someselected}}" style="height: auto; max-height: 7rem; overflow-y: scroll" id="amosfilter_fcmp">
-                <table border="0">
-                    <tr>
-                        <th colspan="2">{{#str}} typecore, local_amos {{/str}}</th>
-                    </tr>
-                    {{#fcmp.options.core}}
-                        {{>local_amos/filter_fcmp_option}}
-                    {{/fcmp.options.core}}
-                    <tr>
-                        <th colspan="2">{{#str}} typestandard, local_amos {{/str}}</th>
-                    </tr>
-                    {{#fcmp.options.standard}}
-                        {{>local_amos/filter_fcmp_option}}
-                    {{/fcmp.options.standard}}
-                    <tr>
-                        <th colspan="2">{{#str}} typecontrib, local_amos {{/str}}</th>
-                    </tr>
-                    {{#fcmp.options.contrib}}
-                        {{>local_amos/filter_fcmp_option}}
-                    {{/fcmp.options.contrib}}
-                </table>
-            </fieldset>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_fcmp" class="m-b-0">{{#str}} filtercmp, local_amos {{/str}}</label>
+                <small id="amosfilter_fcmp_desc" class="form-text text-muted">{{#str}} filtercmp_desc, local_amos {{/str}}</small>
+            </div>
 
-            {{^fcmp.someselected}}
-                <div class="invalid-feedback">{{#str}} filtercmpnothingselected, local_amos {{/str}}</div>
-            {{/fcmp.someselected}}
+            <div class="col-md-10">
+                <fieldset class="form-control {{^fcmp.someselected}}is-invalid{{/fcmp.someselected}}" style="height: auto; max-height: 7rem; overflow-y: scroll" id="amosfilter_fcmp">
+                    <table border="0">
+                        <tr>
+                            <th colspan="2">{{#str}} typecore, local_amos {{/str}}</th>
+                        </tr>
+                        {{#fcmp.options.core}}
+                            {{>local_amos/filter_fcmp_option}}
+                        {{/fcmp.options.core}}
+                        <tr>
+                            <th colspan="2">{{#str}} typestandard, local_amos {{/str}}</th>
+                        </tr>
+                        {{#fcmp.options.standard}}
+                            {{>local_amos/filter_fcmp_option}}
+                        {{/fcmp.options.standard}}
+                        <tr>
+                            <th colspan="2">{{#str}} typecontrib, local_amos {{/str}}</th>
+                        </tr>
+                        {{#fcmp.options.contrib}}
+                            {{>local_amos/filter_fcmp_option}}
+                        {{/fcmp.options.contrib}}
+                    </table>
+                </fieldset>
 
-            <div class="d-flex flex-column flex-md-row">
-                <div>
-                    <input type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
+                {{^fcmp.someselected}}
+                    <div class="invalid-feedback">{{#str}} filtercmpnothingselected, local_amos {{/str}}</div>
+                {{/fcmp.someselected}}
+
+                <div class="d-flex flex-column flex-md-row">
+                    <div>
+                        <input type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
+                    </div>
+
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-light btn-sm">
+                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsstandard, local_amos {{/str}}
+                        </label>
+                        <label class="btn btn-light btn-sm">
+                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsapp, local_amos {{/str}}
+                        </label>
+                        <label class="btn btn-light btn-sm">
+                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsall, local_amos {{/str}}
+                        </label>
+                        <label class="btn btn-light btn-sm">
+                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsnone, local_amos {{/str}}
+                        </label>
+                    </div>
+
+                    <div class="ml-auto">
+                        <button class="btn btn-light btn-sm" type="button"><i class="fa fa-arrows-v" aria-hidden="true"></i> {{#str}} componentsenlarge, local_amos {{/str}}</button>
+                    </div>
                 </div>
 
-                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                    <label class="btn btn-light btn-sm">
-                        <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsstandard, local_amos {{/str}}
-                    </label>
-                    <label class="btn btn-light btn-sm">
-                        <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsapp, local_amos {{/str}}
-                    </label>
-                    <label class="btn btn-light btn-sm">
-                        <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsall, local_amos {{/str}}
-                    </label>
-                    <label class="btn btn-light btn-sm">
-                        <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsnone, local_amos {{/str}}
-                    </label>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_flng" class="m-b-0">{{#str}} filterlng, local_amos {{/str}}</label>
+                <small id="amosfilter_flng_desc" class="form-text text-muted">{{#str}} filterlng_desc, local_amos {{/str}}</small>
+            </div>
+
+            <div class="col-md-10">
+                <select class="form-control {{^flng.someselected}}is-invalid{{/flng.someselected}}" id="amosfilter_flng"
+                        name="flng[]" size="3" multiple="multiple" aria-describedby="amosfilter_flng_desc">
+                    {{#flng.options}}
+                        <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
+                    {{/flng.options}}
+                </select>
+
+                {{^flng.someselected}}
+                    <div class="invalid-feedback">{{#str}} filterlngnothingselected, local_amos {{/str}}</div>
+                {{/flng.someselected}}
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_fmis">{{#str}} filtermis, local_amos {{/str}}</label>
+                <small id="amosfilter_fmis_desc" class="form-text text-muted">{{#str}} filtermis_desc, local_amos {{/str}}</small>
+            </div>
+
+            <div class="col-md-10">
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.missing}} checked {{/filterdata.missing}} type="checkbox" name="fmis" id="amosfilter_fmis" value="1">
+                    <label class="form-check-label" for="amosfilter_fmis">{{#str}} filtermisfmis, local_amos {{/str}}</label>
                 </div>
 
-                <div class="ml-auto">
-                    <button class="btn btn-light btn-sm" type="button"><i class="fa fa-arrows-v" aria-hidden="true"></i> {{#str}} componentsenlarge, local_amos {{/str}}</button>
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.outdated}} checked {{/filterdata.outdated}} type="checkbox" name="fout" id="amosfilter_fout" value="1">
+                    <label class="form-check-label" for="amosfilter_fout">{{#str}} filtermisfout, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.has}} checked {{/filterdata.has}} type="checkbox" name="fhas" id="amosfilter_fhas" value="1">
+                    <label class="form-check-label" for="amosfilter_fhas">{{#str}} filtermisfhas, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.helps}} checked {{/filterdata.helps}} type="checkbox" name="fhlp" id="amosfilter_fhlp" value="1">
+                    <label class="form-check-label" for="amosfilter_fhlp">{{#str}} filtermisfhlp, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.stagedonly}} checked {{/filterdata.stagedonly}} type="checkbox" name="fstg" id="amosfilter_fstg" value="1">
+                    <label class="form-check-label" for="amosfilter_fstg">{{#str}} filtermisfstg, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.greylistedonly}} checked {{/filterdata.greylistedonly}} type="checkbox" name="fglo" id="amosfilter_fglo" value="1">
+                    <label class="form-check-label" for="amosfilter_fglo">{{#str}} filtermisfglo, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.withoutgreylisted}} checked {{/filterdata.withoutgreylisted}} type="checkbox" name="fwog" id="amosfilter_fwog" value="1">
+                    <label class="form-check-label" for="amosfilter_fwog">{{#str}} filtermisfwog, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.app}} checked {{/filterdata.app}} type="checkbox" name="fapp" id="amosfilter_fapp" value="1">
+                    <label class="form-check-label" for="amosfilter_fapp">{{#str}} filtermisfapp, local_amos {{/str}}</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_ftxt">{{#str}} filtertxt, local_amos {{/str}}</label>
+                <small id="amosfilter_ftxt_desc" class="form-text text-muted">{{#str}} filtertxt_desc, local_amos {{/str}}</small>
+            </div>
+
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="amosfilter_ftxt" name="ftxt" aria-describedby="amosfilter_ftxt_desc" value="{{filterdata.substring}}">
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" {{#filterdata.substringregex}} checked {{/filterdata.substringregex}} type="checkbox" name="ftxr" id="amosfilter_ftxr" value="1">
+                    <label class="form-check-label" for="amosfilter_ftxr">{{#str}} filtertxtregex, local_amos {{/str}}</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" {{#filterdata.substringcs}} checked {{/filterdata.substringcs}} type="checkbox" name="ftxs" id="amosfilter_ftxs" value="1">
+                    <label class="form-check-label" for="amosfilter_ftxs">{{#str}} filtertxtcasesensitive, local_amos {{/str}}</label>
                 </div>
             </div>
-
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_flng" class="m-b-0">{{#str}} filterlng, local_amos {{/str}}</label>
-            <small id="amosfilter_flng_desc" class="form-text text-muted">{{#str}} filterlng_desc, local_amos {{/str}}</small>
         </div>
 
-        <div class="col-md-10">
-            <select class="form-control {{^flng.someselected}}is-invalid{{/flng.someselected}}" id="amosfilter_flng"
-					name="flng[]" size="3" multiple="multiple" aria-describedby="amosfilter_flng_desc">
-                {{#flng.options}}
-                    <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
-                {{/flng.options}}
-            </select>
-
-            {{^flng.someselected}}
-                <div class="invalid-feedback">{{#str}} filterlngnothingselected, local_amos {{/str}}</div>
-            {{/flng.someselected}}
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_fmis">{{#str}} filtermis, local_amos {{/str}}</label>
-            <small id="amosfilter_fmis_desc" class="form-text text-muted">{{#str}} filtermis_desc, local_amos {{/str}}</small>
-        </div>
-
-        <div class="col-md-10">
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.missing}} checked {{/filterdata.missing}} type="checkbox" name="fmis" id="amosfilter_fmis" value="1">
-                <label class="form-check-label" for="amosfilter_fmis">{{#str}} filtermisfmis, local_amos {{/str}}</label>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_fsid">{{#str}} filtersid, local_amos {{/str}}</label>
+                <small id="amosfilter_fsid_desc" class="form-text text-muted">{{#str}} filtersid_desc, local_amos {{/str}}</small>
             </div>
 
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.outdated}} checked {{/filterdata.outdated}} type="checkbox" name="fout" id="amosfilter_fout" value="1">
-                <label class="form-check-label" for="amosfilter_fout">{{#str}} filtermisfout, local_amos {{/str}}</label>
-            </div>
+            <div class="col-md-10">
+                <input type="text" class="form-control" id="amosfilter_fsid" name="fsid" aria-describedby="amosfilter_fsid_desc" value="{{filterdata.stringid}}">
 
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.has}} checked {{/filterdata.has}} type="checkbox" name="fhas" id="amosfilter_fhas" value="1">
-                <label class="form-check-label" for="amosfilter_fhas">{{#str}} filtermisfhas, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.helps}} checked {{/filterdata.helps}} type="checkbox" name="fhlp" id="amosfilter_fhlp" value="1">
-                <label class="form-check-label" for="amosfilter_fhlp">{{#str}} filtermisfhlp, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.stagedonly}} checked {{/filterdata.stagedonly}} type="checkbox" name="fstg" id="amosfilter_fstg" value="1">
-                <label class="form-check-label" for="amosfilter_fstg">{{#str}} filtermisfstg, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.greylistedonly}} checked {{/filterdata.greylistedonly}} type="checkbox" name="fglo" id="amosfilter_fglo" value="1">
-                <label class="form-check-label" for="amosfilter_fglo">{{#str}} filtermisfglo, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.withoutgreylisted}} checked {{/filterdata.withoutgreylisted}} type="checkbox" name="fwog" id="amosfilter_fwog" value="1">
-                <label class="form-check-label" for="amosfilter_fwog">{{#str}} filtermisfwog, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.app}} checked {{/filterdata.app}} type="checkbox" name="fapp" id="amosfilter_fapp" value="1">
-                <label class="form-check-label" for="amosfilter_fapp">{{#str}} filtermisfapp, local_amos {{/str}}</label>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_ftxt">{{#str}} filtertxt, local_amos {{/str}}</label>
-            <small id="amosfilter_ftxt_desc" class="form-text text-muted">{{#str}} filtertxt_desc, local_amos {{/str}}</small>
-        </div>
-
-        <div class="col-md-10">
-            <input type="text" class="form-control" id="amosfilter_ftxt" name="ftxt" aria-describedby="amosfilter_ftxt_desc" value="{{filterdata.substring}}">
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" {{#filterdata.substringregex}} checked {{/filterdata.substringregex}} type="checkbox" name="ftxr" id="amosfilter_ftxr" value="1">
-                <label class="form-check-label" for="amosfilter_ftxr">{{#str}} filtertxtregex, local_amos {{/str}}</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" {{#filterdata.substringcs}} checked {{/filterdata.substringcs}} type="checkbox" name="ftxs" id="amosfilter_ftxs" value="1">
-                <label class="form-check-label" for="amosfilter_ftxs">{{#str}} filtertxtcasesensitive, local_amos {{/str}}</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" {{#filterdata.stringidpartial}} checked {{/filterdata.stringidpartial}} type="checkbox" name="fsix" id="amosfilter_fsix" value="1">
+                    <label class="form-check-label" for="amosfilter_fsix">{{#str}} filtersidpartial, local_amos {{/str}}</label>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_fsid">{{#str}} filtersid, local_amos {{/str}}</label>
-            <small id="amosfilter_fsid_desc" class="form-text text-muted">{{#str}} filtersid_desc, local_amos {{/str}}</small>
-        </div>
-
-        <div class="col-md-10">
-            <input type="text" class="form-control" id="amosfilter_fsid" name="fsid" aria-describedby="amosfilter_fsid_desc" value="{{filterdata.stringid}}">
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" {{#filterdata.stringidpartial}} checked {{/filterdata.stringidpartial}} type="checkbox" name="fsix" id="amosfilter_fsix" value="1">
-                <label class="form-check-label" for="amosfilter_fsix">{{#str}} filtersidpartial, local_amos {{/str}}</label>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="amosfilter_fver">{{#str}} filterver, local_amos {{/str}}</label>
-            <small id="amosfilter_fver_desc" class="form-text text-muted">{{#str}} filterver_desc, local_amos {{/str}}</small>
-        </div>
-
-        <div class="col-md-10">
-            <div class="form-check">
-                <input class="form-check-input" {{#filterdata.last}} checked {{/filterdata.last}} type="checkbox" name="flast" id="amosfilter_flast" value="1">
-                <label class="form-check-label" for="amosfilter_flast">{{#str}} lastavailable, local_amos {{/str}}</label>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="amosfilter_fver">{{#str}} filterver, local_amos {{/str}}</label>
+                <small id="amosfilter_fver_desc" class="form-text text-muted">{{#str}} filterver_desc, local_amos {{/str}}</small>
             </div>
 
-            <select class="form-control {{^fver.someselected}}is-invalid{{/fver.someselected}}" id="amosfilter_fver"
-					name="fver" aria-describedby="amosfilter_fver_desc">
-                {{#fver.options}}
-                    <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
-                {{/fver.options}}
-            </select>
+            <div class="col-md-10">
+                <div class="form-check">
+                    <input class="form-check-input" {{#filterdata.last}} checked {{/filterdata.last}} type="checkbox" name="flast" id="amosfilter_flast" value="1">
+                    <label class="form-check-label" for="amosfilter_flast">{{#str}} lastavailable, local_amos {{/str}}</label>
+                </div>
 
-            {{^fver.someselected}}
-                <div class="invalid-feedback">{{#str}} filtervernothingselected, local_amos {{/str}}</div>
-            {{/fver.someselected}}
+                <select class="form-control {{^fver.someselected}}is-invalid{{/fver.someselected}}" id="amosfilter_fver"
+                        name="fver" aria-describedby="amosfilter_fver_desc">
+                    {{#fver.options}}
+                        <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
+                    {{/fver.options}}
+                </select>
+
+                {{^fver.someselected}}
+                    <div class="invalid-feedback">{{#str}} filtervernothingselected, local_amos {{/str}}</div>
+                {{/fver.someselected}}
+            </div>
         </div>
-    </div>
 
-    <div class="form-group row">
-        <div class="col-md-10 offset-md-2">
-            <button class="btn btn-primary" type="submit">{{#str}} savefilter, local_amos {{/str}}</button>
-            <button class="btn btn-secondary" type="button">{{#str}} morefilteringoptions, local_amos {{/str}}</button>
-            <a href="{{permalink}}" class="btn btn-link">{{#str}} permalink, local_amos {{/str}}</a>
+        <div class="form-group row">
+            <div class="col-md-10 offset-md-2">
+                <button class="btn btn-primary" type="submit">{{#str}} savefilter, local_amos {{/str}}</button>
+                <button class="btn btn-secondary" type="button">{{#str}} morefilteringoptions, local_amos {{/str}}</button>
+                <a href="{{permalink}}" class="btn btn-link">{{#str}} permalink, local_amos {{/str}}</a>
+            </div>
         </div>
-    </div>
 
-</form>
+    </form>
+</div>

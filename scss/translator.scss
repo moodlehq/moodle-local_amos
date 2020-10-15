@@ -1,0 +1,20 @@
+// Strings translator.
+#page-local-amos-view #amostranslator {
+
+    // Undo right margin on help icons.
+    .amosinfo .icon {
+        margin-right: 0;
+    }
+
+    .amosinfo {
+        margin-bottom: 0.25rem;
+    }
+
+    .amosoriginal, .amostranslation {
+        flex: 1 1 auto;
+        min-height: 3rem;
+        border: 1px solid rgb(204,204,204);
+        border-radius: 4px;
+        padding: 5px;
+    }
+}

@@ -1,13 +1,21 @@
 @import "variables.scss";
 @import "sitefrontpage.scss";
 @import "filter.scss";
-@import "strings.scss";
+@import "translator";
 @import "stage.scss";
 @import "index.scss";
 @import "comment.scss";
 
+#page-local-amos-view {
+    // Avoid content overlap with side blocks.
+    #region-main {
+        overflow-x: auto;
+    }
 
-// Styles used within the AMOS tool itself
+    h2 {
+        text-align: center;
+    }
+}
 
 .path-local-amos {
 
@@ -20,7 +28,7 @@
         }
     }
 
-    #amostranslator {
+    #amostranslatorold {
 
         .string-text {
             textarea.translation-edit {
@@ -93,45 +101,6 @@
     background-color: $amos-color-staged;
 }
 
-.path-local-amos #amostranslator .stringinfo .metainfo {
-    color: #999;
-    font-size: small;
-}
-
-.path-local-amos #amostranslator .placeholderinfo,
-.path-local-amos #amostranslator .greylistedinfo {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-#page-local-amos-index h1.main,
-#page-local-amos-index h2.main {
-    text-align: left;
-}
-
-#page-local-amos-credits .thanks {
-    text-align:center;
-}
-
-#page-local-amos-credits .quicklinks {
-    text-align: center;
-    margin: 1em auto 2em;
-    padding: 10px;
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-}
-
-#page-local-amos-credits .quicklinks a.current {
-    font-weight: bold;
-}
-
-#page-local-amos-credits .language {
-    border: 1px solid #eee;
-    background-color: #f9f9f9;
-    margin: 0em 2em 3em;
-    padding: 0.5em;
-}
-
 #page-local-amos-credits .langname {
     position: relative;
     left: -1em;
@@ -185,40 +154,6 @@
     padding: 0.5em;
 }
 
-.path-local-amos .pagination {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 1em;
-    text-align: center;
-    font-size: 120%;
-}
-
-.path-local-amos .pagination span {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
-}
-
-.path-local-amos .pagination .current {
-    font-weight: bold;
-}
-
-.path-local-amos .googlebranding {
-    text-align: center;
-}
-
-.path-local-amos .singlebutton.showclosed {
-    text-align: center;
-    margin: 20px auto;
-}
-
-.path-local-amos .stashwrapper {
-    margin: 0px 0px 1em 0px;
-}
-
-.path-local-amos .stashwrapper {
-    background-color: white;
-}
-
 .path-local-amos .stashwrapper.mousein {
     background-color: #f7f7f7;
 }
@@ -228,28 +163,10 @@
     margin: 10px;
 }
 
-.path-local-amos .stash h3 {
-    margin: 0px 0px 0px 40px;
-}
-
-.path-local-amos .stash div {
-    margin-left: 40px;
-}
-
 .path-local-amos .stash img.userpicture {
     position: absolute;
     top: 5px;
     left: 0px;
-}
-
-.path-local-amos .stash .strings span,
-.path-local-amos .stash .languages span,
-.path-local-amos .stash .components span {
-    font-style: italic;
-}
-
-.path-local-amos .stashwrapper .actions {
-    margin: 10px 0px 0px 40px;
 }
 
 .path-local-amos .stashwrapper .actions .singlebutton,

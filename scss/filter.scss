@@ -1,16 +1,13 @@
 // Strings filter at the translator page.
+#page-local-amos-view #amosfilter {
 
-#page-local-amos-view #region-main {
-    overflow-x: auto;
-}
-
-.path-local-amos {
-
+    // Default help texts are designed to be shown below the field. We display them below labels - fix the spacing.
     label + .form-text {
         margin-top: 0;
         margin-bottom: 0.25rem;
     }
 
+    // Once a component is selected, highlight it in bold.
     #amosfilter_fcmp input[type=checkbox]:checked + label {
         font-weight: bold;
     }
