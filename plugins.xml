@@ -10365,6 +10365,7 @@
       <plugin>configlog</plugin>
       <plugin>courseoverview</plugin>
       <plugin>eventlist</plugin>
+      <plugin>infectedfiles</plugin>
       <plugin>insights</plugin>
       <plugin>log</plugin>
       <plugin>loglive</plugin>
