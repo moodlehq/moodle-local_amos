@@ -20,16 +20,17 @@
     Render filter component selector's component line.
 }}
 
-<tr>
+<tr data-region="amosfilter_fcmp_item">
     <td>
         <div class="form-check">
-            <input class="form-check-input" {{#selected}} checked {{/selected}} type="checkbox" name="fcmp[]" id="amosfilter_fcmp_{{name}}" value="{{name}}">
-            <label class="form-check-label" for="amosfilter_fcmp_{{name}}">{{label}}</label>
+            <input class="form-check-input" {{#selected}} checked {{/selected}} type="checkbox" name="fcmp[]" id="amosfilter_fcmp_f_{{name}}" value="{{name}}"
+                data-component-type="{{type}}" {{#app}}data-component-app="1"{{/app}}>
+            <label class="form-check-label" for="amosfilter_fcmp_f_{{name}}">{{label}}</label>
         </div>
     </td>
     <td>
         <span class="badge badge-light">{{since}}</span>
-        <span class="badge badge-light">{{type}}</span>
+        <span class="badge badge-light">{{typename}}</span>
         {{#app}}
             <span class="badge badge-light"><i class="fa fa-mobile"></i> {{#str}} componentsapp, local_amos {{/str}}</span>
         {{/app}}

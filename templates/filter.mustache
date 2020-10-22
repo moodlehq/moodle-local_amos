@@ -18,23 +18,37 @@
     @template local_amos/filter
 
     Render the AMOS translator filter.
+
+    Selectors required for JS:
+    * amosfilter - root element id
+    * amosfilter_fcmp - component selector id
+    * amosfilter_fcmp_counter - indicator of the number of selected components
+    * amosfilter_fcmp_search - searchfilterinput field
+
+    Data attributes required for JS:
+    * data-region
+    * data-action
+
+    Context variables required for this template:
+    * formaction
 }}
 
-<div id="amosfilter" class="m-b-3">
+<div id="amosfilter" data-region="amosfilter" class="m-b-3">
     <form class="form" action="{{formaction}}" method="post">
         <div style="display: none">
             <input type="hidden" name="__lazyform_{{lazyformname}}" value="1">
             <input type="hidden" name="sesskey" value="{{config.sesskey}}">
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-region="amosfilter_fcmp">
             <div class="col-md-2">
                 <label for="amosfilter_fcmp" class="m-b-0">{{#str}} filtercmp, local_amos {{/str}}</label>
+                <span class="badge badge-pill badge-info" id="amosfilter_fcmp_counter">{{fcmp.numselected}}</span>
                 <small id="amosfilter_fcmp_desc" class="form-text text-muted">{{#str}} filtercmp_desc, local_amos {{/str}}</small>
             </div>
 
             <div class="col-md-10">
-                <fieldset class="form-control {{^fcmp.someselected}}is-invalid{{/fcmp.someselected}}" style="height: auto; max-height: 7rem; overflow-y: scroll" id="amosfilter_fcmp">
+                <div class="form-control {{^fcmp.numselected}}is-invalid{{/fcmp.numselected}}" style="height: 7rem; overflow-y: scroll" id="amosfilter_fcmp">
                     <table border="0">
                         <tr>
                             <th colspan="2">{{#str}} typecore, local_amos {{/str}}</th>
@@ -55,34 +69,30 @@
                             {{>local_amos/filter_fcmp_option}}
                         {{/fcmp.options.contrib}}
                     </table>
-                </fieldset>
+                </div>
 
-                {{^fcmp.someselected}}
+                {{^fcmp.numselected}}
                     <div class="invalid-feedback">{{#str}} filtercmpnothingselected, local_amos {{/str}}</div>
-                {{/fcmp.someselected}}
+                {{/fcmp.numselected}}
 
                 <div class="d-flex flex-column flex-md-row">
                     <div>
-                        <input type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
+                        <input id="amosfilter_fcmp_search" type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
                     </div>
 
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                         <label class="btn btn-light btn-sm">
-                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsstandard, local_amos {{/str}}
+                            <input data-action="selectstandard" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsstandard, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsapp, local_amos {{/str}}
+                            <input data-action="selectapp" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsapp, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsall, local_amos {{/str}}
+                            <input data-action="selectall" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsall, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsnone, local_amos {{/str}}
+                            <input data-action="selectnone" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsnone, local_amos {{/str}}
                         </label>
-                    </div>
-
-                    <div class="ml-auto">
-                        <button class="btn btn-light btn-sm" type="button"><i class="fa fa-arrows-v" aria-hidden="true"></i> {{#str}} componentsenlarge, local_amos {{/str}}</button>
                     </div>
                 </div>
 
@@ -231,3 +241,9 @@
 
     </form>
 </div>
+
+{{#js}}
+    require(['local_amos/filter'], function(filterjs) {
+        filterjs.init();
+    });
+{{/js}}

@@ -7,6 +7,12 @@
         margin-bottom: 0.25rem;
     }
 
+    // Make component and language selectors resizable vertically.
+    #amosfilter_fcmp,
+    #amosfilter_flng {
+        resize: vertical;
+    }
+
     // Once a component is selected, highlight it in bold.
     #amosfilter_fcmp input[type=checkbox]:checked + label {
         font-weight: bold;

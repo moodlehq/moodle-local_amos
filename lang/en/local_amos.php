@@ -50,7 +50,6 @@ $string['committableall'] = 'all languages';
 $string['committablenone'] = 'no languages allowed - please contact AMOS manager';
 $string['componentsall'] = 'All';
 $string['componentsapp'] = 'Moodle App';
-$string['componentsenlarge'] = 'Enlarge';
 $string['componentsnone'] = 'None';
 $string['componentsstandard'] = 'Standard';
 $string['confirmaction'] = 'This can not be undone. Are you sure?';

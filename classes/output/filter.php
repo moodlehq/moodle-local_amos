@@ -549,7 +549,7 @@ class filter implements \renderable, \templatable {
                 'standard' => [],
                 'contrib' => [],
             ],
-            'someselected' => false,
+            'numselected' => 0,
         ];
 
         $options = [
@@ -593,13 +593,14 @@ class filter implements \renderable, \templatable {
                     'name' => $componentname,
                     'label' => $componentlabel,
                     'selected' => false,
-                    'type' => get_string('type' . $type . 'badge', 'local_amos'),
+                    'type' => $type,
+                    'typename' => get_string('type' . $type . 'badge', 'local_amos'),
                     'since' => $sinceversion[$componentname],
                     'app' => isset($mobileapp[$componentname]),
                 ];
 
                 if (in_array($componentname, $filterdata->component)) {
-                    $fcmp['someselected'] = true;
+                    $fcmp['numselected']++;
                     $option['selected'] = true;
                 }
 
