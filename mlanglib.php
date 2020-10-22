@@ -1735,9 +1735,10 @@ class mlang_tools {
      * @param bool $english shall the English be included?
      * @param bool $usecache can the internal cache be used?
      * @param bool $showcode append language code to the name
+     * @param bool $showlocal also show the language name in the language itself
      * @return array (string)langcode => (string)langname
      */
-    public static function list_languages($english=true, $usecache=true, $showcode=true) {
+    public static function list_languages($english=true, $usecache=true, $showcode=true, $showlocal=false) {
         global $DB;
 
         $cache = cache::make('local_amos', 'lists');
@@ -1769,9 +1770,9 @@ class mlang_tools {
             $rs = $DB->get_recordset_sql($sql);
 
             foreach ($rs as $lang) {
-                if (!isset($langs[$lang->code])) {
+                if (!isset($langs[$lang->code][$lang->strname])) {
                     // Use the first returned value, all others are historical records.
-                    $langs[$lang->code] = $lang->name;
+                    $langs[$lang->code][$lang->strname] = $lang->name;
                 }
             }
 
@@ -1780,16 +1781,26 @@ class mlang_tools {
             $cache->set('languages', $langs);
         }
 
-        if ($showcode) {
-            foreach (array_keys($langs) as $code) {
-                $langs[$code] .= ' (' . $code . ')';
+        $result = [];
+
+        foreach ($langs as $code => $names) {
+            $lang = $names['thislanguageint'] ?? '???';
+
+            if ($showlocal && $code !== 'en' && substr($code, 0, 3) !== 'en_') {
+                $lang .= ' / ' . ($names['thislanguage'] ?? '???');
             }
+
+            if ($showcode) {
+                $lang .= ' [' . $code . ']';
+            }
+
+            $result[$code] = $lang;
         }
 
         if ($english) {
-            return $langs;
+            return $result;
         } else {
-            return array_diff_key($langs, array('en' => 'English'));
+            return array_diff_key($result, ['en' => '']);
         }
     }
 

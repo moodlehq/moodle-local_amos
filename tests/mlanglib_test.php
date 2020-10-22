@@ -1063,34 +1063,60 @@ EOF;
         $stage = new mlang_stage();
         $component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $component->add_string(new mlang_string('thislanguageint', 'English'));
+        $component->add_string(new mlang_string('thislanguage', 'English'));
         $stage->add($component);
         $component->clear();
 
         $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
         $component->add_string(new mlang_string('thislanguageint', 'Czech'));
+        $component->add_string(new mlang_string('thislanguage', 'Česky'));
         $stage->add($component);
         $component->clear();
 
         $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_19_STABLE'));
         $component->add_string(new mlang_string('thislanguageint', 'CS'));
+        $component->add_string(new mlang_string('thislanguage', 'ČS'));
         $stage->add($component);
         $component->clear();
 
-        $stage->commit('Registering two languages', array('source' => 'unittest'));
+        $component = new mlang_component('langconfig', 'xx', mlang_version::by_branch('MOODLE_21_STABLE'));
+        $component->add_string(new mlang_string('thislanguage', 'Xx'));
+        $stage->add($component);
+        $component->clear();
+
+        $component = new mlang_component('langconfig', 'yy', mlang_version::by_branch('MOODLE_23_STABLE'));
+        $component->add_string(new mlang_string('thislanguageint', 'Yy'));
+        $stage->add($component);
+        $component->clear();
+
+        $stage->commit('Registering languages', array('source' => 'unittest'));
 
         $langs = mlang_tools::list_languages(true, true, false);
         $this->assertEquals(gettype($langs), 'array');
-        $this->assertEquals(count($langs), 2);
+        $this->assertEquals(count($langs), 4);
         $this->assertTrue(array_key_exists('cs', $langs));
         $this->assertTrue(array_key_exists('en', $langs));
         $this->assertEquals($langs['en'], 'English');
         $this->assertEquals($langs['cs'], 'Czech');
+        $this->assertEquals($langs['xx'], '???');
+        $this->assertEquals($langs['yy'], 'Yy');
 
         $langs = mlang_tools::list_languages(false, true, true);
         $this->assertEquals(gettype($langs), 'array');
-        $this->assertEquals(count($langs), 1);
+        $this->assertEquals(count($langs), 3);
         $this->assertTrue(array_key_exists('cs', $langs));
-        $this->assertEquals($langs['cs'], 'Czech (cs)');
+        $this->assertEquals($langs['cs'], 'Czech [cs]');
+        $this->assertEquals($langs['xx'], '??? [xx]');
+        $this->assertEquals($langs['yy'], 'Yy [yy]');
+
+        $langs = mlang_tools::list_languages(true, true, true, true);
+        $this->assertEquals(gettype($langs), 'array');
+        $this->assertEquals(count($langs), 4);
+        $this->assertTrue(array_key_exists('cs', $langs));
+        $this->assertEquals($langs['en'], 'English [en]');
+        $this->assertEquals($langs['cs'], 'Czech / Česky [cs]');
+        $this->assertEquals($langs['xx'], '??? / Xx [xx]');
+        $this->assertEquals($langs['yy'], 'Yy / ??? [yy]');
     }
 
     public function test_list_components() {

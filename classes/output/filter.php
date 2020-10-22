@@ -518,7 +518,7 @@ class filter implements \renderable, \templatable {
             'someselected' => false,
         ];
 
-        foreach (\mlang_tools::list_languages(false) as $langcode => $langname) {
+        foreach (\mlang_tools::list_languages(false, true, true, true) as $langcode => $langname) {
             $option = [
                 'value' => $langcode,
                 'text' => $langname,
