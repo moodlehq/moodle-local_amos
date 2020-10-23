@@ -80,7 +80,6 @@ class translator implements \renderable, \templatable {
         $stringid = $filter->get_data()->stringid;
         $stringidpartial = $filter->get_data()->stringidpartial;
         $stagedonly = $filter->get_data()->stagedonly;
-        $withoutgreylisted = $filter->get_data()->withoutgreylisted;
         $app = $filter->get_data()->app;
 
         // Prepare the SQL queries to load all the filtered strings and their translations.

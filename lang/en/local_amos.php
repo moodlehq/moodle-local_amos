@@ -209,7 +209,6 @@ $string['filterlngnothingselected'] = 'Please select some language';
 $string['filterlng_desc'] = 'Display translations in these languages';
 $string['filtermis'] = 'Miscellaneous';
 $string['filtermis_desc'] = 'Additional conditions on strings to display';
-$string['filtermisfglo'] = 'greylisted strings only';
 $string['filtermisfhas'] = 'translated strings only';
 $string['filtermisfhlp'] = 'help strings only';
 $string['filtermisfmis'] = 'missing and outdated strings only';
@@ -217,7 +216,6 @@ $string['filtermisfapp'] = 'only strings used in the Moodle App';
 $string['filtermisfapp_help'] = 'This string is used in Moodle Apps as {$a}';
 $string['filtermisfout'] = 'outdated strings only';
 $string['filtermisfstg'] = 'staged strings only';
-$string['filtermisfwog'] = 'without greylisted strings';
 $string['filtersid'] = 'String identifier';
 $string['filtersid_desc'] = 'The key in the array of strings';
 $string['filtersidpartial'] = 'partial match';
@@ -234,11 +232,6 @@ $string['foundinfo_help'] = 'Shows the total number of rows in the translator ta
 $string['googletranslate'] = 'ask google';
 $string['gotofirst'] = 'go to the first page';
 $string['gotoprevious'] = 'go to the previous page';
-$string['greylisted'] = 'Greylisted strings';
-$string['greylisted_help'] = 'For legacy reasons, a Moodle language pack may contain strings that are no longer used but have not yet been deleted. These strings are \'greylisted\'. Once it has been confirmed that a greylisted string is no longer used, it is removed from the language pack.
-
-If you notice a greylisted string which is still being used in Moodle, please inform us by a forum post in Translating Moodle course at this site. Otherwise, you can save valuable time by translating strings which are most likely used in Moodle and ignoring greylisted strings.';
-$string['greylistedwarning'] = 'greylisted';
 $string['importfile'] = 'Import translated strings from file';
 $string['importfile_help'] = 'If you have your strings translated offline, you can stage them via this form.
 

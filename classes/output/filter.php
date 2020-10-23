@@ -78,8 +78,6 @@ class filter implements \renderable, \templatable {
             'stringid',
             'stringidpartial',
             'stagedonly',
-            'greylistedonly',
-            'withoutgreylisted',
             'app',
             'last',
             'page',
@@ -173,8 +171,6 @@ class filter implements \renderable, \templatable {
         $data->substringcs = $data->substringcs ?? false;
         $data->stringid = $data->stringid ?? '';
         $data->stagedonly = $data->stagedonly ?? false;
-        $data->greylistedonly = $data->greylistedonly ?? false;
-        $data->withoutgreylisted = $data->withoutgreylisted ?? false;
         $data->app = $data->app ?? false;
         $data->last = $data->last ?? true;
         $data->page = $data->page ?? 1;
@@ -243,8 +239,6 @@ class filter implements \renderable, \templatable {
         }
 
         $data->stagedonly = optional_param('fstg', false, PARAM_BOOL);
-        $data->greylistedonly = optional_param('fglo', false, PARAM_BOOL);
-        $data->withoutgreylisted = optional_param('fwog', false, PARAM_BOOL);
         $data->app = optional_param('fapp', false, PARAM_BOOL);
 
         // Reset the paginator to the first page every time the filter is saved.
@@ -362,8 +356,6 @@ class filter implements \renderable, \templatable {
         }
 
         $data->stagedonly = optional_param('g', false, PARAM_BOOL);
-        $data->greylistedonly = optional_param('o', false, PARAM_BOOL);
-        $data->withoutgreylisted = optional_param('w', false, PARAM_BOOL);
         $data->app = optional_param('a', $data->app, PARAM_BOOL);
 
         // Reset the paginator to the first page for permalinks.
@@ -459,14 +451,6 @@ class filter implements \renderable, \templatable {
 
         if ($fdata->stagedonly) {
             $this->permalink->param('g', 1);
-        }
-
-        if ($fdata->greylistedonly) {
-            $this->permalink->param('o', 1);
-        }
-
-        if ($fdata->withoutgreylisted) {
-            $this->permalink->param('w', 1);
         }
 
         if ($fdata->app) {

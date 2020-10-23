@@ -72,10 +72,6 @@ MOODLE_YY_STABLE even if it is actually master at the moment.
 
 * Turn Jenkins on and let it re-generate all the ZIP packages (took 5 hours minutes)
 * Check http://download.moodle.org/langpack/
-* Clone greylisted strings
-
-        INSERT INTO mdl_amos_greylist (branch, component, stringid)
-        SELECT YY00 AS branch, component, stringid FROM mdl_amos_greylist WHERE branch = XX00;
 
 * Disable the site maintenance mode.
 * Have a beer!

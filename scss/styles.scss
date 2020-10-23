@@ -37,16 +37,12 @@
             }
         }
 
-        .original.greylisted {
-            background-color: $amos-color-greylisted;
-        }
-
         .translation.translatable {
             cursor: text;
         }
 
         .translation.nontranslatable {
-            background-color:   $amos-color-greylisted;
+            background-color:   $amos-color-nontranslatable;
             &.explanation {
                 font-style: italic;
                 color: #909090;
