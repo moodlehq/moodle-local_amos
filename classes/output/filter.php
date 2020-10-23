@@ -515,7 +515,7 @@ class filter implements \renderable, \templatable {
 
         $flng = [
             'options' => [],
-            'someselected' => false,
+            'numselected' => 0,
         ];
 
         foreach (\mlang_tools::list_languages(false, true, true, true) as $langcode => $langname) {
@@ -526,7 +526,7 @@ class filter implements \renderable, \templatable {
             ];
 
             if (in_array($langcode, $filterdata->language)) {
-                $flng['someselected'] = true;
+                $flng['numselected']++;
                 $option['selected'] = true;
             }
 

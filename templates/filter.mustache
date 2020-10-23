@@ -24,6 +24,8 @@
     * amosfilter_fcmp - component selector id
     * amosfilter_fcmp_counter - indicator of the number of selected components
     * amosfilter_fcmp_search - searchfilterinput field
+    * amosfilter_flng_counter - indicator of the number of selected languages
+    * amosfilter_flng_search - search/filter languages input field
 
     Data attributes required for JS:
     * data-region
@@ -99,23 +101,30 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-region="amosfilter_flng">
             <div class="col-md-2">
                 <label for="amosfilter_flng" class="m-b-0">{{#str}} filterlng, local_amos {{/str}}</label>
+                <span class="badge badge-pill badge-info" id="amosfilter_flng_counter">{{flng.numselected}}</span>
                 <small id="amosfilter_flng_desc" class="form-text text-muted">{{#str}} filterlng_desc, local_amos {{/str}}</small>
             </div>
 
             <div class="col-md-10">
-                <select class="form-control {{^flng.someselected}}is-invalid{{/flng.someselected}}" id="amosfilter_flng"
+                <select class="form-control {{^flng.numselected}}is-invalid{{/flng.numselected}}" id="amosfilter_flng"
                         name="flng[]" size="3" multiple="multiple" aria-describedby="amosfilter_flng_desc">
                     {{#flng.options}}
                         <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
                     {{/flng.options}}
                 </select>
 
-                {{^flng.someselected}}
+                {{^flng.numselected}}
                     <div class="invalid-feedback">{{#str}} filterlngnothingselected, local_amos {{/str}}</div>
-                {{/flng.someselected}}
+                {{/flng.numselected}}
+
+                <div class="d-flex flex-column flex-md-row">
+                    <div>
+                        <input id="amosfilter_flng_search" type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
+                    </div>
+                </div>
             </div>
         </div>
 

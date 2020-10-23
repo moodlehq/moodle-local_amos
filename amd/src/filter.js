@@ -41,6 +41,16 @@ const SELECTORS = {
     },
     FCMPSEARCH: {
         ID: 'amosfilter_fcmp_search'
+    },
+    FLNG: {
+        ID: 'amosfilter_flng',
+        REGION: 'amosfilter_flng'
+    },
+    FLNGCOUNTER: {
+        ID: 'amosfilter_flng_counter'
+    },
+    FLNGSEARCH: {
+        ID: 'amosfilter_flng_search'
     }
 };
 
@@ -52,6 +62,7 @@ const SELECTORS = {
 export const init = () => {
     registerEventListeners();
     updateCounterOfSelectedComponents();
+    updateCounterOfSelectedLanguages();
 };
 
 /**
@@ -62,6 +73,8 @@ const registerEventListeners = () => {
     let root = document.getElementById(SELECTORS.ROOT.ID);
     let fcmp = document.getElementById(SELECTORS.FCMP.ID);
     let componentSearch = document.getElementById(SELECTORS.FCMPSEARCH.ID);
+    let flng = document.getElementById(SELECTORS.FLNG.ID);
+    let languageSearch = document.getElementById(SELECTORS.FLNGSEARCH.ID);
 
     // Click event delegation.
     root.addEventListener('click', e => {
@@ -82,19 +95,29 @@ const registerEventListeners = () => {
         if (e.target.getAttribute('id').startsWith('amosfilter_fcmp_')) {
             updateCounterOfSelectedComponents();
         }
+        if (e.target.getAttribute('id') == SELECTORS.FLNG.ID) {
+            updateCounterOfSelectedLanguages();
+        }
     });
 
-    // Prevent form submission on pressing Enter in the component search input.
-    componentSearch.addEventListener('keypress', e => {
-        if (e.keyCode == 13) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+    // Prevent form submission on pressing Enter in the component search and language input.
+    [componentSearch, languageSearch].forEach(inputField => {
+        inputField.addEventListener('keypress', e => {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
     });
 
     // Handle component search.
     componentSearch.addEventListener('input', debounce(e => {
         handleComponentSearch(e, componentSearch, fcmp);
+    }, 200));
+
+    // Handle language search.
+    languageSearch.addEventListener('input', debounce(e => {
+        handleLanguageSearch(e, languageSearch, flng);
     }, 200));
 };
 
@@ -147,11 +170,11 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
  * @param {Element} fcmp
  */
 const handleComponentSearch = (e, inputField, fcmp) => {
-    let needle = inputField.value.toString().replace(/^ +| +$/, '');
+    let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
 
     fcmp.querySelectorAll(':scope label[for^="amosfilter_fcmp_f_"]').forEach(item => {
         let row = item.closest('[data-region="amosfilter_fcmp_item"]');
-        if (needle == '' || item.innerText.toString().indexOf(needle) !== -1) {
+        if (needle == '' || item.innerText.toString().toLowerCase().indexOf(needle) !== -1) {
             row.classList.remove('hidden');
         } else {
             row.classList.add('hidden');
@@ -175,3 +198,41 @@ const updateCounterOfSelectedComponents = () => {
 
     counter.textContent = count;
 };
+
+/**
+ * @function handleLanguageSearch
+ * @param {Event} e
+ * @param {Element} inputField
+ * @param {Element} flng
+ */
+const handleLanguageSearch = (e, inputField, flng) => {
+    let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
+
+    flng.querySelectorAll(':scope option').forEach(item => {
+        if (needle == '' || item.text.toString().toLowerCase().indexOf(needle) !== -1) {
+            item.classList.remove('hidden');
+            item.removeAttribute('disabled');
+        } else {
+            item.classList.add('hidden');
+            item.setAttribute('disabled', 'disabled');
+        }
+    });
+};
+
+/**
+ * @function updateCounterOfSelectedLanguages
+ */
+const updateCounterOfSelectedLanguages = () => {
+    let flng = document.getElementById(SELECTORS.FLNG.ID);
+    let counter = document.getElementById(SELECTORS.FLNGCOUNTER.ID);
+    let count = flng.querySelectorAll(':scope option:checked').length;
+
+    if (count == 0) {
+        counter.classList.add('badge-danger');
+    } else {
+        counter.classList.remove('badge-danger');
+    }
+
+    counter.textContent = count;
+};
+
