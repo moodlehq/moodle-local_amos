@@ -27,31 +27,37 @@ import {debounce} from 'core/utils';
 const SELECTORS = {
     ROOT: {
         ID: 'amosfilter',
-        REGION: 'amosfilter'
+        REGION: 'amosfilter',
     },
     FCMP: {
         ID: 'amosfilter_fcmp',
-        REGION: 'amosfilter_fcmp'
+        REGION: 'amosfilter_fcmp',
     },
     FCMPITEM: {
-        REGION: 'amosfilter_fcmp_item'
+        REGION: 'amosfilter_fcmp_item',
     },
     FCMPCOUNTER: {
-        ID: 'amosfilter_fcmp_counter'
+        ID: 'amosfilter_fcmp_counter',
     },
     FCMPSEARCH: {
-        ID: 'amosfilter_fcmp_search'
+        ID: 'amosfilter_fcmp_search',
     },
     FLNG: {
         ID: 'amosfilter_flng',
-        REGION: 'amosfilter_flng'
+        REGION: 'amosfilter_flng',
     },
     FLNGCOUNTER: {
-        ID: 'amosfilter_flng_counter'
+        ID: 'amosfilter_flng_counter',
     },
     FLNGSEARCH: {
-        ID: 'amosfilter_flng_search'
-    }
+        ID: 'amosfilter_flng_search',
+    },
+    FVER: {
+        ID: 'amosfilter_fver',
+    },
+    FLAST: {
+        ID: 'amosfilter_flast',
+    },
 };
 
 /**
@@ -75,6 +81,8 @@ const registerEventListeners = () => {
     let componentSearch = document.getElementById(SELECTORS.FCMPSEARCH.ID);
     let flng = document.getElementById(SELECTORS.FLNG.ID);
     let languageSearch = document.getElementById(SELECTORS.FLNGSEARCH.ID);
+    let fver = document.getElementById(SELECTORS.FVER.ID);
+    let flast = document.getElementById(SELECTORS.FLAST.ID);
 
     // Click event delegation.
     root.addEventListener('click', e => {
@@ -95,8 +103,17 @@ const registerEventListeners = () => {
         if (e.target.getAttribute('id').startsWith('amosfilter_fcmp_')) {
             updateCounterOfSelectedComponents();
         }
+
         if (e.target.getAttribute('id') == SELECTORS.FLNG.ID) {
             updateCounterOfSelectedLanguages();
+        }
+
+        if (e.target.getAttribute('id') == SELECTORS.FLAST.ID) {
+            if (flast.checked) {
+                fver.classList.add('hidden');
+            } else {
+                fver.classList.remove('hidden');
+            }
         }
     });
 
