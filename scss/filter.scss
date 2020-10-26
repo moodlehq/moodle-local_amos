@@ -17,4 +17,9 @@
     #amosfilter_fcmp input[type=checkbox]:checked + label {
         font-weight: bold;
     }
+
+    // Hide advanced settings in basic mode, unless they are forced to be shown.
+    &[data-level-showadvanced="0"] [data-level="advanced"]:not([data-level-forceshow]) {
+        display: none;
+    }
 }

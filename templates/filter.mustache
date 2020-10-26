@@ -30,12 +30,14 @@
     Data attributes required for JS:
     * data-region
     * data-action
+    * data-level=advanced - region to be shown in advanced mode only
+    * data-level-control=<elementid> - id of the element that controls forced visibility of an advanced setting in basic mode
 
     Context variables required for this template:
     * formaction
 }}
 
-<div id="amosfilter" data-region="amosfilter" class="m-b-3">
+<div id="amosfilter" data-region="amosfilter" data-level-showadvanced="0" class="m-b-3">
     <form class="form" action="{{formaction}}" method="post">
         <div style="display: none">
             <input type="hidden" name="__lazyform_{{lazyformname}}" value="1">
@@ -101,7 +103,7 @@
             </div>
         </div>
 
-        <div class="form-group row" data-region="amosfilter_flng">
+        <div class="form-group row" data-region="amosfilter_flng" data-level="advanced" data-level-control="amosfilter_flng">
             <div class="col-md-2">
                 <label for="amosfilter_flng" class="m-b-0">{{#str}} filterlng, local_amos {{/str}}</label>
                 <span class="badge badge-pill badge-info" id="amosfilter_flng_counter">{{flng.numselected}}</span>
@@ -110,7 +112,7 @@
 
             <div class="col-md-10">
                 <select class="form-control {{^flng.numselected}}is-invalid{{/flng.numselected}}" id="amosfilter_flng"
-                        name="flng[]" size="3" multiple="multiple" aria-describedby="amosfilter_flng_desc">
+                        name="flng[]" size="3" multiple="multiple" aria-describedby="amosfilter_flng_desc" data-default="{{flng.currentlanguage}}">
                     {{#flng.options}}
                         <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
                     {{/flng.options}}
@@ -130,45 +132,48 @@
 
         <div class="form-group row">
             <div class="col-md-2">
-                <label for="amosfilter_fmis">{{#str}} filtermis, local_amos {{/str}}</label>
-                <small id="amosfilter_fmis_desc" class="form-text text-muted">{{#str}} filtermis_desc, local_amos {{/str}}</small>
+                <div data-level="advanced" data-level-control="amosfilter_misc">
+                    <label for="amosfilter_misc">{{#str}} filtermis, local_amos {{/str}}</label>
+                    <small class="form-text text-muted">{{#str}} filtermis_desc, local_amos {{/str}}</small>
+                </div>
             </div>
 
             <div class="col-md-10">
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.missing}} checked {{/filterdata.missing}} type="checkbox" name="fmis" id="amosfilter_fmis" value="1">
-                    <label class="form-check-label" for="amosfilter_fmis">{{#str}} filtermisfmis, local_amos {{/str}}</label>
-                </div>
+                <fieldset id="amosfilter_misc">
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fmis">
+                        <input class="form-check-input" {{#filterdata.missing}} checked {{/filterdata.missing}} type="checkbox" name="fmis" id="amosfilter_fmis" value="1">
+                        <label class="form-check-label" for="amosfilter_fmis">{{#str}} filtermisfmis, local_amos {{/str}}</label>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.outdated}} checked {{/filterdata.outdated}} type="checkbox" name="fout" id="amosfilter_fout" value="1">
-                    <label class="form-check-label" for="amosfilter_fout">{{#str}} filtermisfout, local_amos {{/str}}</label>
-                </div>
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fout">
+                        <input class="form-check-input" {{#filterdata.outdated}} checked {{/filterdata.outdated}} type="checkbox" name="fout" id="amosfilter_fout" value="1">
+                        <label class="form-check-label" for="amosfilter_fout">{{#str}} filtermisfout, local_amos {{/str}}</label>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.has}} checked {{/filterdata.has}} type="checkbox" name="fhas" id="amosfilter_fhas" value="1">
-                    <label class="form-check-label" for="amosfilter_fhas">{{#str}} filtermisfhas, local_amos {{/str}}</label>
-                </div>
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fhas">
+                        <input class="form-check-input" {{#filterdata.has}} checked {{/filterdata.has}} type="checkbox" name="fhas" id="amosfilter_fhas" value="1">
+                        <label class="form-check-label" for="amosfilter_fhas">{{#str}} filtermisfhas, local_amos {{/str}}</label>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.helps}} checked {{/filterdata.helps}} type="checkbox" name="fhlp" id="amosfilter_fhlp" value="1">
-                    <label class="form-check-label" for="amosfilter_fhlp">{{#str}} filtermisfhlp, local_amos {{/str}}</label>
-                </div>
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fhlp">
+                        <input class="form-check-input" {{#filterdata.helps}} checked {{/filterdata.helps}} type="checkbox" name="fhlp" id="amosfilter_fhlp" value="1">
+                        <label class="form-check-label" for="amosfilter_fhlp">{{#str}} filtermisfhlp, local_amos {{/str}}</label>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.stagedonly}} checked {{/filterdata.stagedonly}} type="checkbox" name="fstg" id="amosfilter_fstg" value="1">
-                    <label class="form-check-label" for="amosfilter_fstg">{{#str}} filtermisfstg, local_amos {{/str}}</label>
-                </div>
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fstg">
+                        <input class="form-check-input" {{#filterdata.stagedonly}} checked {{/filterdata.stagedonly}} type="checkbox" name="fstg" id="amosfilter_fstg" value="1">
+                        <label class="form-check-label" for="amosfilter_fstg">{{#str}} filtermisfstg, local_amos {{/str}}</label>
+                    </div>
 
-                <div class="form-check">
-                    <input class="form-check-input" {{#filterdata.app}} checked {{/filterdata.app}} type="checkbox" name="fapp" id="amosfilter_fapp" value="1">
-                    <label class="form-check-label" for="amosfilter_fapp">{{#str}} filtermisfapp, local_amos {{/str}}</label>
-                </div>
-
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fapp">
+                        <input class="form-check-input" {{#filterdata.app}} checked {{/filterdata.app}} type="checkbox" name="fapp" id="amosfilter_fapp" value="1">
+                        <label class="form-check-label" for="amosfilter_fapp">{{#str}} filtermisfapp, local_amos {{/str}}</label>
+                    </div>
+                </fieldset>
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-level="advanced" data-level-control="amosfilter_ftxt">
             <div class="col-md-2">
                 <label for="amosfilter_ftxt">{{#str}} filtertxt, local_amos {{/str}}</label>
                 <small id="amosfilter_ftxt_desc" class="form-text text-muted">{{#str}} filtertxt_desc, local_amos {{/str}}</small>
@@ -189,7 +194,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-level="advanced" data-level-control="amosfilter_fsid">
             <div class="col-md-2">
                 <label for="amosfilter_fsid">{{#str}} filtersid, local_amos {{/str}}</label>
                 <small id="amosfilter_fsid_desc" class="form-text text-muted">{{#str}} filtersid_desc, local_amos {{/str}}</small>
@@ -205,7 +210,7 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-level="advanced" data-level-control="amosfilter_fver">
             <div class="col-md-2">
                 <label for="amosfilter_fver">{{#str}} filterver, local_amos {{/str}}</label>
                 <small id="amosfilter_fver_desc" class="form-text text-muted">{{#str}} filterver_desc, local_amos {{/str}}</small>
@@ -217,8 +222,8 @@
                     <label class="form-check-label" for="amosfilter_flast">{{#str}} lastavailable, local_amos {{/str}}</label>
                 </div>
 
-                <select class="form-control {{^fver.someselected}}is-invalid{{/fver.someselected}} {{#filterdata.last}} hidden {{/filterdata.last}}" id="amosfilter_fver"
-                        name="fver" aria-describedby="amosfilter_fver_desc">
+                <select class="form-control {{^fver.someselected}}is-invalid{{/fver.someselected}}" id="amosfilter_fver"
+                        name="fver" aria-describedby="amosfilter_fver_desc" data-default="" {{#filterdata.last}} disabled {{/filterdata.last}} >
                     {{#fver.options}}
                         <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
                     {{/fver.options}}
@@ -230,10 +235,10 @@
             </div>
         </div>
 
-        <div class="form-group row">
+        <div class="form-group row" data-region="amosfilter_buttons">
             <div class="col-md-10 offset-md-2">
                 <button class="btn btn-primary" type="submit">{{#str}} savefilter, local_amos {{/str}}</button>
-                <button class="btn btn-secondary" type="button">{{#str}} morefilteringoptions, local_amos {{/str}}</button>
+                <button class="btn btn-link" type="button" data-action="togglemoreoptions">{{#str}} morefilteringoptions, local_amos {{/str}}</button>
                 <a href="{{permalink}}" class="btn btn-link">{{#str}} permalink, local_amos {{/str}}</a>
             </div>
         </div>

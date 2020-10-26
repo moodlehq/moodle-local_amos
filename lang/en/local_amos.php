@@ -282,6 +282,7 @@ $string['mergestrings_link'] = 'local/amos/merge';
 $string['messageprovider:checker'] = 'Language pack checker results';
 $string['messageprovider:contribution'] = 'Contributed translations';
 $string['morefilteringoptions'] = 'More options';
+$string['lessfilteringoptions'] = 'Less options';
 $string['newlanguage'] = 'New language';
 $string['nodiffs'] = 'No differences found';
 $string['nofiletoimport'] = 'Please provide a file to import from.';

@@ -500,7 +500,12 @@ class filter implements \renderable, \templatable {
         $flng = [
             'options' => [],
             'numselected' => 0,
+            'currentlanguage' => current_language(),
         ];
+
+        if ($flng['currentlanguage'] === 'en') {
+            $flng['currentlanguage'] = 'en_fix';
+        }
 
         foreach (\mlang_tools::list_languages(false, true, true, true) as $langcode => $langname) {
             $option = [

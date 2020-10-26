@@ -23,6 +23,7 @@
  */
 
 import {debounce} from 'core/utils';
+import {get_string as getString} from 'core/str';
 
 const SELECTORS = {
     ROOT: {
@@ -58,6 +59,9 @@ const SELECTORS = {
     FLAST: {
         ID: 'amosfilter_flast',
     },
+    BUTTONS: {
+        REGION: 'amosfilter_buttons',
+    },
 };
 
 /**
@@ -69,6 +73,8 @@ export const init = () => {
     registerEventListeners();
     updateCounterOfSelectedComponents();
     updateCounterOfSelectedLanguages();
+    showUsedAdvancedOptions();
+    scrollToFirstSelectedComponent();
 };
 
 /**
@@ -96,23 +102,27 @@ const registerEventListeners = () => {
         if (region == SELECTORS.FCMP.REGION) {
             handleComponentSelectorAction(e, fcmp, action);
         }
+
+        if (region == SELECTORS.BUTTONS.REGION && action == 'togglemoreoptions') {
+            toggleMoreOptions(e, root);
+        }
     });
 
     // Input change event delegation.
     root.addEventListener('change', e => {
-        if (e.target.getAttribute('id').startsWith('amosfilter_fcmp_')) {
+        if (e.target.id.startsWith('amosfilter_fcmp_')) {
             updateCounterOfSelectedComponents();
         }
 
-        if (e.target.getAttribute('id') == SELECTORS.FLNG.ID) {
+        if (e.target.id == SELECTORS.FLNG.ID) {
             updateCounterOfSelectedLanguages();
         }
 
-        if (e.target.getAttribute('id') == SELECTORS.FLAST.ID) {
+        if (e.target.id == SELECTORS.FLAST.ID) {
             if (flast.checked) {
-                fver.classList.add('hidden');
+                fver.setAttribute('disabled', 'disabled');
             } else {
-                fver.classList.remove('hidden');
+                fver.removeAttribute('disabled');
             }
         }
     });
@@ -253,3 +263,93 @@ const updateCounterOfSelectedLanguages = () => {
     counter.textContent = count;
 };
 
+/**
+ * @function toggleMoreOptions
+ * @param {Event} e
+ * @param {Element} root
+ */
+const toggleMoreOptions = async(e, root) => {
+    e.preventDefault();
+
+    if (root.getAttribute('data-level-showadvanced') == '0') {
+        root.setAttribute('data-level-showadvanced', 1);
+        e.target.innerText = await getString('lessfilteringoptions', 'local_amos');
+
+    } else {
+        root.setAttribute('data-level-showadvanced', 0);
+        e.target.innerText = await getString('morefilteringoptions', 'local_amos');
+        showUsedAdvancedOptions();
+    }
+};
+
+/**
+ * Make advanced options that have been set, visible even in basic mode.
+ *
+ * @function showUsedAdvancedOptions
+ */
+const showUsedAdvancedOptions = () => {
+    let root = document.getElementById(SELECTORS.ROOT.ID);
+
+    root.querySelectorAll(':scope [data-level="advanced"][data-level-control]').forEach(item => {
+        let control = document.getElementById(item.getAttribute('data-level-control'));
+        let forceshow = false;
+
+        if (control.tagName.toLowerCase() == 'input'
+                && control.getAttribute('type') == 'checkbox'
+                && control.checked) {
+            forceshow = true;
+        }
+
+        if (control.tagName.toLowerCase() == 'input'
+                && control.getAttribute('type') == 'text'
+                && control.value !== '') {
+            forceshow = true;
+        }
+
+        if (control.tagName.toLowerCase() == 'select'
+                && control.hasAttribute('data-default')
+                && !control.hasAttribute('disabled')) {
+            let selected = control.querySelectorAll(':scope option:checked');
+
+            if (selected.length != 1) {
+                forceshow = true;
+
+            } else {
+                selected.forEach(option => {
+                    if (option.value !== control.getAttribute('data-default')) {
+                        forceshow = true;
+                    }
+                });
+            }
+        }
+
+        if (forceshow) {
+            item.setAttribute('data-level-forceshow', 1);
+        } else {
+            item.removeAttribute('data-level-forceshow');
+        }
+    });
+
+    root.querySelectorAll(':scope [data-level="advanced"][data-level-control]').forEach(item => {
+        let control = document.getElementById(item.getAttribute('data-level-control'));
+
+        if (control.tagName.toLowerCase() == 'fieldset') {
+            if (control.querySelector('[data-level-forceshow]')) {
+                item.setAttribute('data-level-forceshow', 1);
+            } else {
+                item.removeAttribute('data-level-forceshow');
+            }
+        }
+    });
+};
+
+/**
+ * @function scrollToFirstSelectedComponent
+ */
+const scrollToFirstSelectedComponent = () => {
+    let comp = document.getElementById(SELECTORS.FCMP.ID).querySelector('input[id^="amosfilter_fcmp_f_"]:checked');
+
+    if (comp) {
+        comp.scrollIntoView(false);
+    }
+};
