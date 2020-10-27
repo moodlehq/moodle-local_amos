@@ -1,0 +1,110 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_amos/translator_strings
+
+    Render a single translatable string.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * englishsincedir - e.g. 2.0
+    * englishsincecode - e.g. 20
+    * englishsincelabel - e.g. 2.0
+    * islatest - e.g. 1
+    * language - e.g. cs
+    * component - e.g. moodle
+    * stringid - e.g. backupdatenew
+    * metainfo - not used yet
+    * original - raw original e.g. "Hello <b>{$a->name}</b>, how are you?"
+    * originalid - e.g. 7637
+    * originalmodified - e.g. 1161111425
+    * committable - e.g. 1
+    * translation - raw translation e.g. "Ahoj <b>{$a->name}</b>, jak se daří?"
+    * translationid - e.g. 259212
+    * timemodified - e.g. 1172691840
+    * translationsincedir - e.g. 2.0
+    * translationsincecode - e.g. 20
+    * translationsincelabel - e.g. 2.0
+    * statusclass - e.g. "translated"
+    * outdated (bool)
+    * nocleaning (bool)
+    * app (bool)
+    * translatable (bool)
+    * displayenglishsince - e.g. "2.0+"
+    * displaycomponent - e.g. "core"
+    * displaylanguage - e.g. "Czech [cs]"
+    * hastranslationsincelabel (bool)
+    * displaytranslationsince - e.g. "2.0+"
+    * timelineurl - e.g. http://langmoodleorg/local/amos/timeline.php?component=moodle&language=cs&stringid=backupdatenew
+    * hasuntranslateurl (bool)
+    * untranslateurl - e.g. http://langmoodleorg/local/amos/untranslate.php?component=moodle&language=cs&stringid=backupdatenew&since=20
+    * displayoriginal (string)
+    * displaytranslation (string)
+
+    Example context (json):
+    {
+        "attributes": [
+            { "name": "src", "value": "http://moodle.com/wp-content/themes/moodle/images/logo-hat2.png" },
+            { "name": "class", "value": "iconsmall" }
+        ]
+    }
+}}
+
+<div class="amostranslatoritem {{statusclass}} {{#committable}} committable {{/committable}} {{#translatable}} translatable {{/translatable}}"
+     data-region="amostranslatoritem"
+     data-mode="view"
+    >
+    <div class="row m-b-2">
+        <div class="col-md d-flex flex-column">
+            <div class="amosinfo small text-muted">
+                {{displayenglishsince}}
+                {{^islatest}}
+                    | <i class="fa fa-warning text-warning"></i> {{#str}} stringversionnotlatest, local_amos {{/str}}
+                {{/islatest}}
+                | {{stringid}} | {{displaycomponent}}
+                {{#isappstring}}
+                    | <i class="fa fa-mobile" title="{{app}}"></i>
+                {{/isappstring}}
+            </div>
+            <div class="amosoriginal">{{{displayoriginal}}}</div>
+        </div>
+
+        <div class="col-md d-flex flex-column">
+            <div class="amosinfo small text-muted">
+                {{#hastranslationsincelabel}}
+                    {{displaytranslationsince}} |
+                {{/hastranslationsincelabel}}
+                {{displaylanguage}}
+                | <a href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
+                {{#hasuntranslateurl}}
+                    | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
+                {{/hasuntranslateurl}}
+            </div>
+            <div class="amostranslation">
+                <div class="amostranslationview">{{{displaytranslation}}}</div>
+                <div class="amostranslationedit">
+                    <textarea data-region="amoseditor">{{{translation}}}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

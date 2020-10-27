@@ -1,20 +1,96 @@
 // Strings translator.
 #page-local-amos-view #amostranslator {
 
-    // Undo right margin on help icons.
-    .amosinfo .icon {
-        margin-right: 0;
-    }
+	.amostranslatoritem {
 
-    .amosinfo {
-        margin-bottom: 0.25rem;
-    }
+		// Undo right margin on help icons.
+		.amosinfo .icon {
+			margin-right: 0;
+		}
 
-    .amosoriginal, .amostranslation {
-        flex: 1 1 auto;
-        min-height: 3rem;
-        border: 1px solid rgb(204,204,204);
-        border-radius: 4px;
-        padding: 5px;
-    }
+		.amosinfo {
+			margin-bottom: 0.25rem;
+		}
+
+        .amosoriginal,
+        .amostranslation {
+			flex: 1 1 auto;
+			min-height: 3rem;
+        }
+
+        .amosoriginal,
+        .amostranslation,
+        .amostranslationedit textarea {
+			border: 1px solid rgb(204,204,204);
+			border-radius: 4px;
+        }
+
+        .amosoriginal,
+        .amostranslationview {
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .amostranslationedit {
+            padding: 4px;
+        }
+
+        .amostranslationedit textarea {
+            padding: 5px;
+        };
+
+		.amostranslation {
+			cursor: text;
+		}
+
+        .amostranslationview,
+        .amostranslationedit,
+        .amostranslationedit textarea {
+            height: 100%;
+            width: 100%;
+        }
+
+        &.committable .amostranslation {
+            background-image:url([[pix:core|i/ne_red_mark]]);
+            background-position:100% 0;
+            background-repeat:no-repeat;
+        }
+
+		&.translatable .amostranslation,
+		&.commitable .amostranslation {
+			background-color: $amos-color-committable;
+		}
+
+        &.translatable.missing .amostranslation,
+        &.committable.missing .amostranslation {
+            background-color: $amos-color-missing;
+        }
+
+        &.translatable.staged .amostranslation,
+        &.committable.staged .amostranslation {
+            background-color: $amos-color-staged;
+        }
+
+        &.translatable.outdated .amostranslation,
+        &.committable.outdated .amostranslation {
+            background-color: $amos-color-outdated;
+        }
+
+        &.nontranslatable .amostranslation {
+            background-color: $amos-color-nontranslatable;
+            &.explanation {
+                font-style: italic;
+                color: #909090;
+            }
+        }
+
+        &[data-mode="view"] .amostranslationedit {
+            display: none !important;
+        }
+
+        &[data-mode="edit"] .amostranslationview {
+            display: none !important;
+        }
+	}
 }

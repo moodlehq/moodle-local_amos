@@ -22,38 +22,13 @@
 
 <div id="amostranslator">
     {{#strings}}
-        <div class="row m-b-2">
-            <div class="col-md d-flex flex-column">
-                <div class="amosinfo small text-muted">
-                    {{displayenglishsince}}
-                    {{^islatest}}
-                        | <i class="fa fa-warning text-warning"></i> {{#str}} stringversionnotlatest, local_amos {{/str}}
-                    {{/islatest}}
-                    | {{stringid}} | {{displaycomponent}}
-                    {{#isappstring}}
-                        | <i class="fa fa-mobile" title="{{app}}"></i>
-                    {{/isappstring}}
-                </div>
-                <div class="amosoriginal">
-                    {{{displayoriginal}}}
-                </div>
-            </div>
-
-            <div class="col-md d-flex flex-column">
-                <div class="amosinfo small text-muted">
-                    {{#hastranslationsincelabel}}
-                        {{displaytranslationsince}} |
-                    {{/hastranslationsincelabel}}
-                    {{displaylanguage}}
-                    | <a href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
-                    {{#hasuntranslateurl}}
-                        | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
-                    {{/hasuntranslateurl}}
-                </div>
-                <div class="amostranslation">
-                    {{{displaytranslation}}}
-                </div>
-            </div>
-        </div>
+        {{>local_amos/translator_string}}
     {{/strings}}
 </div>
+
+{{#js}}
+    require(['local_amos/translator'], function(translatorjs) {
+        translatorjs.init();
+    });
+{{/js}}
+

@@ -224,7 +224,7 @@ class translator implements \renderable, \templatable {
                 $string->text = $staged->text;
                 $string->since = $staged->component->version->code;
                 $string->timemodified = $staged->timemodified;
-                $string->class = 'staged';
+                $string->statusclass = 'staged';
                 $string->nocleaning = $staged->nocleaning;
                 $s[$component->lang][$component->name][$staged->id] = $string;
             }
@@ -266,11 +266,11 @@ class translator implements \renderable, \templatable {
                             $string->translationsincecode = $versince->code;
                             $string->translationsincelabel = $versince->label;
 
-                            if (isset($s[$lang][$component][$stringid]->class)) {
-                                $string->class = $s[$lang][$component][$stringid]->class;
+                            if (isset($s[$lang][$component][$stringid]->statusclass)) {
+                                $string->statusclass = $s[$lang][$component][$stringid]->statusclass;
 
                             } else {
-                                $string->class = 'translated';
+                                $string->statusclass = 'translated';
                             }
 
                             if ($string->originalmodified > $string->timemodified) {
@@ -294,7 +294,7 @@ class translator implements \renderable, \templatable {
                             $string->translationsincedir = null;
                             $string->translationsincecode = null;
                             $string->translationsincelabel = null;
-                            $string->class = 'missing';
+                            $string->statusclass = 'missing';
                             $string->outdated = false;
                             $string->nocleaning = false;
                         }
@@ -317,7 +317,7 @@ class translator implements \renderable, \templatable {
                             continue;
                         }
 
-                        if ($stagedonly && $string->class != 'staged') {
+                        if ($stagedonly && $string->statusclass != 'staged') {
                             continue;
                         }
 
@@ -357,7 +357,7 @@ class translator implements \renderable, \templatable {
                         }
 
                         if ($missing) {
-                            if ($string->class === 'translated' && !$string->outdated) {
+                            if ($string->statusclass === 'translated' && !$string->outdated) {
                                 continue;
                             }
                         }
@@ -402,7 +402,7 @@ class translator implements \renderable, \templatable {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
-                    $string->class = 'missing explanation';
+                    $string->statusclass = 'missing explanation';
                 }
             }
         }
@@ -412,7 +412,7 @@ class translator implements \renderable, \templatable {
                 $string->committable = false;
                 $string->translatable = false;
                 $string->translation = get_string('unableenfixcountries', 'local_amos');
-                $string->class = 'missing explanation';
+                $string->statusclass = 'missing explanation';
             }
         }
 
@@ -435,7 +435,7 @@ class translator implements \renderable, \templatable {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
                 $string->translatable = false;
                 $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
-                $string->class = 'missing explanation';
+                $string->statusclass = 'missing explanation';
             }
         }
     }
@@ -450,8 +450,10 @@ class translator implements \renderable, \templatable {
         global $PAGE;
 
         $result = [
-            'missing' => 0,
+            'found' => $this->numofrows,
+            'missing' => $this->numofmissing,
             'strings' => $this->strings,
+            'pages' => [],
         ];
 
         $listlanguages = \mlang_tools::list_languages();
@@ -498,127 +500,12 @@ class translator implements \renderable, \templatable {
             $string->displayoriginal = str_replace(array("\n", "\r"), '', $string->displayoriginal);
 
             $string->displaytranslation = \local_amos_renderer::add_breaks(s($string->translation));
-continue;
-
-
-
-            // original of the string
-            $original = \local_amos_renderer::add_breaks(s($string->original));
-            // work around https://bugzilla.mozilla.org/show_bug.cgi?id=116083
-            $original = nl2br($original);
-            $original = str_replace(array("\n", "\r"), '', $original);
-            $original = html_writer::div($original, 'preformatted english');
-
-            if ($infogoogle) {
-                $original .= html_writer::div('', 'google-translation');
-            }
-
-            // translation
-            $translation = \local_amos_renderer::add_breaks(s($string->translation));
-            $translation = html_writer::tag('div', $translation, array('class' => 'preformatted translation-view'));
-
-            $trclasses = ' ' . $string->class;
-            if ($string->translatable) {
-                $trclasses .= ' translatable';
-            } else {
-                $trclasses .= ' nontranslatable';
-            }
-            if ($string->committable) {
-                $trclasses .= ' committable';
-            }
-            if ($string->outdated) {
-                $trclasses .= ' outdated';
-            }
-            if ($string->nocleaning) {
-                $trclasses .= ' nocleaning';
-            }
-
-            // mark as up-to-date
-            if ($string->outdated and $string->committable and $string->translation) {
-                if ($string->translationid) {
-                    $uptodate = html_writer::tag('button',
-                        get_string('markuptodatelabel', 'local_amos'),
-                        array('id' => 'uptodate_'.$string->translationid, 'class' => 'btn btn-small btn-warning markuptodate'));
-                    $uptodate .= $this->help_icon('markuptodate', 'local_amos');
-                } else {
-                    $uptodate = $this->help_icon('outdatednotcommitted', 'local_amos', get_string('outdatednotcommittedwarning', 'local_amos'));
-                }
-                $uptodate = html_writer::div($uptodate, 'uptodatewrapper');
-            } else {
-                $uptodate = '';
-            }
-
-            // info lines
-            $infoline1 = $infoversion.' | '.$infostringid.' | '.$infocomponent;
-
-            if ($infoplaceholder) {
-                $infoline1 .= ' | '.$infoplaceholder;
-            }
-
-            if ($infoapp) {
-                $infoline1 .= ' | '.$infoapp;
-            }
-
-            $infoline2 = $this->help_icon('translatortranslation', 'local_amos').' '.$infolanguage;
-
-            if ($string->translationsincelabel !== null) {
-                $infoline2 .= ' | ' . html_writer::span($string->translationsincelabel . '+', 'info info-version');
-            }
-
-            $infoline2 .= ' | '.$infotimeline;
-            $infoline2 .= ' '.$infountranslate;
-            $infoline2 .= ' '.$infogoogle;
-
-            $data = array(
-                'data-amos-lang' => $string->language,
-                'data-amos-originalid' => $string->originalid,
-            );
-
-            if (!empty($string->translationid)) {
-                $data['data-amos-translationid'] = $string->translationid;
-            } else {
-                $data['data-amos-translationid'] = 0;
-            }
-
-            $trout .= html_writer::start_div('string-control-group', $data);
-            $trout .= html_writer::start_div('string-control-label');
-            $trout .= html_writer::start_div('d-flex');
-            $trout .= html_writer::div($infoline1, 'span-6 align-self-stretch');
-            $trout .= html_writer::div($infoline2, 'span-6 align-self-stretch');
-            $trout .= html_writer::end_div(); // .d-flex
-            $trout .= html_writer::end_div(); // .string-control-label
-
-            $trout .= html_writer::start_div('string-controls');
-            $trout .= html_writer::start_div('d-flex');
-            $trout .= html_writer::div(html_writer::div($original, 'string-text original'), 'span-6 align-self-stretch');
-            $trout .= html_writer::div(html_writer::div($translation.$uptodate, 'string-text translation' . $trclasses), 'span-6 align-self-stretch');
-            $trout .= html_writer::end_div(); // .d-flex
-            $trout .= html_writer::end_div(); // .string-controls
-            $trout .= html_writer::end_div(); // .string-control-group
         }
 
+        // TODO paginator.
+        //for ($p = 1; $p <= ceil($this->numofrows / self::PERPAGE); $p++) {
+        //}
+
         return $result;
-
-        $a = array(
-            'found' => $this->numofrows,
-            'missing' => $this->numofmissing,
-            'missingonpage' => $missing
-        );
-        $output = $this->heading_with_help(get_string('found', 'local_amos', $a), 'foundinfo', 'local_amos');
-        $pages = ceil($this->numofrows / self::PERPAGE);
-        $output .= html_writer::tag('div', self::page_links($pages, $this->currentpage), array('class' => 'pagination'));
-        $output .= html_writer::div($trout, '', array('id' => 'amostranslator'));
-        $output .= html_writer::tag('div', self::page_links($pages, $this->currentpage), array('class' => 'pagination'));
-        $output .= html_writer::div(
-            html_writer::link(
-                new moodle_url('/local/amos/stage.php'),
-                get_string('stagetoolopen', 'local_amos'),
-                array('class' => 'btn btn-success')
-            ),
-            'stagetoolopen'
-        );
-        $output = html_writer::tag('div', $output, array('class' => 'translatorwrapper no-overflow'));
-
-        return $output;
     }
 }

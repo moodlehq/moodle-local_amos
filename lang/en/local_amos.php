@@ -387,7 +387,7 @@ $string['quicklinks_newcomers'] = 'Help for newcomers';
 $string['requestactions'] = 'Action';
 $string['requestactions_help'] = '* Apply - copy the translated strings from the pull request into your stage. If the string is already in the stage, it is overwritten with the stashed one.
 * Hide - blocks the pull request so that it is not displayed to you any more.';
-$string['savefilter'] = 'Save filter settings';
+$string['savefilter'] = 'Show strings';
 $string['script'] = 'AMOScript';
 $string['script_help'] = 'AMOScript is a set of instructions to execute over the strings repository.';
 $string['scriptexecute'] = 'Execute and stage result';
