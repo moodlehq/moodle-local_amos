@@ -25,45 +25,6 @@
 import {debounce} from 'core/utils';
 import {get_string as getString} from 'core/str';
 
-const SELECTORS = {
-    ROOT: {
-        ID: 'amosfilter',
-        REGION: 'amosfilter',
-    },
-    FCMP: {
-        ID: 'amosfilter_fcmp',
-        REGION: 'amosfilter_fcmp',
-    },
-    FCMPITEM: {
-        REGION: 'amosfilter_fcmp_item',
-    },
-    FCMPCOUNTER: {
-        ID: 'amosfilter_fcmp_counter',
-    },
-    FCMPSEARCH: {
-        ID: 'amosfilter_fcmp_search',
-    },
-    FLNG: {
-        ID: 'amosfilter_flng',
-        REGION: 'amosfilter_flng',
-    },
-    FLNGCOUNTER: {
-        ID: 'amosfilter_flng_counter',
-    },
-    FLNGSEARCH: {
-        ID: 'amosfilter_flng_search',
-    },
-    FVER: {
-        ID: 'amosfilter_fver',
-    },
-    FLAST: {
-        ID: 'amosfilter_flast',
-    },
-    BUTTONS: {
-        REGION: 'amosfilter_buttons',
-    },
-};
-
 /**
  * Initialise the module and register events handlers.
  *
@@ -82,13 +43,13 @@ export const init = () => {
  * @param {Element} root
  */
 const registerEventListeners = () => {
-    let root = document.getElementById(SELECTORS.ROOT.ID);
-    let fcmp = document.getElementById(SELECTORS.FCMP.ID);
-    let componentSearch = document.getElementById(SELECTORS.FCMPSEARCH.ID);
-    let flng = document.getElementById(SELECTORS.FLNG.ID);
-    let languageSearch = document.getElementById(SELECTORS.FLNGSEARCH.ID);
-    let fver = document.getElementById(SELECTORS.FVER.ID);
-    let flast = document.getElementById(SELECTORS.FLAST.ID);
+    let root = document.getElementById('amosfilter');
+    let fcmp = document.getElementById('amosfilter_fcmp');
+    let componentSearch = document.getElementById('amosfilter_fcmp_search');
+    let flng = document.getElementById('amosfilter_flng');
+    let languageSearch = document.getElementById('amosfilter_flng_search');
+    let fver = document.getElementById('amosfilter_fver');
+    let flast = document.getElementById('amosfilter_flast');
 
     // Click event delegation.
     root.addEventListener('click', e => {
@@ -99,11 +60,11 @@ const registerEventListeners = () => {
         let action = e.target.getAttribute('data-action');
         let region = e.target.closest('[data-region]').getAttribute('data-region');
 
-        if (region == SELECTORS.FCMP.REGION) {
+        if (region == 'amosfilter_fcmp') {
             handleComponentSelectorAction(e, fcmp, action);
         }
 
-        if (region == SELECTORS.BUTTONS.REGION && action == 'togglemoreoptions') {
+        if (region == 'amosfilter_buttons' && action == 'togglemoreoptions') {
             toggleMoreOptions(e, root);
         }
     });
@@ -114,11 +75,11 @@ const registerEventListeners = () => {
             updateCounterOfSelectedComponents();
         }
 
-        if (e.target.id == SELECTORS.FLNG.ID) {
+        if (e.target.id == 'amosfilter_flng') {
             updateCounterOfSelectedLanguages();
         }
 
-        if (e.target.id == SELECTORS.FLAST.ID) {
+        if (e.target.id == 'amosfilter_flast') {
             if (flast.checked) {
                 fver.setAttribute('disabled', 'disabled');
             } else {
@@ -156,7 +117,7 @@ const registerEventListeners = () => {
  */
 const handleComponentSelectorAction = (e, fcmp, action) => {
 
-    let selectorComponentItem = `:scope [data-region="${SELECTORS.FCMPITEM.REGION}"]:not(.hidden) input[name="fcmp[]"]`;
+    let selectorComponentItem = `:scope [data-region="amosfilter_fcmp_item"]:not(.hidden) input[name="fcmp[]"]`;
 
     if (action == 'selectstandard') {
         e.preventDefault();
@@ -213,8 +174,8 @@ const handleComponentSearch = (e, inputField, fcmp) => {
  * @function updateCounterOfSelectedComponents
  */
 const updateCounterOfSelectedComponents = () => {
-    let fcmp = document.getElementById(SELECTORS.FCMP.ID);
-    let counter = document.getElementById(SELECTORS.FCMPCOUNTER.ID);
+    let fcmp = document.getElementById('amosfilter_fcmp');
+    let counter = document.getElementById('amosfilter_fcmp_counter');
     let count = fcmp.querySelectorAll(':scope input[name="fcmp[]"]:checked').length;
 
     if (count == 0) {
@@ -250,8 +211,8 @@ const handleLanguageSearch = (e, inputField, flng) => {
  * @function updateCounterOfSelectedLanguages
  */
 const updateCounterOfSelectedLanguages = () => {
-    let flng = document.getElementById(SELECTORS.FLNG.ID);
-    let counter = document.getElementById(SELECTORS.FLNGCOUNTER.ID);
+    let flng = document.getElementById('amosfilter_flng');
+    let counter = document.getElementById('amosfilter_flng_counter');
     let count = flng.querySelectorAll(':scope option:checked').length;
 
     if (count == 0) {
@@ -288,7 +249,7 @@ const toggleMoreOptions = async(e, root) => {
  * @function showUsedAdvancedOptions
  */
 const showUsedAdvancedOptions = () => {
-    let root = document.getElementById(SELECTORS.ROOT.ID);
+    let root = document.getElementById('amosfilter');
 
     root.querySelectorAll(':scope [data-level="advanced"][data-level-control]').forEach(item => {
         let control = document.getElementById(item.getAttribute('data-level-control'));
@@ -347,7 +308,7 @@ const showUsedAdvancedOptions = () => {
  * @function scrollToFirstSelectedComponent
  */
 const scrollToFirstSelectedComponent = () => {
-    let comp = document.getElementById(SELECTORS.FCMP.ID).querySelector('input[id^="amosfilter_fcmp_f_"]:checked');
+    let comp = document.getElementById('amosfilter_fcmp').querySelector('input[id^="amosfilter_fcmp_f_"]:checked');
 
     if (comp) {
         comp.scrollIntoView(false);
