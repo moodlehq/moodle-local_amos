@@ -176,12 +176,17 @@ const handleComponentSearch = (e, inputField, fcmp) => {
 const updateCounterOfSelectedComponents = () => {
     let fcmp = document.getElementById('amosfilter_fcmp');
     let counter = document.getElementById('amosfilter_fcmp_counter');
+    let invalidfeedback = document.getElementById('amosfilter_fcmp_invalid_feedback');
     let count = fcmp.querySelectorAll(':scope input[name="fcmp[]"]:checked').length;
 
     if (count == 0) {
         counter.classList.add('badge-danger');
+        fcmp.classList.add('is-invalid');
+        invalidfeedback.classList.remove('hidden');
     } else {
         counter.classList.remove('badge-danger');
+        fcmp.classList.remove('is-invalid');
+        invalidfeedback.classList.add('hidden');
     }
 
     counter.textContent = count;
@@ -213,12 +218,17 @@ const handleLanguageSearch = (e, inputField, flng) => {
 const updateCounterOfSelectedLanguages = () => {
     let flng = document.getElementById('amosfilter_flng');
     let counter = document.getElementById('amosfilter_flng_counter');
+    let invalidfeedback = document.getElementById('amosfilter_flng_invalid_feedback');
     let count = flng.querySelectorAll(':scope option:checked').length;
 
     if (count == 0) {
         counter.classList.add('badge-danger');
+        flng.classList.add('is-invalid');
+        invalidfeedback.classList.remove('hidden');
     } else {
         counter.classList.remove('badge-danger');
+        flng.classList.remove('is-invalid');
+        invalidfeedback.classList.add('hidden');
     }
 
     counter.textContent = count;
