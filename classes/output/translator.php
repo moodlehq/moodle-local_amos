@@ -494,12 +494,12 @@ class translator implements \renderable, \templatable {
                 ]))->out(false);
             }
 
-            $string->displayoriginal = \local_amos_renderer::add_breaks(s($string->original));
+            $string->displayoriginal = \local_amos\local\util::add_breaks(s($string->original));
             // Workaround for <https://bugzilla.mozilla.org/show_bug.cgi?id=116083>.
             $string->displayoriginal = nl2br($string->displayoriginal);
             $string->displayoriginal = str_replace(array("\n", "\r"), '', $string->displayoriginal);
 
-            $string->displaytranslation = \local_amos_renderer::add_breaks(s($string->translation));
+            $string->displaytranslation = \local_amos\local\util::add_breaks(s($string->translation));
         }
 
         // TODO paginator.

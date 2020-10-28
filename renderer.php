@@ -1241,6 +1241,10 @@ print_footer();
      * @return string
      */
     public static function add_breaks($text) {
-        return preg_replace('/([,])(\S)/', '$1'."\xe2\x80\x8b".'$2', $text);
+
+        debugging('local_amos_renderer::add_breaks() is deprecated. Use \\local_amos\\local\\util::add_breaks() instead.',
+            DEBUG_DEVELOPER);
+
+        return \local_amos\local\util::add_breaks($text);
     }
 }
