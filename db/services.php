@@ -40,6 +40,14 @@ $functions = [
         'description' => 'Get translation statistics for the given component / plugin.',
         'type' => 'read',
     ],
+    'local_amos_stage_translated_string' => [
+        'classname' => '\local_amos\external\stage_translated_string',
+        'methodname' => 'execute',
+        'description' => 'Add a string translation into a persistent AMOS stage.',
+        'capabilities' => 'local/amos:stage',
+        'type' => 'write',
+        'ajax' => true,
+    ],
 ];
 
 $services = [
