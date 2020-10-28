@@ -40,26 +40,7 @@ class testable_mlang_tools extends mlang_tools {
 /**
  * Test cases for the internal AMOS API
  */
-class mlang_test extends advanced_testcase {
-
-    /**
-     * Helper method to quickly register a language on the given branch(-es)
-     *
-     * @param string $langcode the code of the language, such as 'en'
-     * @param int $since the code of the branch to register the language at.
-     */
-    protected function register_language($langcode, $since) {
-
-        $stage = new mlang_stage();
-
-        $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($since));
-        $component->add_string(new mlang_string('thislanguage', $langcode));
-        $component->add_string(new mlang_string('thislanguageint', $langcode));
-        $stage->add($component);
-        $component->clear();
-
-        $stage->commit('Register language '.$langcode, array('source' => 'unittest'));
-    }
+class mlang_test extends local_amos_testcase {
 
     /**
      * Excercise various helper methods
