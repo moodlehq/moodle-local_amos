@@ -36,30 +36,64 @@ const registerEventListeners = () => {
     let root = document.getElementById('amostranslator');
 
     root.addEventListener('click', e => {
-        if (e.target.classList.contains('amostranslationview')) {
+        if (e.target.classList.contains('amostranslation') || e.target.classList.contains('amostranslationview')) {
             let item = e.target.closest('[data-region="amostranslatoritem"]');
-            let textarea = item.querySelector('[data-region="amoseditor"]');
 
-            let refHeight = item.querySelector('.amostranslation').clientHeight;
-
-            if (refHeight > 40) {
-                textarea.style.height = (refHeight - 9) + 'px';
+            if (item.getAttribute('data-mode') == 'view') {
+                translatorItemEditingOn(item, e.ctrlKey);
             }
-
-            item.setAttribute('data-mode', 'edit');
-            textarea.focus();
         }
     });
 
     root.addEventListener('blur', e => {
-        window.console.log(e.target);
-        if (!e.target.hasAttribute('data-region')) {
-            return;
-        }
-
-        if (e.target.getAttribute('data-region') == 'amoseditor') {
+        if (e.target.hasAttribute('data-region') && e.target.getAttribute('data-region') == 'amoseditor') {
             let item = e.target.closest('[data-region="amostranslatoritem"]');
-            item.setAttribute('data-mode', 'view');
+            translatorItemEditingOff(item);
         }
     }, true);
 };
+
+/**
+ * @function translatorItemEditingOn
+ * @param {Element} item
+ * @param {bool} [nocleaning=false] - turn editing on with nocleaning enabled
+ */
+const translatorItemEditingOn = (item, nocleaning = false) => {
+    let textarea = item.querySelector('[data-region="amoseditor"]');
+    let refHeight = item.querySelector('.amostranslation').clientHeight;
+
+    textarea.setAttribute('data-previous', textarea.value);
+    textarea.setAttribute('data-nocleaning', nocleaning ? 'nocleaning' : '');
+
+    if (refHeight > 40) {
+        textarea.style.height = (refHeight - 9) + 'px';
+    }
+
+    item.setAttribute('data-mode', 'edit');
+    textarea.focus();
+};
+
+/**
+ * @function translatorItemEditingOff
+ * @param {Element} item
+ */
+const translatorItemEditingOff = (item) => {
+    let textarea = item.querySelector('[data-region="amoseditor"]');
+    let previoustext = textarea.getAttribute('data-previous');
+    let nocleaning = textarea.getAttribute('data-nocleaning');
+    let newtext = textarea.value;
+
+    if (nocleaning !== 'nocleaning') {
+        newtext = newtext.trim();
+    }
+
+    if (previoustext === newtext) {
+        // The following line is intentionally here to remove added trailing/heading whitespace.
+        textarea.value = previoustext;
+        item.setAttribute('data-mode', 'view');
+
+    } else {
+        textarea.disabled = true;
+    }
+};
+

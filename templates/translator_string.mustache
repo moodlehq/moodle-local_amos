@@ -23,7 +23,9 @@
     * none
 
     Data attributes required for JS:
-    * none
+    * data-region="amostranslatoritem" - indicates a "row" in the translator - English original and a translation
+    * data-mode - mode of the translator item - "view" or "edit"
+    * data-region="amoseditor" - textarea element within the translator item
 
     Context variables required for this template:
     * englishsincedir - e.g. 2.0
@@ -102,7 +104,7 @@
             <div class="amostranslation">
                 <div class="amostranslationview">{{{displaytranslation}}}</div>
                 <div class="amostranslationedit">
-                    <textarea data-region="amoseditor">{{{translation}}}</textarea>
+                    <textarea maxlength="13200" autocomplete="off" data-region="amoseditor" data-previous="{{translation}}">{{translation}}</textarea>
                 </div>
             </div>
         </div>
