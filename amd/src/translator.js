@@ -22,11 +22,16 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {call as fetchMany} from 'core/ajax';
+import Config from 'core/config';
+import Notification from 'core/notification';
+
 /**
  * @function init
  */
 export const init = () => {
     registerEventListeners();
+    turnAllMissingForEditing();
 };
 
 /**
@@ -40,15 +45,14 @@ const registerEventListeners = () => {
             let item = e.target.closest('[data-region="amostranslatoritem"]');
 
             if (item.getAttribute('data-mode') == 'view') {
-                translatorItemEditingOn(item, e.ctrlKey);
+                translatorItemEditingOn(item, e.ctrlKey).focus();
             }
         }
     });
 
     root.addEventListener('blur', e => {
         if (e.target.hasAttribute('data-region') && e.target.getAttribute('data-region') == 'amoseditor') {
-            let item = e.target.closest('[data-region="amostranslatoritem"]');
-            translatorItemEditingOff(item);
+            translatorItemSave(e.target);
         }
     }, true);
 };
@@ -57,43 +61,95 @@ const registerEventListeners = () => {
  * @function translatorItemEditingOn
  * @param {Element} item
  * @param {bool} [nocleaning=false] - turn editing on with nocleaning enabled
+ * @return {Element}
  */
 const translatorItemEditingOn = (item, nocleaning = false) => {
     let textarea = item.querySelector('[data-region="amoseditor"]');
     let refHeight = item.querySelector('.amostranslation').clientHeight;
 
+    item.setAttribute('data-nocleaning', nocleaning ? '1' : '0');
     textarea.setAttribute('data-previous', textarea.value);
-    textarea.setAttribute('data-nocleaning', nocleaning ? 'nocleaning' : '');
 
     if (refHeight > 40) {
         textarea.style.height = (refHeight - 9) + 'px';
     }
 
     item.setAttribute('data-mode', 'edit');
-    textarea.focus();
+
+    return textarea;
 };
 
 /**
- * @function translatorItemEditingOff
- * @param {Element} item
+ * @function translatorItemSave
+ * @param {Element} textarea
+ * @return {Promise}
  */
-const translatorItemEditingOff = (item) => {
-    let textarea = item.querySelector('[data-region="amoseditor"]');
+const translatorItemSave = (textarea) => {
+    let item = textarea.closest('[data-region="amostranslatoritem"]');
+    let nocleaning = item.getAttribute('data-nocleaning');
     let previoustext = textarea.getAttribute('data-previous');
-    let nocleaning = textarea.getAttribute('data-nocleaning');
     let newtext = textarea.value;
 
-    if (nocleaning !== 'nocleaning') {
+    if (nocleaning === '1') {
         newtext = newtext.trim();
     }
 
-    if (previoustext === newtext) {
-        // The following line is intentionally here to remove added trailing/heading whitespace.
+    if (previoustext === newtext && nocleaning !== '1') {
+        // Remove eventually added trailing/heading whitespace and just switch back.
         textarea.value = previoustext;
         item.setAttribute('data-mode', 'view');
 
+        return Promise.resolve(false);
+
     } else {
+        // Send the translation to the stage if the translation has changed or nocleaning applies.
+        item.classList.add('staged');
         textarea.disabled = true;
+
+        return stageTranslatedString(item, newtext)
+
+        .then(response => {
+            item.setAttribute('data-mode', 'view');
+            textarea.disabled = false;
+            textarea.removeAttribute('data-previous');
+            textarea.innerHTML = textarea.value = response.translation;
+            item.querySelector('[data-region="amostranslationview"]').innerHTML = response.displaytranslation;
+            item.querySelector('[data-region="displaytranslationsince"]').innerHTML = response.displaytranslationsince + ' | ';
+
+            window.console.log(response);
+
+            return true;
+
+        }).catch(Notification.exception);
     }
 };
 
+/**
+ * @function stageTranslatedString
+ * @param {Element} item
+ * @param {string} text
+ * @returns {Promise}
+ */
+const stageTranslatedString = (item, text) => {
+
+    return fetchMany([{
+        methodname: 'local_amos_stage_translated_string',
+        args: {
+            stageid: Config.sesskey,
+            originalid: item.getAttribute('data-originalid'),
+            lang: item.getAttribute('data-language'),
+            text: text,
+            translationid: parseInt(item.getAttribute('data-translationid')) || 0,
+            nocleaning: item.getAttribute('data-nocleaning'),
+        },
+    }])[0];
+};
+
+/**
+ * @function turnAllMissingForEditing
+ */
+const turnAllMissingForEditing = () => {
+    let root = document.getElementById('amostranslator');
+    let missingItems = root.querySelectorAll(':scope [data-region="amostranslatoritem"].missing');
+    missingItems.forEach(translatorItemEditingOn);
+};
