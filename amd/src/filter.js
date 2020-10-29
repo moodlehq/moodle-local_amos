@@ -24,6 +24,8 @@
 
 import {debounce} from 'core/utils';
 import {get_string as getString} from 'core/str';
+import * as PubSub from 'core/pubsub';
+import FilterEvents from './filter_events';
 
 /**
  * Initialise the module and register events handlers.
@@ -66,6 +68,16 @@ const registerEventListeners = () => {
 
         if (region == 'amosfilter_buttons' && action == 'togglemoreoptions') {
             toggleMoreOptions(e, root);
+        }
+
+        if (region == 'amosfilter_buttons' && action == 'submit') {
+            e.preventDefault();
+            e.target.blur();
+            let form = root.querySelector('form');
+            let formdata = new FormData(form);
+            formdata.delete('__lazyform_amosfilter');
+            formdata.delete('sesskey');
+            PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
         }
     });
 
