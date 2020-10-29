@@ -1,6 +1,13 @@
 // Strings translator.
 #page-local-amos-view #amostranslator {
 
+    opacity: 1;
+    transition: opacity 0.2s;
+
+    &.loading {
+        opacity: 0;
+    }
+
 	.amostranslatoritem {
 
 		// Undo right margin on help icons.

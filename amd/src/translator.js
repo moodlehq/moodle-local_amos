@@ -164,6 +164,9 @@ const turnAllMissingForEditing = () => {
  */
 const showFilteredStrings = (filterQuery) => {
 
+    let root = document.getElementById('amostranslator');
+    root.classList.add('loading');
+
     return fetchMany([{
         methodname: 'local_amos_get_translator_data',
         args: {
@@ -180,12 +183,11 @@ const showFilteredStrings = (filterQuery) => {
         }
 
     }).then((html, js = '') => {
-        let root = document.getElementById('amostranslator');
-
         return Templates.replaceNodeContents(root, html, js);
 
     }).then(() => {
         turnAllMissingForEditing();
+        root.classList.remove('loading');
         return true;
 
     }).catch(Notification.exception);
