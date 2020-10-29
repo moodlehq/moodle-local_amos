@@ -146,6 +146,7 @@ class translator implements \renderable, \templatable {
         // Iterate over the results and pick the most recent string value for each selected branch.
         $tree = [];
         $newer = [];
+        $compbranch = 0;
 
         foreach ($recordset as $record) {
             if ($last) {
