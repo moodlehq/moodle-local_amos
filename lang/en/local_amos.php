@@ -46,6 +46,7 @@ $string['commitmessage'] = 'Commit message';
 $string['commitmessageempty'] = 'Please fill the commit message';
 $string['commitstage'] = 'Commit staged strings';
 $string['commitstage_help'] = 'Permanently store all staged translations in AMOS repository. Stage is automatically pruned and rebased before it is committed. Only committable strings are stored. That means that only translations below highlighted in green will be stored. The stage is cleared after the commit.';
+$string['committable'] = 'You have permission to commit to this language pack';
 $string['committableall'] = 'all languages';
 $string['committablenone'] = 'no languages allowed - please contact AMOS manager';
 $string['componentsall'] = 'All';

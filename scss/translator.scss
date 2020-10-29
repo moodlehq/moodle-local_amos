@@ -51,12 +51,6 @@
             width: 100%;
         }
 
-        &.committable .amostranslation {
-            background-image:url([[pix:core|i/ne_red_mark]]);
-            background-position:100% 0;
-            background-repeat:no-repeat;
-        }
-
 		&.translatable .amostranslation,
 		&.commitable .amostranslation {
 			background-color: $amos-color-committable;

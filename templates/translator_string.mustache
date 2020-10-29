@@ -71,7 +71,7 @@
     }
 }}
 
-<div class="amostranslatoritem {{statusclass}} {{#committable}} committable {{/committable}} {{#translatable}} translatable {{/translatable}}"
+<div class="amostranslatoritem {{statusclass}} {{#translatable}} translatable {{/translatable}}"
      data-region="amostranslatoritem"
      data-mode="view"
     >
@@ -96,6 +96,9 @@
                     {{displaytranslationsince}} |
                 {{/hastranslationsincelabel}}
                 {{displaylanguage}}
+                {{#committable}}
+                    <span class="mx-1" title="{{#str}} committable, local_amos {{/str}}"><i class="fa fa-floppy-o" aria-hidden="true"></i></span>
+                {{/committable}}
                 | <a href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
                 {{#hasuntranslateurl}}
                     | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
