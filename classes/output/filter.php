@@ -132,18 +132,18 @@ class filter implements \renderable, \templatable {
      * @return object
      */
     protected function get_data_default() {
-        global $USER;
+        global $SESSION;
 
-        $data = (object) [];
+        // Check to see if we have data set via {@see self::set_data_default()}.
+        if (isset($SESSION->local_amos->filter_default_data)) {
+            $data = json_decode($SESSION->local_amos->filter_default_data);
 
-        // If we have a previously saved filter settings in the session, use it.
-        foreach ($this->fields as $field) {
-            if (isset($USER->{'local_amos_' . $field})) {
-                $data->{$field} = unserialize($USER->{'local_amos_' . $field});
-
-            } else {
-                $data->{$field} = null;
+            if (!is_object($data)) {
+                $data = (object) [];
             }
+
+        } else {
+            $data = (object) [];
         }
 
         if (empty($data->version)) {
@@ -365,20 +365,22 @@ class filter implements \renderable, \templatable {
     }
 
     /**
-     * Prepare permanent link for the given filter data
+     * Return a permanent link for the current filter data.
      *
      * @param \moodle_url $baseurl
-     * @param object $fdata as returned by {@see self::get_data()}
      * @return \moodle_url $permalink
      */
-    public function set_permalink(\moodle_url $baseurl, object $fdata) {
+    public function get_permalink(?\moodle_url $baseurl = null): \moodle_url {
 
-        $this->permalink = new \moodle_url($baseurl, array('t' => time()));
+        $baseurl = $baseurl ?: new \moodle_url('/local/amos/view.php');
+
+        $fdata = $this->get_data();
+        $permalink = new \moodle_url($baseurl, ['t' => time()]);
 
         if ($fdata->last) {
-            $this->permalink->param('v', 'l');
+            $permalink->param('v', 'l');
         } else {
-            $this->permalink->param('v', $fdata->version);
+            $permalink->param('v', $fdata->version);
         }
 
         // List of languages or '*' if all are selected.
@@ -389,9 +391,9 @@ class filter implements \renderable, \templatable {
         }
 
         if (empty($all)) {
-            $this->permalink->param('l', '*');
+            $permalink->param('l', '*');
         } else {
-            $this->permalink->param('l', implode(',', $fdata->language));
+            $permalink->param('l', implode(',', $fdata->language));
         }
 
         unset($all);
@@ -407,64 +409,57 @@ class filter implements \renderable, \templatable {
 
         // The '*std' cannot be preselected because it depends on version.
         if (empty($all)) {
-            $this->permalink->param('c', '*');
+            $permalink->param('c', '*');
 
         } else if (empty($app)) {
-            $this->permalink->param('c', '*app');
+            $permalink->param('c', '*app');
 
         } else {
-            $this->permalink->param('c', implode(',', $fdata->component));
+            $permalink->param('c', implode(',', $fdata->component));
         }
 
         unset($all);
 
-        $this->permalink->param('s', $fdata->substring);
-        $this->permalink->param('d', $fdata->stringid);
+        $permalink->param('s', $fdata->substring);
+        $permalink->param('d', $fdata->stringid);
 
         if ($fdata->missing) {
-            $this->permalink->param('m', 1);
+            $permalink->param('m', 1);
         }
 
         if ($fdata->outdated) {
-            $this->permalink->param('u', 1);
+            $permalink->param('u', 1);
         }
 
         if ($fdata->has) {
-            $this->permalink->param('x', 1);
+            $permalink->param('x', 1);
         }
 
         if ($fdata->helps) {
-            $this->permalink->param('h', 1);
+            $permalink->param('h', 1);
         }
 
         if ($fdata->substringregex) {
-            $this->permalink->param('r', 1);
+            $permalink->param('r', 1);
         }
 
         if ($fdata->substringcs) {
-            $this->permalink->param('i', 1);
+            $permalink->param('i', 1);
         }
 
         if ($fdata->stringidpartial) {
-            $this->permalink->param('p', 1);
+            $permalink->param('p', 1);
         }
 
         if ($fdata->stagedonly) {
-            $this->permalink->param('g', 1);
+            $permalink->param('g', 1);
         }
 
         if ($fdata->app) {
-            $this->permalink->param('a', 1);
+            $permalink->param('a', 1);
         }
 
-        return $this->permalink;
-    }
-
-    /**
-     * @return null|\moodle_url permanent link to the filter settings
-     */
-    public function get_permalink() {
-        return $this->permalink;
+        return $permalink;
     }
 
     /**
@@ -628,5 +623,15 @@ class filter implements \renderable, \templatable {
         }
 
         return $fver;
+    }
+
+    /**
+     * Set the current filter data as the user's default data for this session.
+     */
+    public function set_data_default() {
+        global $SESSION;
+
+        $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
+        $SESSION->local_amos->filter_default_data = json_encode($this->get_data());
     }
 }

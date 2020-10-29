@@ -38,21 +38,14 @@ $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 
 $output = $PAGE->get_renderer('local_amos');
 
-// create a renderable object that represents the filter form
 $filter = new \local_amos\output\filter($PAGE->url);
-// save the filter settings into the sesssion
-$fdata = $filter->get_data();
-foreach ($fdata as $setting => $value) {
-    $USER->{'local_amos_' . $setting} = serialize($value);
-}
-$filter->set_permalink($PAGE->url, $fdata);
+$filter->set_data_default();
 
-// just make sure that USER contains sesskey
-$sesskey = sesskey();
-// create a renderable object that represent the translation table
+// Make sure that $USER contains the sesskey property.
+sesskey();
+
 $translator = new \local_amos\output\translator($filter, $USER);
 
-/// Output starts here
 echo $output->header();
 echo $output->render($filter);
 
