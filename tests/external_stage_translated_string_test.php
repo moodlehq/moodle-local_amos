@@ -22,14 +22,6 @@
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-/**
- * local_amos_external_stage_translated_string_testcase
- *
- * @package     plugintype_pluginname
- * @category    optional API reference
- * @copyright   2020 David Mudrák <david@moodle.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class local_amos_external_stage_translated_string_testcase extends local_amos_testcase {
 
     /**

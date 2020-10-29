@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/externallib.php');
 class stage_translated_string extends \external_api {
 
     /**
-     * Describes the external function parameters.
+     * Describe the external function parameters.
      *
      * @return \external_function_parameters
      */
@@ -49,7 +49,7 @@ class stage_translated_string extends \external_api {
     }
 
     /**
-     * Executes the external function.
+     * Execute the external function.
      */
     public static function execute(string $stageid, int $originalid, string $lang, string $text,
             ?int $translationid = null, ?bool $nocleaning = false): array {
@@ -114,7 +114,7 @@ class stage_translated_string extends \external_api {
     }
 
     /**
-     * Describes the external function result value.
+     * Describe the external function result value.
      *
      * @return \external_description
      */
