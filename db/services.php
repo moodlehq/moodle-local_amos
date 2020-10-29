@@ -48,6 +48,14 @@ $functions = [
         'type' => 'write',
         'ajax' => true,
     ],
+    'local_amos_get_translator_data' => [
+        'classname' => '\local_amos\external\get_translator_data',
+        'methodname' => 'execute',
+        'description' => 'Return data for the translator based on the filter query.',
+        'capabilities' => 'local/amos:stage',
+        'type' => 'read',
+        'ajax' => true,
+    ],
 ];
 
 $services = [
