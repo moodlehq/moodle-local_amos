@@ -15,18 +15,15 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_amos/translator
+    @template local_amos/translator_root
 
-    Render the AMOS Translator widget and initialize the module.
+    Render the content of the AMOS translator.
 }}
 
-<div id="amostranslator">
-    {{>local_amos/translator_root}}
+<div>
+    Found: {{found}} | Missing: {{missing}}
 </div>
 
-{{#js}}
-    require(['local_amos/translator'], function(translatorjs) {
-        translatorjs.init();
-    });
-{{/js}}
-
+{{#strings}}
+    {{>local_amos/translator_string}}
+{{/strings}}

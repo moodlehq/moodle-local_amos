@@ -75,7 +75,6 @@ const registerEventListeners = () => {
             e.target.blur();
             let form = root.querySelector('form');
             let formdata = new FormData(form);
-            formdata.delete('__lazyform_amosfilter');
             formdata.delete('sesskey');
             PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
         }

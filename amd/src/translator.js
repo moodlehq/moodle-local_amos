@@ -25,6 +25,9 @@
 import {call as fetchMany} from 'core/ajax';
 import Config from 'core/config';
 import Notification from 'core/notification';
+import * as PubSub from 'core/pubsub';
+import FilterEvents from './filter_events';
+import Templates from 'core/templates';
 
 /**
  * @function init
@@ -32,6 +35,10 @@ import Notification from 'core/notification';
 export const init = () => {
     registerEventListeners();
     turnAllMissingForEditing();
+
+    PubSub.subscribe(FilterEvents.submit, filterquery => {
+        showFilteredStrings(filterquery);
+    });
 };
 
 /**
@@ -116,8 +123,6 @@ const translatorItemSave = (textarea) => {
             item.querySelector('[data-region="amostranslationview"]').innerHTML = response.displaytranslation;
             item.querySelector('[data-region="displaytranslationsince"]').innerHTML = response.displaytranslationsince + ' | ';
 
-            window.console.log(response);
-
             return true;
 
         }).catch(Notification.exception);
@@ -152,4 +157,36 @@ const turnAllMissingForEditing = () => {
     let root = document.getElementById('amostranslator');
     let missingItems = root.querySelectorAll(':scope [data-region="amostranslatoritem"].missing');
     missingItems.forEach(translatorItemEditingOn);
+};
+
+/**
+ * @function showFilteredStrings
+ */
+const showFilteredStrings = (filterQuery) => {
+
+    return fetchMany([{
+        methodname: 'local_amos_get_translator_data',
+        args: {
+            filterquery: filterQuery,
+        },
+
+    }])[0].then(response => {
+        try {
+            let data = JSON.parse(response.json);
+            return Templates.render('local_amos/translator_root', data);
+
+        } catch (error) {
+            return Promise.reject(error);
+        }
+
+    }).then((html, js = '') => {
+        let root = document.getElementById('amostranslator');
+
+        return Templates.replaceNodeContents(root, html, js);
+
+    }).then(() => {
+        turnAllMissingForEditing();
+        return true;
+
+    }).catch(Notification.exception);
 };
