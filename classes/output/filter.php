@@ -150,7 +150,7 @@ class filter implements \renderable, \templatable {
             $data->version = \mlang_version::latest_version()->code;
         }
 
-        if ($data->language === null) {
+        if (empty($data->language)) {
             $currentlanguage = current_language();
 
             if ($currentlanguage === 'en') {
