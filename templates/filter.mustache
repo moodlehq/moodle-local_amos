@@ -222,16 +222,12 @@
                     <label class="form-check-label" for="amosfilter_flast">{{#str}} lastavailable, local_amos {{/str}}</label>
                 </div>
 
-                <select class="form-control {{^fver.someselected}}is-invalid{{/fver.someselected}}" id="amosfilter_fver"
+                <select class="form-control" id="amosfilter_fver"
                         name="fver" aria-describedby="amosfilter_fver_desc" data-default="" {{#filterdata.last}} disabled {{/filterdata.last}} >
                     {{#fver.options}}
                         <option value="{{value}}" {{#selected}} selected {{/selected}}>{{text}}</option>
                     {{/fver.options}}
                 </select>
-
-                {{^fver.someselected}}
-                    <div class="invalid-feedback">{{#str}} filtervernothingselected, local_amos {{/str}}</div>
-                {{/fver.someselected}}
             </div>
         </div>
 

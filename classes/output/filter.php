@@ -603,7 +603,6 @@ class filter implements \renderable, \templatable {
 
         $fver = [
             'options' => [],
-            'someselected' => false,
         ];
 
         foreach (\mlang_version::list_all() as $version) {
@@ -614,7 +613,6 @@ class filter implements \renderable, \templatable {
             ];
 
             if ($version->code == $filterdata->version) {
-                $fver['someselected'] = true;
                 $option['selected'] = true;
             }
 
