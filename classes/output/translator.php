@@ -53,12 +53,17 @@ class translator implements \renderable, \templatable {
     /** @var array of object strings to display */
     public $strings = [];
 
+    /** @var \local_amos\output\filter */
+    public $filter = null;
+
     /**
      * @param \local_amos\output\filter $filter
      * @param object $user working with the translator
      */
     public function __construct(\local_amos\output\filter $filter, object $user) {
         global $DB;
+
+        $this->filter = $filter;
 
         // Get the list of strings to display according the current filter values.
         $last = $filter->get_data()->last;
@@ -451,6 +456,7 @@ class translator implements \renderable, \templatable {
         global $PAGE;
 
         $result = [
+            'permalink' => $this->filter->get_permalink()->out(false),
             'found' => $this->numofrows,
             'missing' => $this->numofmissing,
             'strings' => $this->strings,

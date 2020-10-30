@@ -479,7 +479,6 @@ class filter implements \renderable, \templatable {
             'flng' => $this->export_for_template_flng($output, $filterdata),
             'fcmp' => $this->export_for_template_fcmp($output, $filterdata),
             'fver' => $this->export_for_template_fver($output, $filterdata),
-            'permalink' => $this->get_permalink()->out(false),
         ];
 
         return $result;

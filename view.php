@@ -61,9 +61,6 @@ if (empty($translator->strings)) {
     } else {
         echo $output->heading(get_string('nostringsfound', 'local_amos'));
     }
-
-    echo $output->footer();
-    exit();
 }
 
 echo $output->render($translator);
