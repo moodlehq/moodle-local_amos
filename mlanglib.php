@@ -1588,12 +1588,12 @@ class mlang_version {
     public static function by_code($code) {
 
         if (preg_match('/^(\d)(\d)$/', $code, $m)) {
-            return new mlang_version((int) $code, (string) ($m[1] . '.' . $m[2]));
+            return static::create_or_reuse_instance((int) $code, (string) ($m[1] . '.' . $m[2]));
 
         } else if (preg_match('/^(\d){3,}$/', $code)) {
             $x = floor($code / 100);
             $y = $code - $x * 100;
-            return new mlang_version((int) $code, (string) ($x . '.' . $y));
+            return static::create_or_reuse_instance((int) $code, (string) ($x . '.' . $y));
 
         } else {
             throw new mlang_exception('Unexpected version code');
@@ -1701,6 +1701,22 @@ class mlang_version {
 
     /**
      * Used by factory methods to create instances of this class.
+     *
+     * @param int $code
+     * @param string $dir
+     */
+    protected static function create_or_reuse_instance(int $code, string $dir): mlang_version {
+        static $instances = [];
+
+        if (!isset($instances[$code])) {
+            $instances[$code] = new static($code, $dir);
+        }
+
+        return $instances[$code];
+    }
+
+    /**
+     * To be used by {@see self::create_or_reuse_instance()} only.
      *
      * @param int $code
      * @param string $dir

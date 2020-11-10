@@ -1740,7 +1740,18 @@ AMOS END';
         unset($component);
     }
 
-    public function test_stash_push() {
+    /**
+     * Test that mlang_version instances are re-used.
+     */
+    public function test_mlang_version_reuse() {
 
+        $v20b = mlang_version::by_branch('MOODLE_20_STABLE');
+        $v20c = mlang_version::by_code(20);
+        $v20d = mlang_version::by_dir('2.0');
+        $v21c = mlang_version::by_code(21);
+
+        $this->assertSame($v20b, $v20c);
+        $this->assertSame($v20c, $v20d);
+        $this->assertNotSame($v20c, $v21c);
     }
 }
