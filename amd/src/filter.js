@@ -73,8 +73,18 @@ const registerEventListeners = () => {
         if (region == 'amosfilter_buttons' && action == 'submit') {
             e.preventDefault();
             e.target.blur();
+
+            // Temporarily enable all language selector options to make sure that selected ones are submitted.
+            flng.querySelectorAll(':scope option').forEach(item => {
+                item.removeAttribute('disabled');
+            });
+
             let form = root.querySelector('form');
             let formdata = new FormData(form);
+
+            // Put the language selector into original state again (disable all hidden options).
+            handleLanguageSearch(languageSearch, flng);
+
             formdata.delete('sesskey');
             PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
         }
@@ -115,8 +125,8 @@ const registerEventListeners = () => {
     }, 200));
 
     // Handle language search.
-    languageSearch.addEventListener('input', debounce(e => {
-        handleLanguageSearch(e, languageSearch, flng);
+    languageSearch.addEventListener('input', debounce(() => {
+        handleLanguageSearch(languageSearch, flng);
     }, 200));
 };
 
@@ -205,16 +215,17 @@ const updateCounterOfSelectedComponents = () => {
 
 /**
  * @function handleLanguageSearch
- * @param {Event} e
  * @param {Element} inputField
  * @param {Element} flng
  */
-const handleLanguageSearch = (e, inputField, flng) => {
+const handleLanguageSearch = (inputField, flng) => {
     let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
 
     flng.querySelectorAll(':scope option').forEach(item => {
         if (needle == '' || item.text.toString().toLowerCase().indexOf(needle) !== -1) {
             item.classList.remove('hidden');
+            // It is not enough to hide the options, because block-select (via select) would select hidden intermediate options too.
+            // So we need to disable them.
             item.removeAttribute('disabled');
         } else {
             item.classList.add('hidden');
