@@ -285,191 +285,26 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Renders the stage
      *
-     * @param local_amos_stage $stage
+     * @param local_amos\output\stage $stage
      * @return string
      */
-    protected function render_local_amos_stage(local_amos_stage $stage) {
+    protected function render_stage(local_amos\output\stage $stage) {
         global $CFG;
 
-        $listlanguages = mlang_tools::list_languages();
+        // Count the number of committable strings.
         $committable = 0;
-        $standard = array();
-        $trout = '';
-
-        foreach (local_amos_standard_plugins() as $plugins) {
-            $standard = array_merge($standard, $plugins);
-        }
-
         foreach ($stage->strings as $string) {
-            $cells = array();
-
-            // string identification
-            $infoversion = html_writer::span($string->version . '+', 'info info-version');
-
-            $infostringid = html_writer::span($string->stringid, 'info info-stringid');
-
-            if (isset($standard[$string->component])) {
-                $infocomponent = $standard[$string->component];
-            } else {
-                $infocomponent = $string->component;
-            }
-            $infocomponent = html_writer::span($infocomponent, 'info info-component');
-
-            $infolanguage = html_writer::span($listlanguages[$string->language], 'info info-language');
-
-            // original of the string
-            $original = self::add_breaks(s($string->original));
-            // work around https://bugzilla.mozilla.org/show_bug.cgi?id=116083
-            $original = nl2br($original);
-            $original = str_replace(array("\n", "\r"), '', $original);
-            $original = html_writer::div($original, 'preformatted english');
-
-            // unnstage button
-            $unstageurl = new moodle_url('/local/amos/stage.php', array(
-                'unstage'   => $string->stringid,
-                'component' => $string->component,
-                'branch'    => $string->branch,
-                'lang'      => $string->language,
-                'sesskey'   => sesskey(),
-            ));
-            $unstagebutton = html_writer::link($unstageurl, '<i class="fa fa-eject"></i> '.get_string('unstage', 'local_amos'), array(
-                'class' => 'btn btn-warning btn-small unstagebutton',
-                'data-unstage' => $string->stringid,
-                'data-component' => $string->component,
-                'data-branch' => $string->branch,
-                'data-lang' => $string->language,
-                'data-sesskey' => sesskey(),
-            ));
-
-            // edit string button
-            $editurl = new moodle_url('/local/amos/view.php', array(
-                't' => time(),
-                'v' => $string->branch,
-                'l' => $string->language,
-                'c' => $string->component,
-                'd' => $string->stringid,
-            ));
-            $editbutton = html_writer::link($editurl, '<i class="fa fa-edit"></i> '.get_string('edit'),
-                array('class' => 'btn btn-info btn-small editbutton'));
-
-            $trclasses = ' ';
-
-            if ($string->deleted) {
-                // removal of the string
-                if ($string->committable) {
-                    $committable++;
-                    $trclasses .= ' committable removal';
-                } else {
-                    $trclasses .= ' uncommittable removal';
-                }
-                $t = html_writer::div(self::add_breaks(s($string->current)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
-            } else if (is_null($string->current)) {
-                // new translation
-                if ($string->committable) {
-                    $trclasses .= ' committable new';
-                    $committable++;
-                }
-                if (!$string->committable) {
-                    $trclasses .= ' uncommittable new';
-                }
-                $t = html_writer::div(self::add_breaks(s($string->new)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
-            } else if (($string->nocleaning && $string->current === $string->new) ||
-                    (!$string->nocleaning && trim($string->current) === trim($string->new))) {
-                // no difference
-                $trclasses .= ' uncommittable nodiff';
-                $t = html_writer::div(self::add_breaks(s($string->current)), 'preformatted');
-                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
-            } else {
-                // there is a difference
-                if ($string->committable) {
-                    $trclasses .= ' committable diff';
-                    $committable++;
-                }
-                if (!$string->committable) {
-                    $trclasses .= ' uncommittable diff';
-                }
+            if ($string->committable) {
                 if ($string->nocleaning) {
-                    $trclasses .= ' nocleaning';
-                }
-
-                $c = s($string->current);
-                $n = s($string->new);
-                $x1 = explode(' ', $c);
-                $x2 = explode(' ', $n);
-
-                $t = '';
-                $diff = local_amos_simplediff($x1, $x2);
-                $numd = 0;
-                $numi = 0;
-                foreach ($diff as $k) { // $diff is a sequence of chunks (words) $k
-                    if (is_array($k)) {
-                        if (!empty($k['d'])) {
-                            $kd = implode(' ', $k['d']);
-                            if (!empty($kd)) {
-                                $t .= '<del>'.$kd.'</del> ';
-                                $numd += count($k['d']);
-                            }
-                        }
-                        if (!empty($k['i'])) {
-                            $ki = implode(' ', $k['i']);
-                            if (!empty($ki)) {
-                                $t .= '<ins>'.$ki.'</ins> ';
-                                $numi += count($k['i']);
-                            }
-                        }
-                    } else {
-                        $t .= $k . ' ';
-                    }
-                }
-
-                if ($numi == 0 or $numd == 0 or ($numd == 1 and $numi == 1)) {
-                    $cstyle = 'display:none;';
-                    $nstyle = 'display:none;';
-                    $tstyle = 'display:block;';
+                    $isdifferent = ($string->current !== $string->new);
                 } else {
-                    $cstyle = 'display:block;';
-                    $nstyle = 'display:block;';
-                    $tstyle = 'display:none;';
+                    $isdifferent = (trim($string->current) !== trim($string->new));
                 }
-                $n = html_writer::tag('ins', $n);
-                $n = html_writer::tag('div', self::add_breaks($n), array('class' => 'preformatted stringtext new', 'style' => $nstyle));
-                $c = html_writer::tag('del', $c);
-                $c = html_writer::tag('div', self::add_breaks($c), array('class' => 'preformatted stringtext current', 'style' => $cstyle));
-                $t = html_writer::tag('div', self::add_breaks($t), array('class' => 'preformatted stringtext diff', 'style' => $tstyle));
-                $t = html_writer::div($n . $c . $t);
-                $t .= html_writer::div($unstagebutton.$editbutton, 'translationactions');
+
+                if ($isdifferent) {
+                    $committable++;
+                }
             }
-
-            // info lines
-            $infoline1 = $infoversion.' | '.$infostringid.' | '.$infocomponent;
-
-            $infoline2 = $this->help_icon('stagetranslation', 'local_amos') . ' ' . $infolanguage;
-
-            $data = array(
-                'data-amos-lang' => $string->language,
-            );
-
-            if (!empty($string->translationid)) {
-                $data['data-amos-translationid'] = $string->translationid;
-            }
-
-            $trout .= html_writer::start_div('string-control-group', $data);
-            $trout .= html_writer::start_div('string-control-label');
-            $trout .= html_writer::start_div('d-flex');
-            $trout .= html_writer::div($infoline1, 'span-6 align-self-stretch');
-            $trout .= html_writer::div($infoline2, 'span-6 align-self-stretch');
-            $trout .= html_writer::end_div(); // .d-flex
-            $trout .= html_writer::end_div(); // .string-control-label
-
-            $trout .= html_writer::start_div('string-controls');
-            $trout .= html_writer::start_div('d-flex');
-            $trout .= html_writer::div(html_writer::div($original, 'string-text original'), 'span-6 align-self-stretch');
-            $trout .= html_writer::div(html_writer::div($t, 'string-text translation' . $trclasses), 'span-6 align-self-stretch');
-            $trout .= html_writer::end_div(); // .d-flex
-            $trout .= html_writer::end_div(); // .string-controls
-            $trout .= html_writer::end_div(); // .string-control-group
         }
 
         if (empty($stage->strings)) {
@@ -560,10 +395,12 @@ class local_amos_renderer extends plugin_renderer_base {
                     ))
                 );
                 $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-                $commitform .= html_writer::tag('label',
-                    html_writer::checkbox('keepstaged', 1, false) . get_string('commitkeepstaged', 'local_amos'),
-                    array('class' => 'inline checkbox')
+
+                $commitform .= html_writer::div(
+                    html_writer::checkbox('keepstaged', 1, false, get_string('commitkeepstaged', 'local_amos'), [],
+                    ['class' => 'small px-1'])
                 );
+
                 $commitform .= html_writer::div(
                     html_writer::tag('button', get_string('commitbutton', 'local_amos'), array(
                         'type' => 'submit',
@@ -685,13 +522,12 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             // And finally the staged strings themselves.
-            $output .= html_writer::div($trout, '', array('id' => 'amosstage'));
+            $output .= $this->render_from_template('local_amos/stage', $stage->export_for_template($this));
         }
 
-        $output = html_writer::tag('div', $output, array('class' => 'stagewrapper'));
+        $output = html_writer::tag('div', $output, ['id' => 'amosstagewrapper']);
 
         return $output;
-
     }
 
     /**
@@ -708,7 +544,7 @@ class local_amos_renderer extends plugin_renderer_base {
         if ($expanded) {
             $attr = array('aria-expanded' => 'true');
             $collapsed = '';
-            $collapse = ' in';
+            $collapse = ' show';
         } else {
             $attr = array('aria-expanded' => 'false');
             $collapsed = ' collapsed';

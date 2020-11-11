@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,22 +22,22 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/mlanglib.php');
-require_once(dirname(__FILE__).'/importfile_form.php');
-require_once(dirname(__FILE__).'/merge_form.php');
-require_once(dirname(__FILE__).'/diff_form.php');
-require_once(dirname(__FILE__).'/execute_form.php');
+require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/mlanglib.php');
+require_once(__DIR__ . '/importfile_form.php');
+require_once(__DIR__ . '/merge_form.php');
+require_once(__DIR__ . '/diff_form.php');
+require_once(__DIR__ . '/execute_form.php');
 
-$message    = optional_param('message', null, PARAM_RAW); // commit message
-$keepstaged = optional_param('keepstaged', false, PARAM_BOOL); // keep staged after commit
-$unstage    = optional_param('unstage', null, PARAM_STRINGID); // stringid to unstage - other param required if non empty
-$prune      = optional_param('prune', null, PARAM_INT);
-$rebase     = optional_param('rebase', null, PARAM_INT);
-$submit     = optional_param('submit', null, PARAM_INT);
+$message = optional_param('message', null, PARAM_RAW);
+$keepstaged = optional_param('keepstaged', false, PARAM_BOOL);
+$unstage = optional_param('unstage', null, PARAM_STRINGID);
+$prune = optional_param('prune', null, PARAM_INT);
+$rebase = optional_param('rebase', null, PARAM_INT);
+$submit = optional_param('submit', null, PARAM_INT);
 $unstageall = optional_param('unstageall', null, PARAM_INT);
-$download   = optional_param('download', null, PARAM_INT);
+$download = optional_param('download', null, PARAM_INT);
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', context_system::instance());
@@ -47,9 +46,6 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stage.php');
 $PAGE->set_title('AMOS ' . get_string('stage', 'local_amos'));
 $PAGE->set_heading('AMOS ' . get_string('stage', 'local_amos'));
-$PAGE->requires->strings_for_js(array('commitmessageempty', 'unstage', 'unstageconfirm', 'unstaging',
-    'confirmaction', 'stagestringsnocommit', 'diffstringmode'), 'local_amos');
-$PAGE->requires->yui_module('moodle-local_amos-stage', 'M.local_amos.init_stage');
 
 if (!empty($message)) {
     require_sesskey();
@@ -63,7 +59,7 @@ if (!empty($message)) {
     $allowed = mlang_tools::list_allowed_languages($USER->id);
     $stage->prune($allowed);
     list($numstrings, $listlanguages, $listcomponents) = mlang_stage::analyze($stage);
-    $stage->commit($message, array('source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'),
+    $stage->commit($message, ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
         false, null, $clear);
     $stage->store();
     // Automatically backport translations to lower versions if they apply.
@@ -86,10 +82,40 @@ if (!empty($message)) {
     redirect($nexturl);
 }
 if (!empty($unstage)) {
-    require_sesskey();
     $name = required_param('component', PARAM_ALPHANUMEXT);
     $branch = required_param('branch', PARAM_INT);
     $lang = required_param('lang', PARAM_ALPHANUMEXT);
+    $confirm = optional_param('confirm', false, PARAM_BOOL);
+
+    if (!$confirm) {
+        $output = $PAGE->get_renderer('local_amos');
+        echo $output->header();
+        echo $output->heading(get_string('unstaging', 'local_amos'));
+
+        $a = [
+            'component' => $name,
+            'language' => $lang,
+            'stringid' => $unstage,
+        ];
+
+        echo $output->confirm(
+            get_string('unstageconfirmlong', 'local_amos', $a),
+            new moodle_url($PAGE->url, [
+                'unstage' => $unstage,
+                'sesskey' => sesskey(),
+                'confirm' => true,
+                'component' => $name,
+                'branch' => $branch,
+                'lang' => $lang,
+            ]),
+            $PAGE->url
+        );
+
+        echo $output->footer();
+        die();
+    }
+
+    require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $component = $stage->get_component($name, $lang, mlang_version::by_code($branch));
     if ($component) {
@@ -137,23 +163,26 @@ if (!empty($submit)) {
 
 $output = $PAGE->get_renderer('local_amos');
 
-// make sure that USER contains sesskey property
+// Make sure that USER contains sesskey property.
 $sesskey = sesskey();
-// create a renderable object that represents the stage
-$stage = new local_amos_stage($USER);
-if (empty($stage->strings)) {
+
+// Create a renderable object that represents the stage.
+$stageui = new \local_amos\output\stage($USER);
+
+if (empty($stageui->strings)) {
     unset($SESSION->local_amos->presetcommitmessage);
     unset($SESSION->local_amos->stagedcontribution);
+
 } else {
     if (!empty($SESSION->local_amos->presetcommitmessage)) {
-        $stage->presetmessage = $SESSION->local_amos->presetcommitmessage;
+        $stageui->presetmessage = $SESSION->local_amos->presetcommitmessage;
     }
+
     if (!empty($SESSION->local_amos->stagedcontribution)) {
-        $stage->stagedcontribution = $SESSION->local_amos->stagedcontribution;
+        $stageui->stagedcontribution = $SESSION->local_amos->stagedcontribution;
     }
 }
 
-/// Output starts here
 echo $output->header();
-echo $output->render($stage);
+echo $output->render($stageui);
 echo $output->footer();

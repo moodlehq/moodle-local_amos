@@ -1,0 +1,78 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_amos/stage
+
+    Render the AMOS Stage page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Example context (json):
+}}
+
+<div id="amosstagestrings">
+    {{#strings}}
+        <div class="amosstageitem {{statusclass}} {{#committable}} committable {{/committable}} {{^committable}} uncommittable {{/committable}}"
+             data-region="amosstageitem"
+             data-diffmode="{{diffmode}}"
+        >
+            <div class="row m-b-2">
+                <div class="col-md d-flex flex-column">
+                    <div class="amosinfo small text-muted">
+                        {{displaysince}} | {{stringid}} | {{displaycomponent}}
+                    </div>
+                    <div class="amosoriginal">{{{displayoriginal}}}</div>
+                </div>
+
+                <div class="col-md d-flex flex-column">
+                    <div class="amosinfo small text-muted d-flex">
+                        <span>
+                            {{displaysince}} | {{displaylanguage}}
+                            {{#committable}}
+                                <span class="mx-1" title="{{#str}} committable, local_amos {{/str}}"><i class="fa fa-floppy-o" aria-hidden="true"></i></span>
+                            {{/committable}}
+                            | <a href="{{unstageurl}}" class="text-danger">{{#str}} unstage, local_amos {{/str}}</a>
+                            | <a href="{{editurl}}">{{#str}} edit {{/str}}</a>
+                        </span>
+                        <a data-action="toggle-diffmode"
+                           href="#"
+                           class="ml-auto badge badge-light badge-large badge-pill"
+                           title="{{#str}} diffstringmode, local_amos {{/str}}"
+                           style="font-family:monospace; font-size:larger;">+/-
+                        </a>
+                    </div>
+                    <div class="amostranslation">{{!--
+                        --}}<div class="translation-diff">{{{displaytranslationdiff}}}</div>{{!--
+                        --}}<div class="translation-current">{{{displaytranslationcurrent}}}</div>{{!--
+                        --}}<div class="translation-new">{{{displaytranslationnew}}}</div>{{!--
+                    --}}</div>
+                </div>
+            </div>
+        </div>
+    {{/strings}}
+</div>
+
+{{#js}}
+    require(['local_amos/stage'], function(stagejs) {
+        stagejs.init();
+    });
+{{/js}}
+

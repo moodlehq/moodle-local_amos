@@ -1,60 +1,39 @@
-// Styles used at the stage page
+// Styles used at the stage page.
 
-$collapsible-padding: 20px;
+.path-local-amos #amosstagewrapper {
 
-.path-local-amos {
+    .stagetool {
+        margin-bottom: 10px;
 
-    .stagewrapper {
-
-        .stagetool {
-            border: 1px solid #ddd;
-            @include border-radius(10px);
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .stagetool.simple {
+        &.simple {
             text-align: center;
             border: none;
             margin-bottom: 20px;
         }
 
-        .stagetool {
+        .stagetool-title {
+            font-size: larger;
+            background: url([[pix:core|t/expanded]]) no-repeat scroll 0 center;
+            padding-left: 20px;
+            cursor: pointer;
+            color: $link-color;
+            text-decoration: $link-decoration;
 
-            .stagetool-title {
-                font-size: larger;
-                background: url([[pix:core|t/expanded]]) no-repeat scroll 0 center;
-                padding-left: $collapsible-padding;
-                cursor: pointer;
-                color: $link-color;
-                text-decoration: $link-decoration;
-
-                &:hover {
-                    color: $link-hover-color;
-                    text-decoration: $link-hover-decoration;
-                }
-            }
-
-            .collapsed .stagetool-title {
-                background-image: url([[pix:core|t/collapsed]]);
-            }
-
-            .stagetool-content {
-                margin-top: 15px;
-
-                .form-control {
-                    width: 100vh;
-                }
+            &:hover {
+                color: $link-hover-color;
+                text-decoration: $link-hover-decoration;
             }
         }
 
-        .stagetool.commit, .stagetool.stageactions, .stagetool.stashactions {
-            .stagetool-content {
-                text-align: center;
-            }
+        .collapsed .stagetool-title {
+            background-image: url([[pix:core|t/collapsed]]);
         }
 
-        .stagetool.commit {
+        .stagetool-content {
+            padding-left: 1.3rem;
+        }
+
+        &.commit {
             label.checkbox {
                 margin-bottom: 5px;
             }
@@ -64,58 +43,63 @@ $collapsible-padding: 20px;
             }
         }
 
-        .stagetool.stageactions {
+        &.stageactions {
             .btn {
                 margin: 2px;
             }
         }
-
     }
 
-    #amosstage {
+    #amosstagestrings {
+        margin-top: 2rem;
 
-        .translation.uncommittable {
-            background-color: $amos-color-staged;
+        .amosoriginal, .amostranslation {
+            flex: 1 1 auto;
+            min-height: 3rem;
+            border: 1px solid rgb(204,204,204);
+            border-radius: 4px;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
-        .translation.uncommittable.nodiff {
-            background-color: white;
-            color: #999;
+        .amosstageitem.uncommittable .amostranslation {
+			background-color: $amos-color-nontranslatable;
         }
 
-        .translation.committable.new {
+        .amosstageitem.committable .amostranslation {
             background-color: $amos-color-committable;
         }
 
-        .translation.committable.diff {
-            background-color: $amos-color-outdated;
-        }
-
-        .translation.committable.removal {
-            background-color: $amos-color-red;
-        }
-
-        .translation.nocleaning {
-            border-style: solid;
-            border-color: red;
-        }
-
-        .translation .translationactions {
-            margin: 3px;
-            .btn {
-                margin: 2px;
+        .amosstageitem.diff[data-diffmode="chunks"] .amostranslation {
+            .translation-new, .translation-current {
+                display: none;
             }
         }
 
-        .translation.diff {
-            del {
-                color: #999;
+        .amosstageitem.diff[data-diffmode="blocks"] .amostranslation {
+            .translation-diff {
+                display: none;
             }
-            ins {
-                color: green;
-                text-decoration: none;
+        }
+
+        .amosstageitem.diff {
+            &[data-diffmode="chunks"] .amostranslation del,
+            &[data-diffmode="blocks"] .amostranslation .translation-current {
+                color: #6b6b6b;
+                text-decoration: line-through double;
+            }
+
+            &[data-diffmode="chunks"] .amostranslation ins,
+            &[data-diffmode="blocks"] .amostranslation .translation-new {
+                color: #008000;
                 font-weight: bold;
+                text-decoration: underline dotted;
             }
+        }
+
+        .amosstageitem:not([class~="diff"]) [data-action="toggle-diffmode"] {
+            display: none;
         }
     }
 }
