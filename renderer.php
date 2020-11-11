@@ -456,7 +456,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 array('class' => 'btn')
             );
 
-            $params['fver'] = $stage->filterfields->fver;
+            $params['flast'] = $stage->filterfields->flast;
 
             $i = 0;
             foreach ($stage->filterfields->flng as $flng) {

@@ -163,12 +163,10 @@ class stage implements \renderable, \templatable {
 
         unset($stringstree);
 
-        $fver = [];
         $flng = [];
         $fcmp = [];
 
         foreach ($needed as $branch => $languages) {
-            $fver[$branch] = true;
             foreach ($languages as $language => $components) {
                 $flng[$language] = true;
                 foreach ($components as $component => $stringnames) {
@@ -180,10 +178,7 @@ class stage implements \renderable, \templatable {
         }
 
         $this->filterfields = (object) [];
-        $this->filterfields->fver = null;
-        if (!empty($fver) && is_array($fver)) {
-            $this->filterfields->fver = max(array_keys($fver));
-        }
+        $this->filterfields->flast = true;
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
         $allowedlangs = \mlang_tools::list_allowed_languages($user->id);
