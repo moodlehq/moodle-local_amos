@@ -48,21 +48,5 @@ $translator = new \local_amos\output\translator($filter, $USER);
 
 echo $output->header();
 echo $output->render($filter);
-
-if (empty($translator->strings)) {
-    if ($translator->currentpage > 1) {
-        echo $output->heading(get_string('nostringsfoundonpage', 'local_amos', $translator->currentpage));
-        echo html_writer::div(
-            html_writer::link(new moodle_url($PAGE->url, ['fpg' => 1]), get_string('gotofirst', 'local_amos')) . ' | '.
-            html_writer::link(new moodle_url($PAGE->url, ['fpg' => $translator->currentpage - 1]),
-                get_string('gotoprevious', 'local_amos')),
-            'text-center');
-
-    } else {
-        echo $output->heading(get_string('nostringsfound', 'local_amos'));
-    }
-}
-
 echo $output->render($translator);
-echo $output->box('', 'googlebranding', 'googlebranding');
 echo $output->footer();

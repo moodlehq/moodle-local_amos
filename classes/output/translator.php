@@ -41,11 +41,14 @@ class translator implements \renderable, \templatable {
     /** @const int number of rows per page */
     const PERPAGE = 100;
 
-    /** @var int total number of the rows int the table */
+    /** @var int total number of found strings matching the filter */
     public $numofrows = 0;
 
-    /** @var total number of untranslated strings */
+    /** @var int total number of untranslated strings */
     public $numofmissing = 0;
+
+    /** @var int number of untranslated strings on the current page */
+    public $numofmissingoncurrentpage = 0;
 
     /** @var int */
     public $currentpage = 1;
@@ -376,7 +379,7 @@ class translator implements \renderable, \templatable {
 
                         $this->numofrows++;
 
-                        if (is_null($string->translation)) {
+                        if ($string->translation === null) {
                             $this->numofmissing++;
                         }
 
@@ -384,6 +387,10 @@ class translator implements \renderable, \templatable {
                         if ($this->numofrows < $from || $this->numofrows > $to) {
                             unset($string);
                             continue;
+                        }
+
+                        if ($string->translation === null) {
+                            $this->numofmissingoncurrentpage++;
                         }
 
                         $this->strings[] = $string;
@@ -459,8 +466,9 @@ class translator implements \renderable, \templatable {
             'permalink' => $this->filter->get_permalink()->out(false),
             'found' => $this->numofrows,
             'missing' => $this->numofmissing,
+            'missingcurrentpage' => $this->numofmissingoncurrentpage,
             'strings' => $this->strings,
-            'pages' => [],
+            'paginator' => $this->export_for_template_paginator($output),
         ];
 
         $listlanguages = \mlang_tools::list_languages();
@@ -509,9 +517,70 @@ class translator implements \renderable, \templatable {
             $string->displaytranslation = \local_amos\local\util::add_breaks(s($string->translation));
         }
 
-        // TODO paginator.
-        //for ($p = 1; $p <= ceil($this->numofrows / self::PERPAGE); $p++) {
-        //}
+        return $result;
+    }
+
+    /**
+     * Export data allowing to render the paginator.
+     *
+     * @param \renderer_base $output
+     * @return array
+     */
+    protected function export_for_template_paginator(\renderer_base $output): array {
+
+        $totalpages = ceil($this->numofrows / self::PERPAGE);
+
+        $result = [
+            'hasmultiplepages' => ($totalpages > 1),
+            'hasmorepages' => ($this->currentpage < $totalpages),
+            'totalpages' => $totalpages,
+            'currentpage' => $this->currentpage,
+            'perpage' => self::PERPAGE,
+            'navigation' => [],
+        ];
+
+        if ($this->currentpage > 1 && $this->currentpage <= $totalpages) {
+            $result['navigation'][] = [
+                'islink' => true,
+                'label' => '<i class="fa fa-step-backward" aria-hidden="true" title="' . get_string('previouspage') . '"></i>',
+                'value' => $this->currentpage - 1,
+                'iscurrent' => false,
+            ];
+        }
+
+        for ($pnumber = 1; $pnumber < $totalpages && $pnumber <= $this->currentpage + 1; $pnumber++) {
+            $result['navigation'][] = [
+                'islink' => ($pnumber != $this->currentpage),
+                'label' => $pnumber,
+                'value' => $pnumber,
+                'iscurrent' => ($pnumber == $this->currentpage),
+            ];
+        }
+
+        if ($this->currentpage + 1 < $totalpages) {
+            $result['navigation'][] = [
+                'islink' => false,
+                'label' => '&hellip;',
+            ];
+        }
+
+        if ($this->currentpage <= $totalpages) {
+            $result['navigation'][] = [
+                'islink' => ($totalpages != $this->currentpage),
+                'label' => $totalpages,
+                'value' => $totalpages,
+                'iscurrent' => ($totalpages == $this->currentpage),
+            ];
+        }
+
+        if ($this->currentpage < $totalpages) {
+            $result['navigation'][] = [
+                'islink' => true,
+                'label' => '<i class="fa fa-step-forward" aria-hidden="true" title="' . get_string('nextpage') . '"></i>',
+                'value' => $this->currentpage + 1,
+                'iscurrent' => false,
+            ];
+        }
 
         return $result;
     }

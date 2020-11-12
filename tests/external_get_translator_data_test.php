@@ -64,7 +64,7 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
 
         $stage->commit('First string', ['source' => 'unittest']);
 
-        // Emaulate what URLSearchParams.toString() does on the client side.
+        // Emulate what URLSearchParams.toString() does on the client side.
         $filterquery = http_build_query([
             '__lazyform_amosfilter' => 1,
             'sesskey' => sesskey(),
@@ -82,7 +82,27 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
         $data = json_decode($response['json'], true);
 
         $this->assertEquals(1, $data['missing']);
+        $this->assertEquals(1, $data['missingcurrentpage']);
         $this->assertEquals(1, count($data['strings']));
         $this->assertEquals('Foo bar', $data['strings'][0]['original']);
+
+        // Emulate what URLSearchParams.toString() does on the client side.
+        $filterquery = http_build_query([
+            '__lazyform_amosfilter' => 1,
+            'sesskey' => sesskey(),
+            'fcmp' => ['foo_bar', 'baz_quix'],
+            'flng' => ['cs'],
+            'flast' => 1,
+            'fpg' => 3,
+        ], '', '&');
+
+        $response = \local_amos\external\get_translator_data::execute($filterquery);
+        $response = external_api::clean_returnvalue(\local_amos\external\get_translator_data::execute_returns(), $response);
+
+        $this->assertTrue(isset($response['json']));
+
+        $data = json_decode($response['json'], true);
+
+        print_object($data); die(); // DONOTCOMMIT
     }
 }

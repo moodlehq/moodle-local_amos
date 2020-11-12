@@ -94,4 +94,11 @@
             display: none !important;
         }
 	}
+
+    .amospaginator {
+        .paginatoritem.current {
+            font-weight: bold;
+            background-color: #eee;
+        }
+    }
 }

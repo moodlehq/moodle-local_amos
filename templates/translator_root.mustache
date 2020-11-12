@@ -20,10 +20,42 @@
     Render the content of the AMOS translator.
 }}
 
-<div>
-    Found: {{found}} | Missing: {{missing}} | <a href="{{permalink}}">{{#str}} permalink, local_amos {{/str}}</a>
+<div class="mt-4 mb-3">
+    <div class="row">
+        <div class="col-md">
+            <ul class="list-inline">
+                <li class="list-inline-item">{{#str}} foundtotal, local_amos, <span class="badge badge-info">{{found}}</span> {{/str}}</li>
+                <li class="list-inline-item">{{#str}} foundmissing, local_amos, <span class="badge badge-light">{{missing}}</span> {{/str}}</li>
+                <li class="list-inline-item"><i class="fa fa-link" aria-hidden="true"></i> <a href="{{permalink}}">{{#str}} permalink, local_amos {{/str}}</a></li>
+            </ul>
+        </div>
+        <div class="col-md text-md-right">
+            {{#paginator}}
+                {{>local_amos/translator_paginator}}
+            {{/paginator}}
+        </div>
+    </div>
 </div>
 
 {{#strings}}
     {{>local_amos/translator_string}}
 {{/strings}}
+
+<div class="my-3">
+    <div class="row">
+        <div class="col-md">
+            <ul class="list-inline">
+                {{#found}}
+                    <li class="list-inline-item"><a href="#amosfilter"><i class="fa fa-arrow-up" aria-hidden="true"></i> {{#str}} up {{/str}}</a></li>
+                {{/found}}
+                <li class="list-inline-item"><a href="/local/amos/stage.php"><i class="fa fa-arrow-right" aria-hidden="true"></i> {{#str}} stagetoolopen, local_amos{{/str}}</a></li>
+            </ul>
+        </div>
+        <div class="col-md text-md-right">
+            {{#paginator}}
+                {{>local_amos/translator_paginator}}
+            {{/paginator}}
+        </div>
+    </div>
+</div>
+
