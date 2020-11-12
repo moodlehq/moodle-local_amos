@@ -69,6 +69,10 @@
             background-color: $amos-color-committable;
         }
 
+        .amosstageitem.committable.nodiff .amostranslation {
+            background-color: white;
+        }
+
         .amosstageitem.diff[data-diffmode="chunks"] .amostranslation {
             .translation-new, .translation-current {
                 display: none;
