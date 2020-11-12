@@ -80,32 +80,6 @@ class local_amos_renderer extends plugin_renderer_base {
                 );
             }
 
-            if ($stage->mergeform) {
-                ob_start();
-                $stage->mergeform->display();
-                $formoutput = ob_get_contents();
-                ob_end_clean();
-
-                $output .= $this->collapsible_stage_tool(
-                    get_string('mergestrings', 'local_amos'),
-                    $formoutput,
-                    $this->help_icon('mergestrings', 'local_amos')
-                );
-            }
-
-            if ($stage->diffform) {
-                ob_start();
-                $stage->diffform->display();
-                $formoutput = ob_get_contents();
-                ob_end_clean();
-
-                $output .= $this->collapsible_stage_tool(
-                    get_string('diffstrings', 'local_amos'),
-                    $formoutput,
-                    $this->help_icon('diffstrings', 'local_amos')
-                );
-            }
-
             if ($stage->executeform) {
                 ob_start();
                 $stage->executeform->display();

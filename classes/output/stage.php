@@ -49,12 +49,6 @@ class stage implements \renderable, \templatable {
     /** $var local_amos_importfile_form form to import data */
     public $importform;
 
-    /** @var local_amos_merge_form to merge strings form another branch */
-    public $mergeform;
-
-    /** @var local_amos_diff_form to stage differences between two branches */
-    public $diffform;
-
     /** @var local_amos_execute_form to execute a given AMOScript */
     public $executeform;
 
@@ -85,14 +79,6 @@ class stage implements \renderable, \templatable {
 
         if (has_capability('local/amos:commit', \context_system::instance(), $user)) {
             $this->cancommit = true;
-            $this->mergeform = new \local_amos_merge_form(
-                new \moodle_url('/local/amos/merge.php'),
-                local_amos_merge_options()
-            );
-            $this->diffform = new \local_amos_diff_form(
-                new \moodle_url('/local/amos/diff.php'),
-                local_amos_diff_options()
-            );
         }
 
         if (has_capability('local/amos:stash', \context_system::instance(), $user)) {

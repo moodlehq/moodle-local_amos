@@ -26,8 +26,6 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/mlanglib.php');
 require_once(__DIR__ . '/importfile_form.php');
-require_once(__DIR__ . '/merge_form.php');
-require_once(__DIR__ . '/diff_form.php');
 require_once(__DIR__ . '/execute_form.php');
 
 $message = optional_param('message', null, PARAM_RAW);
