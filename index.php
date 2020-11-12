@@ -37,7 +37,6 @@ $output = $PAGE->get_renderer('local_amos');
 
 /// Output starts here
 echo $output->header();
-echo $output->heading(get_string('amos', 'local_amos'), 1);
 
 $amosroot = $PAGE->navigation->get('amos_root');
 
@@ -52,7 +51,7 @@ foreach ($amosroot->get_children_key_list() as $childkey) {
         html_writer::link(
             $child->action,
             $child->text,
-            array('class' => 'btn btn-large')
+            array('class' => 'btn btn-primary btn-large')
         ),
         'well amostool amostool-'.$child->key
     );
