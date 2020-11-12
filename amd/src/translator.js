@@ -27,6 +27,7 @@ import Config from 'core/config';
 import Notification from 'core/notification';
 import * as PubSub from 'core/pubsub';
 import FilterEvents from './filter_events';
+import TranslatorEvents from './translator_events';
 import Templates from 'core/templates';
 
 /**
@@ -48,12 +49,21 @@ const registerEventListeners = () => {
     let root = document.getElementById('amostranslator');
 
     root.addEventListener('click', e => {
+        // Check to see if the user clicked on a translation to edit it.
         if (e.target.classList.contains('amostranslation') || e.target.classList.contains('amostranslationview')) {
             let item = e.target.closest('[data-region="amostranslatoritem"]');
 
             if (item.getAttribute('data-mode') == 'view') {
                 translatorItemEditingOn(item, e.ctrlKey).focus();
             }
+        }
+
+        // Check to see if the user clicked on paginator link.
+        let paginatorlink = e.target.closest('[data-paginatorlink]');
+        window.console.log(paginatorlink);
+        if (paginatorlink) {
+            e.preventDefault();
+            PubSub.publish(TranslatorEvents.pagechange, paginatorlink.getAttribute('data-paginatorlink'));
         }
     });
 

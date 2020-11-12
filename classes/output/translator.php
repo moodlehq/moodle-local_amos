@@ -557,7 +557,7 @@ class translator implements \renderable, \templatable {
             ];
         }
 
-        if ($this->currentpage + 1 < $totalpages) {
+        if ($this->currentpage + 2 < $totalpages) {
             $result['navigation'][] = [
                 'islink' => false,
                 'label' => '&hellip;',

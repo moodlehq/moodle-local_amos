@@ -42,7 +42,7 @@
         {{#navigation}}
             <span class="d-inline-block small p-1 paginatoritem {{#iscurrent}}current{{/iscurrent}}">
                 {{#islink}}
-                    <a href="?fpg={{value}}">{{{label}}}</a>
+                    <a data-paginatorlink="{{value}}" href="?fpg={{value}}">{{{label}}}</a>
                 {{/islink}}
                 {{^islink}}
                     {{{label}}}

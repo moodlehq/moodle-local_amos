@@ -26,6 +26,7 @@ import {debounce} from 'core/utils';
 import {get_string as getString} from 'core/str';
 import * as PubSub from 'core/pubsub';
 import FilterEvents from './filter_events';
+import TranslatorEvents from './translator_events';
 
 /**
  * Initialise the module and register events handlers.
@@ -73,20 +74,7 @@ const registerEventListeners = () => {
         if (region == 'amosfilter_buttons' && action == 'submit') {
             e.preventDefault();
             e.target.blur();
-
-            // Temporarily enable all language selector options to make sure that selected ones are submitted.
-            flng.querySelectorAll(':scope option').forEach(item => {
-                item.removeAttribute('disabled');
-            });
-
-            let form = root.querySelector('form');
-            let formdata = new FormData(form);
-
-            // Put the language selector into original state again (disable all hidden options).
-            handleLanguageSearch(languageSearch, flng);
-
-            formdata.delete('sesskey');
-            PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
+            submitFilter();
         }
     });
 
@@ -107,6 +95,12 @@ const registerEventListeners = () => {
                 fver.removeAttribute('disabled');
             }
         }
+    });
+
+    // Pagination clicks.
+    PubSub.subscribe(TranslatorEvents.pagechange, page => {
+        document.getElementById('amosfilter_fpg').value = page;
+        submitFilter();
     });
 
     // Prevent form submission on pressing Enter in the component search and language input.
@@ -345,4 +339,27 @@ const scrollToFirstSelectedComponent = () => {
     if (comp) {
         comp.scrollIntoView(false);
     }
+};
+
+/**
+ * @function submitFilter
+ */
+const submitFilter = () => {
+    let root = document.getElementById('amosfilter');
+    let flng = document.getElementById('amosfilter_flng');
+    let languageSearch = document.getElementById('amosfilter_flng_search');
+
+    // Temporarily enable all language selector options to make sure that selected ones are submitted.
+    flng.querySelectorAll(':scope option').forEach(item => {
+        item.removeAttribute('disabled');
+    });
+
+    let form = root.querySelector('form');
+    let formdata = new FormData(form);
+
+    // Put the language selector into original state again (disable all hidden options).
+    handleLanguageSearch(languageSearch, flng);
+
+    formdata.delete('sesskey');
+    PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
 };
