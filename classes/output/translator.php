@@ -548,13 +548,16 @@ class translator implements \renderable, \templatable {
             ];
         }
 
-        for ($pnumber = 1; $pnumber < $totalpages && $pnumber <= $this->currentpage + 1; $pnumber++) {
+        for ($pnumber = 1; $pnumber < $totalpages && $pnumber <= $this->currentpage + 90; $pnumber++) {
             $result['navigation'][] = [
                 'islink' => ($pnumber != $this->currentpage),
                 'label' => $pnumber,
                 'value' => $pnumber,
                 'iscurrent' => ($pnumber == $this->currentpage),
             ];
+            if (abs($pnumber - $this->currentpage) >= 10) {
+                $pnumber += 9;
+            }
         }
 
         if ($this->currentpage + 2 < $totalpages) {
