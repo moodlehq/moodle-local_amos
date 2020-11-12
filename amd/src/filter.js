@@ -74,6 +74,7 @@ const registerEventListeners = () => {
         if (region == 'amosfilter_buttons' && action == 'submit') {
             e.preventDefault();
             e.target.blur();
+            document.getElementById('amosfilter_fpg').value = 1;
             submitFilter();
         }
     });
