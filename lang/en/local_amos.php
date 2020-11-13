@@ -451,4 +451,6 @@ $string['untranslate'] = 'untranslate';
 $string['untranslateconfirm'] = '<p>You are going to remove existing translation of the string <code>{$a->stringid}</code>, component <code>{$a->component}</code>, from <code>{$a->since}</code> and higher versions of the language pack <code>{$a->language}</code>.</p><p>Are you sure?</p>';
 $string['untranslatetitle'] = 'Removing translation from the language pack';
 $string['untranslating'] = 'Untranslating';
+$string['userdefaultsave'] = 'Save as my defaults';
+$string['userdefaultreset'] = 'Reset to my defaults';
 $string['version'] = 'Version';

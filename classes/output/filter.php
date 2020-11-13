@@ -90,10 +90,6 @@ class filter implements \renderable, \templatable {
         $this->datadefault = $this->get_data_default();
         $this->datasubmitted = $this->get_data_submitted();
         $this->datapermalink = $this->get_data_permalink();
-
-        if ($this->datasubmitted) {
-            $this->set_data_session_default();
-        }
     }
 
     /**
@@ -136,19 +132,8 @@ class filter implements \renderable, \templatable {
      * @return object
      */
     protected function get_data_default() {
-        global $SESSION;
 
-        // Check to see if we have default session data set via {@see self::set_data_session_default()}.
-        if (isset($SESSION->local_amos->filter_default_data)) {
-            $data = json_decode($SESSION->local_amos->filter_default_data);
-
-            if (!is_object($data)) {
-                $data = (object) [];
-            }
-
-        } else {
-            $data = (object) [];
-        }
+        $data = (object) array_merge((array) $this->get_data_user_default(), (array) $this->get_data_session_default());
 
         if (empty($data->version)) {
             $data->version = \mlang_version::latest_version()->code;
@@ -196,7 +181,14 @@ class filter implements \renderable, \templatable {
         }
 
         require_sesskey();
+
         $data = (object) [];
+
+        if (optional_param('resetmydefault', false, PARAM_BOOL)) {
+            $userdefault = $this->get_data_user_default();
+            $this->set_data_session_default($userdefault);
+            return $userdefault;
+        }
 
         $data->version = null;
         $data->last = optional_param('flast', false, PARAM_BOOL);
@@ -251,6 +243,12 @@ class filter implements \renderable, \templatable {
         if ($data->missing and $data->outdated) {
             // It does not make sense to have both.
             $data->missing = false;
+        }
+
+        $this->set_data_session_default($data);
+
+        if (optional_param('saveasmydefault', false, PARAM_BOOL)) {
+            $this->set_data_user_default($data);
         }
 
         return $data;
@@ -629,10 +627,111 @@ class filter implements \renderable, \templatable {
     /**
      * Set the current filter data as the user's default data for this session.
      */
-    protected function set_data_session_default() {
+    protected function set_data_session_default(object $data) {
         global $SESSION;
 
         $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
-        $SESSION->local_amos->filter_default_data = json_encode($this->get_data());
+        $SESSION->local_amos->filter_session_default_data = json_encode($data);
+    }
+
+    /**
+     * Check to see if we have default session data set via {@see self::set_data_session_default()}
+     *
+     * @return object;
+     */
+    protected function get_data_session_default(): object {
+        global $SESSION;
+
+        if (isset($SESSION->local_amos->filter_session_default_data)) {
+            $data = json_decode($SESSION->local_amos->filter_session_default_data);
+
+            if (!is_object($data)) {
+                $data = (object) [];
+            }
+
+        } else {
+            $data = (object) [];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Set the current filter data as the user's default data.
+     *
+     */
+    protected function set_data_user_default(object $data) {
+        global $DB, $USER, $SESSION;
+
+        $data = fullclone($data);
+        $data->_formatrevision = 1;
+        $data = json_encode($data);
+
+        $current = $DB->get_record('amos_preferences', [
+            'userid' => $USER->id,
+            'name' => 'filter_default',
+        ]);
+
+        if (!$current) {
+            $DB->insert_record('amos_preferences', [
+                'userid' => $USER->id,
+                'name' => 'filter_default',
+                'value' => $data,
+            ]);
+
+        } else {
+            $DB->update_record('amos_preferences', [
+                'id' => $current->id,
+                'value' => $data,
+            ]);
+        }
+
+        $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
+        $SESSION->local_amos->filter_user_default_data = $data;
+    }
+
+    /**
+     * Load the user's default data previously set by {@see self::set_data_user_default()}.
+     *
+     * @return object
+     */
+    protected function get_data_user_default(): object {
+        global $DB, $USER, $SESSION;
+
+        $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
+
+        if (isset($SESSION->local_amos->filter_user_default_data)) {
+            $data = json_decode($SESSION->local_amos->filter_user_default_data);
+
+            if (is_object($data)) {
+                return $data;
+            }
+        }
+
+        $pref = $DB->get_field('amos_preferences', 'value', [
+            'userid' => $USER->id,
+            'name' => 'filter_default',
+        ]);
+
+        if (empty($pref)) {
+            $SESSION->local_amos->filter_user_default_data = json_encode((object) []);
+            return (object) [];
+        }
+
+        $data = json_decode($pref);
+
+        if (!is_object($data)) {
+            $SESSION->local_amos->filter_user_default_data = json_encode((object) []);
+            return (object) [];
+        }
+
+        if (!$data->_formatrevision == 1) {
+            $SESSION->local_amos->filter_user_default_data = json_encode((object) []);
+            return (object) [];
+        }
+
+        $SESSION->local_amos->filter_user_default_data = json_encode($data);
+
+        return $data;
     }
 }
