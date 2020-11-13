@@ -86,31 +86,6 @@
     padding: 0.5em;
 }
 
-.path-local-amos .stashwrapper.mousein {
-    background-color: #f7f7f7;
-}
-
-.path-local-amos .stash {
-    position: relative; // to reset coordinate system for nested elements
-    margin: 10px;
-}
-
-.path-local-amos .stash img.userpicture {
-    position: absolute;
-    top: 5px;
-    left: 0px;
-}
-
-.path-local-amos .stashwrapper .actions .singlebutton,
-.path-local-amos .stashwrapper .actions .singlebutton form,
-.path-local-amos .stashwrapper .actions .singlebutton form div {
-    display: inline;
-}
-
-.path-local-amos .stashwrapper .actions .singlebutton.submit {
-    margin-left: 10px;
-}
-
 .path-local-amos .contributionlist {
     margin: 1em auto;
 }
@@ -245,15 +220,4 @@
 
 .path-local-amos .timelinetable .c1 {
     width: 50%;
-}
-
-.path-local-amos .yui3-overlay-loading,
-.path-local-amos .yui3-overlay-content {
-    padding: 5px;
-    border: 1px solid #666;
-    background-color: #eee;
-}
-
-.path-local-amos .yui3-widget-hd {
-    text-align: right;
 }

@@ -540,8 +540,11 @@ print_footer();
             $output .= html_writer::tag('h3', s($stash->name));
             $extraclasses = '';
         }
-        $output .= html_writer::tag('div', fullname($stash->owner), array('class' => 'owner'));
-        $output .= $this->output->user_picture($stash->owner);
+        $output .= $this->output->user_picture($stash->owner, [
+            'includefullname' => true,
+            'class' => 'my-2 mr-2 d-inline-block',
+            'size' => 21,
+        ]);
         $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
                                     array('class' => 'timecreated'));
         $output .= html_writer::tag('div', get_string('stashstrings', 'local_amos', $stash->strings),
