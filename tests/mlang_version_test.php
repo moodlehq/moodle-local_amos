@@ -171,7 +171,7 @@ class local_amos_mlang_version_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        set_config('brancheslist', '38,39,310,400', 'local_amos');
+        set_config('branchesall', '38,39,310,400', 'local_amos');
 
         $list = mlang_version::list_all();
 
@@ -187,7 +187,7 @@ class local_amos_mlang_version_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        set_config('brancheslist', '38,39,310', 'local_amos');
+        set_config('branchesall', '38,39,310', 'local_amos');
 
         $latest = mlang_version::latest_version();
 
@@ -201,7 +201,7 @@ class local_amos_mlang_version_test extends advanced_testcase {
 
         $this->resetAfterTest();
 
-        set_config('brancheslist', '38,39,310,311,400,401', 'local_amos');
+        set_config('branchesall', '38,39,310,311,400,401', 'local_amos');
 
         $range = mlang_version::list_range(400);
 

@@ -1644,12 +1644,7 @@ class mlang_version {
      */
     public static function list_all(): array {
 
-        $codes = get_config('local_amos', 'brancheslist');
-
-        if (empty($codes)) {
-            $codes = '20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,310,400';
-        }
-
+        $codes = get_config('local_amos', 'branchesall');
         $codes = array_filter(array_map('trim', explode(',', $codes)));
         sort($codes, SORT_NUMERIC);
         $list = [];

@@ -29,6 +29,15 @@ if ($hassiteconfig) {
     $settings = new admin_settingpage('local_amos', get_string('pluginname', 'local_amos'));
 
     if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configtextarea(
+            'local_amos/branchesall',
+            get_string('branchesall', 'local_amos'),
+            get_string('branchesall_desc', 'local_amos'),
+            '20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,310,400',
+            PARAM_RAW_TRIMMED,
+            60, 3
+        ));
+
         $settings->add(new admin_setting_configtext(
             'local_amos/applangindexfile',
             get_string('applangindexfile', 'local_amos'),
