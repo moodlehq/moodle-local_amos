@@ -39,7 +39,6 @@ $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 $output = $PAGE->get_renderer('local_amos');
 
 $filter = new \local_amos\output\filter($PAGE->url);
-$filter->set_data_session_default();
 
 // Make sure that $USER contains the sesskey property.
 sesskey();

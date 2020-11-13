@@ -90,6 +90,10 @@ class filter implements \renderable, \templatable {
         $this->datadefault = $this->get_data_default();
         $this->datasubmitted = $this->get_data_submitted();
         $this->datapermalink = $this->get_data_permalink();
+
+        if ($this->datasubmitted) {
+            $this->set_data_session_default();
+        }
     }
 
     /**
@@ -625,7 +629,7 @@ class filter implements \renderable, \templatable {
     /**
      * Set the current filter data as the user's default data for this session.
      */
-    public function set_data_session_default() {
+    protected function set_data_session_default() {
         global $SESSION;
 
         $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
