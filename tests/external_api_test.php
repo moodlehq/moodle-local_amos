@@ -118,7 +118,7 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
         $component->clear();
 
         $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_37_STABLE'));
-        $this->assertFalse($component->has_string());
+        $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
         $component->clear();
 
         $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_34_STABLE'));
