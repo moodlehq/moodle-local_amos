@@ -1,12 +1,42 @@
 <?php
-defined('MOODLE_INTERNAL') || die;
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once($CFG->dirroot . '/mod/assign/adminlib.php');
-$settings = new admin_settingpage('local_amos', get_string('pluginname', 'local_amos'));
-$ADMIN->add('localplugins', $settings);
+/**
+ * Defines administration settings for AMOS
+ *
+ * @package     local_amos
+ * @category    admin
+ * @copyright   2010 David Mudrák <david@moodle.com>, 2019 Pau Ferrer Ocaña <crazyserver@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext('local_amos/applangindexfile', get_string('applangindexfile', 'local_amos'), get_string('applangindexfile_desc', 'local_amos'), 'https://raw.githubusercontent.com/moodlehq/moodlemobile2/integration/scripts/langindex.json', PARAM_TEXT));
+defined('MOODLE_INTERNAL') || die();
+
+if ($hassiteconfig) {
+    $settings = new admin_settingpage('local_amos', get_string('pluginname', 'local_amos'));
+
+    if ($ADMIN->fulltree) {
+        $settings->add(new admin_setting_configtext(
+            'local_amos/applangindexfile',
+            get_string('applangindexfile', 'local_amos'),
+            get_string('applangindexfile_desc', 'local_amos'),
+            'https://raw.githubusercontent.com/moodlehq/moodlemobile2/integration/scripts/langindex.json',
+            PARAM_URL
+        ));
+    }
+
+    $ADMIN->add('localplugins', $settings);
 }
-
-
