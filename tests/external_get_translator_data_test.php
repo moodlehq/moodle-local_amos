@@ -81,10 +81,15 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
 
         $data = json_decode($response['json'], true);
 
+        $this->assertArrayHasKey('permalink', $data);
+        $this->assertEquals(1, $data['found']);
         $this->assertEquals(1, $data['missing']);
         $this->assertEquals(1, $data['missingcurrentpage']);
         $this->assertEquals(1, count($data['strings']));
         $this->assertEquals('Foo bar', $data['strings'][0]['original']);
+        $this->assertFalse($data['paginator']['hasmultiplepages']);
+        $this->assertEquals(1, $data['paginator']['currentpage']);
+        $this->assertEquals(1, $data['paginator']['navigation'][0]['label']);
 
         // Emulate what URLSearchParams.toString() does on the client side.
         $filterquery = http_build_query([
@@ -103,6 +108,12 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
 
         $data = json_decode($response['json'], true);
 
-        print_object($data); die(); // DONOTCOMMIT
+        $this->assertArrayHasKey('permalink', $data);
+        $this->assertEquals(1, $data['found']);
+        $this->assertEquals(1, $data['missing']);
+        $this->assertEquals(0, $data['missingcurrentpage']);
+        $this->assertEquals(0, count($data['strings']));
+        $this->assertFalse($data['paginator']['hasmultiplepages']);
+        $this->assertEquals(3, $data['paginator']['currentpage']);
     }
 }
