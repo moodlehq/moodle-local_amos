@@ -62,7 +62,7 @@ class get_translator_data extends \external_api {
         parse_str($filterquery, $_POST);
 
         $filter = new \local_amos\output\filter(new \moodle_url('/local/amos/view.php'));
-        $filter->set_data_default();
+        $filter->set_data_session_default();
 
         // Make sure that $USER contains the sesskey property.
         sesskey();

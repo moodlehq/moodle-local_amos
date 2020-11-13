@@ -134,7 +134,7 @@ class filter implements \renderable, \templatable {
     protected function get_data_default() {
         global $SESSION;
 
-        // Check to see if we have data set via {@see self::set_data_default()}.
+        // Check to see if we have default session data set via {@see self::set_data_session_default()}.
         if (isset($SESSION->local_amos->filter_default_data)) {
             $data = json_decode($SESSION->local_amos->filter_default_data);
 
@@ -625,7 +625,7 @@ class filter implements \renderable, \templatable {
     /**
      * Set the current filter data as the user's default data for this session.
      */
-    public function set_data_default() {
+    public function set_data_session_default() {
         global $SESSION;
 
         $SESSION->local_amos = $SESSION->local_amos ?? (object)[];
