@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_testcase extends advanced_testcase {
+abstract class local_amos_testcase extends advanced_testcase {
 
     /**
      * Register a language on the given branch.
