@@ -60,7 +60,6 @@ const registerEventListeners = () => {
 
         // Check to see if the user clicked on paginator link.
         let paginatorlink = e.target.closest('[data-paginatorlink]');
-        window.console.log(paginatorlink);
         if (paginatorlink) {
             e.preventDefault();
             PubSub.publish(TranslatorEvents.pagechange, paginatorlink.getAttribute('data-paginatorlink'));
