@@ -162,7 +162,7 @@ class local_amos_external_api_testcase extends externallib_advanced_testcase {
         $stage->commit('Registering English language', ['source' => 'unittest']);
 
         $statsman = new local_amos_stats_manager();
-        $statsman->update_stats('3600', 'en', 'tool_foo', 9);
+        $statsman->update_stats('36', 'en', 'tool_foo', 9);
 
         $raw = \local_amos\external\api::plugin_translation_stats('tool_foo');
         $clean = external_api::clean_returnvalue(\local_amos\external\api::plugin_translation_stats_returns(), $raw);

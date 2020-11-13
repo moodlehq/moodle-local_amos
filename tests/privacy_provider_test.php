@@ -69,6 +69,6 @@ class local_amos_privacy_provider_testcase extends advanced_testcase {
 
         $expected = [$u1->id, $u2->id];
         $actual = $userlist->get_userids();
-        $this->assertEquals($expected, $actual, '', 0, 10, true);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 }

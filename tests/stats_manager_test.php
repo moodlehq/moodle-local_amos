@@ -44,36 +44,36 @@ class local_amos_stats_manager_test extends advanced_testcase {
         $statsman = new local_amos_stats_manager();
 
         // Inserting fresh data.
-        $statsman->update_stats('3700', 'cs', 'tool_foo', 78);
-        $statsman->update_stats('3700', 'en', 'tool_foo', 81);
+        $statsman->update_stats('37', 'cs', 'tool_foo', 78);
+        $statsman->update_stats('37', 'en', 'tool_foo', 81);
 
         $this->assertEquals(78, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3700, 'lang' => 'cs', 'component' => 'tool_foo']));
+            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
         $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3700, 'lang' => 'en', 'component' => 'tool_foo']));
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
 
         // Data from another branch do not affect data on other branches.
-        $statsman->update_stats('3600', 'en', 'tool_foo', 72);
+        $statsman->update_stats('36', 'en', 'tool_foo', 72);
 
         $this->assertEquals(72, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3600, 'lang' => 'en', 'component' => 'tool_foo']));
+            ['branch' => 36, 'lang' => 'en', 'component' => 'tool_foo']));
         $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3700, 'lang' => 'en', 'component' => 'tool_foo']));
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
 
         // Data can be updated.
-        $statsman->update_stats('3700', 'en', 'tool_foo', 85);
+        $statsman->update_stats('37', 'en', 'tool_foo', 85);
 
         $this->assertEquals(85, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3700, 'lang' => 'en', 'component' => 'tool_foo']));
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
 
         // Data can be NULL and NULL'ed.
-        $statsman->update_stats('3800', 'cs', 'tool_foo', null);
-        $statsman->update_stats('3700', 'en', 'tool_foo', null);
+        $statsman->update_stats('38', 'cs', 'tool_foo', null);
+        $statsman->update_stats('37', 'en', 'tool_foo', null);
 
         $this->assertSame(null, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3800, 'lang' => 'cs', 'component' => 'tool_foo']));
+            ['branch' => 38, 'lang' => 'cs', 'component' => 'tool_foo']));
         $this->assertSame(null, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 3700, 'lang' => 'en', 'component' => 'tool_foo']));
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
     }
 
     /**
@@ -92,20 +92,20 @@ class local_amos_stats_manager_test extends advanced_testcase {
 
         $this->assertFalse($statsman->get_component_stats('tool_foo'));
 
-        $statsman->update_stats('3700', 'en', 'tool_foo', 12);
-        $statsman->update_stats('3600', 'en', 'tool_foo', 9);
+        $statsman->update_stats('37', 'en', 'tool_foo', 12);
+        $statsman->update_stats('36', 'en', 'tool_foo', 9);
 
-        $statsman->update_stats('3700', 'cs', 'tool_foo', 10);
-        $statsman->update_stats('3600', 'cs', 'tool_foo', 6);
-        $statsman->update_stats('3500', 'cs', 'tool_foo', 8);
+        $statsman->update_stats('37', 'cs', 'tool_foo', 10);
+        $statsman->update_stats('36', 'cs', 'tool_foo', 6);
+        $statsman->update_stats('35', 'cs', 'tool_foo', 8);
 
-        $statsman->update_stats('3700', 'de', 'tool_foo', 12);
-        $statsman->update_stats('3600', 'de', 'tool_foo', 10000000);
+        $statsman->update_stats('37', 'de', 'tool_foo', 12);
+        $statsman->update_stats('36', 'de', 'tool_foo', 10000000);
 
-        $statsman->update_stats('3700', 'fr', 'tool_foo', 1);
+        $statsman->update_stats('37', 'fr', 'tool_foo', 1);
 
-        $statsman->update_stats('3600', 'sk', 'tool_foo', 0);
-        $statsman->update_stats('3500', 'sk', 'tool_foo', 0);
+        $statsman->update_stats('36', 'sk', 'tool_foo', 0);
+        $statsman->update_stats('35', 'sk', 'tool_foo', 0);
 
         $raw = $statsman->get_component_stats('tool_foo');
 
@@ -113,9 +113,9 @@ class local_amos_stats_manager_test extends advanced_testcase {
         $this->assertTrue(isset($raw['lastmodified']));
         $this->assertTrue(isset($raw['langnames']));
         $this->assertEquals(3, count($raw['langnames']));
-        $this->assertContains(['lang' => 'en', 'name' => 'English (en)'], $raw['langnames']);
-        $this->assertContains(['lang' => 'cs', 'name' => 'Czech (cs)'], $raw['langnames']);
-        $this->assertContains(['lang' => 'de', 'name' => 'German (de)'], $raw['langnames']);
+        $this->assertContains(['lang' => 'en', 'name' => 'English [en]'], $raw['langnames']);
+        $this->assertContains(['lang' => 'cs', 'name' => 'Czech [cs]'], $raw['langnames']);
+        $this->assertContains(['lang' => 'de', 'name' => 'German [de]'], $raw['langnames']);
         $this->assertNotEmpty($raw['branches']);
 
         foreach ($raw['branches'] as $branchinfo) {
