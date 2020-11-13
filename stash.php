@@ -90,6 +90,23 @@ if ($drop) {
         print_error('stashaccessdenied', 'local_amos');
         die();
     }
+    $confirm = optional_param('confirm', false, PARAM_BOOL);
+
+    if (!$confirm) {
+        $output = $PAGE->get_renderer('local_amos');
+        echo $output->header();
+        echo $output->confirm(
+            get_string('stashdropconfirm', 'local_amos', s($stash->name)),
+            new moodle_url($PAGE->url, [
+                'confirm' => true,
+                'drop' => $drop,
+            ]),
+            $PAGE->url
+        );
+        echo $output->footer();
+        die();
+    }
+
     $stash->drop();
     redirect($PAGE->url);
 }

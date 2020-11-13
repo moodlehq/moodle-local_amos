@@ -403,6 +403,7 @@ $string['stashautosave_help'] = 'This stash contains the most recent snapshot of
 $string['stashcomponents'] = '<span>Components:</span> {$a}';
 $string['stashdownload'] = 'Download';
 $string['stashdrop'] = 'Drop';
+$string['stashdropconfirm'] = 'Do you really want to permanently delete saved stash <em>\'{$a}\'</em>?';
 $string['stashes'] = 'Stashes';
 $string['stashlanguages'] = '<span>Languages:</span> {$a}';
 $string['stashpop'] = 'Pop';
