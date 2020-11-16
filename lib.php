@@ -43,7 +43,6 @@ function local_amos_extend_navigation(global_navigation $navigation) {
         $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'), navigation_node::TYPE_CUSTOM, null, 'stashes');
         $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'), navigation_node::TYPE_CUSTOM, null, 'contributions');
     }
-    $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'), navigation_node::TYPE_CUSTOM, null, 'log');
     $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'), navigation_node::TYPE_CUSTOM, null, 'credits');
     if (has_capability('local/amos:manage', context_system::instance())) {
         $admin = $amos->add(get_string('administration'));
