@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,42 +24,41 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->libdir . '/clilib.php');
 
-// Let us get an information about existing components
-$sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
-          FROM {amos_repository}
-         WHERE deleted=0
-      GROUP BY branch,lang,component
-      ORDER BY branch,lang,component";
-$rs = $DB->get_recordset_sql($sql);
-$tree = array();    // [branch][language][component] => numofstrings
-foreach ($rs as $record) {
-    $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
-}
-$rs->close();
+$usage = "Export component strings into Moodle PHP language file format.
 
-remove_dir(AMOS_EXPORT_DIR, true);
-foreach ($tree as $vercode => $languages) {
-    $version = mlang_version::by_code($vercode);
-    foreach ($languages as $langcode => $components) {
-        if ($langcode == 'en') {
-            continue;
-        }
-        foreach ($components as $componentname => $unused) {
-            $component = mlang_component::from_snapshot($componentname, $langcode, $version);
-            if ($component->has_string()) {
-                $file = AMOS_EXPORT_DIR . '/' . $version->dir . '/' . $langcode . '/' . $component->get_phpfile_location(false);
-                if (!file_exists(dirname($file))) {
-                    mkdir(dirname($file), 0755, true);
-                }
-                echo "$file\n";
-                $component->export_phpfile($file);
-            }
-            $component->clear();
-        }
-    }
+Usage:
+    # php export-php.php --component=<component> --language=<language> --version=<version>
+    # php export-php.php [--help|-h]
+";
+
+list($options, $unrecognised) = cli_get_params([
+    'help' => false,
+    'component' => null,
+    'language' => null,
+    'version' => null,
+], [
+    'h' => 'help'
+]);
+
+if ($unrecognised) {
+    $unrecognised = implode(PHP_EOL . '  ', $unrecognised);
+    cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
 }
-echo "DONE\n";
+
+if ($options['help']) {
+    cli_writeln($usage);
+    exit(2);
+}
+
+if ($options['component'] === null || $options['language'] === null || $options['version'] === null) {
+    cli_writeln($usage);
+    exit(3);
+}
+
+mlang_component::from_snapshot($options['component'], $options['language'], mlang_version::by_code($options['version']))
+    ->export_phpfile('php://stdout');
