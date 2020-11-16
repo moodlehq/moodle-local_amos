@@ -45,10 +45,16 @@ while (!$done) {
     $rs = $DB->get_recordset_sql($sql);
 
     if (!$rs->valid()) {
-        $done = true;
+        printf("no commits in chunk %d\n", $chunk);
+        $rs->close();
+        $chunk++;
+        continue;
     }
 
     foreach ($rs as $r) {
+        if ($r->commitid == $maxid) {
+            $done = true;
+        }
         printf("%d %% / commitid %d / lang %s / string id %d [%s, %s] / branch %s / timemodified %d\n",
             floor(100 * $r->commitid / $maxid),
             $r->commitid,
