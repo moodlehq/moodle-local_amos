@@ -205,10 +205,10 @@ class amos_export_zip {
     }
 
     /**
-     * Regenerates index.php and languages.md5 files in output folders
+     * Regenerates languages.md5 and lang-table.html files in output folders
      */
     public function rebuild_output_folders() {
-        $this->log('== Rebuilding index.php and languages.md5 files ==');
+        $this->log('== Rebuilding languages.md5 and lang-table.html files ==');
 
         foreach ($this->get_versions() as $version) {
             $packinfofile = $this->vardirroot.'/'.$version->dir.'/packinfo.ser';
@@ -220,7 +220,6 @@ class amos_export_zip {
             ksort($packinfo);
 
             $this->rebuild_languages_md5($version, $packinfo);
-            $this->rebuild_index_php($version, $packinfo);
             $this->rebuild_index_tablehtml($version, $packinfo);
         }
     }
@@ -609,25 +608,8 @@ class amos_export_zip {
     }
 
     /**
-     * Rebuilds index.php file for the given version
-     *
-     * @param mlang_version $version
-     * @param array $packinfo
-     */
-    protected function rebuild_index_php(mlang_version $version, array $packinfo) {
-        global $PAGE;
-
-        $indexpage = new local_amos_index_page($version, $packinfo);
-        $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
-        $indexpagehtml = $output->render($indexpage);
-        $this->log($version->dir.'/index.php', amos_cli_logger::LEVEL_DEBUG);
-        file_put_contents($this->outputdirroot.'/'.$version->dir.'/'.'index.php', $indexpagehtml);
-    }
-
-    /**
      * Rebuilds lang-table.html file for the given version
      *
-     * @todo This will eventually replace rebuild_index_php when MDLSITE-2784 is completed.
      * @param mlang_version $version
      * @param array $packinfo
      */

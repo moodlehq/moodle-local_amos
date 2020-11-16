@@ -589,7 +589,7 @@ class local_amos_log implements renderable {
 /**
  * Represents data to be displayed at http://download.moodle.org/langpack/x.x/ index page
  */
-class local_amos_index_page implements renderable {
+class local_amos_index_tablehtml implements renderable {
 
     /** @var mlang_version */
     public $version = null;
@@ -683,12 +683,6 @@ class local_amos_index_page implements renderable {
         }
     }
 }
-
-/**
- * Represents data to be displayed at http://download.moodle.org/langpack/x.x/ html page.
- * @todo This will eventually replace local_amos_index_page when MDLSITE-2784 is completed.
- */
-class local_amos_index_tablehtml extends local_amos_index_page {}
 
 /**
  * Renderable stash
