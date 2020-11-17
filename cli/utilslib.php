@@ -191,8 +191,10 @@ class amos_export_zip {
     public function rebuild_zip_packages() {
         $this->log('== Rebuilding outdated ZIP language packs ==');
 
-        foreach ($this->detect_recently_modified_languages() as $langcode => $since) {
-            foreach ($this->get_versions() as $version) {
+        $langpacks = $this->detect_recently_modified_languages();
+
+        foreach ($this->get_versions() as $version) {
+            foreach ($langpacks as $langcode => $since) {
                 if ($version->code < $since) {
                     continue;
                 }
@@ -238,16 +240,13 @@ class amos_export_zip {
     /**
      * Returns the list of mlang_versions that we should process
      *
-     * Make sure the order of returned values is from the oldest version to the
-     * newest one.
-     *
      * @return array {@link mlang_version} objects indexed by the version code
      */
     protected function get_versions() {
 
         if (!isset($this->stash['versions'])) {
             $this->stash['versions'] = mlang_version::list_range(20);
-            ksort($this->stash['versions']);
+            krsort($this->stash['versions']);
         }
 
         return $this->stash['versions'];
