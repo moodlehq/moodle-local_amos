@@ -163,6 +163,8 @@ class amos_export_zip {
         } else {
             $this->statsman = $statsman;
         }
+
+        raise_memory_limit(MEMORY_HUGE);
     }
 
     /**
