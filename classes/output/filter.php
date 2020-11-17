@@ -87,8 +87,8 @@ class filter implements \renderable, \templatable {
 
         $this->lazyformname = 'amosfilter';
         $this->handler = $handler;
-        $this->datadefault = $this->get_data_default();
         $this->datasubmitted = $this->get_data_submitted();
+        $this->datadefault = $this->get_data_default();
         $this->datapermalink = $this->get_data_permalink();
     }
 
