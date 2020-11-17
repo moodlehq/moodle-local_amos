@@ -117,12 +117,6 @@ class filter implements \renderable, \templatable {
             }
         }
 
-        $page = optional_param('fpg', null, PARAM_INT);
-
-        if (!empty($page)) {
-            $data->page = $page;
-        }
-
         return $data;
     }
 
@@ -237,9 +231,6 @@ class filter implements \renderable, \templatable {
         $data->stagedonly = optional_param('fstg', false, PARAM_BOOL);
         $data->app = optional_param('fapp', false, PARAM_BOOL);
 
-        // Reset the paginator to the first page every time the filter is saved.
-        $data->page = 1;
-
         if ($data->missing and $data->outdated) {
             // It does not make sense to have both.
             $data->missing = false;
@@ -250,6 +241,8 @@ class filter implements \renderable, \templatable {
         if (optional_param('saveasmydefault', false, PARAM_BOOL)) {
             $this->set_data_user_default($data);
         }
+
+        $data->page = optional_param('fpg', 1, PARAM_INT);
 
         return $data;
     }
@@ -653,6 +646,8 @@ class filter implements \renderable, \templatable {
             $data = (object) [];
         }
 
+        unset($data->page);
+
         return $data;
     }
 
@@ -704,6 +699,7 @@ class filter implements \renderable, \templatable {
             $data = json_decode($SESSION->local_amos->filter_user_default_data);
 
             if (is_object($data)) {
+                unset($data->page);
                 return $data;
             }
         }
@@ -729,6 +725,8 @@ class filter implements \renderable, \templatable {
             $SESSION->local_amos->filter_user_default_data = json_encode((object) []);
             return (object) [];
         }
+
+        unset($data->page);
 
         $SESSION->local_amos->filter_user_default_data = json_encode($data);
 
