@@ -56,6 +56,14 @@ $functions = [
         'type' => 'read',
         'ajax' => true,
     ],
+    'local_amos_get_string_timeline' => [
+        'classname' => '\local_amos\external\get_string_timeline',
+        'methodname' => 'execute',
+        'description' => 'Return data for the string timeline modal info.',
+        'capabilities' => 'local/amos:stage',
+        'type' => 'read',
+        'ajax' => true,
+    ],
 ];
 
 $services = [

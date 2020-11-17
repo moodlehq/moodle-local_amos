@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,28 +23,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-//require_once($CFG->dirroot . '/local/amos/locallib.php');
+require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 require_login(SITEID, false);
 require_capability('local/amos:stage', context_system::instance());
 
-$component  = required_param('component', PARAM_ALPHANUMEXT);
-$language   = required_param('language', PARAM_ALPHANUMEXT);
-$stringid   = required_param('stringid', PARAM_STRINGID);
-$ajax       = optional_param('ajax', 0, PARAM_BOOL);
+$component = required_param('component', PARAM_ALPHANUMEXT);
+$language = required_param('language', PARAM_ALPHANUMEXT);
+$stringid = required_param('stringid', PARAM_STRINGID);
 
-$PAGE->set_url('/local/amos/timeline.ajax.php');
-$PAGE->set_pagelayout('popup');
+$PAGE->set_url('/local/amos/timeline.php');
+$PAGE->set_pagelayout('standard');
+$PAGE->set_heading(get_string('timeline', 'local_amos'));
 $PAGE->set_context(context_system::instance());
 
-if ($ajax) {
-    @header('Content-Type: text/plain; charset=utf-8');
-} else {
-    echo $OUTPUT->header();
-}
+echo $OUTPUT->header();
 
 $sql = "SELECT -s.id AS id, 'en' AS lang, s.strtext, s.since, s.timemodified,
                c.userinfo, c.commitmsg, c.commithash
@@ -86,8 +80,8 @@ $preven = '';
 $prevtr = '';
 
 foreach ($results as $result) {
-    $encell     = new html_table_cell();
-    $langcell   = new html_table_cell();
+    $encell = new html_table_cell();
+    $langcell = new html_table_cell();
     if ($result->lang == 'en') {
         $cell = $encell;
         $none = $langcell;
@@ -107,7 +101,7 @@ foreach ($results as $result) {
     } else {
         $text = s($result->strtext);
     }
-    $text = local_amos_renderer::add_breaks($text);
+    $text = \local_amos\local\util::add_breaks($text);
     if ($result->commithash) {
         if ($result->lang == 'en') {
             $url = 'https://github.com/moodle/moodle/commit/'.$result->commithash;
@@ -139,6 +133,4 @@ $table->data = array_reverse($table->data);
 
 echo html_writer::table($table);
 
-if (!$ajax) {
-    echo $OUTPUT->footer();
-}
+echo $OUTPUT->footer();

@@ -191,33 +191,3 @@
 .path-local-amos .commentswrapper .comment-area {
     margin: 0px auto;
 }
-
-.path-local-amos .timelinetable {
-    margin: 0px auto;
-    width: 100%;
-}
-
-.path-local-amos .timelinetable,
-.path-local-amos .timelinetable .r0,
-.path-local-amos .timelinetable .r1 {
-    background-color: transparent;
-}
-
-.path-local-amos .timelinetable .timemodified,
-.path-local-amos .timelinetable .usermessage {
-    font-size: 80%;
-}
-
-.path-local-amos .timelinetable .usermessage .commitmsg {
-    font-style: italic;
-}
-
-.path-local-amos .timelinetable .text {
-    padding: 5px;
-    margin-top: 0.5em;
-    background-color: white;
-}
-
-.path-local-amos .timelinetable .c1 {
-    width: 50%;
-}

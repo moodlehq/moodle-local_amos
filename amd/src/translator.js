@@ -29,6 +29,9 @@ import * as PubSub from 'core/pubsub';
 import FilterEvents from './filter_events';
 import TranslatorEvents from './translator_events';
 import Templates from 'core/templates';
+import ModalEvents from 'core/modal_events';
+import ModalFactory from 'core/modal_factory';
+import {get_string as getString} from 'core/str';
 
 /**
  * @function init
@@ -55,7 +58,16 @@ const registerEventListeners = () => {
 
             if (item.getAttribute('data-mode') == 'view') {
                 translatorItemEditingOn(item, e.ctrlKey).focus();
+                return;
             }
+        }
+
+        // String history timeline link.
+        if (e.target.hasAttribute('data-region') && e.target.getAttribute('data-region') == 'timelinelink') {
+            let item = e.target.closest('[data-region="amostranslatoritem"]');
+            e.preventDefault();
+            showTimeline(item);
+            return;
         }
 
         // Check to see if the user clicked on paginator link.
@@ -198,6 +210,41 @@ const showFilteredStrings = (filterQuery) => {
         turnAllMissingForEditing();
         root.classList.remove('loading');
         return true;
+
+    }).catch(Notification.exception);
+};
+
+/**
+ * @function showTimeline
+ * @param {Element} item
+ */
+const showTimeline = (item) => {
+    return fetchMany([{
+        methodname: 'local_amos_get_string_timeline',
+        args: {
+            component: item.getAttribute('data-component'),
+            language: item.getAttribute('data-language'),
+            strname: item.getAttribute('data-stringid'),
+        },
+
+    }])[0].then(response => {
+        return Templates.render('local_amos/timeline', response);
+
+    }).then((html) => {
+        return ModalFactory.create({
+            large: true,
+            title: getString('timeline', 'local_amos'),
+            body: html,
+        });
+
+    }).then(modal => {
+        modal.getRoot().on(ModalEvents.hidden, () => {
+            modal.destroy();
+        });
+
+        modal.show();
+
+        return modal;
 
     }).catch(Notification.exception);
 };
