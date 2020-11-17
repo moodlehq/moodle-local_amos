@@ -303,34 +303,37 @@ class amos_export_zip {
     protected function detect_recently_modified_languages() {
         global $DB;
 
-        $params =[
-            'lastexportzip' => $this->last,
-            'enfix' => 'en_fix',
+        $params = [
+            'lastexportzip1' => $this->last,
+            'lastexportzip2' => $this->last,
         ];
 
-        $this->log('Looking for recent commits since ' . date('Y-m-d H:i:s', $params['lastexportzip']),
-            amos_cli_logger::LEVEL_DEBUG);
+        $this->log('Looking for recent commits since ' . date('Y-m-d H:i:s', $this->last), amos_cli_logger::LEVEL_DEBUG);
 
-        $sql = "SELECT t.lang, MIN(t.since) AS since
-                  FROM {amos_translations} t
-                  JOIN {amos_commits} c ON c.id = t.commitid
-                 WHERE t.strtext IS NOT NULL
-                   AND c.timecommitted >= :lastexportzip
-                   AND t.lang <> :enfix
-              GROUP BY t.lang
-              ORDER BY MIN(t.since), lang";
+        $sql = "SELECT *
+                  FROM (
+                        SELECT t.lang, MIN(t.since) AS since
+                          FROM {amos_translations} t
+                          JOIN {amos_commits} c ON c.id = t.commitid
+                         WHERE c.timecommitted >= :lastexportzip1
+                           AND t.lang <> 'en_fix'
+                      GROUP BY t.lang
 
-        $rs = $DB->get_recordset_sql($sql, $params);
+                         UNION
 
-        $result = [];
+                        SELECT 'en' AS lang, MIN(s.since) AS since
+                          FROM {amos_strings} s
+                          JOIN {amos_commits} c ON c.id = s.commitid
+                         WHERE c.timecommitted >= :lastexportzip2
+                       ) r
+              ORDER BY lang";
 
-        foreach ($rs as $record) {
-            $result[$record->lang] = $record->since;
-            $this->log(sprintf('Recent commit detected in language %s affecting branches since %d', $record->lang, $record->since),
+        $result = $DB->get_records_sql_menu($sql, $params);
+
+        foreach ($result as $lang => $since) {
+            $this->log(sprintf('Recent commit detected in language %s affecting branches since %d', $lang, $since),
                 amos_cli_logger::LEVEL_DEBUG);
         }
-
-        $rs->close();
 
         if (empty($result)) {
             $this->log('No recent changes found, nothing to rebuild', amos_cli_logger::LEVEL_DEBUG);
