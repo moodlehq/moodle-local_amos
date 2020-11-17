@@ -28,6 +28,7 @@
                 <li class="list-inline-item">{{#str}} foundmissing, local_amos, <span class="badge badge-light">{{missing}}</span> {{/str}}</li>
                 <li class="list-inline-item">{{#str}} foundmissingonthispage, local_amos, <span class="badge badge-light">{{missingcurrentpage}}</span> {{/str}}</li>
                 <li class="list-inline-item"><i class="fa fa-link" aria-hidden="true"></i> <a href="{{permalink}}">{{#str}} permalink, local_amos {{/str}}</a></li>
+                <li class="list-inline-item"><i class="fa fa-arrow-right" aria-hidden="true"></i> <a href="/local/amos/stage.php">{{#str}} stagetoolopen, local_amos{{/str}}</a></li>
             </ul>
         </div>
         <div class="col-md text-md-right">
@@ -47,9 +48,9 @@
         <div class="col-md">
             <ul class="list-inline">
                 {{#found}}
-                    <li class="list-inline-item"><a href="#amosfilter"><i class="fa fa-arrow-up" aria-hidden="true"></i> {{#str}} up {{/str}}</a></li>
+                    <li class="list-inline-item"><i class="fa fa-arrow-up" aria-hidden="true"></i> <a href="#amosfilter">{{#str}} up {{/str}}</a></li>
+                    <li class="list-inline-item"><i class="fa fa-arrow-right" aria-hidden="true"></i> <a href="/local/amos/stage.php">{{#str}} stagetoolopen, local_amos{{/str}}</a></li>
                 {{/found}}
-                <li class="list-inline-item"><a href="/local/amos/stage.php"><i class="fa fa-arrow-right" aria-hidden="true"></i> {{#str}} stagetoolopen, local_amos{{/str}}</a></li>
             </ul>
         </div>
         <div class="col-md text-md-right">

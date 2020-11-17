@@ -348,7 +348,10 @@ const scrollToFirstSelectedComponent = () => {
 const submitFilter = () => {
     let root = document.getElementById('amosfilter');
     let flng = document.getElementById('amosfilter_flng');
+    let loadingIndicator = document.getElementById('amosfilter_loading_indicator');
     let languageSearch = document.getElementById('amosfilter_flng_search');
+
+    loadingIndicator.classList.remove('hidden');
 
     // Temporarily enable all language selector options to make sure that selected ones are submitted.
     flng.querySelectorAll(':scope option').forEach(item => {

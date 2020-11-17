@@ -186,6 +186,8 @@ const turnAllMissingForEditing = () => {
 const showFilteredStrings = (filterQuery) => {
 
     let root = document.getElementById('amostranslator');
+    let loadingIndicator = document.getElementById('amosfilter_loading_indicator');
+
     root.classList.add('loading');
 
     return fetchMany([{
@@ -208,6 +210,7 @@ const showFilteredStrings = (filterQuery) => {
 
     }).then(() => {
         turnAllMissingForEditing();
+        loadingIndicator.classList.add('hidden');
         root.classList.remove('loading');
         return true;
 
