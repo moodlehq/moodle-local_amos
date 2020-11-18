@@ -82,7 +82,7 @@ trait update_strings_file {
         require_capability('local/amos:importstrings', $context);
 
         // Load all known standard plugins and core subsystems.
-        $standardplugins = local_amos_standard_plugins();
+        $standardplugins = \local_amos\local\util::standard_components_tree();
 
         // Iterate over all passed components and process them.
         $results = array();
@@ -105,7 +105,7 @@ trait update_strings_file {
 
             // If it is an activity module, make sure the name does not collide with a core subsystem.
             if (strpos($component['componentname'], 'mod_') === 0) {
-                foreach ($standardplugins as $moodleversion => $frankenstylenames) {
+                foreach ($standardplugins as $frankenstylenames) {
                     if (isset($frankenstylenames[$componentname])
                             && $frankenstylenames[$componentname] === 'core_'.$componentname) {
                         $exceptionmsg = 'The name of your activity module collides with a name of a core subsystem in Moodle';
@@ -124,7 +124,7 @@ trait update_strings_file {
 
             // Make sure we do not try to import English strings for a standard plugin.
             if ($componentlanguage === 'en') {
-                if (isset($standardplugins[$componentversion->dir][$componentname])) {
+                if (isset($standardplugins[$componentversion->code][$componentname])) {
                     $result['status'] = 'error';
                     $result['message'] = 'Unable to import strings for a standard plugin';
                     $results[] = $result;

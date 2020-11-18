@@ -327,10 +327,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $a = (object)array('strings' => $log->numofstrings, 'commits' => count($log->commits));
         $output .= $this->heading(get_string('numofmatchingstrings', 'local_amos', $a));
 
-        $standard = array();
-        foreach (local_amos_standard_plugins() as $plugins) {
-            $standard = array_merge($standard, $plugins);
-        }
+        $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($log->commits as $commit) {
             $o  = '';

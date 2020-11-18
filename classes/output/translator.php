@@ -407,11 +407,12 @@ class translator implements \renderable, \templatable {
                 $string->committable = true;
             }
         }
-        $standard = local_amos_standard_plugins();
+
+        $standard = \local_amos\local\util::standard_components_tree();
 
         foreach ($this->strings as $string) {
             if ($string->language === 'en_fix') {
-                if (false && !isset($standard[$string->branchdir][$string->component])) {
+                if (!isset($standard[$string->englishsincecode][$string->component])) {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
@@ -469,11 +470,7 @@ class translator implements \renderable, \templatable {
         ];
 
         $listlanguages = \mlang_tools::list_languages();
-
-        $standard = [];
-        foreach (local_amos_standard_plugins() as $plugins) {
-            $standard = array_merge($standard, $plugins);
-        }
+        $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($result['strings'] as &$string) {
             $string->displayenglishsince = $string->englishsincelabel . '+';

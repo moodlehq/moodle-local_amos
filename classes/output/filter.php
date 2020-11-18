@@ -310,10 +310,7 @@ class filter implements \renderable, \templatable {
 
         if ($fcmp == '*std') {
             // Standard components.
-            $data->component = array();
-            foreach (local_amos_standard_plugins() as $plugins) {
-                $data->component = array_merge($data->component, array_keys($plugins));
-            }
+            $data->component = array_keys(\local_amos\local\util::standard_components_list());
 
         } else if ($fcmp == '*app') {
             // Mobile App components.
@@ -536,11 +533,7 @@ class filter implements \renderable, \templatable {
             'contrib' => [],
         ];
 
-        $standard = [];
-        foreach (local_amos_standard_plugins() as $plugins) {
-            // Merging standard plugins from all versions.
-            $standard = array_merge($standard, $plugins);
-        }
+        $standard = \local_amos\local\util::standard_components_list();
 
         // Categorize components into Core, Standard or Add-ons.
         foreach (\mlang_tools::list_components() as $componentname => $since) {

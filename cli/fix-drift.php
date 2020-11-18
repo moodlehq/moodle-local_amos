@@ -37,14 +37,14 @@ require_once($CFG->libdir.'/clilib.php');
 
 list($options, $unrecognized) = cli_get_params(array('execute' => false));
 
-$plugins = local_amos_standard_plugins();
+$plugins = \local_amos\local\util::standard_components_tree();
 
 $stage = new mlang_stage();
 
 $cliresult = 0;
 
-foreach ($plugins as $versionnumber => $plugintypes) {
-    $version = mlang_version::by_dir($versionnumber);
+foreach ($plugins as $versioncode => $plugintypes) {
+    $version = mlang_version::by_code($versioncode);
 
     if ($version->branch == 'MOODLE_40_STABLE') {
         $gitbranch = 'origin/master';

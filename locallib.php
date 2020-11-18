@@ -247,10 +247,10 @@ class local_amos_index_tablehtml implements renderable {
         $this->percents = array('0' => 0, '40' => 0, '60' => 0, '80' => 0); // percents => number of langpacks
         // get the number of strings for standard plugins
         // only the standard plugins are taken into statistics calculation
-        $standard = local_amos_standard_plugins();
+        $standard = \local_amos\local\util::standard_components_tree();
         $english = array(); // holds the number of English strings per component
 
-        foreach ($standard[$this->version->dir] as $componentname => $unused) {
+        foreach ($standard[$this->version->code] as $componentname => $unused) {
             $component = mlang_component::from_snapshot($componentname, 'en', $this->version);
             $english[$componentname] = $component->get_number_of_strings(true);
             $this->totalenglish += $english[$componentname];
@@ -275,7 +275,7 @@ class local_amos_index_tablehtml implements renderable {
             if ($langpack->parent == 'en') {
                 $langpack->totaltranslated = 0;
                 foreach ($info['numofstrings'] as $component => $translated) {
-                    if (isset($standard[$this->version->dir][$component])) {
+                    if (isset($standard[$this->version->code][$component])) {
                         $langpack->totaltranslated += min($translated, $english[$component]);
                     }
                 }
@@ -474,38 +474,6 @@ class local_amos_contribution implements renderable {
             $this->assignee = $assignee;
         }
     }
-}
-
-/**
- * Returns the list of standard components
- *
- * @return array (string)version => (string)legacyname => (string)frankenstylename
- */
-function local_amos_standard_plugins() {
-    global $CFG;
-    static $list = null;
-
-    if (is_null($list)) {
-        $xml  = simplexml_load_file($CFG->dirroot.'/local/amos/plugins.xml');
-        foreach ($xml->moodle as $moodle) {
-            $version = (string)$moodle['version'];
-            $list[$version] = array();
-            $list[$version]['moodle'] = 'core';
-            foreach ($moodle->plugins as $plugins) {
-                $type = (string)$plugins['type'];
-                foreach ($plugins as $plugin) {
-                    $name = (string)$plugin;
-                    if ($type == 'core' or $type == 'mod') {
-                        $list[$version][$name] = "{$type}_{$name}";
-                    } else {
-                        $list[$version]["{$type}_{$name}"] = "{$type}_{$name}";
-                    }
-                }
-            }
-        }
-    }
-
-    return $list;
 }
 
 /**

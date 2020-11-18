@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,12 +21,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$usage = "
-Use this script to compare the contents of two unzipped language packs
-
-    $ php compare-packs.php --version=2.6 --master=/tmp/en --slave=/tmp/fr
-";
-
 define('CLI_SCRIPT', 1);
 
 require(__DIR__.'/../../../config.php');
@@ -35,6 +28,12 @@ require_once($CFG->libdir.'/pluginlib.php');
 require_once($CFG->libdir.'/clilib.php');
 require_once($CFG->dirroot.'/local/amos/mlanglib.php');
 require_once($CFG->dirroot.'/local/amos/locallib.php');
+
+$usage = "
+Use this script to compare the contents of two unzipped language packs
+
+    $ php compare-packs.php --version=2.6 --master=/tmp/en --slave=/tmp/fr
+";
 
 list($options, $unrecognized) = cli_get_params(array('version' => '', 'master' => '', 'slave' => ''));
 
@@ -46,10 +45,16 @@ if (empty($version) or empty($master) or empty($slave)) {
     cli_error($usage);
 }
 
-$standard = local_amos_standard_plugins();
+if (strpos($version, '.')) {
+    $version = mlang_version::by_dir($version);
+} else {
+    $version = mlang_version::by_code($version);
+}
 
-if (!isset($standard[$version])) {
-    cli_error($version.' not a known version');
+$standard = \local_amos\local\util::standard_components_tree();
+
+if (!isset($standard[$version->code])) {
+    cli_error($version->dir . ' not a known version');
 }
 
 if (!is_dir($master)) {
@@ -104,7 +109,7 @@ foreach ($spack as $component => $strings) {
 
 // Report all missing slave strings if the master pack is a standard one.
 foreach ($mpack as $component => $strings) {
-    if (!isset($standard[$version][$component])) {
+    if (!isset($standard[$version->code][$component])) {
         continue;
     }
     foreach (array_keys($strings) as $string) {

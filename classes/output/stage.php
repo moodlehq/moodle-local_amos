@@ -206,11 +206,7 @@ class stage implements \renderable, \templatable {
         ];
 
         $listlanguages = \mlang_tools::list_languages();
-
-        $standard = [];
-        foreach (local_amos_standard_plugins() as $plugins) {
-            $standard = array_merge($standard, $plugins);
-        }
+        $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($this->strings as $string) {
             $string->displaysince = $string->sincelabel . '+';

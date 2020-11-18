@@ -78,7 +78,7 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
     $discussion->message .= 'http://git.moodle.org/gw?p=moodle.git;a=commit;h='.$commithash . "\n";
     $discussion->message .= 'http://github.com/moodle/moodle/commit/'.$commithash . "\n\n";
 
-    $standardplugins = local_amos_standard_plugins();
+    $standardplugins = \local_amos\local\util::standard_components_tree();
 
     foreach ($stage as $component) {
         foreach ($component as $string) {
@@ -88,8 +88,8 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
                 $sign = '+  ';
             }
 
-            if (isset($standardplugins[$component->version->dir][$component->name])) {
-                $name = $standardplugins[$component->version->dir][$component->name];
+            if (isset($standardplugins[$component->version->code][$component->name])) {
+                $name = $standardplugins[$component->version->code][$component->name];
             } else {
                 $name = $component->name;
             }
@@ -281,7 +281,7 @@ $MLANG_PARSE_BRANCHES = array(
     'MOODLE_40_STABLE',
 );
 
-$standardplugins = local_amos_standard_plugins();
+$standardplugins = \local_amos\local\util::standard_components_tree();
 $stage = new mlang_stage();
 
 fputs(STDOUT, "*****************************************\n");
@@ -390,9 +390,9 @@ foreach ($MLANG_PARSE_BRANCHES as $branch) {
             fputs(STDOUT, "SKIP unit test fixture file\n");
             continue;
         }
-        if (isset($standardplugins[$version->dir])) {
+        if (isset($standardplugins[$version->code])) {
             // for 2.0 and higher we can make sure that we parse only standard component
-            if (!isset($standardplugins[$version->dir][$componentname])) {
+            if (!isset($standardplugins[$version->code][$componentname])) {
                 fputs(STDERR, "WARNING non-standard component on this branch ($componentname)\n");
             }
         }
