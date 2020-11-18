@@ -59,14 +59,8 @@ class util {
 
         $minver = min(array_keys($tree));
         $maxver = max(array_keys($tree));
-
-        $list = get_config('local_amos', 'standardcomponents');
-
-        if (empty($list)) {
-            throw new \coding_exception('List of standard components not defined!');
-        }
-
         $minmax = [];
+        $list = get_config('local_amos', 'standardcomponents');
 
         foreach (explode(PHP_EOL, $list) as $line) {
             $parts = preg_split('/\s+/', $line, null, PREG_SPLIT_NO_EMPTY);
@@ -109,6 +103,7 @@ class util {
         }
 
         foreach (array_keys($tree) as $version) {
+            $tree[$version]['moodle'] = 'core';
             foreach ($minmax as $component => [$min, $max]) {
                 if ($min <= $version && $version <= $max) {
                     [$type, $name] = \core_component::normalize_component($component);

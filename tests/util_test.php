@@ -52,9 +52,10 @@ class util_test extends \advanced_testcase {
 
         $this->assertDebuggingCalled('Unexpected standardcomponents line starting with: _test');
         $this->assertEquals(3, count($tree));
-        $this->assertEquals(4, count($tree[38]));
-        $this->assertEquals(3, count($tree[39]));
-        $this->assertEquals(2, count($tree[310]));
+        $this->assertEquals(5, count($tree[38]));
+        $this->assertEquals(4, count($tree[39]));
+        $this->assertEquals(3, count($tree[310]));
+        $this->assertEquals('core', $tree[38]['moodle']);
         $this->assertEquals('mod_foobar', $tree[38]['foobar']);
         $this->assertEquals('mod_foobar', $tree[39]['foobar']);
         $this->assertEquals('mod_foobar', $tree[310]['foobar']);
@@ -78,7 +79,8 @@ class util_test extends \advanced_testcase {
 
         $list = util::standard_components_list();
 
-        $this->assertEquals(4, count($list));
+        $this->assertEquals(5, count($list));
+        $this->assertEquals('core', $list['moodle']);
         $this->assertEquals('mod_foobar', $list['foobar']);
         $this->assertEquals('foobar_one', $list['foobar_one']);
         $this->assertEquals('foobar_two', $list['foobar_two']);
