@@ -16,6 +16,10 @@
 
 namespace local_amos\local;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+
 /**
  * Utilities and helper methods.
  *
@@ -38,5 +42,105 @@ class util {
      */
     public static function add_breaks($text) {
         return preg_replace('/([,])(\S)/', '$1'."\xe2\x80\x8b".'$2', $text);
+    }
+
+    /**
+     * Returns a tree of standard components.
+     *
+     * @return array (int)versioncode => (string)legacyname => (string)frankenstylename
+     */
+    public static function standard_components_tree() {
+
+        $tree = [];
+
+        foreach (\mlang_version::list_all() as $mlangversion) {
+            $tree[$mlangversion->code] = [];
+        }
+
+        $minver = min(array_keys($tree));
+        $maxver = max(array_keys($tree));
+
+        $list = get_config('local_amos', 'standardcomponents');
+
+        if (empty($list)) {
+            throw new \coding_exception('List of standard components not defined!');
+        }
+
+        $minmax = [];
+
+        foreach (explode(PHP_EOL, $list) as $line) {
+            $parts = preg_split('/\s+/', $line, null, PREG_SPLIT_NO_EMPTY);
+
+            if (empty($parts)) {
+                continue;
+            }
+
+            if ($parts[0] !== clean_param($parts[0], PARAM_COMPONENT)) {
+                debugging('Unexpected standardcomponents line starting with: ' . $parts[0], DEBUG_DEVELOPER);
+                continue;
+            }
+
+            if (count($parts) == 1) {
+                $minmax[$parts[0]] = [$minver, $maxver];
+
+            } else if (count($parts) == 2) {
+                if ($parts[1] > 0) {
+                    $minmax[$parts[0]] = [$minver, $parts[1]];
+
+                } else {
+                     $minmax[$parts[0]] = [-$parts[1], $maxver];
+                }
+
+            } else if (count($parts) == 3) {
+                if ($parts[1] > 0 && $parts[2] < 0) {
+                    $minmax[$parts[0]] = [$parts[1], -$parts[2]];
+
+                } else if ($parts[1] < 0 && $parts[2] > 0) {
+                    $minmax[$parts[0]] = [$parts[2], -$parts[1]];
+
+                } else {
+                    debugging('Unexpected standardcomponents line versions range: ' . $line, DEBUG_DEVELOPER);
+                    continue;
+                }
+
+            } else {
+                debugging('Unexpected standardcomponents line syntax: ' . $line, DEBUG_DEVELOPER);
+            }
+        }
+
+        foreach (array_keys($tree) as $version) {
+            foreach ($minmax as $component => [$min, $max]) {
+                if ($min <= $version && $version <= $max) {
+                    [$type, $name] = \core_component::normalize_component($component);
+
+                    if ($type === 'core' || $type === 'mod') {
+                        $filename = $name;
+
+                    } else {
+                        $filename = $type . '_' . $name;
+                    }
+
+                    $tree[$version][$filename] = $type . '_' . $name;
+                }
+            }
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Returns a list of components that were/are standard on at least some version.
+     *
+     * @return array (string)legacyname => (string)frankenstylename
+     */
+    public static function standard_components_list() {
+
+        $list = [];
+
+        foreach (static::standard_components_tree() as $sublist) {
+            $list += $sublist;
+        }
+
+        return $list;
     }
 }
