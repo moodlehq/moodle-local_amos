@@ -264,6 +264,7 @@ class translator implements \renderable, \templatable {
                         $string->original = $english->text;
                         $string->originalid = $english->amosid;
                         $string->originalmodified = $english->timemodified;
+                        $string->translatable = true;
                         $string->committable = false;
 
                         if (isset($s[$lang][$component][$stringid])) {
@@ -405,7 +406,6 @@ class translator implements \renderable, \templatable {
             if (!empty($allowedlangs['X']) || !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
-            $string->translatable = true;
         }
         $standard = local_amos_standard_plugins();
 
@@ -415,7 +415,6 @@ class translator implements \renderable, \templatable {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
-                    $string->statusclass = 'missing explanation';
                 }
             }
         }
@@ -425,7 +424,6 @@ class translator implements \renderable, \templatable {
                 $string->committable = false;
                 $string->translatable = false;
                 $string->translation = get_string('unableenfixcountries', 'local_amos');
-                $string->statusclass = 'missing explanation';
             }
         }
 
@@ -448,7 +446,6 @@ class translator implements \renderable, \templatable {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
                 $string->translatable = false;
                 $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
-                $string->statusclass = 'missing explanation';
             }
         }
     }

@@ -18,21 +18,6 @@
     }
 }
 
-.path-local-amos #amostranslator .translation.translatable,
-.path-local-amos #amostranslator .translation.committable {
-    background-color: $amos-color-committable;
-}
-
-.path-local-amos #amostranslator .translation.translatable.outdated,
-.path-local-amos #amostranslator .translation.committable.outdated {
-    background-color: $amos-color-outdated;
-}
-
-.path-local-amos #amostranslator .translation.staged,
-.path-local-amos #amostranslator .translation.staged.outdated {
-    background-color: $amos-color-staged;
-}
-
 #page-local-amos-credits .langname {
     position: relative;
     left: -1em;
@@ -112,7 +97,7 @@
 .path-local-amos .contributionlist .status20 .status,
 .path-local-amos .contributionwrapper .details .status20 td,
 .path-local-amos .contribactions .singlebutton.reject input[type="submit"] {
-    background-color: $amos-color-red;
+    background-color: #ffd3d9;
 }
 
 .path-local-amos .contributionlist .status30 .id,

@@ -2,9 +2,10 @@
 @import "../../../theme/boost/scss/bootstrap/variables";
 @import "../../../theme/boost/scss/bootstrap/mixins";
 
-$amos-color-red: #ffd3d9;
-$amos-color-missing: $amos-color-red;
-$amos-color-committable: #ecf4d2;
-$amos-color-outdated: #f3f2aa;
+// Background colors indicating the status of the string in the translator.
+$amos-color-missing: #f8d7da;
+$amos-color-committable: #d4edda;
+$amos-color-translatable: #d4edda;
+$amos-color-outdated: #fff3cd;
 $amos-color-nontranslatable: #f7f7f7;
-$amos-color-staged: #d2ebff;
+$amos-color-staged: #d1ecf1;

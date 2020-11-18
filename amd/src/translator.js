@@ -54,7 +54,7 @@ const registerEventListeners = () => {
     root.addEventListener('click', e => {
         // Check to see if the user clicked on a translation to edit it.
         if (e.target.classList.contains('amostranslation') || e.target.classList.contains('amostranslationview')) {
-            let item = e.target.closest('[data-region="amostranslatoritem"]');
+            let item = e.target.closest('[data-region="amostranslatoritem"].translatable');
 
             if (item.getAttribute('data-mode') == 'view') {
                 translatorItemEditingOn(item, e.ctrlKey).focus();
@@ -176,7 +176,7 @@ const stageTranslatedString = (item, text) => {
  */
 const turnAllMissingForEditing = () => {
     let root = document.getElementById('amostranslator');
-    let missingItems = root.querySelectorAll(':scope [data-region="amostranslatoritem"].missing');
+    let missingItems = root.querySelectorAll(':scope [data-region="amostranslatoritem"].translatable.missing');
     missingItems.forEach(translatorItemEditingOn);
 };
 

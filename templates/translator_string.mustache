@@ -17,7 +17,7 @@
 {{!
     @template local_amos/translator_strings
 
-    Render a single translatable string.
+    Render a single translator string.
 
     Classes required for JS:
     * none
@@ -46,7 +46,7 @@
     * translationsincedir - e.g. 2.0
     * translationsincecode - e.g. 20
     * translationsincelabel - e.g. 2.0
-    * statusclass - e.g. "translated"
+    * statusclass - e.g. "translated", "staged", "missing" or "outdated"
     * outdated (bool)
     * nocleaning (bool)
     * app (bool)
@@ -71,7 +71,7 @@
     }
 }}
 
-<div class="amostranslatoritem {{statusclass}} {{#translatable}} translatable {{/translatable}}"
+<div class="amostranslatoritem {{statusclass}} {{#translatable}} translatable {{/translatable}} {{^translatable}} nontranslatable {{/translatable}} {{#outdated}} outdated {{/outdated}}"
      data-region="amostranslatoritem"
      data-mode="view"
      data-component="{{component}}"

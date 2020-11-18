@@ -58,32 +58,30 @@
             width: 100%;
         }
 
-		&.translatable .amostranslation,
-		&.commitable .amostranslation {
-			background-color: $amos-color-committable;
+		&.translatable .amostranslation {
+			background-color: $amos-color-translatable;
 		}
 
-        &.translatable.missing .amostranslation,
-        &.committable.missing .amostranslation {
+        &.translatable.missing .amostranslation {
             background-color: $amos-color-missing;
         }
 
-        &.translatable.staged .amostranslation,
-        &.committable.staged .amostranslation {
-            background-color: $amos-color-staged;
+        &.translatable.outdated .amostranslation {
+            background-color: $amos-color-outdated;
         }
 
-        &.translatable.outdated .amostranslation,
-        &.committable.outdated .amostranslation {
+        &.translatable.staged .amostranslation {
+            background-color: $amos-color-staged !important;
+        }
+
+        &.translatable.outdated .amostranslation {
             background-color: $amos-color-outdated;
         }
 
         &.nontranslatable .amostranslation {
             background-color: $amos-color-nontranslatable;
-            &.explanation {
-                font-style: italic;
-                color: #909090;
-            }
+            font-style: italic;
+            color: #545454;
         }
 
         &[data-mode="view"] .amostranslationedit {
@@ -102,3 +100,4 @@
         }
     }
 }
+
