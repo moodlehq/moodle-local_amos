@@ -38,6 +38,15 @@ if ($hassiteconfig) {
             60, 3
         ));
 
+        $settings->add(new admin_setting_configtextarea(
+            'local_amos/standardcomponents',
+            get_string('standardcomponents', 'local_amos'),
+            get_string('standardcomponents_desc', 'local_amos'),
+            '',
+            PARAM_RAW_TRIMMED,
+            60, 10
+        ));
+
         $settings->add(new admin_setting_configtext(
             'local_amos/applangindexfile',
             get_string('applangindexfile', 'local_amos'),

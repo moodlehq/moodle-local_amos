@@ -397,6 +397,12 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * Blue - you have modified the translation or added a missing translation but you are not allowed to commit it into the given language.
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['stageunstageall'] = 'Unstage all';
+$string['standardcomponents'] = 'List of standard components';
+$string['standardcomponents_desc'] = 'List of Moodle standard components. The optional number indicates the version code since when the component is standard. If the number is negative, it indicates the last version when the component was present as standard one. Both numbers can be present. Example:
+
+* `mod_workshop` - with no versions, this component is considered as standard one on all versions
+* `report_infectedfiles 310` - indicates a component that should be considered as standard starting with Moodle 3.10
+* `theme_clean 25 -36` - standard component starting from Moodle 2.5 up to 3.6 inclusive';
 $string['stashactions'] = 'Save work in progress';
 $string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be submitted to the official language pack maintainers for inclusion into the language pack.';
 $string['stashapply'] = 'Apply';
