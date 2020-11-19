@@ -968,15 +968,16 @@ class mlang_stage implements IteratorAggregate, Countable {
      * @param bool $skiprebase if true, do not rebase before committing
      * @param int $timecommitted timestamp of the commit, defaults to now
      * @param bool $clear clear the stage after it is committed
+     * @return int Commit id or 0 if nothing committed.
      */
-    public function commit($message='', array $meta=null, $skiprebase=false, $timecommitted=null, $clear=true) {
+    public function commit($message='', array $meta=null, $skiprebase=false, $timecommitted=null, $clear=true): int {
         global $DB;
 
         if (empty($skiprebase)) {
             $this->rebase();
         }
         if (empty($this->components)) {
-            return;
+            return 0;
         }
 
         $purgecaches = false;
@@ -1034,6 +1035,8 @@ class mlang_stage implements IteratorAggregate, Countable {
             if ($clear) {
                 $this->clear();
             }
+
+            return $commit->id;
 
         } catch (Exception $e) {
             // This is here in order not to clear the stage, just re-throw the exception.
