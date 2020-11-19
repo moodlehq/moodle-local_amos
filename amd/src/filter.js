@@ -48,8 +48,10 @@ export const init = () => {
 const registerEventListeners = () => {
     let root = document.getElementById('amosfilter');
     let fcmp = document.getElementById('amosfilter_fcmp');
+    let fcmpItems = fcmp.querySelectorAll(':scope label[for^="amosfilter_fcmp_f_"]');
     let componentSearch = document.getElementById('amosfilter_fcmp_search');
     let flng = document.getElementById('amosfilter_flng');
+    let flngItems = flng.querySelectorAll(':scope option');
     let languageSearch = document.getElementById('amosfilter_flng_search');
     let fver = document.getElementById('amosfilter_fver');
     let flast = document.getElementById('amosfilter_flast');
@@ -116,12 +118,12 @@ const registerEventListeners = () => {
 
     // Handle component search.
     componentSearch.addEventListener('input', debounce(e => {
-        handleComponentSearch(e, componentSearch, fcmp);
+        handleComponentSearch(e, componentSearch, fcmpItems);
     }, 200));
 
     // Handle language search.
     languageSearch.addEventListener('input', debounce(() => {
-        handleLanguageSearch(languageSearch, flng);
+        handleLanguageSearch(languageSearch, flngItems);
     }, 200));
 };
 
@@ -171,12 +173,12 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
  * @function handleComponentSearch
  * @param {Event} e
  * @param {Element} inputField
- * @param {Element} fcmp
+ * @param {Array} fcmpItems
  */
-const handleComponentSearch = (e, inputField, fcmp) => {
+const handleComponentSearch = (e, inputField, fcmpItems) => {
     let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
 
-    fcmp.querySelectorAll(':scope label[for^="amosfilter_fcmp_f_"]').forEach(item => {
+    fcmpItems.forEach(item => {
         let row = item.closest('[data-region="amosfilter_fcmp_item"]');
         if (needle == '' || item.innerText.toString().toLowerCase().indexOf(needle) !== -1) {
             row.classList.remove('hidden');
@@ -211,12 +213,12 @@ const updateCounterOfSelectedComponents = () => {
 /**
  * @function handleLanguageSearch
  * @param {Element} inputField
- * @param {Element} flng
+ * @param {Array} flngItems
  */
-const handleLanguageSearch = (inputField, flng) => {
+const handleLanguageSearch = (inputField, flngItems) => {
     let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
 
-    flng.querySelectorAll(':scope option').forEach(item => {
+    flngItems.forEach(item => {
         if (needle == '' || item.text.toString().toLowerCase().indexOf(needle) !== -1) {
             item.classList.remove('hidden');
             // It is not enough to hide the options, because block-select (via select) would select hidden intermediate options too.
