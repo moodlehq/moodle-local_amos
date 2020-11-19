@@ -568,10 +568,10 @@ class local_amos_renderer extends plugin_renderer_base {
      */
     public function page_credits(array $people, $currentlanguage, $editmode = false) {
 
-        $out = $this->output->heading(get_string('creditstitlelong', 'local_amos'));
-        $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'thanks');
+        $out = '';
+        $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'p-1 thanks');
 
-        $out .= $this->output->container_start('quicklinks');
+        $out .= $this->output->container_start('small quicklinks p-2');
         $links = array();
         foreach ($people as $langcode => $langdata) {
             if ($langcode === $currentlanguage) {
@@ -587,18 +587,24 @@ class local_amos_renderer extends plugin_renderer_base {
         $out .= $this->output->container_end();
 
         foreach ($people as $langcode => $langdata) {
-            $out .= $this->output->container_start('language', 'credits-language-'.$langcode);
-            $out .= $this->output->heading($langdata->langname, 3, 'langname');
+            $out .= $this->output->container_start('card mb-2', 'credits-language-'.$langcode);
+            $out .= $this->output->container($this->output->heading($langdata->langname, 3, 'langname'), 'card-header');
+            $out .= $this->output->container_start('card-body');
 
             $out .= $this->output->container_start('maintainers');
             if (empty($langdata->maintainers)) {
-                $out .= $this->output->container(get_string('creditsnomaintainer', 'local_amos', array('url' => 'https://docs.moodle.org/dev/Translation')));
+                $out .= $this->output->container(
+                    get_string('creditsnomaintainer', 'local_amos', array('url' => 'https://docs.moodle.org/dev/Translation')),
+                    'alert alert-warning',
+                );
             } else {
-                $out .= $this->output->container(get_string('creditsmaintainedby', 'local_amos'), 'maintainers-title');
+                $out .= $this->output->container(get_string('creditsmaintainedby', 'local_amos'),
+                    'font-weight-bold py-1 maintainers-title');
+                $out .= $this->output->container_start('d-flex align-items-stretch');
                 foreach ($langdata->maintainers as $maintainer) {
-                    $out .= $this->output->container_start('maintainer');
+                    $out .= $this->output->container_start('maintainer bg-light p-3 border mr-2 mb-2');
                     $out .= $this->output->user_picture($maintainer, array('size' => 50));
-                    $out .= $this->output->container(fullname($maintainer), 'fullname');
+                    $out .= $this->output->container(fullname($maintainer), 'fullname my-1');
                     $out .= $this->output->action_icon(
                         new moodle_url('/message/index.php', array('id' => $maintainer->id)),
                         new pix_icon('t/message', get_string('creditscontact', 'local_amos')),
@@ -620,23 +626,26 @@ class local_amos_renderer extends plugin_renderer_base {
                     }
                     $out .= $this->output->container_end();
                 }
+                $out .= $this->output->container_end();
             }
             if ($editmode) {
                 $out .= html_writer::link(
-                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_MAINTAINER, 'langcode' => $langcode)),
+                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_MAINTAINER,
+                        'langcode' => $langcode)),
                     get_string('creditsaddmaintainer', 'local_amos'),
-                    array('class' => 'btn')
+                    array('class' => 'btn btn-secondary m-1')
                 );
             }
             $out .= $this->output->container_end(); // .maintainers
 
             $out .= $this->output->container_start('contributors');
             if (!empty($langdata->contributors)) {
-                $out .= $this->output->container(get_string('creditscontributors', 'local_amos'), 'contributors-title');
+                $out .= $this->output->container(get_string('creditscontributors', 'local_amos'),
+                    'contributors-title font-weight-bold py-1');
                 foreach ($langdata->contributors as $contributor) {
-                    $out .= $this->output->container_start('contributor');
-                    $out .= $this->output->user_picture($contributor, array('size' => 16));
-                    $out .= $this->output->container(fullname($contributor), 'fullname');
+                    $out .= $this->output->container_start('contributor d-inline-block border m-1 p-1 bg-light');
+                    $out .= $this->output->user_picture($contributor, array('size' => 16, 'class' => 'd-inline-block m-1'));
+                    $out .= $this->output->container(fullname($contributor), 'fullname d-inline-block');
                     if ($editmode and $contributor->iseditable) {
                         $out .= $this->output->action_icon(
                             new moodle_url('/local/amos/admin/translators.php', array(
@@ -657,12 +666,13 @@ class local_amos_renderer extends plugin_renderer_base {
                 $out .= html_writer::link(
                     new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_CONTRIBUTOR, 'langcode' => $langcode)),
                     get_string('creditsaddcontributor', 'local_amos'),
-                    array('class' => 'btn btn-small')
+                    array('class' => 'btn btn-secondary m-1')
                 );
             }
             $out .= $this->output->container_end(); // .contributors
 
-            $out .= $this->output->container_end();
+            $out .= $this->output->container_end(); // .card-body
+            $out .= $this->output->container_end(); // .card
         }
 
         return $out;

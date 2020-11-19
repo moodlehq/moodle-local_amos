@@ -43,7 +43,7 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/credits.php');
 $PAGE->set_title(get_string('creditstitleshort', 'local_amos'));
-$PAGE->set_heading(get_string('creditstitleshort', 'local_amos'));
+$PAGE->set_heading(get_string('creditstitlelong', 'local_amos'));
 
 if ($canedit and $editmode) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, array('editmode' => 0)), get_string('turneditingoff'), 'get'));
