@@ -138,6 +138,9 @@ if ($submitform->is_cancelled()) {
     $langstages = array();  // (string)langcode => (mlang_stage)
     $stash->apply($stage);
     foreach ($stage as $component) {
+        if (!$component->has_string()) {
+            continue;
+        }
         $lang = $component->lang;
         if (!isset($langstages[$lang])) {
             $langstages[$lang] = new mlang_stage();
