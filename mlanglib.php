@@ -2091,11 +2091,12 @@ class mlang_tools {
             'component' => $componentname,
         ];
 
+        $languages = array_diff($languages, ['en', 'en_fix']);
+
         if (empty($languages)) {
             $langsql = "<> :excludelang0";
             $langparams = ['excludelang0' => 'en_fix'];
         } else {
-            $languages = array_diff($languages, ['en', 'en_fix']);
             [$langsql, $langparams] = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
         }
 
