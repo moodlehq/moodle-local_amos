@@ -68,7 +68,7 @@ if (has_capability('local/amos:stage', context_system::instance())) {
     $caps[] = get_string('amos:stage', 'local_amos');
 }
 if (has_capability('local/amos:commit', context_system::instance())) {
-    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    $allowed = mlang_tools::list_allowed_languages();
     if (empty($allowed)) {
         $allowed = get_string('committablenone', 'local_amos');
     } elseif (!empty($allowed['X'])) {

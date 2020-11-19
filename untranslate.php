@@ -35,7 +35,7 @@ $confirm = optional_param('confirm', false, PARAM_BOOL);
 require_login(SITEID, false);
 require_capability('local/amos:commit', context_system::instance());
 
-$allowedlangs = mlang_tools::list_allowed_languages($USER->id);
+$allowedlangs = mlang_tools::list_allowed_languages();
 
 if (empty($allowedlangs['X']) and empty($allowedlangs[$language])) {
     throw new moodle_exception('err_unexpected_language', 'local_amos');

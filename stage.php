@@ -54,7 +54,7 @@ if (!empty($message)) {
         $clear = false;
     }
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    $allowed = mlang_tools::list_allowed_languages();
     $stage->prune($allowed);
     list($numstrings, $listlanguages, $listcomponents) = mlang_stage::analyze($stage);
     $stage->commit($message, ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
@@ -125,7 +125,7 @@ if (!empty($unstage)) {
 if (!empty($prune)) {
     require_sesskey();
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $allowed = mlang_tools::list_allowed_languages($USER->id);
+    $allowed = mlang_tools::list_allowed_languages();
     $stage->prune($allowed);
     $stage->store();
     redirect($PAGE->url);

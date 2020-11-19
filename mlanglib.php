@@ -1850,22 +1850,28 @@ class mlang_tools {
     }
 
     /**
-     * For the given user, returns a list of languges she is allowed commit into
+     * For the given user, returns a list of languages she/he is allowed commit into.
      *
      * Language code 'X' has a special meaning - the user is allowed to edit all languages.
      *
-     * @param mixed $userid user id
-     * @return array of (string)langcode => (string)langcode
+     * @param int $userid User id, defaults to the current user
+     * @return array List of (string)langcode => (string)langcode
      */
-    public static function list_allowed_languages($userid) {
-        global $CFG, $DB;
+    public static function list_allowed_languages(?int $userid = null): array {
+        global $CFG, $DB, $USER;
         require_once($CFG->dirroot.'/local/amos/locallib.php');
 
-        $records = $DB->get_records('amos_translators', array('userid' => $userid, 'status' => AMOS_USER_MAINTAINER));
-        $langs = array();
+        if ($userid === null) {
+            $userid = $USER->id;
+        }
+
+        $records = $DB->get_records('amos_translators', ['userid' => $userid, 'status' => AMOS_USER_MAINTAINER]);
+        $langs = [];
+
         foreach ($records as $record) {
             $langs[$record->lang] = $record->lang;
         }
+
         return $langs;
     }
 
