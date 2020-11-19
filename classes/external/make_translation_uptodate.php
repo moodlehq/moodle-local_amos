@@ -88,9 +88,9 @@ class make_translation_uptodate extends \external_api {
             throw new \invalid_parameter_exception('Invalid parameters: not a maintainer of ' . $translation->lang);
         }
 
-        $component = new \mlang_component($translation->component, $translation->lang,
-            \mlang_version::by_code($translation->since));
+        $version = \mlang_version::by_code($original->since);
 
+        $component = new \mlang_component($translation->component, $translation->lang, $version);
         $component->add_string(new \mlang_string($translation->strname, $translation->strtext));
 
         $stage = new \mlang_stage();
@@ -112,6 +112,7 @@ class make_translation_uptodate extends \external_api {
 
         return [
             'translationid' => $translation->id,
+            'displaytranslationsince' => $version->label . '+',
         ];
     }
 
@@ -124,6 +125,7 @@ class make_translation_uptodate extends \external_api {
 
         return new \external_single_structure([
             'translationid' => new \external_value(PARAM_INT, 'ID of the new translation'),
+            'displaytranslationsince' => new \external_value(PARAM_RAW, 'Label indicating version since the translation applies'),
         ]);
     }
 }

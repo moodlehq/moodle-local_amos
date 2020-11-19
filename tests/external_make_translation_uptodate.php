@@ -129,6 +129,9 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         $response = external_api::clean_returnvalue(\local_amos\external\make_translation_uptodate::execute_returns(), $response);
 
         $this->assertTrue(is_array($response));
-        $this->assertTrue($DB->record_exists('amos_translations', ['id' => $response['translationid']]));
+        $this->assertEquals('Skupinový režim', $DB->get_field('amos_translations', 'strtext', [
+            'id' => $response['translationid'],
+        ]));
+        $this->assertEquals('2.1+', $response['displaytranslationsince']);
     }
 }
