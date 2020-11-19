@@ -31,7 +31,8 @@
     * englishsincedir - e.g. 2.0
     * englishsincecode - e.g. 20
     * englishsincelabel - e.g. 2.0
-    * islatest - e.g. 1
+    * islatestoriginal - e.g. 1
+    * islatesttranslation - e.g. 1
     * language - e.g. cs
     * component - e.g. moodle
     * stringid - e.g. backupdatenew
@@ -85,9 +86,9 @@
         <div class="col-md d-flex flex-column">
             <div class="amosinfo small text-muted">
                 {{displayenglishsince}}
-                {{^islatest}}
+                {{^islatestoriginal}}
                     | <i class="fa fa-warning text-warning"></i> {{#str}} stringversionnotlatest, local_amos {{/str}}
-                {{/islatest}}
+                {{/islatestoriginal}}
                 | {{stringid}} | {{displaycomponent}}
                 {{#isappstring}}
                     | <i class="fa fa-mobile" title="{{app}}"></i>
@@ -107,6 +108,9 @@
                 {{#committable}}
                     <span class="mx-1" title="{{#str}} committable, local_amos {{/str}}"><i class="fa fa-floppy-o" aria-hidden="true"></i></span>
                 {{/committable}}
+                {{^islatesttranslation}}
+                    | <i class="fa fa-warning text-warning"></i> {{#str}} stringversionnotlatest, local_amos {{/str}}
+                {{/islatesttranslation}}
                 {{#hasuntranslateurl}}
                     | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
                 {{/hasuntranslateurl}}

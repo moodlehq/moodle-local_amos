@@ -163,11 +163,12 @@ class translator implements \renderable, \templatable {
                 $compbranch = $version;
             }
 
-            if ($record->since > $compbranch) {
-                // Make a note that more recent version exists.
+            if (!$last && $record->since > $compbranch) {
+                // Make a note that more recent version exists and exit early as we are showing selected version only.
                 $newer[$record->lang][$record->component][$record->strname] = true;
                 continue;
             }
+
             if (!isset($tree[$record->lang][$record->component][$record->strname])) {
                 $tree[$record->lang][$record->component][$record->strname] = $record;
 
@@ -255,7 +256,7 @@ class translator implements \renderable, \templatable {
                         $string->englishsincedir = $versince->dir;
                         $string->englishsincecode = $versince->code;
                         $string->englishsincelabel = $versince->label;
-                        $string->islatest = $english->islatest;
+                        $string->islatestoriginal = $english->islatest;
                         $string->language = $lang;
                         $string->component = $component;
                         $string->stringid = $stringid;
@@ -266,6 +267,7 @@ class translator implements \renderable, \templatable {
                         $string->originalmodified = $english->timemodified;
                         $string->translatable = true;
                         $string->committable = false;
+                        $string->islatesttranslation = empty($newer[$lang][$component][$stringid]);
 
                         if (isset($s[$lang][$component][$stringid])) {
                             $string->translation = $s[$lang][$component][$stringid]->text;
