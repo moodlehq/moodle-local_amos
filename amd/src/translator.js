@@ -98,14 +98,19 @@ const registerEventListeners = () => {
  * @function translatorItemEditingOn
  * @param {Element} item
  * @param {bool} [nocleaning=false] - turn editing on with nocleaning enabled
+ * @param {int} [tabIndex=0] - tabIndex value to set to the textarea
  * @return {Element}
  */
-const translatorItemEditingOn = (item, nocleaning = false) => {
+const translatorItemEditingOn = (item, nocleaning = false, tabIndex = 0) => {
     let textarea = item.querySelector('[data-region="amoseditor"]');
     let refHeight = item.querySelector('.amostranslation').clientHeight;
 
     item.setAttribute('data-nocleaning', nocleaning ? '1' : '0');
     textarea.setAttribute('data-previous', textarea.value);
+
+    if (tabIndex > 0) {
+        textarea.tabIndex = tabIndex;
+    }
 
     if (refHeight > 40) {
         textarea.style.height = (refHeight - 9) + 'px';
@@ -127,7 +132,7 @@ const translatorItemSave = (textarea) => {
     let previoustext = textarea.getAttribute('data-previous');
     let newtext = textarea.value;
 
-    if (nocleaning === '1') {
+    if (nocleaning !== '1') {
         newtext = newtext.trim();
     }
 
@@ -188,7 +193,9 @@ const stageTranslatedString = (item, text) => {
 const turnAllMissingForEditing = () => {
     let root = document.getElementById('amostranslator');
     let missingItems = root.querySelectorAll(':scope [data-region="amostranslatoritem"].translatable.missing');
-    missingItems.forEach(translatorItemEditingOn);
+    missingItems.forEach((item, index) => {
+        translatorItemEditingOn(item, false, index + 1);
+    });
 };
 
 /**
