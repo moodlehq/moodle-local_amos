@@ -46,7 +46,7 @@
     * translationsincedir - e.g. 2.0
     * translationsincecode - e.g. 20
     * translationsincelabel - e.g. 2.0
-    * statusclass - e.g. "translated", "staged", "missing" or "outdated"
+    * statusclass - "translated", "staged" or "missing"
     * outdated (bool)
     * nocleaning (bool)
     * app (bool)
@@ -107,10 +107,13 @@
                 {{#committable}}
                     <span class="mx-1" title="{{#str}} committable, local_amos {{/str}}"><i class="fa fa-floppy-o" aria-hidden="true"></i></span>
                 {{/committable}}
-                | <a data-region="timelinelink" href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
                 {{#hasuntranslateurl}}
                     | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
                 {{/hasuntranslateurl}}
+                | <a data-region="timelinelink" href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
+                {{#outdated}}
+                    | <a data-region="markuptodatelink" href="#">{{#str}} markuptodatelabel, local_amos {{/str}}</a>
+                {{/outdated}}
             </div>
             <div class="amostranslation">
                 <div class="amostranslationview" data-region="amostranslationview">{{{displaytranslation}}}</div>

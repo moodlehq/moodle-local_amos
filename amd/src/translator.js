@@ -70,6 +70,15 @@ const registerEventListeners = () => {
             return;
         }
 
+        // Marking translation as up-to-date.
+        if (e.target.hasAttribute('data-region') && e.target.getAttribute('data-region') == 'markuptodatelink') {
+            let item = e.target.closest('[data-region="amostranslatoritem"]');
+            e.preventDefault();
+            markUpToDate(item);
+            return;
+        }
+
+
         // Check to see if the user clicked on paginator link.
         let paginatorlink = e.target.closest('[data-paginatorlink]');
         if (paginatorlink) {
@@ -132,6 +141,7 @@ const translatorItemSave = (textarea) => {
     } else {
         // Send the translation to the stage if the translation has changed or nocleaning applies.
         item.classList.add('staged');
+        item.classList.remove('outdated');
         textarea.disabled = true;
 
         return stageTranslatedString(item, newtext)
@@ -143,6 +153,7 @@ const translatorItemSave = (textarea) => {
             textarea.innerHTML = textarea.value = response.translation;
             item.querySelector('[data-region="amostranslationview"]').innerHTML = response.displaytranslation;
             item.querySelector('[data-region="displaytranslationsince"]').innerHTML = response.displaytranslationsince + ' | ';
+            item.querySelector('[data-region="markuptodatelink"]')?.remove();
 
             return true;
 
@@ -248,6 +259,27 @@ const showTimeline = (item) => {
         modal.show();
 
         return modal;
+
+    }).catch(Notification.exception);
+};
+
+/**
+ * @function markUpToDate
+ * @param {Element} item
+ */
+const markUpToDate = (item) => {
+    return fetchMany([{
+        methodname: 'local_amos_make_translation_uptodate',
+        args: {
+            originalid: item.getAttribute('data-originalid'),
+            translationid: item.getAttribute('data-translationid'),
+        },
+
+    }])[0].then(response => {
+        item.classList.remove('outdated');
+        item.setAttribute('data-translationid', response.translationid);
+        item.querySelector('[data-region="displaytranslationsince"]').innerHTML = response.displaytranslationsince + ' | ';
+        item.querySelector('[data-region="markuptodatelink"]').remove();
 
     }).catch(Notification.exception);
 };
