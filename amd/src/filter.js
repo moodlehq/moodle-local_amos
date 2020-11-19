@@ -28,17 +28,41 @@ import * as PubSub from 'core/pubsub';
 import FilterEvents from './filter_events';
 import TranslatorEvents from './translator_events';
 
+let globalComponentsSelectorRowsCache = new Map();
+let globalLanguageSelectorOptionsCache = [];
+
 /**
  * Initialise the module and register events handlers.
  *
  * @function init
  */
 export const init = () => {
+    populateDOMElementCaches();
     registerEventListeners();
     updateCounterOfSelectedComponents();
     updateCounterOfSelectedLanguages();
     showUsedAdvancedOptions();
     scrollToFirstSelectedComponent();
+};
+
+/**
+ * @function populateDOMElementCaches
+ */
+const populateDOMElementCaches = () => {
+
+    // Create a cache map of all rendered component rows, keyed by the lowercase component name.
+    document.getElementById('amosfilter_fcmp_items_table').querySelectorAll(':scope tr').forEach((row, index) => {
+        let rowLabel = row.querySelector('label[for^="amosfilter_fcmp_f_"]');
+        let mapKey = 'HEADING_' + index;
+
+        if (rowLabel) {
+            mapKey = rowLabel.innerText.toString().toLowerCase();
+        }
+
+        globalComponentsSelectorRowsCache.set(mapKey, row);
+    });
+
+    globalLanguageSelectorOptionsCache = document.getElementById('amosfilter_flng').querySelectorAll(':scope option');
 };
 
 /**
@@ -48,10 +72,7 @@ export const init = () => {
 const registerEventListeners = () => {
     let root = document.getElementById('amosfilter');
     let fcmp = document.getElementById('amosfilter_fcmp');
-    let fcmpItems = fcmp.querySelectorAll(':scope label[for^="amosfilter_fcmp_f_"]');
     let componentSearch = document.getElementById('amosfilter_fcmp_search');
-    let flng = document.getElementById('amosfilter_flng');
-    let flngItems = flng.querySelectorAll(':scope option');
     let languageSearch = document.getElementById('amosfilter_flng_search');
     let fver = document.getElementById('amosfilter_fver');
     let flast = document.getElementById('amosfilter_flast');
@@ -117,13 +138,13 @@ const registerEventListeners = () => {
     });
 
     // Handle component search.
-    componentSearch.addEventListener('input', debounce(e => {
-        handleComponentSearch(e, componentSearch, fcmpItems);
+    componentSearch.addEventListener('input', debounce(() => {
+        handleComponentSearch(componentSearch);
     }, 200));
 
     // Handle language search.
     languageSearch.addEventListener('input', debounce(() => {
-        handleLanguageSearch(languageSearch, flngItems);
+        handleLanguageSearch(languageSearch);
     }, 200));
 };
 
@@ -171,21 +192,29 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
 
 /**
  * @function handleComponentSearch
- * @param {Event} e
  * @param {Element} inputField
  * @param {Array} fcmpItems
  */
-const handleComponentSearch = (e, inputField, fcmpItems) => {
-    let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
+const handleComponentSearch = (inputField) => {
 
-    fcmpItems.forEach(item => {
-        let row = item.closest('[data-region="amosfilter_fcmp_item"]');
-        if (needle == '' || item.innerText.toString().toLowerCase().indexOf(needle) !== -1) {
-            row.classList.remove('hidden');
-        } else {
-            row.classList.add('hidden');
+    let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
+    let shadowTableBody = document.createElement('tbody');
+
+    globalComponentsSelectorRowsCache.forEach((row, key) => {
+        if (key.startsWith('HEADING')) {
+            shadowTableBody.appendChild(row);
+            return;
+        }
+
+        if (needle == '' || key.indexOf(needle) !== -1) {
+            shadowTableBody.appendChild(row);
+            return;
         }
     });
+
+    let fcmpItemTable = document.getElementById('amosfilter_fcmp_items_table');
+    fcmpItemTable.innerHTML = '';
+    fcmpItemTable.appendChild(shadowTableBody);
 };
 
 /**
@@ -213,12 +242,11 @@ const updateCounterOfSelectedComponents = () => {
 /**
  * @function handleLanguageSearch
  * @param {Element} inputField
- * @param {Array} flngItems
  */
-const handleLanguageSearch = (inputField, flngItems) => {
+const handleLanguageSearch = (inputField) => {
     let needle = inputField.value.toString().replace(/^ +| +$/, '').toLowerCase();
 
-    flngItems.forEach(item => {
+    globalLanguageSelectorOptionsCache.forEach(item => {
         if (needle == '' || item.text.toString().toLowerCase().indexOf(needle) !== -1) {
             item.classList.remove('hidden');
             // It is not enough to hide the options, because block-select (via select) would select hidden intermediate options too.
@@ -364,7 +392,7 @@ const submitFilter = () => {
     let formdata = new FormData(form);
 
     // Put the language selector into original state again (disable all hidden options).
-    handleLanguageSearch(languageSearch, flng);
+    handleLanguageSearch(languageSearch);
 
     formdata.delete('sesskey');
     PubSub.publish(FilterEvents.submit, new URLSearchParams(formdata).toString());
