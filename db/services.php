@@ -64,6 +64,14 @@ $functions = [
         'type' => 'read',
         'ajax' => true,
     ],
+    'local_amos_make_translation_uptodate' => [
+        'classname' => '\local_amos\external\make_translation_uptodate',
+        'methodname' => 'execute',
+        'description' => 'Mark given translation as up-to-date against the given original.',
+        'capabilities' => 'local/amos:commit',
+        'type' => 'write',
+        'ajax' => true,
+    ],
 ];
 
 $services = [
