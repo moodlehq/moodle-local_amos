@@ -595,7 +595,7 @@ class local_amos_renderer extends plugin_renderer_base {
             if (empty($langdata->maintainers)) {
                 $out .= $this->output->container(
                     get_string('creditsnomaintainer', 'local_amos', array('url' => 'https://docs.moodle.org/dev/Translation')),
-                    'alert alert-warning',
+                    'alert alert-warning'
                 );
             } else {
                 $out .= $this->output->container(get_string('creditsmaintainedby', 'local_amos'),
