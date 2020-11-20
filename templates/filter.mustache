@@ -76,10 +76,6 @@
                     </table>
                 </div>
 
-                <div id="amosfilter_fcmp_invalid_feedback" class="invalid-feedback {{#fcmp.numselected}} hidden {{/fcmp.numselected}}">
-                    {{#str}} filtercmpnothingselected, local_amos {{/str}}
-                </div>
-
                 <div class="d-flex flex-column flex-md-row">
                     <div>
                         <input id="amosfilter_fcmp_search" type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
@@ -101,6 +97,10 @@
                     </div>
                 </div>
 
+                <div id="amosfilter_fcmp_invalid_feedback" class="invalid-feedback {{#fcmp.numselected}} hidden {{/fcmp.numselected}}">
+                    {{#str}} filtercmpnothingselected, local_amos {{/str}}
+                </div>
+
             </div>
         </div>
 
@@ -119,14 +119,14 @@
                     {{/flng.options}}
                 </select>
 
-                <div id="amosfilter_flng_invalid_feedback" class="invalid-feedback {{#flng.numselected}} hidden {{/flng.numselected}}">
-                    {{#str}} filterlngnothingselected, local_amos {{/str}}
-                </div>
-
                 <div class="d-flex flex-column flex-md-row">
                     <div>
                         <input id="amosfilter_flng_search" type="text" size="15" maxlength="30" placeholder="{{#str}} filter, core {{/str}}" class="form-control form-control-sm" />
                     </div>
+                </div>
+
+                <div id="amosfilter_flng_invalid_feedback" class="invalid-feedback {{#flng.numselected}} hidden {{/flng.numselected}}">
+                    {{#str}} filterlngnothingselected, local_amos {{/str}}
                 </div>
             </div>
         </div>
