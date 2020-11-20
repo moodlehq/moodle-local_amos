@@ -44,7 +44,7 @@ class util_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
-        set_config('standardcomponents', " mod_foobar\t\n  foobar_one  39  \n  foobar_two 37 -38\n\n\n_test\nfoobar_three -38",
+        set_config('standardcomponents', " mod_foobar\t\n  foobar_one  39  \n  foobar_two 37 -38\n\n\n_test\nfoobar_three 39 -39",
             'local_amos'
         );
 
@@ -52,14 +52,24 @@ class util_test extends \advanced_testcase {
 
         $this->assertDebuggingCalled('Unexpected standardcomponents line starting with: _test');
         $this->assertEquals(3, count($tree));
-        $this->assertEquals(5, count($tree[38]));
+        $this->assertEquals(3, count($tree[38]));
         $this->assertEquals(4, count($tree[39]));
         $this->assertEquals(3, count($tree[310]));
         $this->assertEquals('core', $tree[38]['moodle']);
+        $this->assertEquals('core', $tree[39]['moodle']);
+        $this->assertEquals('core', $tree[310]['moodle']);
         $this->assertEquals('mod_foobar', $tree[38]['foobar']);
         $this->assertEquals('mod_foobar', $tree[39]['foobar']);
         $this->assertEquals('mod_foobar', $tree[310]['foobar']);
-        $this->assertEquals('foobar_three', $tree[310]['foobar_three']);
+        $this->assertArrayNotHasKey('foobar_one', $tree[38]);
+        $this->assertEquals('foobar_one', $tree[39]['foobar_one']);
+        $this->assertEquals('foobar_one', $tree[310]['foobar_one']);
+        $this->assertEquals('foobar_two', $tree[38]['foobar_two']);
+        $this->assertArrayNotHasKey('foobar_two', $tree[39]);
+        $this->assertArrayNotHasKey('foobar_two', $tree[310]);
+        $this->assertArrayNotHasKey('foobar_three', $tree[38]);
+        $this->assertEquals('foobar_three', $tree[39]['foobar_three']);
+        $this->assertArrayNotHasKey('foobar_three', $tree[310]);
 
         set_config('standardcomponents', "mod_foobar\ninvalid_range 37 39", 'local_amos');
 

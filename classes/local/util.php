@@ -79,10 +79,10 @@ class util {
 
             } else if (count($parts) == 2) {
                 if ($parts[1] > 0) {
-                    $minmax[$parts[0]] = [$minver, $parts[1]];
+                    $minmax[$parts[0]] = [$parts[1], $maxver];
 
                 } else {
-                     $minmax[$parts[0]] = [-$parts[1], $maxver];
+                     $minmax[$parts[0]] = [$minver, -$parts[1]];
                 }
 
             } else if (count($parts) == 3) {
