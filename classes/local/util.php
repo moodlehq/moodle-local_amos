@@ -47,7 +47,7 @@ class util {
     /**
      * Returns versions on which components were standard ones.
      *
-     * @return array
+     * @return array (string)frankenstylename => [(int)minver, (int)maxver]
      */
     public static function standard_components_range_versions(): array {
 

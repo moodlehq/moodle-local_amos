@@ -534,6 +534,7 @@ class filter implements \renderable, \templatable {
         ];
 
         $standard = \local_amos\local\util::standard_components_in_latest_version();
+        $stdversions = \local_amos\local\util::standard_components_range_versions();
 
         // Categorize components into Core, Standard or Add-ons.
         foreach (\mlang_tools::list_components() as $componentname => $since) {
@@ -569,6 +570,11 @@ class filter implements \renderable, \templatable {
                     'since' => $sinceversion[$componentname],
                     'app' => isset($mobileapp[$componentname]),
                 ];
+
+                if ($type === 'contrib' && isset($stdversions[$componentname])) {
+                    $option['hasstdvernote'] = true;
+                    $option['stdvernote'] = $this->fcmp_stdvernote($componentname, $stdversions[$componentname]);
+                }
 
                 if (in_array($componentname, $filterdata->component)) {
                     $fcmp['numselected']++;
@@ -724,5 +730,39 @@ class filter implements \renderable, \templatable {
         $SESSION->local_amos->filter_user_default_data = json_encode($data);
 
         return $data;
+    }
+
+    /**
+     * Generate info for additional (contrib) plugins there were once standard ones
+     *
+     * @param string $componentname
+     * @param array $minmax
+     * @return string
+     */
+    protected function fcmp_stdvernote(string $componentname, array $minmax): string {
+
+        [$min, $max] = $minmax;
+        $a = [];
+
+        if ($min > PHP_INT_MIN) {
+            $a['from'] = \mlang_version::by_code($min)->label;
+        }
+
+        if ($max < PHP_INT_MAX) {
+            $a['to'] = \mlang_version::by_code($max)->label;
+        }
+
+        if ($min > PHP_INT_MIN && $max == PHP_INT_MAX) {
+            return get_string('stdvernotefrom', 'local_amos', $a);
+
+        } else if ($min == PHP_INT_MIN && $max < PHP_INT_MAX) {
+            return get_string('stdvernoteto', 'local_amos', $a);
+
+        } else if ($min > PHP_INT_MIN && $max < PHP_INT_MAX) {
+            return get_string('stdvernotebetween', 'local_amos', $a);
+
+        } else {
+            return '';
+        }
     }
 }

@@ -31,6 +31,9 @@
     <td>
         <span class="badge badge-light">{{since}}</span>
         <span class="badge badge-light">{{typename}}</span>
+        {{#hasstdvernote}}
+            <span class="badge badge-light">{{stdvernote}}</span>
+        {{/hasstdvernote}}
         {{#app}}
             <span class="badge badge-light"><i class="fa fa-mobile"></i> {{#str}} componentsapp, local_amos {{/str}}</span>
         {{/app}}
