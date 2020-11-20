@@ -45,21 +45,14 @@ class util {
     }
 
     /**
-     * Returns a tree of standard components.
+     * Returns versions on which components were standard ones.
      *
-     * @return array (int)versioncode => (string)legacyname => (string)frankenstylename
+     * @return array
      */
-    public static function standard_components_tree() {
+    public static function standard_components_range_versions(): array {
 
-        $tree = [];
-
-        foreach (\mlang_version::list_all() as $mlangversion) {
-            $tree[$mlangversion->code] = [];
-        }
-
-        $minver = min(array_keys($tree));
-        $maxver = max(array_keys($tree));
         $minmax = [];
+
         $list = get_config('local_amos', 'standardcomponents');
 
         foreach (explode(PHP_EOL, $list) as $line) {
@@ -75,14 +68,14 @@ class util {
             }
 
             if (count($parts) == 1) {
-                $minmax[$parts[0]] = [$minver, $maxver];
+                $minmax[$parts[0]] = [PHP_INT_MIN, PHP_INT_MAX];
 
             } else if (count($parts) == 2) {
                 if ($parts[1] > 0) {
-                    $minmax[$parts[0]] = [$parts[1], $maxver];
+                    $minmax[$parts[0]] = [$parts[1], PHP_INT_MAX];
 
                 } else {
-                     $minmax[$parts[0]] = [$minver, -$parts[1]];
+                     $minmax[$parts[0]] = [PHP_INT_MIN, -$parts[1]];
                 }
 
             } else if (count($parts) == 3) {
@@ -101,6 +94,24 @@ class util {
                 debugging('Unexpected standardcomponents line syntax: ' . $line, DEBUG_DEVELOPER);
             }
         }
+
+        return $minmax;
+    }
+
+    /**
+     * Returns a tree of standard components.
+     *
+     * @return array (int)versioncode => (string)legacyname => (string)frankenstylename
+     */
+    public static function standard_components_tree(): array {
+
+        $tree = [];
+
+        foreach (\mlang_version::list_all() as $mlangversion) {
+            $tree[$mlangversion->code] = [];
+        }
+
+        $minmax = static::standard_components_range_versions();
 
         foreach (array_keys($tree) as $version) {
             $tree[$version]['moodle'] = 'core';
@@ -128,7 +139,7 @@ class util {
      *
      * @return array (string)legacyname => (string)frankenstylename
      */
-    public static function standard_components_list() {
+    public static function standard_components_list(): array {
 
         $list = [];
 
@@ -144,7 +155,7 @@ class util {
      *
      * @return array (string)legacyname => (string)frankenstylename
      */
-    public static function standard_components_in_latest_version() {
+    public static function standard_components_in_latest_version(): array {
 
         $tree = static::standard_components_tree();
         $latestversioncode = max(array_keys($tree));

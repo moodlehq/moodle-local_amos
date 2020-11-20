@@ -121,4 +121,29 @@ class util_test extends \advanced_testcase {
         $this->assertEquals('core', $list['moodle']);
         $this->assertEquals('mod_foobar', $list['foobar']);
     }
+
+    /**
+     * Test functionality of {@see local_amos\local\util::standard_components_range_versions()}.
+     */
+    public function test_standard_components_range_versions() {
+        $this->resetAfterTest();
+
+        set_config('branchesall', '38,39,310', 'local_amos');
+        set_config('standardcomponents', "mod_foobar\nfoobar_one 39\nfoobar_two 37 -38\nfoobar_three -310\ncore_barbar 310 -310",
+            'local_amos');
+
+        $list = util::standard_components_range_versions();
+
+        $this->assertEquals(5, count($list));
+        $this->assertEquals(PHP_INT_MIN, $list['mod_foobar'][0]);
+        $this->assertEquals(PHP_INT_MAX, $list['mod_foobar'][1]);
+        $this->assertEquals(39, $list['foobar_one'][0]);
+        $this->assertEquals(PHP_INT_MAX, $list['foobar_one'][1]);
+        $this->assertEquals(37, $list['foobar_two'][0]);
+        $this->assertEquals(38, $list['foobar_two'][1]);
+        $this->assertEquals(PHP_INT_MIN, $list['foobar_three'][0]);
+        $this->assertEquals(310, $list['foobar_three'][1]);
+        $this->assertEquals(310, $list['core_barbar'][0]);
+        $this->assertEquals(310, $list['core_barbar'][1]);
+    }
 }
