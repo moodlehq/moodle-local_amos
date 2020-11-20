@@ -1528,6 +1528,137 @@ class local_amos_contribution implements renderable {
 }
 
 /**
+ * Represents a collection changes to be sent to subscribers
+ */
+class local_amos_sub_notification implements renderable, templatable {
+
+    /** @var array of $components including the changes made for string od them*/
+    public $components = array();
+
+    /** @var stdClass user */
+    public $user;
+
+    /** @var bool $html States if the notification should be */
+    public $html;
+
+    /**
+     * Fetches the required commits from the repository
+     *
+     * @param stdClass $user id of the subscriber
+     * @param int $since timestamp since when changes should be returned.
+     * @param bool $html States if the notification should be
+     */
+    public function __construct($user, $since, $html = false) {
+        global $DB;
+
+        // Get all unique combinations of stringid, component, lang and branch.
+        $getsqlrelevantstrings = "SELECT r.stringid,
+                                         r.component, 
+                                         r.lang, 
+                                         r.branch, 
+                                         max(r.timemodified) timemodified
+                         FROM {amos_commits} co
+                         JOIN {amos_repository} r ON (co.id = r.commitid)
+                         JOIN {amos_texts} t ON (r.textid = t.id)
+                         JOIN {amos_subscription} s ON (s.lang = r.lang AND s.component = r.component)
+                        WHERE r.timemodified > ?
+                        GROUP BY r.stringid, r.component, r.lang, r.branch";
+
+        // Query the newest and oldest repository ids for the respective relevant string combinations.
+        $getsqlforoldmodified = "SELECT relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           relevantstrings.branch,
+                           relevantstrings.timemodified newmodified,
+                           max(oldtexts.timemodified) oldmodified
+                           FROM ($getsqlrelevantstrings) as relevantstrings LEFT JOIN
+                           {amos_repository} oldtexts ON 
+                           relevantstrings.stringid = oldtexts.stringid AND 
+                           relevantstrings.component = oldtexts.component AND
+                           relevantstrings.lang = oldtexts.lang AND 
+                           relevantstrings.branch = oldtexts.branch AND 
+                           oldtexts.timemodified < ?
+                           GROUP BY relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           relevantstrings.branch,
+                           relevantstrings.timemodified";
+
+        $getrepoids = "SELECT relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           relevantstrings.branch,
+                           max(newrepo.textid) newtextid,
+                           max(oldrepo.textid) oldtextid
+                           FROM ($getsqlforoldmodified) as relevantstrings JOIN
+                           {amos_repository} newrepo ON 
+                           relevantstrings.stringid = newrepo.stringid AND 
+                           relevantstrings.component = newrepo.component AND
+                           relevantstrings.lang = newrepo.lang AND 
+                           relevantstrings.branch = newrepo.branch AND 
+                           relevantstrings.newmodified = newrepo.timemodified LEFT JOIN
+                           {amos_repository} oldrepo ON 
+                           relevantstrings.stringid = oldrepo.stringid AND 
+                           relevantstrings.component = oldrepo.component AND
+                           relevantstrings.lang = oldrepo.lang AND 
+                           relevantstrings.branch = oldrepo.branch AND 
+                           relevantstrings.oldmodified = oldrepo.timemodified
+                           GROUP BY relevantstrings.stringid, 
+                           relevantstrings.component,
+                           relevantstrings.lang,
+                           relevantstrings.branch";
+
+        // Actually query the result containing the identifiers of the unique combinaiton.
+        // And also the old and the new texts.
+        $getsql = "SELECT innersql.stringid, 
+                           innersql.component,
+                           innersql.lang,
+                           innersql.branch,
+                           newtext.text newtext, 
+                           oldtext.text oldtext FROM
+                           ($getrepoids) as innersql JOIN
+                           {amos_texts} newtext ON
+                              innersql.newtextid = newtext.id  LEFT JOIN
+                           {amos_texts} oldtext ON
+                              innersql.oldtextid = oldtext.id";
+        $recordset = $DB->get_recordset_sql($getsql, array($since, $since));
+
+        // Build the data format for the mustach template.
+        foreach ($recordset as $record) {
+            $identifier = $record->component . '#' . $record->lang;
+            if (!array_key_exists($identifier, $this->components)) {
+                $component = new stdClass();
+                $component->name = $record->component;
+                $component->lang = $record->lang;
+                $component->changes = [];
+                $this->components[$identifier] = $component;
+            }
+            $component = $this->components[$identifier];
+            $change = new stdClass();
+            $change->newtext = $record->newtext;
+            $change->oldtext = $record->oldtext;
+            $change->stringid = $record->stringid;
+            $change->branch = mlang_version::by_code($record->branch)->label;
+            $component->changes [] = $change;
+        }
+
+        // Remove the text keys and replace them by random ints in order for mustach to work.
+        $this->components = array_values($this->components);
+
+        $this->user = $user;
+
+        $this->html = $html;
+    }
+
+    /**
+     * The class already stores the data in the correct structure, so it returns itself.
+     */
+    public function export_for_template(renderer_base $output) {
+        return $this;
+    }
+}
+
+/**
  * Returns the list of standard components
  *
  * @return array (string)version => (string)legacyname => (string)frankenstylename
@@ -1766,4 +1897,14 @@ function local_amos_simplediff(array $old, array $new) {
         local_amos_simplediff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
         array_slice($new, $nmax, $maxlen),
         local_amos_simplediff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+}
+
+class local_amos_subscription_filter extends local_amos_filter {
+
+    public function __construct(moodle_url $handler)
+    {
+        parent::__construct($handler);
+        $this->fields = ['component', 'language'];
+    }
+
 }

@@ -44,6 +44,7 @@ function local_amos_extend_navigation(global_navigation $navigation) {
         $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'), navigation_node::TYPE_CUSTOM, null, 'contributions');
     }
     $amos->add(get_string('log', 'local_amos'), new moodle_url('/local/amos/log.php'), navigation_node::TYPE_CUSTOM, null, 'log');
+    $amos->add(get_string('subscription', 'local_amos'), new moodle_url('/local/amos/subscription.php'), navigation_node::TYPE_CUSTOM, 'subscription');
     $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'), navigation_node::TYPE_CUSTOM, null, 'credits');
     if (has_capability('local/amos:manage', context_system::instance())) {
         $admin = $amos->add(get_string('administration'));
@@ -183,4 +184,46 @@ function local_amos_comment_template($params) {
     $template .= html_writer::end_tag('div'); // .plugin-comment
 
     return $template;
+}
+
+/**
+ * Callback to update a value in an inplace_editable.
+ *
+ * @param $itemtype
+ * @param $itemid
+ * @param $newvalue
+ */
+function local_amos_inplace_editable($itemtype, $itemid, $newvalue) {
+    global $USER;
+
+    \external_api::validate_context(context_system::instance());
+
+    if ($itemtype === 'subscription') {
+        $component = clean_param($itemid, PARAM_ALPHANUMEXT);
+        $langs = json_decode($newvalue);
+
+        $manager = new \local_amos\subscription_manager($USER->id);
+        $manager->remove_component_subscription($component);
+
+        foreach ($langs as $lang) {
+            $lang = clean_param($lang, PARAM_ALPHANUMEXT);
+            $manager->add_subscription($component, $lang);
+        }
+
+        $manager->apply_changes();
+        $subs = $manager->fetch_subscriptions();
+        $newlangs = (isset($subs[$component])) ? $subs[$component] : [];
+
+        return \local_amos\local\subscription_table::get_lang_inplace_editable($component, $newlangs);
+    }
+}
+
+/**
+ * Callback to remove user subscriptions when user will be deleted.
+ *
+ * @param $user
+ */
+function local_amos_pre_user_delete($user) {
+    $manager = new \local_amos\subscription_manager($user->id);
+    $manager->remove_all_subscriptions();
 }
