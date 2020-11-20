@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Cmpare the contents of two unzipped language packs
+ *
  * @package     local_amos
  * @subpackage  cli
  * @copyright   2013 David Mudrak <david@moodle.com>
@@ -23,101 +25,99 @@
 
 define('CLI_SCRIPT', 1);
 
-require(__DIR__.'/../../../config.php');
-require_once($CFG->libdir.'/pluginlib.php');
-require_once($CFG->libdir.'/clilib.php');
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
-require_once($CFG->dirroot.'/local/amos/locallib.php');
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-$usage = "
-Use this script to compare the contents of two unzipped language packs
+$usage = "Use this script to compare the contents of two unzipped language packs
 
-    $ php compare-packs.php --version=2.6 --master=/tmp/en --slave=/tmp/fr
+    $ php compare-packs.php --old=/tmp/old/cs --new=/tmp/new/cs
 ";
 
-list($options, $unrecognized) = cli_get_params(array('version' => '', 'master' => '', 'slave' => ''));
+list($options, $unrecognised) = cli_get_params([
+    'help' => false,
+    'old' => '',
+    'new' => '',
+], [
+    'h' => 'help',
+]);
 
-$version = $options['version'];
-$master = $options['master'];
-$slave = $options['slave'];
+if ($unrecognised) {
+    $unrecognised = implode(PHP_EOL . '  ', $unrecognised);
+    cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
+}
 
-if (empty($version) or empty($master) or empty($slave)) {
+if ($options['help']) {
+    cli_writeln($usage);
+    exit(2);
+}
+
+$old = $options['old'];
+$new = $options['new'];
+
+if (empty($old) || empty($new)) {
     cli_error($usage);
 }
 
-if (strpos($version, '.')) {
-    $version = mlang_version::by_dir($version);
-} else {
-    $version = mlang_version::by_code($version);
+if (!is_dir($old)) {
+    cli_error($old . ' is not a directory');
 }
 
-$standard = \local_amos\local\util::standard_components_tree();
-
-if (!isset($standard[$version->code])) {
-    cli_error($version->dir . ' not a known version');
+if (!is_dir($new)) {
+    cli_error($new . ' is not a directory');
 }
 
-if (!is_dir($master)) {
-    cli_error($master.' is not a directory');
+$oldpack = load_language_pack($old);
+$newpack = load_language_pack($new);
+
+if ($diff = array_diff(array_keys($oldpack), array_keys($newpack))) {
+    cli_writeln('(+ ) component only in old: ' . implode(', ', $diff));
 }
 
-if (!is_dir($slave)) {
-    cli_error($slave.' is not a directory');
+if ($diff = array_diff(array_keys($newpack), array_keys($oldpack))) {
+    cli_writeln('( +) components only in new: ' . implode(', ', $diff));
 }
 
-$mpack = array();
-$spack = array();
-
-foreach (new DirectoryIterator($master) as $file) {
-    if ($file->isDot() or $file->isDir()) {
-        continue;
+foreach (array_intersect(array_keys($newpack), array_keys($oldpack)) as $component) {
+    if ($diff = array_diff(array_keys($oldpack[$component]), array_keys($newpack[$component]))) {
+        cli_writeln('[ +] strings only in old ' . $component . ': ' . implode(', ', $diff));
     }
-    if (substr($file->getFilename(), -4) !== '.php') {
-        fputs(STDERR, 'Unexpected file '.$file->getPathname());
-        exit(1);
-    }
-    $component = mlang_component::name_from_filename($file->getFilename());
-    $string = array();
-    require($file->getPathname());
-    $mpack[$component] = array_flip(array_keys($string));
-    unset($string);
-}
 
-foreach (new DirectoryIterator($slave) as $file) {
-    if ($file->isDot() or $file->isDir()) {
-        continue;
+    if ($diff = array_diff(array_keys($newpack[$component]), array_keys($oldpack[$component]))) {
+        cli_writeln('[+ ] strings only in new ' . $component . ': ' . implode(', ', $diff));
     }
-    if (substr($file->getFilename(), -4) !== '.php') {
-        fputs(STDERR, 'Unexpected file '.$file->getPathname());
-        exit(1);
-    }
-    $component = mlang_component::name_from_filename($file->getFilename());
-    $string = array();
-    require($file->getPathname());
-    $spack[$component] = array_flip(array_keys($string));
-    unset($string);
-}
 
-// Report all slave strings not present in the master pack.
-foreach ($spack as $component => $strings) {
-    foreach (array_keys($strings) as $string) {
-        if (!isset($mpack[$component][$string])) {
-            fputs(STDERR, '['.$component.','.$string.'] defined in the slave only'.PHP_EOL);
+    foreach (array_intersect(array_keys($newpack[$component]), array_keys($oldpack[$component])) as $strname) {
+        if ($newpack[$component][$strname] !== $oldpack[$component][$strname]) {
+            cli_writeln('[!!] string mismatch in component ' . $component . ': ' . $strname);
         }
     }
 }
 
-// Report all missing slave strings if the master pack is a standard one.
-foreach ($mpack as $component => $strings) {
-    if (!isset($standard[$version->code][$component])) {
-        continue;
-    }
-    foreach (array_keys($strings) as $string) {
-        if (substr($string, -5) === '_link') {
+/**
+ * Load all strings from all files in the given language pack path.
+ *
+ * @param string $path
+ * @return array (string)componentname => (string)strname => (string)strtext
+ */
+function load_language_pack(string $path): array {
+
+    $pack = [];
+
+    foreach (new DirectoryIterator($path) as $file) {
+        if ($file->isDot() or $file->isDir()) {
             continue;
         }
-        if (!isset($spack[$component][$string])) {
-            fputs(STDERR, '['.$component.','.$string.'] defined in the master only'.PHP_EOL);
+        if (substr($file->getFilename(), -4) !== '.php') {
+            fputs(STDERR, 'Unexpected file ' . $file->getPathname());
+            exit(1);
         }
+        $component = mlang_component::name_from_filename($file->getFilename());
+        $string = [];
+        require($file->getPathname());
+        $pack[$component] = $string;
+        unset($string);
     }
+
+    return $pack;
 }
