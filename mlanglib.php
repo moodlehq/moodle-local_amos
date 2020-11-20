@@ -2091,12 +2091,19 @@ class mlang_tools {
             'component' => $componentname,
         ];
 
-        $languages = array_diff($languages, ['en', 'en_fix']);
-
         if (empty($languages)) {
+            // Perform backporting in all language packs but en_fix.
             $langsql = "<> :excludelang0";
             $langparams = ['excludelang0' => 'en_fix'];
+
         } else {
+            // Check to see if there is some language left after removing en_fix and quite early eventually.
+            $languages = array_diff($languages, ['en', 'en_fix']);
+
+            if (empty($languages)) {
+                return;
+            }
+
             [$langsql, $langparams] = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
         }
 
