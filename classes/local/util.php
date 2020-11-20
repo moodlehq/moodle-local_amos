@@ -138,4 +138,17 @@ class util {
 
         return $list;
     }
+
+    /**
+     * Returns a list of components that are standard in the latest known version.
+     *
+     * @return array (string)legacyname => (string)frankenstylename
+     */
+    public static function standard_components_in_latest_version() {
+
+        $tree = static::standard_components_tree();
+        $latestversioncode = max(array_keys($tree));
+
+        return $tree[$latestversioncode];
+    }
 }

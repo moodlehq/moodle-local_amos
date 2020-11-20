@@ -96,4 +96,29 @@ class util_test extends \advanced_testcase {
         $this->assertEquals('foobar_two', $list['foobar_two']);
         $this->assertEquals('core_barbar', $list['barbar']);
     }
+
+    /**
+     * Test functionality of {@see local_amos\local\util::standard_components_in_latest_version()}.
+     */
+    public function test_standard_components_in_latest_version() {
+        $this->resetAfterTest();
+
+        set_config('branchesall', '38,39,310', 'local_amos');
+        set_config('standardcomponents', "mod_foobar\nfoobar_one -39\nfoobar_two 37 -38\ncore_barbar 310 -310", 'local_amos');
+
+        $list = util::standard_components_in_latest_version();
+
+        $this->assertEquals(3, count($list));
+        $this->assertEquals('core', $list['moodle']);
+        $this->assertEquals('mod_foobar', $list['foobar']);
+        $this->assertEquals('core_barbar', $list['barbar']);
+
+        set_config('branchesall', '38,39,310,311', 'local_amos');
+
+        $list = util::standard_components_in_latest_version();
+
+        $this->assertEquals(2, count($list));
+        $this->assertEquals('core', $list['moodle']);
+        $this->assertEquals('mod_foobar', $list['foobar']);
+    }
 }

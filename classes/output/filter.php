@@ -533,7 +533,7 @@ class filter implements \renderable, \templatable {
             'contrib' => [],
         ];
 
-        $standard = \local_amos\local\util::standard_components_list();
+        $standard = \local_amos\local\util::standard_components_in_latest_version();
 
         // Categorize components into Core, Standard or Add-ons.
         foreach (\mlang_tools::list_components() as $componentname => $since) {
