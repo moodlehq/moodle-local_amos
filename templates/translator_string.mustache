@@ -115,9 +115,11 @@
                     | <a href="{{untranslateurl}}">{{#str}} untranslate, local_amos {{/str}}</a>
                 {{/hasuntranslateurl}}
                 | <a data-region="timelinelink" href="{{timelineurl}}" target="_blank">{{#str}} stringhistory, local_amos {{/str}}</a>
-                {{#outdated}}
-                    | <a data-region="markuptodatelink" href="#">{{#str}} markuptodatelabel, local_amos {{/str}}</a>
-                {{/outdated}}
+                {{#committable}}
+                    {{#outdated}}
+                        | <a data-region="markuptodatelink" href="#">{{#str}} markuptodatelabel, local_amos {{/str}}</a>
+                    {{/outdated}}
+                {{/committable}}
             </div>
             <div class="amostranslation">
                 <div class="amostranslationview" data-region="amostranslationview">{{{displaytranslation}}}</div>
