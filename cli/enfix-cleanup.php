@@ -30,6 +30,8 @@ require_once($CFG->libdir  . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
+cli_error('TODO - this needs to be updated to use the new storage system.');
+
 list($options, $unrecognized) = cli_get_params(array('execute' => false, 'aggresive' => false));
 
 fputs(STDOUT, "*****************************************\n");

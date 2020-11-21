@@ -30,6 +30,8 @@ require_once($CFG->libdir  . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
+cli_error('TODO - this needs to be updated to use the new storage system.');
+
 // Get an information about existing strings in the en_fix
 $sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
           FROM {amos_repository}
