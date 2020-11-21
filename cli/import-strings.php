@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -18,36 +17,38 @@
 /**
  * Imports English strings for a given component from PHP file
  *
- * This is used typically for contributed plugins.
+ * This can be used to manually import contributed plugins, for example. Note there is an external function for this
+ * feature, too.
  *
- * @package    local
- * @subpackage amos
- * @copyright  2011 David Mudrak <david@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2011 David Mudrak <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
-require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir . '/clilib.php');
 
-list($options, $unrecognized) = cli_get_params(array(
-    'lang'          => 'en',
-    'version'       => 'MOODLE_21_STABLE',
-    'timemodified'  => null,
-    'name'          => null,
-    'format'        => 2,
-    'message'       => '',
-    'userinfo'      => 'David Mudrak <david@moodle.com>',
-    'commithash'    => null,
-    'yes'         => false,
-    'help'          => false
+list($options, $unrecognised) = cli_get_params([
+    'lang' => 'en',
+    'versioncode' => null,
+    'timemodified' => null,
+    'name' => null,
+    'format' => 2,
+    'message' => '',
+    'userinfo' => 'David Mudrak <david@moodle.com>',
+    'commithash' => null,
+    'yes' => false,
+    'help' => false
+], [
+    'h' => 'help',
+    'y' => 'yes',
+]);
 
-    ), array('h' => 'help'));
-
-$usage = <<<EOF
+$usage = "
 Imports strings from a file into the AMOS repository.
 
 Usage:
@@ -56,40 +57,39 @@ Usage:
 Options:
     --message       Commit message
     --lang          Language code, defaults to 'en',
-    --version       Branch to commit to, defaults to 'MOODLE_21_STABLE'
+    --versioncode   Code of the branch to commit to, defaults to most recent one
     --timemodified  Timestamp of the commit, defaults to the file last modification time
     --name          Name of the component, defaults to the filename
-    --format        Format of the file, defaults to 2 (Moodle 2.x)
+    --format        Format of the file, defaults to 2 (Moodle 2.0+)
     --userinfo      Committer information, defaults to 'David Mudrak <david@moodle.com>'
     --commithash    Allows to specify the git commit hash
-    --yes           It won't ask to continue
-    --help          Show this usage
+    --yes | -y      It won't ask to continue
+    --help | -h     Show this usage
 
 The file is directly included into the PHP processor. Make sure to review the file
 for a malicious contents before you import it via this script.
+";
 
-EOF;
-
-if ($options['help'] or empty($options['message']) or empty($unrecognized)) {
+if ($options['help'] || empty($options['message']) || empty($unrecognised)) {
     echo $usage . PHP_EOL;
     exit(1);
 }
 
-$filepath = $unrecognized[0];
+$filepath = $unrecognised[0];
 if (!is_readable($filepath)) {
     echo 'File "'.$filepath.'" not readable' . PHP_EOL;
     echo $usage . PHP_EOL;
     exit(2);
 }
 
-$version = mlang_version::by_branch($options['version']);
-if (is_null($version)) {
-    echo 'Invalid version' . PHP_EOL;
-    exit(3);
+if ($options['versioncode']) {
+    $version = mlang_version::by_code($options['versioncode']);
+} else {
+    $version = mlang_version::latest_version();
 }
 
 $component = mlang_component::from_phpfile($filepath, $options['lang'], $version,
-        $options['timemodified'], $options['name'], (int)$options['format']);
+    $options['timemodified'], $options['name'], (int)$options['format']);
 
 fputs(STDOUT, "{$component->name} {$component->version->label} {$component->lang}" . PHP_EOL);
 
