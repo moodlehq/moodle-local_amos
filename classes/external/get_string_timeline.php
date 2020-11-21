@@ -144,13 +144,19 @@ class get_string_timeline extends \external_api {
             $cell['displaytext'] = \local_amos\local\util::add_breaks($displaytext);
 
             if ($record->commithash) {
-                $cell['hascommithash'] = true;
-                $cell['commithash'] = $record->commithash;
-
-                if ($record->lang == 'en') {
+                if ($record->lang === 'en' && $record->source === 'git') {
+                    $cell['hascommithash'] = true;
+                    $cell['commithash'] = $record->commithash;
                     $cell['commiturl'] = 'https://github.com/moodle/moodle/commit/' . $record->commithash;
 
-                } else {
+                } else if ($record->lang !== 'en' && $record->source === 'commitscript') {
+                    $cell['hascommithash'] = true;
+                    $cell['commithash'] = $record->commithash;
+                    $cell['commiturl'] = 'https://github.com/moodle/moodle/commit/' . $record->commithash;
+
+                } else if ($record->lang !== 'en' && $record->source === 'git') {
+                    $cell['hascommithash'] = true;
+                    $cell['commithash'] = $record->commithash;
                     $cell['commiturl'] = 'https://github.com/mudrd8mz/moodle-lang/commit/' . $record->commithash;
                 }
             }
@@ -160,7 +166,7 @@ class get_string_timeline extends \external_api {
                 'translation' => $langcell,
             ];
 
-            if ($record->lang == 'en') {
+            if ($record->lang === 'en') {
                 $preven = $record->strtext;
             } else {
                 $prevtr = $record->strtext;
