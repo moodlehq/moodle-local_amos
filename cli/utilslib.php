@@ -353,6 +353,11 @@ class amos_export_zip {
 
         foreach (mlang_tools::list_components() as $componentname => $ignored) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
+            if ($langcode !== 'en') {
+                $english = mlang_component::from_snapshot($componentname, 'en', $version);
+                $component->intersect($english);
+                $english->clear();
+            }
             $this->dump_component_into_temp($component);
             $component->clear();
             unset($component);
