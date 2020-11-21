@@ -59,10 +59,12 @@ class git {
     /**
      * Executes git with given arguments and returns the command output
      *
-     * @param string $args
+     * @param string $args Git command and arguments.
+     * @param bool $throw Throw exception on non-zero exit status.
+     * @param int $status Return status via this reference.
      * @return array output
      */
-    public function exec($args) {
+    public function exec($args, bool $throw=true, &$status=null) {
 
         chdir($this->repodir);
         $out = [];
@@ -71,7 +73,9 @@ class git {
         exec($this->git_shell_cmd($args), $out, $status);
 
         if ($status <> 0) {
-            throw new \Exception('Error executing git command ('.$status.')', $status);
+            if ($throw) {
+                throw new \Exception('Error executing git command (' . $status . ')', $status);
+            }
         }
 
         return $out;
