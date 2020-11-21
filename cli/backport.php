@@ -29,16 +29,24 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 require_once($CFG->libdir.'/clilib.php');
 
-$usage = <<<EOF
-Automatically fill missing translations from other branches.
+$usage = "
+Automatically backport translations to lower versions if they apply.
+
+A typical use case is when plugin English strings are registered on version X and translated. And then the X - 1 version
+is registered. Without backporting, that translations would exist since X only. But we want the translations of
+identical strings be backported from X to X -1 automatically.
+
+Backporting does not happen on 'en' and 'en_fix' languages.
+
+It is implicitly executed on committing in AMOS UI and whem importing English strings via external API. This script can
+be used to run it explicitly.
 
 Usage:
-    php automerge.php [--component=<frankenstyle>]
+    php backport.php [--component=<frankenstyle>]
 
 Options:
-    --component     Automerge just the given component. Defaults to all known components.
-
-EOF;
+    --component     Backport translations for the given component only. Defaults to all known components.
+";
 
 list($options, $unrecognized) = cli_get_params([
     'component' => null,
@@ -57,6 +65,11 @@ $logger = new amos_cli_logger();
 $logger->log('backport', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
 
 $components = array_keys(mlang_tools::list_components());
+
+if ($options['component']) {
+    $components = array_intersect($components, [$options['component']]);
+}
+
 $count = count($components);
 $i = 1;
 
