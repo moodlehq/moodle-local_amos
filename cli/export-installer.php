@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,19 +28,15 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-// list of branches to process
-$branches = array(
-    'MOODLE_35_STABLE',
-    'MOODLE_36_STABLE',
-    'MOODLE_37_STABLE',
-    'MOODLE_38_STABLE',
-    'MOODLE_39_STABLE',
-    'MOODLE_40_STABLE',
-);
+// Export for the eight most recent versions only.
+$versions = array_slice(array_reverse(mlang_version::list_all(), true), 0, 8);
+
+$git = new \local_amos\local\git(AMOS_REPO_MOODLE);
+$git->exec('remote update --prune');
 
 fputs(STDOUT, "*****************************************\n");
 fputs(STDOUT, date('Y-m-d H:i', time()));
@@ -49,37 +44,36 @@ fputs(STDOUT, " EXPORT INSTALLER JOB STARTED\n");
 
 remove_dir(AMOS_EXPORT_INSTALLER_DIR, true);
 
-foreach ($branches as $branch) {
-    fputs(STDOUT, "BRANCH {$branch}\n");
-    if ($branch == 'MOODLE_40_STABLE') {
+$exitstatus = 0;
+
+foreach ($versions as $version) {
+    if ($git->has_remote_branch($version->branch)) {
+        $gitbranch = 'origin/' . $version->branch;
+        $exportdir = $version->code . '_STABLE';
+
+    } else if ($version->code == mlang_version::latest_version()->code) {
         $gitbranch = 'origin/master';
+        $exportdir = 'master';
+
     } else {
-        $gitbranch = 'origin/' . $branch;
-    }
-    $version = mlang_version::by_branch($branch);
-
-    // read the contents of stringnames.txt at the given branch
-    chdir(AMOS_REPO_MOODLE);
-    $gitout = array();
-    $gitstatus = 0;
-    $gitcmd = AMOS_PATH_GIT . " show {$gitbranch}:install/stringnames.txt";
-    exec($gitcmd, $gitout, $gitstatus);
-
-    if ($gitstatus <> 0) {
-        fputs(STDERR, "ERROR EXECUTING {$gitcmd}\n");
-        exit($gitstatus);
+        fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
+        exit(3);
     }
 
-    $list = array();    // [component][stringid] => true
+    fputs(STDOUT, "PROCESSING VERSION {$version->code} ({$gitbranch})\n");
+
+    // Read the contents of stringnames.txt on the given branch.
+    $gitout = $git->exec('show ' . escapeshellarg($gitbranch . ':install/stringnames.txt'));
+
+    $list = [];
+
     foreach ($gitout as $string) {
-        list($stringid, $component) = array_map('trim', explode(',', $string));
+        [$stringid, $component] = array_map('trim', explode(',', $string));
         $list[$component][$stringid] = true;
     }
     unset($gitout);
 
-    $tree = mlang_tools::components_tree(array('branch' => $version->code));
-    $langs = array_keys($tree[$version->code]);
-    unset($tree);
+    $langs = array_keys(mlang_tools::list_languages());
 
     $phpdoc = <<<EOF
 /**
@@ -98,27 +92,26 @@ foreach ($branches as $branch) {
 
 EOF;
 
-    $status = 0; // exit status, 0 means no problems
-
     foreach ($list as $componentname => $stringids) {
         foreach ($langs as $lang) {
             if ($lang === 'en_fix') {
                 continue;
             }
-            $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false, array_keys($stringids));
+            $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false,
+                array_keys($stringids));
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $version->dir . '/install/lang/' . $lang . '/' . $component->name . '.php';
+                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/install/lang/' . $lang . '/' . $component->name . '.php';
                 if (!file_exists(dirname($file))) {
                     mkdir(dirname($file), 0755, true);
                 }
                 $component->export_phpfile($file, $phpdoc);
             }
-            if ($lang == 'en') {
-                // check that all string were exported
+            if ($lang === 'en') {
+                // Check that all string were exported.
                 foreach (array_keys($stringids) as $stringid) {
                     if (!$component->has_string($stringid)) {
                         fputs(STDERR, "ERROR Unknown $stringid,$componentname\n");
-                        $status = 1;
+                        $exitstatus = 1;
                     }
                 }
             }
@@ -130,4 +123,4 @@ EOF;
 fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " EXPORT INSTALLER JOB DONE\n");
 
-exit($status);
+exit($exitstatus);
