@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->libdir.'/clilib.php');
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'execute' => false,
 ]);
 
@@ -46,10 +46,9 @@ if ($unrecognised) {
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');
 
-$plugins = array_reverse(\local_amos\local\util::standard_components_tree(), true);
+$plugins = \local_amos\local\util::standard_components_tree();
 
-$stage = new mlang_stage();
-
+$stages = [];
 $cliresult = 0;
 
 foreach ($plugins as $versioncode => $plugintypes) {
@@ -223,7 +222,8 @@ foreach ($plugins as $versioncode => $plugintypes) {
         }
 
         if ($fixcomponent->has_string()) {
-            $stage->add($fixcomponent);
+            $stages[$version->code] = $stages[$version->code] ?? new mlang_stage();
+            $stages[$version->code]->add($fixcomponent);
         }
 
         $fixcomponent->clear();
@@ -232,16 +232,19 @@ foreach ($plugins as $versioncode => $plugintypes) {
     }
 }
 
-list($x, $y, $z) = mlang_stage::analyze($stage);
-if ($x > 0) {
-    fputs(STDOUT, "There are $x string changes prepared for sync execution\n");
-    fputs(STDOUT, "JENKINS:SET-STATUS-UNSTABLE\n");
-    if ($options['execute']) {
-        fputs(STDOUT, "Executing\n");
-        $stage->commit('Fixing the drift between Git and AMOS repository', [
-            'source' => 'fixdrift',
-            'userinfo' => 'AMOS-bot <amos@moodle.org>',
-        ]);
+foreach ($stages as $versioncode => $stage) {
+    [$x, $y, $z] = mlang_stage::analyze($stage);
+
+    if ($x > 0) {
+        fputs(STDOUT, "There are {$x} string changes prepared for sync execution on branch {$versioncode}\n");
+        fputs(STDOUT, "JENKINS:SET-STATUS-UNSTABLE\n");
+        if ($options['execute']) {
+            fputs(STDOUT, "Executing\n");
+            $stage->commit('Fixing the drift between Git and AMOS repository', [
+                'source' => 'fixdrift',
+                'userinfo' => 'AMOS-bot <amos@moodle.org>',
+            ]);
+        }
     }
 }
 
