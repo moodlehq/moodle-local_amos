@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -35,9 +34,19 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->libdir.'/clilib.php');
 
-list($options, $unrecognized) = cli_get_params(array('execute' => false));
+list($options, $unrecognised) = cli_get_params([
+    'execute' => false,
+]);
 
-$plugins = \local_amos\local\util::standard_components_tree();
+if ($unrecognised) {
+    $unrecognised = implode(PHP_EOL . '  ', $unrecognised);
+    cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
+}
+
+$git = new \local_amos\local\git(AMOS_REPO_MOODLE);
+$git->exec('remote update --prune');
+
+$plugins = array_reverse(\local_amos\local\util::standard_components_tree(), true);
 
 $stage = new mlang_stage();
 
@@ -46,26 +55,31 @@ $cliresult = 0;
 foreach ($plugins as $versioncode => $plugintypes) {
     $version = mlang_version::by_code($versioncode);
 
-    if ($version->branch == 'MOODLE_40_STABLE') {
-        $gitbranch = 'origin/master';
-    } else {
+    if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
+
+    } else if ($versioncode == max(array_keys($plugins))) {
+        $gitbranch = 'origin/master';
+
+    } else {
+        fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
+        exit(3);
     }
 
     foreach ($plugintypes as $legacyname => $frankenstylename) {
 
-        // moodle.org was replaced with a local plugin and strings were dropped from 2.0 and 2.1
+        // Component moodle.org was replaced with a local plugin and strings were dropped from 2.0 and 2.1.
         if ($legacyname == 'moodle.org') {
             continue;
         }
 
-        // prepare an empty component containing the fixes
+        // Prepare an empty component containing the fixes.
         $fixcomponent = new mlang_component($legacyname, 'en', $version);
 
-        // get the most recent snapshot from the AMOS repository
+        // Get the most recent snapshot from the AMOS repository.
         $amoscomponent = mlang_component::from_snapshot($legacyname, 'en', $version);
 
-        // get the location of the plugin
+        // Get the location of the plugin.
         if ($frankenstylename == 'core') {
             $plugintype = 'core';
             $pluginname = null;
@@ -73,9 +87,8 @@ foreach ($plugins as $versioncode => $plugintypes) {
             $plugintype = substr($frankenstylename, 0, strpos($frankenstylename, '_'));
             $pluginname = substr($frankenstylename, strpos($frankenstylename, '_') + 1);
         }
-        // very hacky way to get plugin basedirs for all versions
-        // see core_component::fetch_plugintypes() in lib/classes/component.php
-        // when adding a new one.
+        // Very hacky way to get plugin basedirs for all versions.
+        // See core_component::fetch_plugintypes() in lib/classes/component.php when adding a new one.
         $basedirs = [
             'mod'                   => 'mod',
             'auth'                  => 'auth',
@@ -137,7 +150,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
         ];
 
         if ($version->code <= 21) {
-            // since 2.2 beta, reports have moved
+            // Since 2.2 beta, reports have moved.
             $basedirs['report'] = 'admin/report';
         }
 
@@ -151,12 +164,9 @@ foreach ($plugins as $versioncode => $plugintypes) {
             $filepath = $basedirs[$plugintype].'/'.$pluginname.'/lang/en/'.$legacyname.'.php';
         }
 
-        // get the most recent snapshot from the git repository
-        chdir(AMOS_REPO_MOODLE);
-        $gitout = array();
-        $gitstatus = 0;
-        $gitcmd = AMOS_PATH_GIT . " show {$gitbranch}:{$filepath} 2> /dev/null";
-        exec($gitcmd, $gitout, $gitstatus);
+        // Get the most recent snapshot from the git repository.
+        $gitcmd = ' show ' . escapeshellarg($gitbranch) . ':' . escapeshellarg($filepath) . ' 2> /dev/null';
+        $gitout = $git->exec($gitcmd, false, $gitstatus);
 
         if ($gitstatus == 128) {
             // The $filepath does not exist in the $gitbranch. Probably removed from core to the plugins directory.
@@ -166,7 +176,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
                 fputs(STDERR, "SUPPOSEDLY STANDARD COMPONENT '{$frankenstylename}' FILE '{$filepath}' NOT FOUND IN {$gitbranch}\n");
                 exit(2);
             }
-            // no string file and nothing in AMOS - that is correct
+            // No string file and nothing in AMOS - that is correct.
             continue;
         }
 
@@ -228,7 +238,10 @@ if ($x > 0) {
     fputs(STDOUT, "JENKINS:SET-STATUS-UNSTABLE\n");
     if ($options['execute']) {
         fputs(STDOUT, "Executing\n");
-        $stage->commit('Fixing the drift between Git and AMOS repository', array('source' => 'fixdrift', 'userinfo' => 'AMOS-bot <amos@moodle.org>'));
+        $stage->commit('Fixing the drift between Git and AMOS repository', [
+            'source' => 'fixdrift',
+            'userinfo' => 'AMOS-bot <amos@moodle.org>',
+        ]);
     }
 }
 
