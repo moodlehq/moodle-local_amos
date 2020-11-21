@@ -70,7 +70,7 @@ class get_string_timeline extends \external_api {
             'language'
         ));
 
-        $sql = "SELECT -s.id AS id, 'en' AS lang, s.strtext, s.since, s.timemodified,
+        $sql = "SELECT s.id, 'en' AS lang, s.strtext, s.since, s.timemodified,
                        c.userinfo, c.commitmsg, c.commithash, c.source
                   FROM {amos_strings} s
                   JOIN {amos_commits} c ON c.id = s.commitid
@@ -79,10 +79,10 @@ class get_string_timeline extends \external_api {
 
                  UNION
 
-                SELECT s.id, s.lang, s.strtext, s.since, s.timemodified,
+                SELECT t.id, t.lang, t.strtext, t.since, t.timemodified,
                        c.userinfo, c.commitmsg, c.commithash, c.source
-                  FROM {amos_translations} s
-                  JOIN {amos_commits} c ON c.id = s.commitid
+                  FROM {amos_translations} t
+                  JOIN {amos_commits} c ON c.id = t.commitid
                  WHERE component = :component2
                    AND lang = :lang
                    AND strname = :strname2
@@ -97,7 +97,14 @@ class get_string_timeline extends \external_api {
             'strname2' => $strname,
         ];
 
-        $records = $DB->get_records_sql($sql, $params);
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $records = [];
+
+        foreach ($rs as $record) {
+            $records[] = $record;
+        }
+
+        $rs->close();
 
         if (empty($records)) {
             throw new \invalid_parameter_exception('Invalid timeline parameters');
