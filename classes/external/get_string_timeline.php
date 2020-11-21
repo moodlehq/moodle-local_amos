@@ -71,7 +71,7 @@ class get_string_timeline extends \external_api {
         ));
 
         $sql = "SELECT -s.id AS id, 'en' AS lang, s.strtext, s.since, s.timemodified,
-                       c.userinfo, c.commitmsg, c.commithash
+                       c.userinfo, c.commitmsg, c.commithash, c.source
                   FROM {amos_strings} s
                   JOIN {amos_commits} c ON c.id = s.commitid
                  WHERE component = :component1
@@ -80,7 +80,7 @@ class get_string_timeline extends \external_api {
                  UNION
 
                 SELECT s.id, s.lang, s.strtext, s.since, s.timemodified,
-                       c.userinfo, c.commitmsg, c.commithash
+                       c.userinfo, c.commitmsg, c.commithash, c.source
                   FROM {amos_translations} s
                   JOIN {amos_commits} c ON c.id = s.commitid
                  WHERE component = :component2
@@ -132,6 +132,7 @@ class get_string_timeline extends \external_api {
                 'userinfo' => $record->userinfo,
                 'commitmsg' => $record->commitmsg,
                 'hascommithash' => false,
+                'commitsource' => $record->source,
             ];
 
             if ($record->strtext === null) {
@@ -193,6 +194,7 @@ class get_string_timeline extends \external_api {
             'hascommithash' => new \external_value(PARAM_BOOL, 'Is commit hash info present?', VALUE_OPTIONAL),
             'commithash' => new \external_value(PARAM_RAW, 'Commit hash', VALUE_OPTIONAL),
             'commiturl' => new \external_value(PARAM_URL, 'Commit URL', VALUE_OPTIONAL),
+            'commitsource' => new \external_value(PARAM_RAW, 'Commit source', VALUE_OPTIONAL),
             'displaytext' => new \external_value(PARAM_RAW, 'Formatted string text content', VALUE_OPTIONAL),
         ]);
 
