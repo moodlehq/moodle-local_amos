@@ -97,7 +97,7 @@ class make_translation_uptodate extends \external_api {
         $stage->add($component);
 
         $commitid = $stage->commit(get_string('markuptodate', 'local_amos'), [
-            'source' => 'amos',
+            'source' => 'uptodate',
             'userid' => $USER->id,
             'userinfo' => fullname($USER) . ' <' . $USER->email . '>',
         ], true);
