@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -29,7 +28,7 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -62,7 +61,7 @@ class amos_checker {
 
         if (!method_exists($this, 'check_'.$taskname)) {
             fputs(STDERR, "Error: Unknown checker task: ".$taskname."\n");
-            exit(amos_checker::RESULT_PARAMS);
+            exit(self::RESULT_PARAMS);
         }
 
         $this->task = $taskname;
@@ -79,21 +78,15 @@ class amos_checker {
     protected function check_separators() {
 
         $details = array();
-        $langnames = array();
-        $tree = mlang_tools::components_tree(array('component' => 'langconfig'));
-        foreach ($tree as $branch => $languages) {
-            $version = mlang_version::by_code($branch);
-            foreach (array_keys($languages) as $language) {
+        $langnames = mlang_tools::list_languages();
+        $versions = mlang_version::list_all();
+        foreach ($versions as $version) {
+            foreach (array_keys($langnames) as $language) {
                 if ($language === 'en_fix') {
                     // Having empty values in en_fix is expected, do not check it.
                     continue;
                 }
                 $langconfig = mlang_component::from_snapshot('langconfig', $language, $version);
-                if ($langname = $langconfig->get_string('thislanguageint')) {
-                    $langnames[$language] = $langname->text;
-                } else {
-                    $langnames[$language] = $language;
-                }
                 if ($decsep = $langconfig->get_string('decsep')) {
                     $decsep = $decsep->text;
                 }
@@ -124,7 +117,8 @@ class amos_checker {
         foreach ($details as $language => $branches) {
             foreach ($branches as $branch => $msgs) {
                 foreach ($msgs as $msg) {
-                    $this->output(sprintf('  Misconfigured separators: %s {%s} %s %s', $langnames[$language], $language, $branch, $msg), true);
+                    $this->output(sprintf('  Misconfigured separators: %s {%s} %s %s',
+                        $langnames[$language], $language, $branch, $msg), true);
                     $status = self::RESULT_FAILURE;
                 }
             }
@@ -173,7 +167,8 @@ class amos_checker {
             list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
 
             if ($rebasedstrings == 0) {
-                $msg = sprintf('  Pending contribution #%d with no new strings to be committed - marking as accepted', $contribution->id);
+                $msg = sprintf('  Pending contribution #%d with no new strings to be committed - marking as accepted',
+                    $contribution->id);
                 $this->output($msg, true);
                 $status = self::RESULT_FAILURE;
                 $DB->set_field('amos_contributions', 'status', local_amos_contribution::STATE_ACCEPTED,
@@ -184,17 +179,21 @@ class amos_checker {
                 if (empty($maintainers)) {
                     $msg = sprintf('  Pending contribution #%d - no active maintainers to notify!!', $contribution->id);
                 } else {
-                    $msg = sprintf('  Pending contribution #%d - notifying maintainers %s', $contribution->id, implode(',', array_keys($maintainers)));
+                    $msg = sprintf('  Pending contribution #%d - notifying maintainers %s', $contribution->id,
+                        implode(',', array_keys($maintainers)));
 
                     foreach ($maintainers as $maintainer) {
                         $this->notify($maintainer,
-                            get_string_manager()->get_string('contribnotif', 'local_amos', array('id' => $contribution->id), $maintainer->lang),
-                            get_string_manager()->get_string('contribnotifpending', 'local_amos', array(
+                            get_string_manager()->get_string('contribnotif', 'local_amos', [
+                                'id' => $contribution->id,
+                            ], $maintainer->lang),
+                            get_string_manager()->get_string('contribnotifpending', 'local_amos', [
                                 'id' => $contribution->id,
                                 'subject' => $contribution->subject,
-                                'contriburl' => (new moodle_url('/local/amos/contrib.php', array('id' => $contribution->id)))->out(false),
+                                'contriburl' => (new moodle_url('/local/amos/contrib.php', ['id' => $contribution->id]))
+                                    ->out(false),
                                 'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack'
-                            ), $maintainer->lang)
+                            ], $maintainer->lang)
                         );
                     }
                 }
