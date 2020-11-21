@@ -29,7 +29,7 @@
 
 define('CLI_SCRIPT', true);
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -159,15 +159,12 @@ foreach ($plugins as $versioncode => $plugintypes) {
         exec($gitcmd, $gitout, $gitstatus);
 
         if ($gitstatus == 128) {
-            // the $filepath does not exist in the $gitbranch
+            // The $filepath does not exist in the $gitbranch. Probably removed from core to the plugins directory.
+            // Previously we used to delete all the strings, it was a mistake. Better to fail loudly and let the site
+            // admins to fix the list of standard plugins.
             if ($amoscomponent->has_string()) {
-                fputs(STDERR, "-- '{$filepath}' does not exist in {$gitbranch}\n");
-                foreach ($amoscomponent as $string) {
-                    $string->deleted = true;
-                    $string->timemodified = time();
-                }
-                $stage->add($amoscomponent);
-                continue;
+                fputs(STDERR, "SUPPOSEDLY STANDARD COMPONENT '{$frankenstylename}' FILE '{$filepath}' NOT FOUND IN {$gitbranch}\n");
+                exit(2);
             }
             // no string file and nothing in AMOS - that is correct
             continue;
