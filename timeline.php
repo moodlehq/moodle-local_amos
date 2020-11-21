@@ -34,11 +34,12 @@ $language = required_param('language', PARAM_ALPHANUMEXT);
 
 $PAGE->set_url('/local/amos/timeline.php');
 $PAGE->set_pagelayout('standard');
-$PAGE->set_heading(get_string('timeline', 'local_amos'));
 $PAGE->set_context(context_system::instance());
 
 $timeline = \local_amos\external\get_string_timeline::execute($component, $stringid, $language);
 $timeline = external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $timeline);
+
+$PAGE->set_heading(get_string('timelineheading', 'local_amos', $timeline));
 
 $output = $PAGE->get_renderer('local_amos');
 

@@ -431,6 +431,7 @@ $string['submitting'] = 'Submitting a contribution';
 $string['submitting_help'] = 'This will send translated strings to official language maintainers. They will be able to apply your work into their stage, review it and eventually commit. Please provide a message for them describing your work and why you would like to see your contribution included.';
 $string['targetversion'] = 'Target version';
 $string['timeline'] = 'String timeline';
+$string['timelineheading'] = 'String timeline: {$a->component} | {$a->strname}';
 $string['translatortool'] = 'Translator';
 $string['translatortoolopen'] = 'Open AMOS translator';
 $string['translatortranslation'] = 'Translation';

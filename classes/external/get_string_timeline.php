@@ -170,6 +170,9 @@ class get_string_timeline extends \external_api {
         $results = array_reverse($results);
 
         return [
+            'component' => $component,
+            'strname' => $strname,
+            'language' => $language,
             'changes' => $results,
         ];
     }
@@ -199,6 +202,9 @@ class get_string_timeline extends \external_api {
         ]);
 
         return new \external_single_structure([
+            'component' => new \external_value(PARAM_ALPHANUMEXT, 'Component containing the string.'),
+            'strname' => new \external_value(PARAM_STRINGID, 'String identifier'),
+            'language' => new \external_value(PARAM_ALPHANUMEXT, 'Language code.'),
             'changes' => new \external_multiple_structure(
                 new \external_single_structure([
                     'english' => $info,

@@ -76,6 +76,9 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         $response = \local_amos\external\get_string_timeline::execute('foo_bar', 'foobar', 'cs');
         $response = external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
 
+        $this->assertEquals('foo_bar', $response['component']);
+        $this->assertEquals('foobar', $response['strname']);
+        $this->assertEquals('cs', $response['language']);
         $this->assertEquals('Foo bar!', $response['changes'][0]['english']['displaytext']);
         $this->assertEquals('en', $response['changes'][0]['english']['langcode']);
         $this->assertEquals('3.10+', $response['changes'][0]['english']['displaysince']);

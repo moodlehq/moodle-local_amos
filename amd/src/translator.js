@@ -240,6 +240,7 @@ const showFilteredStrings = (filterQuery) => {
  * @param {Element} item
  */
 const showTimeline = (item) => {
+    let modalTitle = '';
     return fetchMany([{
         methodname: 'local_amos_get_string_timeline',
         args: {
@@ -249,12 +250,13 @@ const showTimeline = (item) => {
         },
 
     }])[0].then(response => {
+        modalTitle = getString('timelineheading', 'local_amos', response);
         return Templates.render('local_amos/timeline', response);
 
     }).then((html) => {
         return ModalFactory.create({
             large: true,
-            title: getString('timeline', 'local_amos'),
+            title: modalTitle,
             body: html,
         });
 
