@@ -910,7 +910,7 @@ function xmldb_local_amos_upgrade($oldversion) {
             'tool_task 27',
             'tool_templatelibrary 29',
             'tool_timezoneimport 22 -28',
-            'tool_unittest 22 -32',
+            'tool_unittest 22 -23',
             'tool_unsuproles 22',
             'tool_uploadcourse 26',
             'tool_uploaduser 22',
