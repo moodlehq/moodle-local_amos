@@ -32,8 +32,7 @@ require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-// Export for the eight most recent versions only.
-$versions = array_slice(array_reverse(mlang_version::list_all(), true), 0, 8);
+$versions = array_reverse(mlang_version::list_supported(), true);
 
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');

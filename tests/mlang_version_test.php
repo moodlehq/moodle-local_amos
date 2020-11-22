@@ -224,4 +224,23 @@ class local_amos_mlang_version_test extends advanced_testcase {
 
         $this->assertEquals(0, count($range));
     }
+
+    /**
+     * Test obtaining list of supported versions.
+     */
+    public function test_list_supported() {
+
+        $this->resetAfterTest();
+
+        set_config('branchesall', '34,35,36,37,38,39,310,400,401', 'local_amos');
+        set_config('branchsupported', '39', 'local_amos');
+
+        $supported = mlang_version::list_supported();
+
+        $this->assertEquals(4, count($supported));
+        $this->assertEquals('3.9', $supported[39]->dir);
+        $this->assertEquals('3.10', $supported[310]->dir);
+        $this->assertEquals('4.0', $supported[400]->dir);
+        $this->assertEquals('4.1', $supported[401]->dir);
+    }
 }

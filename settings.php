@@ -38,6 +38,15 @@ if ($hassiteconfig) {
             60, 3
         ));
 
+        $settings->add(new admin_setting_configtext(
+            'local_amos/branchsupported',
+            get_string('branchsupported', 'local_amos'),
+            get_string('branchsupported_desc', 'local_amos'),
+            '35',
+            PARAM_INT,
+            10
+        ));
+
         $settings->add(new admin_setting_configtextarea(
             'local_amos/standardcomponents',
             get_string('standardcomponents', 'local_amos'),

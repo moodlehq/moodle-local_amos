@@ -1686,6 +1686,18 @@ class mlang_version {
     }
 
     /**
+     * List of versions that are supported upstream.
+     *
+     * AMOS will track for English strings on these branches and generate installer language packs for them.
+     *
+     * @return array
+     */
+    public static function list_supported(): array {
+
+        return self::list_range(get_config('local_amos', 'branchsupported'));
+    }
+
+    /**
      * Return the most recent known version.
      *
      * @return mlang_version
