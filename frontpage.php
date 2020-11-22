@@ -66,22 +66,22 @@ function local_amos_frontpage_contribution_stats() {
 ?>
 
 <div id="amos-custom-front-page" class="container-fluid">
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="well frontpageblock">
-                <h2><?php print_string('amos', 'local_amos'); ?></h2>
+    <div class="card-deck">
+        <div class="card">
+            <h2 class="card-header"><?php print_string('amos', 'local_amos'); ?></h2>
+            <div class="card-body">
                 <div><?php print_string('about', 'local_amos'); ?></div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="well frontpageblock">
-                <h2><?php print_string('contribute', 'local_amos'); ?></h2>
+        <div class="card">
+            <h2 class="card-header"><?php print_string('contribute', 'local_amos'); ?></h2>
+            <div class="card-body">
                 <?php echo local_amos_frontpage_contribution_stats(); ?>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="well frontpageblock">
-                <h2><?php print_string('quicklinks', 'local_amos'); ?></h2>
+        <div class="card">
+            <h2 class="card-header"><?php print_string('quicklinks', 'local_amos'); ?></h2>
+            <div class="card-body">
                 <ul class="unstyled">
                     <li><a href="/local/amos/view.php"><i class="icon-pencil"></i> <?php print_string('quicklinks_amos', 'local_amos'); ?></a></li>
                     <li><a href="/course/view.php?id=2"><i class="icon-comment"></i> <?php print_string('quicklinks_forum', 'local_amos'); ?></a></li>
