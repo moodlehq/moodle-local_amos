@@ -1,0 +1,114 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_plugins/frontpage
+
+    Template purpose and description.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * attributes Array of name / value pairs.
+
+    Example context (json):
+    {
+        "attributes": [
+            { "name": "src", "value": "http://moodle.com/wp-content/themes/moodle/images/logo-hat2.png" },
+            { "name": "class", "value": "iconsmall" }
+        ]
+    }
+}}
+
+<div class="card-deck my-2">
+    <div class="card">
+        <div class="lead card-header">{{#str}} amos, local_amos {{/str}}</div>
+        <div class="card-body">
+            <div>{{#str}} about, local_amos {{/str}}</div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="lead card-header">{{#str}} contribute, local_amos {{/str}}</div>
+        <div class="card-body">
+            <p>{{#str}} contributestats, local_amos, {"count": {{#quote}} {{{contributedstrings}}} {{/quote}} } {{/str}}</p>
+            <p>{{#str}} contributethanks, local_amos, { "listcontributors": {{#quote}} {{{listcontributors}}} {{/quote}} } {{/str}}</p>
+            <p class="text-center"><a class="btn btn-large btn-success" href="/local/amos/">{{#str}} contributenow, local_amos {{/str}}</a></p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="lead card-header">{{#str}} quicklinks, local_amos {{/str}}</div>
+        <div class="card-body">
+            <ul class="unstyled">
+                <li>
+                    <a href="/local/amos/view.php">
+                        {{#str}} quicklinks_amos, local_amos {{/str}}
+                    </a>
+                </li>
+                <li>
+                    <a href="/course/view.php?id=2">
+                        {{#str}} quicklinks_forum, local_amos {{/str}}
+                    </a>
+                </li>
+                <li>
+                    <a href="/mod/page/view.php?id=9">
+                        {{#str}} quicklinks_newcomers, local_amos {{/str}}
+                    </a>
+                </li>
+                <li>
+                    <a href="https://docs.moodle.org/dev/AMOS_manual">
+                        {{#str}} quicklinks_manual, local_amos {{/str}}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="lead card-header">{{#str}} availablelangs, core_install {{/str}}</div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            {{#langpackstats}}
+                <li id="langpack-{{langcode}}"  class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div class="flex-grow-1">
+                            <strong style="font-size: larger">{{langname}}</strong>
+                            <div class="mt-1">
+                                <ul class="list-inline">
+                                    {{#childpacks}}
+                                        <li class="list-inline-item small"><em>{{langname}}</em>&nbsp;<span class="badge badge-light">{{totalstrings}}</span></li>
+                                    {{/childpacks}}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="pt-1" style="min-width: 50%">
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width:{{ratio}}%" aria-valuenow="{{ratio}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div>
+                                <strong class="p-3">{{ratio}}%</strong><small>{{totalstrings}} / {{totalenglish}}</small>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {{/langpackstats}}
+        </ul>
+    </div>
+</div>

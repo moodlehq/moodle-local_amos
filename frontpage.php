@@ -22,12 +22,109 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+
+['contributedstrings' => $contributedstrings, 'listcontributors' => $listcontributors] = local_amos_frontpage_contribution_stats();
+
+echo $OUTPUT->render_from_template('local_amos/frontpage', [
+    'langpackstats' => local_amos_frontpage_translation_stats(),
+    'contributedstrings' => $contributedstrings,
+    'listcontributors' => $listcontributors,
+]);
+
+/**
+ * Generate translations stats for the front page.
+ *
+ * @return array
+ */
+function local_amos_frontpage_translation_stats(): array {
+    global $DB;
+
+    $langnames = mlang_tools::list_languages(true, true, false, true);
+    $latestversion = mlang_version::latest_version();
+    $standardcomponents = \local_amos\local\util::standard_components_in_latest_version();
+
+    [$standardsql, $standardparams] = $DB->get_in_or_equal(array_keys($standardcomponents), SQL_PARAMS_NAMED);
+
+    $sql = "SELECT lang, SUM(numofstrings) AS totalnumofstrings
+        FROM {amos_stats}
+        WHERE component ${standardsql}
+        AND branch = :latestversioncode
+        GROUP BY lang
+        ORDER BY totalnumofstrings DESC, MAX(timemodified), lang";
+
+    $params = [
+        'latestversioncode' => $latestversion->code,
+    ];
+
+    $params += $standardparams;
+
+    $rs = $DB->get_recordset_sql($sql, $params);
+
+    $langpacks = [];
+    $primary = [];
+
+    foreach ($rs as $record) {
+        $langpacks[$record->lang] = (object) [
+            'langcode' => $record->lang,
+            'langname' => $langnames[$record->lang],
+            'totalstrings' => $record->totalnumofstrings,
+        ];
+    }
+
+    $rs->close();
+
+    // Make sure that English is the first in the list.
+    $english = $langpacks['en'];
+    unset($langpacks['en']);
+    $langpacks = array_merge(['en' => $english], $langpacks);
+
+    foreach ($langpacks as $langpack) {
+        if (substr($langpack->langcode, 0, 3) === 'en_') {
+            $parent = 'en';
+        } else {
+            $langconfig = mlang_component::from_snapshot('langconfig', $langpack->langcode, $latestversion);
+            if ($mlangstringparentlanguage = $langconfig->get_string('parentlanguage')) {
+                $parent = $mlangstringparentlanguage->text;
+            } else {
+                $parent = '';
+            }
+            if ($parent === 'en') {
+                $parent = '';
+            }
+        }
+
+        if (empty($parent)) {
+            $primary[] = $langpack;
+
+        } else if (isset($langpacks[$parent])) {
+            $langpack->parentlanguagecode = $parent;
+            $langpack->parentlanguagename = $langpacks[$parent]->langname;
+            $langpacks[$parent]->childpacks = $langpacks[$parent]->childpacks ?? [];
+            $langpacks[$parent]->childpacks[] = $langpack;
+
+        } else {
+            // Orphaned language pack.
+            continue;
+        }
+    }
+
+    array_walk($langpacks, function (&$item) use ($english) {
+        $item->totalenglish = $english->totalstrings;
+        $item->ratio = round(100 * $item->totalstrings / $english->totalstrings);
+    });
+
+    return $primary;
+}
+
 /**
  * Populates the contribution front page block contents.
  *
  * @return string
  */
-function local_amos_frontpage_contribution_stats() {
+function local_amos_frontpage_contribution_stats(): array {
     global $CFG, $DB;
 
     $total = (int)$DB->get_field_sql("
@@ -56,39 +153,8 @@ function local_amos_frontpage_contribution_stats() {
         'contributor4' => $links[3],
     ]);
 
-    return '<p>' . get_string('contributestats', 'local_amos', array('count' => $total)) . '</p>
-        <div style="text-align:center; margin:1em;">
-        <a class="btn btn-large btn-success" href="/local/amos/">' . get_string('contributenow', 'local_amos') . '</a>
-        </div>
-        <p>' . get_string('contributethanks', 'local_amos', array('listcontributors' => $links)) . '</p>';
+    return [
+        'contributedstrings' => number_format($total, 0, '', get_string('thousandssep', 'core_langconfig')),
+        'listcontributors' => $links,
+    ];
 }
-
-?>
-
-<div id="amos-custom-front-page" class="container-fluid">
-    <div class="card-deck">
-        <div class="card">
-            <h2 class="card-header"><?php print_string('amos', 'local_amos'); ?></h2>
-            <div class="card-body">
-                <div><?php print_string('about', 'local_amos'); ?></div>
-            </div>
-        </div>
-        <div class="card">
-            <h2 class="card-header"><?php print_string('contribute', 'local_amos'); ?></h2>
-            <div class="card-body">
-                <?php echo local_amos_frontpage_contribution_stats(); ?>
-            </div>
-        </div>
-        <div class="card">
-            <h2 class="card-header"><?php print_string('quicklinks', 'local_amos'); ?></h2>
-            <div class="card-body">
-                <ul class="unstyled">
-                    <li><a href="/local/amos/view.php"><i class="icon-pencil"></i> <?php print_string('quicklinks_amos', 'local_amos'); ?></a></li>
-                    <li><a href="/course/view.php?id=2"><i class="icon-comment"></i> <?php print_string('quicklinks_forum', 'local_amos'); ?></a></li>
-                    <li><a href="/mod/page/view.php?id=9"><i class="icon-info-sign"></i> <?php print_string('quicklinks_newcomers', 'local_amos'); ?></a></li>
-                    <li><a href="/mod/url/view.php?id=16&amp;redirect=1"><i class="icon-book"></i> <?php print_string('quicklinks_manual', 'local_amos'); ?></a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
