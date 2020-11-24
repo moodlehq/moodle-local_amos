@@ -233,6 +233,7 @@ All strings found in the file will be staged for the selected version and langua
 Multiple PHP files can be processed at once if you put them into a ZIP file.';
 $string['importfile_link'] = 'local/amos/importfile';
 $string['language'] = 'Language';
+$string['languagepacks'] = 'Additional language packs may be installed on your Moodle site via <em>Administration > Site administration > Language > Language packs</em>, or manually. For more details, see the <a href="https://docs.moodle.org/en/Language_packs">Language packs documentation</a>.';
 $string['languages'] = 'Languages';
 $string['languagesall'] = 'All';
 $string['languagesnone'] = 'None';
