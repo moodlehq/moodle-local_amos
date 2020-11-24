@@ -49,7 +49,10 @@
         <div class="card-body">
             <p>{{#str}} contributestats, local_amos, {"count": {{#quote}} {{{contributedstrings}}} {{/quote}} } {{/str}}</p>
             <p>{{#str}} contributethanks, local_amos, { "listcontributors": {{#quote}} {{{listcontributors}}} {{/quote}} } {{/str}}</p>
-            <p class="text-center"><a class="btn btn-large btn-success" href="/local/amos/">{{#str}} contributenow, local_amos {{/str}}</a></p>
+            <p class="text-center">
+                <a class="btn btn-large btn-success" href="/local/amos/">{{#str}} contributenow, local_amos {{/str}}</a>
+                <a class="btn btn-large btn-secondary" href="/local/amos/credits.php">{{#str}} creditstitleshort, local_amos {{/str}}</a>
+            </p>
         </div>
     </div>
     <div class="card">
