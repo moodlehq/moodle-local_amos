@@ -326,6 +326,7 @@ class amos_export_zip {
                           JOIN {amos_commits} c ON c.id = s.commitid
                          WHERE c.timecommitted >= :lastexportzip2
                        ) r
+                 WHERE since IS NOT NULL
               ORDER BY lang";
 
         $result = $DB->get_records_sql_menu($sql, $params);
