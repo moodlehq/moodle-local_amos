@@ -285,7 +285,8 @@ class translator implements \renderable, \templatable {
                                 $string->statusclass = 'translated';
                             }
 
-                            if ($string->originalmodified > $string->timemodified) {
+                            if ($string->englishsincecode >= $string->translationsincecode &&
+                                    $string->originalmodified > $string->timemodified) {
                                 $string->outdated = true;
 
                             } else {
