@@ -82,7 +82,7 @@ if (!empty($message)) {
 if (!empty($unstage)) {
     $name = required_param('component', PARAM_ALPHANUMEXT);
     $branch = required_param('branch', PARAM_INT);
-    $lang = required_param('lang', PARAM_ALPHANUMEXT);
+    $lang = required_param('langcode', PARAM_ALPHANUMEXT);
     $confirm = optional_param('confirm', false, PARAM_BOOL);
 
     if (!$confirm) {
@@ -104,7 +104,7 @@ if (!empty($unstage)) {
                 'confirm' => true,
                 'component' => $name,
                 'branch' => $branch,
-                'lang' => $lang,
+                'langcode' => $lang,
             ]),
             $PAGE->url
         );

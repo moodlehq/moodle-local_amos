@@ -222,7 +222,7 @@ class stage implements \renderable, \templatable {
                 'unstage' => $string->stringid,
                 'component' => $string->component,
                 'branch' => $string->sincecode,
-                'lang' => $string->language,
+                'langcode' => $string->language,
             ]))->out(false);
 
             $string->editurl = (new \moodle_url('/local/amos/view.php', [
