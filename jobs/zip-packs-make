@@ -5,4 +5,9 @@
 # 0 * * * *
 # downstream: zip-packs-publish
 
-php $AMOSCLIROOT/export-zip.php
+NOW=$(date +%s)
+
+php $AMOSCLIROOT/export-zip.php --minver=35 && \
+    php $AMOSCLIROOT/export-zip.php --minver=27 --maxver=34 && \
+    php $AMOSCLIROOT/export-zip.php --maxver=26 && \
+    php $AMOSCLIROOT/../../../admin/cli/cfg.php  --component=local_amos --name=lastexportzip --set=${NOW}
