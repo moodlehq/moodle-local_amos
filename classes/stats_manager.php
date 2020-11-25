@@ -32,6 +32,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_amos_stats_manager {
 
+    /** @var array */
+    protected $buffer;
+
     /**
      * Reset MUC caches.
      */
@@ -44,7 +47,7 @@ class local_amos_stats_manager {
     /**
      * Update (or insert) the stats for the given language pack version.
      *
-     * @param int $branch Version code such as 3700
+     * @param int $branch Version code such as 39, 310 or 400
      * @param string $lang Language code such as 'cs' or 'en'
      * @param string $component Component name such as 'forum', 'moodle' or 'workshopallocation_random'
      * @param int|null $numofstrings Number of strings in the given language pack
@@ -74,6 +77,97 @@ class local_amos_stats_manager {
         } else {
             $DB->insert_record('amos_stats', $record, false);
         }
+    }
+
+    /**
+     * Register a change of stats to be queued in the input write buffer.
+     *
+     * This is to avoid too many too frequent small writes that take a lot of time during the ZIP packages generating.
+     *
+     * @param int $branch Version code such as 39, 310 or 400
+     * @param string $lang Language code such as 'cs' or 'en'
+     * @param string $component Component name such as 'forum', 'moodle' or 'workshopallocation_random'
+     * @param int|null $numofstrings Number of strings in the given language pack
+     */
+    public function add_to_buffer(int $branch, string $lang, string $component, int $numofstrings = null) {
+        $this->buffer[$branch][$lang][$component] = $numofstrings;
+    }
+
+    /**
+     * Write the data in the buffer to the database.
+     */
+    public function write_buffer() {
+        global $DB;
+
+        $listbranches = [];
+        $listlangs = [];
+        $listcomponents = [];
+
+        foreach ($this->buffer as $branch => $langs) {
+            $listbranches[$branch] = true;
+            foreach ($langs as $lang => $components) {
+                $listlangs[$lang] = true;
+                foreach (array_keys($components) as $component) {
+                    $listcomponents[$component] = true;
+                }
+            }
+        }
+
+        if (empty($listbranches) || empty($listlangs) || empty($listcomponents)) {
+            return;
+        }
+
+        // Get know current ids of existing records in a single query.
+        [$sqlbranches, $parambranches] = $DB->get_in_or_equal(array_keys($listbranches), SQL_PARAMS_NAMED);
+        [$sqllangs, $paramlangs] = $DB->get_in_or_equal(array_keys($listlangs), SQL_PARAMS_NAMED);
+        [$sqlcomponents, $paramcomponents] = $DB->get_in_or_equal(array_keys($listcomponents), SQL_PARAMS_NAMED);
+
+        $sql = "SELECT id, branch, lang, component
+                  FROM {amos_stats}
+                 WHERE branch ${sqlbranches}
+                   AND lang ${sqllangs}
+                   AND component ${sqlcomponents}";
+
+        $ids = [];
+        $rs = $DB->get_recordset_sql($sql, array_merge($parambranches, $paramlangs, $paramcomponents));
+
+        foreach ($rs as $r) {
+            $ids[$r->branch][$r->lang][$r->component] = $r->id;
+        }
+
+        $rs->close();
+
+        // Insert or update all data in the buffer.
+        $now = time();
+        foreach ($this->buffer as $branch => $langs) {
+            foreach ($langs as $lang => $components) {
+                foreach ($components as $component => $numofstrings) {
+                    if ($id = $ids[$branch][$lang][$component] ?? null) {
+                        $DB->update_record('amos_stats', [
+                            'id' => $id,
+                            'branch' => $branch,
+                            'lang' => $lang,
+                            'component' => $component,
+                            'numofstrings' => $numofstrings,
+                            'timemodified' => $now,
+                        ], true);
+
+                    } else {
+                        $DB->insert_record('amos_stats', [
+                            'branch' => $branch,
+                            'lang' => $lang,
+                            'component' => $component,
+                            'numofstrings' => $numofstrings,
+                            'timemodified' => $now,
+                        ], false);
+                    }
+
+                    unset($this->buffer[$branch][$lang][$component]);
+                }
+            }
+        }
+
+        $this->buffer = [];
     }
 
     /**

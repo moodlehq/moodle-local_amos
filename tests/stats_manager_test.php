@@ -41,8 +41,6 @@ class local_amos_stats_manager_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        set_config('branchesall', '35,36,37', 'local_amos');
-
         $statsman = new local_amos_stats_manager();
 
         // Inserting fresh data.
@@ -76,6 +74,37 @@ class local_amos_stats_manager_test extends advanced_testcase {
             ['branch' => 38, 'lang' => 'cs', 'component' => 'tool_foo']));
         $this->assertSame(null, $DB->get_field('amos_stats', 'numofstrings',
             ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+    }
+
+    /**
+     * Test updating stats when using the write buffer.
+     */
+    public function test_buffered_workflow() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $statsman = new local_amos_stats_manager();
+
+        $statsman->update_stats(36, 'en', 'tool_foo', 80);
+        $statsman->update_stats(37, 'en', 'tool_foo', 80);
+
+        $statsman->add_to_buffer('37', 'en', 'tool_foo', 81);
+        $statsman->add_to_buffer('37', 'en', 'tool_bar', 42);
+        $statsman->add_to_buffer('37', 'cs', 'tool_foo', 78);
+
+        $this->assertEquals(80, $DB->get_field('amos_stats', 'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertFalse($DB->record_exists('amos_stats', ['branch' => 37, 'lang' => 'en', 'component' => 'tool_bar']));
+        $this->assertFalse($DB->record_exists('amos_stats', ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
+
+        $statsman->write_buffer();
+
+        $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertEquals(42, $DB->get_field('amos_stats', 'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_bar']));
+        $this->assertEquals(78, $DB->get_field('amos_stats', 'numofstrings',
+            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
     }
 
     /**
