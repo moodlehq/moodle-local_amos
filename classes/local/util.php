@@ -151,15 +151,24 @@ class util {
     }
 
     /**
+     * Returns a list of components that are standard in the given version.
+     *
+     * @param int $vercode Numerical version code such as 39, 310 or 400
+     * @return array (string)legacyname => (string)frankenstylename
+     */
+    public static function standard_components_in_version(int $vercode): array {
+
+        $tree = static::standard_components_tree();
+
+        return $tree[$vercode] ?? [];
+    }
+
+    /**
      * Returns a list of components that are standard in the latest known version.
      *
      * @return array (string)legacyname => (string)frankenstylename
      */
     public static function standard_components_in_latest_version(): array {
-
-        $tree = static::standard_components_tree();
-        $latestversioncode = max(array_keys($tree));
-
-        return $tree[$latestversioncode];
+        return static::standard_components_in_version(\mlang_version::latest_version()->code);
     }
 }

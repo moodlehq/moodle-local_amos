@@ -98,6 +98,49 @@ class util_test extends \advanced_testcase {
     }
 
     /**
+     * Test functionality of {@see local_amos\local\util::standard_components_in_version()}.
+     */
+    public function test_standard_components_in_version() {
+        $this->resetAfterTest();
+
+        set_config('branchesall', '38,39,310', 'local_amos');
+        set_config('standardcomponents', '', 'local_amos');
+
+        foreach ([38, '39', 310] as $vercode) {
+            $list = util::standard_components_in_version($vercode);
+            $this->assertEquals(1, count($list));
+            $this->assertEquals('core', $list['moodle']);
+        }
+
+        set_config('standardcomponents', implode(PHP_EOL, [
+            'mod_foobar',
+            'foobar_one -39',
+            'foobar_two 37 -38',
+            'core_barbar 310 -310',
+            'barbar_one 39',
+        ]), 'local_amos');
+
+        $list = util::standard_components_in_version(38);
+
+        $this->assertEquals(4, count($list));
+        $this->assertEquals('core', $list['moodle']);
+        $this->assertEquals('mod_foobar', $list['foobar']);
+        $this->assertEquals('foobar_one', $list['foobar_one']);
+        $this->assertEquals('foobar_two', $list['foobar_two']);
+
+        $list = util::standard_components_in_version(310);
+
+        $this->assertEquals(4, count($list));
+        $this->assertEquals('core', $list['moodle']);
+        $this->assertEquals('mod_foobar', $list['foobar']);
+        $this->assertEquals('core_barbar', $list['barbar']);
+        $this->assertEquals('barbar_one', $list['barbar_one']);
+
+        $list = util::standard_components_in_version(16);
+        $this->assertSame([], $list);
+    }
+
+    /**
      * Test functionality of {@see local_amos\local\util::standard_components_in_latest_version()}.
      */
     public function test_standard_components_in_latest_version() {
