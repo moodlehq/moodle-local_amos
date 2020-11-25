@@ -212,12 +212,19 @@ class amos_export_zip {
     public function rebuild_output_folders() {
         $this->log('== Rebuilding languages.md5 and lang-table.html files ==');
 
-        // For each folder in outputdirroot
-        $target = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
+        foreach (new DirectoryIterator($this->outputdirroot) as $outputdir) {
+            if (!$outputdir->isDir()) {
+                continue;
+            }
 
-        foreach ($this->get_versions() as $version) {
+            if ($outputdir->isDot()) {
+                continue;
+            }
+
+            $version = mlang_version::by_dir($outputdir->getFilename());
+
             $this->rebuild_languages_md5($version);
-            $this->rebuild_index_tablehtml($version);
+            $this->rebuild_download_page($version);
         }
     }
 
@@ -346,11 +353,13 @@ class amos_export_zip {
                 $english->clear();
             }
             $this->dump_component_into_temp($component);
-            $this->update_component_stats($component);
+            $numberofstrings = $component->get_number_of_strings(true);
+            $this->statsman->add_to_buffer($component->version->code, $component->lang, $component->name, $numberofstrings);
             $component->clear();
             unset($component);
         }
 
+        $this->statsman->write_buffer();
         $this->make_zip_package($version, $langcode);
     }
 
@@ -419,17 +428,6 @@ class amos_export_zip {
     }
 
     /**
-     * Update the statistics about the number of translated strings in the component.
-     *
-     * @param mlang_component $component
-     */
-    protected function update_component_stats(mlang_component $component) {
-
-        $numberofstrings = $component->get_number_of_strings(true);
-        $this->statsman->update_stats($component->version->code, $component->lang, $component->name, $numberofstrings);
-    }
-
-    /**
      * Makes a ZIP file of all string files in the temp area
      *
      * @param mlang_version $version
@@ -483,22 +481,25 @@ class amos_export_zip {
      */
     protected function rebuild_languages_md5(mlang_version $version) {
 
-        // TODO packinfo
+        $langnames = mlang_tools::list_languages(true, true, false, true);
         $languagesmd5 = '';
-        foreach ($packinfo as $langcode => $info) {
-            $zipfile = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
-            if (!file_exists($zipfile)) {
-                $this->log('File '.$version->dir.'/'.$langcode.'.zip not found in the output directory', amos_cli_logger::LEVEL_WARNING);
+
+        foreach (new DirectoryIterator($this->outputdirroot . '/' . $version->dir) as $zipfile) {
+            if (!$zipfile->isFile()) {
                 continue;
             }
-            $languagesmd5 .= $langcode.','.$info['md5'].','.$info['langname']."\n";
+
+            if (substr($zipfile->getFilename(), -4) !== '.zip') {
+                continue;
+            }
+
+            $langcode = substr($zipfile->getFilename(), 0, -4);
+            $md5 = md5_file($this->outputdirroot . '/' . $version->dir . '/' . $langcode . '.zip');
+            $languagesmd5 .= $langcode . ',' . $md5 . ',' . $langnames[$langcode]."\n";
         }
-        if (empty($languagesmd5)) {
-            $this->log('No lines would be written to '.$version->dir.'/languages.md5', amos_cli_logger::LEVEL_WARNING);
-        } else {
-            $this->log($version->dir.'/languages.md5', amos_cli_logger::LEVEL_DEBUG);
-            file_put_contents($this->outputdirroot.'/'.$version->dir.'/languages.md5', $languagesmd5);
-        }
+
+        file_put_contents($this->outputdirroot . '/' . $version->dir . '/languages.md5', $languagesmd5);
+        $this->log($version->dir.'/languages.md5', amos_cli_logger::LEVEL_DEBUG);
     }
 
     /**
@@ -506,15 +507,35 @@ class amos_export_zip {
      *
      * @param mlang_version $version
      */
-    protected function rebuild_index_tablehtml(mlang_version $version) {
-        global $PAGE;
+    protected function rebuild_download_page(mlang_version $version) {
+        global $OUTPUT;
 
-        // TODO packinfo
-        $indextable = new local_amos_index_tablehtml($version, $packinfo);
-        $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
-        $tablehtml = $output->render($indextable);
-        $this->log($version->dir.'/lang-table.html', amos_cli_logger::LEVEL_DEBUG);
-        file_put_contents($this->outputdirroot.'/'.$version->dir.'/'.'lang-table.html', $tablehtml);
+        $langpacks = $this->statsman->get_language_pack_download_page_data($version->code);
+
+        foreach ($langpacks as &$langpack) {
+            $zipfile = $this->outputdirroot . '/' . $version->dir . '/' . $langpack['langcode'] . '.zip';
+            if (file_exists($zipfile)) {
+                $langpack['haszip'] = true;
+                $langpack['downloadurl'] = '/download.php/langpack/' . $version->dir . '/' . $langpack['langcode'] . '.zip';
+                $langpack['filesize'] = display_size(filesize($zipfile));
+            }
+        }
+
+        $now = time();
+        $tz = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+        $generatedlabel = date('Y-m-d H:i e', $now);
+        $generateddatetime = date('c', $now);
+        date_default_timezone_set($tz);
+
+        $html = $OUTPUT->render_from_template('local_amos/downloadpage', [
+            'langpacks' => $langpacks,
+            'generatedlabel' => $generatedlabel,
+            'generateddatetime' => $generateddatetime,
+        ]);
+
+        file_put_contents($this->outputdirroot . '/' . $version->dir . '/' . 'lang-table.html', $html);
+        $this->log($version->dir . '/lang-table.html', amos_cli_logger::LEVEL_DEBUG);
     }
 }
 

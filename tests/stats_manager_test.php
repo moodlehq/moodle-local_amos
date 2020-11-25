@@ -231,6 +231,38 @@ class local_amos_stats_manager_test extends advanced_testcase {
     }
 
     /**
+     * Test obtaining data for the download page.
+     */
+    public function test_get_language_pack_download_page_data() {
+        $this->resetAfterTest();
+
+        set_config('branchesall', '400', 'local_amos');
+
+        $statsman = new local_amos_stats_manager();
+
+        $this->helper_add_language('en', 'English');
+        $this->helper_add_language('cs', 'Czech', 'Čeština');
+        $this->helper_add_language('de_du', 'German (personal)', 'Deutsch (Du)', 'de');
+        $this->helper_add_language('de', 'German', 'Deutsch');
+
+        $statsman->update_stats('400', 'en', 'moodle', 10);
+        $statsman->update_stats('400', 'de_du', 'moodle', 1);
+        $statsman->update_stats('400', 'cs', 'moodle', 9);
+        $statsman->update_stats('400', 'de', 'moodle', 10);
+
+        $data = $statsman->get_language_pack_download_page_data(400);
+
+        $this->assertEquals(4, count($data));
+        $this->assertEquals('cs', $data[0]['langcode']);
+        $this->assertEquals('Czech / Čeština', $data[0]['langname']);
+        $this->assertEquals('9', $data[0]['totalstrings']);
+        $this->assertEquals('en', $data[1]['langcode']);
+        $this->assertEquals('de', $data[2]['langcode']);
+        $this->assertEquals('de_du', $data[3]['langcode']);
+        $this->assertEquals('de', $data[3]['parentlanguagecode']);
+    }
+
+    /**
      * Helper function for registering a known language in AMOS.
      *
      * @param string $code

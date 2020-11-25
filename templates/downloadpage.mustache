@@ -1,0 +1,86 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_plugins/frontpage
+
+    Template purpose and description.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * attributes Array of name / value pairs.
+
+    Example context (json):
+    {}
+}}
+
+<table class="generaltable" width="100%">
+    <thead>
+        <tr>
+            <th class="header c0" style="" scope="col">Language</th>
+            <th class="header c1" style="" scope="col">Download</th>
+            <th class="header c2" style="" scope="col">Size</th>
+            <th class="header c4 lastcol" style="" scope="col">Percentage of language strings translated</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#langpacks}}
+            {{#haszip}}
+                <tr>
+                    <td class="cell c0">
+                        {{^parentlanguagecode}}
+                            <strong>{{langname}}</strong>
+                        {{/parentlanguagecode}}
+                        {{#parentlanguagecode}}
+                            <em style="padding-left: 1rem;">{{langname}}</em>
+                        {{/parentlanguagecode}}
+                    </td>
+
+                    <td class="cell c1">
+                        <a class="btn btn-secondary" href="{{downloadurl}}">Download {{langcode}}.zip</a>
+                    </td>
+
+                    <td class="cell c2">
+                        {{filesize}}
+                    </td>
+
+                    <td class="cell c3 lastcol">
+                        {{^parentlanguagecode}}
+                            <div style="min-width: 500px">
+                                <div style="width: {{ratio}}%; height: 20px; background-color: #6eab2e;">&nbsp;</div>
+                                <div>
+                                    <span class="label">{{ratio}}%</span> <small>{{totalstrings}} / {{totalenglish}}</small>
+                                </div>
+                            </div>
+                        {{/parentlanguagecode}}
+                        {{#parentlanguagecode}}
+                            <small>{{totalstrings}} changes from the parent language '{{parentlanguagecode}}'</small>
+                        {{/parentlanguagecode}}
+                    </td>
+                </tr>
+            {{/haszip}}
+        {{/langpacks}}
+    </tbody>
+</table>
+
+<p style="text-align: right; margin-top: 2rem">
+<em>Generated <time datetime="{{generateddatetime}}">{{generatedlabel}}</time></em>
+</p>

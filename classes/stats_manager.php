@@ -290,7 +290,7 @@ class local_amos_stats_manager {
     /**
      * Return the number of translated strings in standard language packs.
      *
-     * This is displyed as the indicator of the language pack completeness.
+     * This is displayed as the indicator of the language pack completeness.
      *
      * @param int|null $vercode - Show stats for the version, defaults to latest version.
      * return array
@@ -398,6 +398,52 @@ class local_amos_stats_manager {
         $cache->set($cachekey, $primary);
 
         return $primary;
+    }
+
+    /**
+     * Return the number of translated strings in standard language packs.
+     *
+     * This is used to generate the download language pack page.
+     *
+     * @param int $vercode
+     * return array
+     */
+    public function get_language_pack_download_page_data(int $vercode): array {
+
+        $stats = static::get_language_pack_ratio_stats($vercode);
+
+        // Sort packs by name.
+        usort($stats, function($a, $b) {
+            return strcmp($a->langname, $b->langname);
+        });
+
+        // Flatten the list.
+        $result = [];
+
+        foreach ($stats as $langpack) {
+            $result[] = [
+                'langcode' => $langpack->langcode,
+                'langname' => $langpack->langname,
+                'totalstrings' => $langpack->totalstrings,
+                'totalenglish' => $langpack->totalenglish,
+                'ratio' => $langpack->ratio,
+            ];
+
+            if (!empty($langpack->childpacks)) {
+                foreach ($langpack->childpacks as $childpack) {
+                    $result[] = [
+                        'parentlanguagecode' => $childpack->parentlanguagecode,
+                        'langcode' => $childpack->langcode,
+                        'langname' => $childpack->langname,
+                        'totalstrings' => $childpack->totalstrings,
+                        'totalenglish' => $childpack->totalenglish,
+                        'ratio' => $childpack->ratio,
+                    ];
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

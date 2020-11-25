@@ -38,8 +38,6 @@ Options:
     --minver=<minver>   Generate only versions greater or equal than given code.
     --maxver=<maxver>   Generate only versions lower or equal than given code.
 
-If versions are limited, the 
-
 Example:
     $ php export-zip.php --minver=400
 ";
@@ -66,4 +64,4 @@ $logger = new amos_cli_logger();
 $exporter = new amos_export_zip($logger);
 $exporter->init($options['minver'], $options['maxver']);
 $exporter->rebuild_zip_packages();
-//$exporter->rebuild_output_folders();
+$exporter->rebuild_output_folders();

@@ -362,69 +362,6 @@ class local_amos_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render the html table for display on http://download.moodle.org/langpack/x.x/
-     *
-     * Output of this renderer is expected to be saved into the file lang-table.html and uploaded to the server.
-     *
-     * @param local_amos_index_tablehtml $data
-     * @return string HTML
-     */
-    protected function render_local_amos_index_tablehtml(local_amos_index_tablehtml $data) {
-        $output = '';
-
-        $table = new html_table();
-        $table->head = array('Language', 'Download', 'Size', 'Last updated', 'Percentage of language strings translated');
-        $table->width = '100%';
-        foreach ($data->langpacks as $langcode => $langpack) {
-            $row = array();
-            if ($langpack->parent == 'en' and (substr($langcode, 0, 3) != 'en_')) {
-                // standard pack without parent
-                $row[0] = $langpack->langname;
-            } else {
-                $row[0] = html_writer::tag('em', $langpack->langname, array('style'=>'margin-left:1em;'));
-            }
-            $row[1] = '<a class="btn btn-primary" href="/download.php/langpack/'.$data->version->dir.'/'.$langpack->filename.'">'.$langpack->filename.'</a>';
-            $row[2] = display_size($langpack->filesize);
-            if (time() - $langpack->modified < WEEKSECS) {
-                $row[3] = html_writer::tag('strong', self::commit_datetime($langpack->modified), array('class'=>'recentlymodified'));
-            } else {
-                $row[3] = self::commit_datetime($langpack->modified);
-            }
-            if (($langpack->parent == 'en') and (substr($langcode, 0, 3) != 'en_')) {
-                // standard package
-                if (!is_null($langpack->ratio)) {
-                    $barmax = 500; // pixels
-                    $barwidth = floor($barmax * $langpack->ratio);
-                    $barvalue = sprintf('%d %%', $langpack->ratio * 100).' <span style="color:#666">('.$langpack->totaltranslated.'/'.$data->totalenglish.')</span>';
-                    if ($langpack->ratio >= 0.8) {
-                        $bg = '#e7f1c3'; // green
-                    } elseif ($langpack->ratio >= 0.6) {
-                        $bg = '#d2ebff'; // blue
-                    } elseif ($langpack->ratio >= 0.4) {
-                        $bg = '#f3f2aa'; // yellow
-                    } else {
-                        $bg = '#ffd3d9'; // red
-                    }
-                    $row[4] = '<div style="width:100%">
-                                <div style="width:'.$barwidth.'px;background-color:'.$bg.';float:left;margin-right: 5px;">&nbsp;</div><span>'.$barvalue.'</span></div>';
-                } else {
-                    $row[4] = '';
-                }
-            } else {
-                // variant of parent language
-                $row[4] = $langpack->totaltranslated.' changes from '.$langpack->parent;
-            }
-            $table->data[] = $row;
-        }
-        $output .= html_writer::table($table);
-        $output .= '<div style="margin-top: 1em; text-align:center;">';
-        $output .= html_writer::tag('em', 'Generated: '.self::commit_datetime($data->timemodified), array('class'=>'timemodified'));
-        $output .= "</div>\n";
-
-        return $output;
-    }
-
-    /**
      * Render stash information
      *
      * @param local_amos_stash $stash
