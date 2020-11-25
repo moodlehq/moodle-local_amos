@@ -216,6 +216,8 @@ if ($submitform->is_cancelled()) {
     unset($SESSION->local_amos->presetcommitmessage);
     unset($SESSION->local_amos->stagedcontribution);
 
+    local_amos_stats_manager::reset_caches();
+
     redirect(new moodle_url('/local/amos/contrib.php'));
 }
 

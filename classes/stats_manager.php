@@ -33,6 +33,15 @@ defined('MOODLE_INTERNAL') || die();
 class local_amos_stats_manager {
 
     /**
+     * Reset MUC caches.
+     */
+    public static function reset_caches() {
+
+        $cache = cache::make('local_amos', 'stats');
+        $cache->purge();
+    }
+
+    /**
      * Update (or insert) the stats for the given language pack version.
      *
      * @param int $branch Version code such as 3700
@@ -76,6 +85,13 @@ class local_amos_stats_manager {
     public function get_component_stats(string $component) {
         global $CFG, $DB;
         require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+
+        $cache = cache::make('local_amos', 'stats');
+        $cachekey = 'component_' . $component;
+
+        if ($cached = $cache->get($cachekey)) {
+            return $cached;
+        }
 
         $data = [];
         $lastmodified = 0;
@@ -172,6 +188,8 @@ class local_amos_stats_manager {
             ]);
         }
 
+        $cache->set($cachekey, $result);
+
         return $result;
     }
 
@@ -190,6 +208,13 @@ class local_amos_stats_manager {
             $version = mlang_version::by_code($vercode);
         } else {
             $version = mlang_version::latest_version();
+        }
+
+        $cache = cache::make('local_amos', 'stats');
+        $cachekey = 'langpackratio' . $version->code;
+
+        if ($cached = $cache->get($cachekey)) {
+            return $cached;
         }
 
         $langnames = mlang_tools::list_languages(true, true, false, true);
@@ -266,7 +291,7 @@ class local_amos_stats_manager {
         }
 
         array_walk($langpacks, function (&$item) use ($english) {
-            if (!empty($item))  {
+            if (!empty($item)) {
                 $item->totalenglish = $english->totalstrings;
                 if ($item->totalenglish > 0) {
                     $item->ratio = max(0, min(100, round(100 * $item->totalstrings / $english->totalstrings)));
@@ -275,6 +300,8 @@ class local_amos_stats_manager {
                 }
             }
         });
+
+        $cache->set($cachekey, $primary);
 
         return $primary;
     }
@@ -286,6 +313,13 @@ class local_amos_stats_manager {
      */
     public function frontpage_contribution_stats(): array {
         global $CFG, $DB;
+
+        $cache = cache::make('local_amos', 'stats');
+        $cachekey = 'contributionstats';
+
+        if ($cached = $cache->get($cachekey)) {
+            return $cached;
+        }
 
         $total = (int)$DB->get_field_sql("
             SELECT SUM(strings)
@@ -313,9 +347,13 @@ class local_amos_stats_manager {
             'contributor4' => $links[3],
         ]);
 
-        return [
+        $result = [
             'contributedstrings' => number_format($total, 0, '', get_string('thousandssep', 'core_langconfig')),
             'listcontributors' => $links,
         ];
+
+        $cache->set($cachekey, $result);
+
+        return $result;
     }
 }

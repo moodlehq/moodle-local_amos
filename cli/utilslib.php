@@ -206,6 +206,8 @@ class amos_export_zip {
                 $this->update_stats($version, $langcode);
             }
         }
+
+        $this->statsman->reset_caches();
     }
 
     /**
