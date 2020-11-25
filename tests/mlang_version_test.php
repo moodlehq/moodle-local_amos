@@ -195,6 +195,20 @@ class local_amos_mlang_version_test extends advanced_testcase {
     }
 
     /**
+     * Test obtaining the first known version
+     */
+    public function test_oldest_version() {
+
+        $this->resetAfterTest();
+
+        set_config('branchesall', '38,39,310', 'local_amos');
+
+        $latest = mlang_version::oldest_version();
+
+        $this->assertSame('3.8', $latest->dir);
+    }
+
+    /**
      * Test obtaining a range of versions.
      */
     public function test_list_range() {

@@ -1710,6 +1710,18 @@ class mlang_version {
     }
 
     /**
+     * Return the oldest known version.
+     *
+     * @return mlang_version
+     */
+    public static function oldest_version() {
+
+        $all = static::list_all();
+
+        return array_shift($all);
+    }
+
+    /**
      * Used by factory methods to create instances of this class.
      *
      * @param int $code
