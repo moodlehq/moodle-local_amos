@@ -33,6 +33,7 @@ require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
     require_once($CFG->dirroot . '/local/amos/cli/config.php');
+
 } else {
     require_once($CFG->dirroot . '/local/amos/cli/config-dist.php');
 }
@@ -131,20 +132,17 @@ class amos_export_zip {
     /** @var string full path to the root of temp folders */
     protected $tempdirroot;
 
-    /** @var string full path to the root of folders with packinfo.ser files */
-    protected $vardirroot;
-
-    /** @var int the timestamp of the current execution */
-    protected $now;
-
     /** @var int the timestamp of the last execution of this job */
     protected $last;
 
-    /** @var array in-memory stash for caching various data for other steps of the execution */
-    protected $stash = array();
-
     /** @var local_amos_stats_manager instance used for updating translation stats while exporting the ZIPs */
     protected $statsman;
+
+    /** @var int|null min version code to process */
+    protected $minver;
+
+    /** @var int|null max version code to process */
+    protected $maxver;
 
     /**
      * Instantinate the exporter job
@@ -156,7 +154,6 @@ class amos_export_zip {
         $this->logger = $logger;
         $this->outputdirroot = $CFG->dataroot.'/amos/export-zip';
         $this->tempdirroot = $CFG->dataroot.'/amos/temp/export-zip';
-        $this->vardirroot = $CFG->dataroot.'/amos/var/export-zip';
 
         if (!$statsman) {
             $this->statsman = new local_amos_stats_manager();
@@ -180,9 +177,10 @@ class amos_export_zip {
     /**
      * Initialize this exporter job instance
      */
-    public function init() {
+    public function init(?int $minver = null, ?int $maxver = null) {
+
         $this->log('== Initializing the ZIP language packs exporter ==');
-        $this->init_timestamp_now();
+        $this->init_versions_range($minver, $maxver);
         $this->init_timestamp_last();
         $this->init_temp_folders();
     }
@@ -202,8 +200,6 @@ class amos_export_zip {
                 }
                 $this->rebuild_zip_package($version, $langcode);
                 $this->push_zip_package($version, $langcode);
-                $this->update_packinfo($version, $langcode);
-                $this->update_stats($version, $langcode);
             }
         }
 
@@ -216,27 +212,13 @@ class amos_export_zip {
     public function rebuild_output_folders() {
         $this->log('== Rebuilding languages.md5 and lang-table.html files ==');
 
+        // For each folder in outputdirroot
+        $target = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
+
         foreach ($this->get_versions() as $version) {
-            $packinfofile = $this->vardirroot.'/'.$version->dir.'/packinfo.ser';
-            if (!file_exists($packinfofile)) {
-                $this->log('File packinfo.ser not found for '.$version->dir, amos_cli_logger::LEVEL_WARNING);
-                continue;
-            }
-            $packinfo = unserialize(file_get_contents($packinfofile));
-            ksort($packinfo);
-
-            $this->rebuild_languages_md5($version, $packinfo);
-            $this->rebuild_index_tablehtml($version, $packinfo);
+            $this->rebuild_languages_md5($version);
+            $this->rebuild_index_tablehtml($version);
         }
-    }
-
-    /**
-     * Cleanup and dismiss this exporter job instance
-     */
-    public function finalize() {
-        $this->log('== Finalizing the exporter job ==');
-        $this->set_timestamp_last();
-        $this->job_success('Done!');
     }
 
     // End of external API /////////////////////////////////////////////////////
@@ -248,20 +230,29 @@ class amos_export_zip {
      */
     protected function get_versions() {
 
-        if (!isset($this->stash['versions'])) {
-            $this->stash['versions'] = mlang_version::list_range(20);
-            krsort($this->stash['versions']);
-        }
+        $minver = max(20, $this->minver ?? 20);
+        $maxver = $this->maxver;
 
-        return $this->stash['versions'];
+        $versions = mlang_version::list_range($minver, $maxver);
+        krsort($versions);
+
+        return $versions;
     }
 
     /**
-     * Loads the current execution timestamps
+     * Set optional limits for processed versions.
      */
-    protected function init_timestamp_now() {
-        $this->now = time();
-        $this->log('Setting the current execution timestamp to '.date('Y-m-d H:i:s', $this->now), amos_cli_logger::LEVEL_DEBUG);
+    protected function init_versions_range(?int $minver, ?int $maxver) {
+
+        if ($this->minver = $minver) {
+            $this->log('Processing only versions starting from ' . mlang_version::by_code($minver)->label,
+                amos_cli_logger::LEVEL_DEBUG);
+        }
+
+        if ($this->maxver = $maxver) {
+            $this->log('Processing only versions up to ' . mlang_version::by_code($maxver)->label,
+                amos_cli_logger::LEVEL_DEBUG);
+        }
     }
 
     /**
@@ -271,19 +262,12 @@ class amos_export_zip {
         $lastexportzip = get_config('local_amos', 'lastexportzip');
         if (empty($lastexportzip)) {
             $lastexportzip = 0;
-            $this->log('Previous execution timestamp not found, setting it to the beginning of the epoch '.date('Y-m-d H:i:s', $lastexportzip), amos_cli_logger::LEVEL_DEBUG);
+            $this->log('Previous execution timestamp (lastexportzip) not configured.', amos_cli_logger::LEVEL_DEBUG);
         } else {
-            $this->log('Previous execution timestamp was '.date('Y-m-d H:i:s', $lastexportzip), amos_cli_logger::LEVEL_DEBUG);
+            $this->log(sprintf('Previous execution timestamp found: %d (%s).', $lastexportzip, date('Y-m-d H:i:s', $lastexportzip)),
+                amos_cli_logger::LEVEL_DEBUG);
         }
         $this->last = $lastexportzip;
-    }
-
-    /**
-     * Stores the last execution timestamp
-     */
-    protected function set_timestamp_last() {
-        $this->log('Store the current execution timestamp '.date('Y-m-d H:i:s', $this->now), amos_cli_logger::LEVEL_DEBUG);
-        set_config('lastexportzip', $this->now, 'local_amos');
     }
 
     /**
@@ -292,7 +276,7 @@ class amos_export_zip {
     protected function init_temp_folders() {
         $this->log('Preparing temporary folders', amos_cli_logger::LEVEL_DEBUG);
         fulldelete($this->tempdirroot);
-        foreach($this->get_versions() as $version) {
+        foreach ($this->get_versions() as $version) {
             make_writable_directory($this->tempdirroot.'/'.$version->dir);
         }
     }
@@ -362,6 +346,7 @@ class amos_export_zip {
                 $english->clear();
             }
             $this->dump_component_into_temp($component);
+            $this->update_component_stats($component);
             $component->clear();
             unset($component);
         }
@@ -390,104 +375,6 @@ class amos_export_zip {
         }
 
         rename($source, $target);
-    }
-
-    /**
-     * Updates the information about the pushed ZIP package in packinfo.ser file
-     *
-     * @param mlang_version $version
-     * @param string $langcode
-     */
-    protected function update_packinfo(mlang_version $version, $langcode) {
-
-        $packinfofile = $this->vardirroot.'/'.$version->dir.'/packinfo.ser';
-
-        if (file_exists($packinfofile)) {
-            $packinfo = unserialize(file_get_contents($packinfofile));
-        } else {
-            $packinfo = array();
-            if (!file_exists(dirname($packinfofile))) {
-                make_writable_directory(dirname($packinfofile));
-            }
-        }
-        if ($info = $this->generate_packinfo($version, $langcode)) {
-            $packinfo[$langcode] = $info;
-            file_put_contents($packinfofile, serialize($packinfo));
-        }
-    }
-
-    /**
-     * Generates new packinfo structure about the pushed ZIP package
-     *
-     * @param mlang_version $version
-     * @param string $langcode
-     * @return array|null
-     */
-    protected function generate_packinfo(mlang_version $version, $langcode) {
-
-        $info = array();
-
-        // Name of the language
-        if (isset($this->stash['langnames'][$langcode])) {
-            $info['langname'] = $this->stash['langnames'][$langcode];
-        } else {
-            $info['langname'] = $langcode;
-        }
-
-        // Parent language
-        if (isset($this->stash['langparents'][$langcode])) {
-           $info['parent'] = $this->stash['langparents'][$langcode];
-        }
-
-        // Pack modification date
-        if (!isset($this->stash['componentrecenttimemodified'][$version->code][$langcode])) {
-            $this->log('Unable to generate packinfo/modified for '.$version->dir.'/'.$langcode, amos_cli_logger::LEVEL_WARNING);
-            return null;
-        }
-        $packmodified = 0;
-        foreach ($this->stash['componentrecenttimemodified'][$version->code][$langcode] as $componentname => $componentmodified) {
-            if ($componentmodified > $packmodified) {
-                $packmodified = $componentmodified;
-            }
-        }
-        if ($packmodified == 0) {
-            $this->job_failure('Unexpected zero value of packinfo/modified for '.$version->dir.'/'.$langcode);
-        } else {
-            $info['modified'] = $packmodified;
-        }
-
-        // Number of strings per component
-        if (!isset($this->stash['componentnumofstrings'][$version->code][$langcode])) {
-            $this->job_failure('Unable to generate packinfo/numofstrings for '.$version->dir.'/'.$langcode);
-        }
-        foreach ($this->stash['componentnumofstrings'][$version->code][$langcode] as $componentname => $numberofstrings) {
-            $info['numofstrings'][$componentname] = $numberofstrings;
-        }
-
-        // Information about the ZIP file
-        $zipfile = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
-        $info['md5'] = md5_file($zipfile);
-        $info['filesize'] = filesize($zipfile);
-
-        return $info;
-    }
-
-    /**
-     * Update the statistics about the number of translated strings.
-     *
-     * @param mlang_version $version
-     * @param string $langcode
-     */
-    protected function update_stats(mlang_version $version, string $langcode) {
-
-        if (!isset($this->stash['componentnumofstrings'][$version->code][$langcode])) {
-            $this->log('Number of strings not available for '.$version->dir.'/'.$langcode);
-            return;
-        }
-
-        foreach ($this->stash['componentnumofstrings'][$version->code][$langcode] as $componentname => $numberofstrings) {
-            $this->statsman->update_stats($version->code, $langcode, $componentname, $numberofstrings);
-        }
     }
 
     /**
@@ -522,29 +409,24 @@ class amos_export_zip {
             return;
         }
 
-        // Write the strings and stash some meta-information about the component for later usage
         $file = $this->tempdirroot . '/' . $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
+
         if (!file_exists(dirname($file))) {
             make_writable_directory(dirname($file));
         }
+
         $component->export_phpfile($file);
+    }
+
+    /**
+     * Update the statistics about the number of translated strings in the component.
+     *
+     * @param mlang_component $component
+     */
+    protected function update_component_stats(mlang_component $component) {
 
         $numberofstrings = $component->get_number_of_strings(true);
-        $this->stash['componentnumofstrings'][$component->version->code][$component->lang][$component->name] = $numberofstrings;
-
-        $recentmodified = $component->get_recent_timemodified();
-        $this->stash['componentrecenttimemodified'][$component->version->code][$component->lang][$component->name] = $recentmodified;
-
-        if ($component->name === 'langconfig') {
-            if ($component->has_string('thislanguage')) {
-                $langname = $component->get_string('thislanguage')->text;
-                $this->stash['langnames'][$component->lang] = $langname;
-            }
-            if ($component->has_string('parentlanguage')) {
-                $parentlanguage = $component->get_string('parentlanguage')->text;
-                $this->stash['langparents'][$component->lang] = $parentlanguage;
-            }
-        }
+        $this->statsman->update_stats($component->version->code, $component->lang, $component->name, $numberofstrings);
     }
 
     /**
@@ -598,10 +480,10 @@ class amos_export_zip {
      * Rebuilds languages.md5 file for the given version
      *
      * @param mlang_version $version
-     * @param array $packinfo
      */
-    protected function rebuild_languages_md5(mlang_version $version, array $packinfo) {
+    protected function rebuild_languages_md5(mlang_version $version) {
 
+        // TODO packinfo
         $languagesmd5 = '';
         foreach ($packinfo as $langcode => $info) {
             $zipfile = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
@@ -623,11 +505,11 @@ class amos_export_zip {
      * Rebuilds lang-table.html file for the given version
      *
      * @param mlang_version $version
-     * @param array $packinfo
      */
-    protected function rebuild_index_tablehtml(mlang_version $version, array $packinfo) {
+    protected function rebuild_index_tablehtml(mlang_version $version) {
         global $PAGE;
 
+        // TODO packinfo
         $indextable = new local_amos_index_tablehtml($version, $packinfo);
         $output = $PAGE->get_renderer('local_amos', null, RENDERER_TARGET_GENERAL);
         $tablehtml = $output->render($indextable);

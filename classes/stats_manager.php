@@ -292,7 +292,7 @@ class local_amos_stats_manager {
 
         array_walk($langpacks, function (&$item) use ($english) {
             if (!empty($item)) {
-                $item->totalenglish = $english->totalstrings;
+                $item->totalenglish = $english->totalstrings ?? 0;
                 if ($item->totalenglish > 0) {
                     $item->ratio = max(0, min(100, round(100 * $item->totalstrings / $english->totalstrings)));
                 } else {
