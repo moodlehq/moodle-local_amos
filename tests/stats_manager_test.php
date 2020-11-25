@@ -41,6 +41,8 @@ class local_amos_stats_manager_test extends advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
+        set_config('branchesall', '35,36,37', 'local_amos');
+
         $statsman = new local_amos_stats_manager();
 
         // Inserting fresh data.
@@ -82,13 +84,15 @@ class local_amos_stats_manager_test extends advanced_testcase {
     public function test_get_component_stats() {
         $this->resetAfterTest();
 
-        $this->helper_add_language('en', 'English');
-        $this->helper_add_language('cs', 'Czech');
-        $this->helper_add_language('de', 'German');
-        $this->helper_add_language('en_us', 'English (US)');
-        $this->helper_add_language('sk', 'Slovak');
+        set_config('branchesall', '35,36,37', 'local_amos');
 
         $statsman = new local_amos_stats_manager();
+
+        $this->helper_add_language('en', 'English');
+        $this->helper_add_language('cs', 'Czech', 'Čeština');
+        $this->helper_add_language('de', 'German', 'Deutsch');
+        $this->helper_add_language('en_us', 'English (US)');
+        $this->helper_add_language('sk', 'Slovak', 'Slovenčina');
 
         $this->assertFalse($statsman->get_component_stats('tool_foo'));
 
@@ -140,27 +144,80 @@ class local_amos_stats_manager_test extends advanced_testcase {
     }
 
     /**
+     * Test obtaining stats showing the translation completeness.
+     */
+    public function test_get_language_pack_ratio_stats() {
+        $this->resetAfterTest();
+
+        set_config('branchesall', '35,36,37', 'local_amos');
+
+        $statsman = new local_amos_stats_manager();
+
+        $this->helper_add_language('en', 'English');
+        $this->helper_add_language('cs', 'Czech', 'Čeština');
+        $this->helper_add_language('de', 'German', 'Deutsch');
+        $this->helper_add_language('de_du', 'German (personal)', 'Deutsch (Du)', 'de');
+
+        $statsman->update_stats('35', 'en', 'moodle', 10);
+        $statsman->update_stats('35', 'cs', 'moodle', 9);
+        $statsman->update_stats('35', 'de', 'moodle', 10);
+        $statsman->update_stats('35', 'de_du', 'moodle', 1);
+
+        $statsman->update_stats('36', 'en', 'moodle', 12);
+        $statsman->update_stats('36', 'cs', 'moodle', 10);
+        $statsman->update_stats('36', 'de', 'moodle', 9);
+        $statsman->update_stats('36', 'de_du', 'moodle', 1);
+
+        $statsman->update_stats('37', 'en', 'moodle', 20);
+        $statsman->update_stats('37', 'cs', 'moodle', 15);
+        $statsman->update_stats('37', 'de', 'moodle', 17);
+        $statsman->update_stats('37', 'de_du', 'moodle', 3);
+
+        $lateststats = $statsman->get_language_pack_ratio_stats();
+
+        $this->assertEquals(3, count($lateststats));
+
+        $this->assertEquals('en', $lateststats[0]->langcode);
+        $this->assertEquals('English', $lateststats[0]->langname);
+        $this->assertEquals(20, $lateststats[0]->totalstrings);
+        $this->assertEquals(20, $lateststats[0]->totalenglish);
+        $this->assertEquals(100, $lateststats[0]->ratio);
+
+        $this->assertEquals('de', $lateststats[1]->langcode);
+        $this->assertEquals('German / Deutsch', $lateststats[1]->langname);
+        $this->assertEquals(17, $lateststats[1]->totalstrings);
+        $this->assertEquals(20, $lateststats[1]->totalenglish);
+        $this->assertEquals(round(17 / 20 * 100), $lateststats[1]->ratio);
+        $this->assertEquals(1, count($lateststats[1]->childpacks));
+        $this->assertEquals('de_du', $lateststats[1]->childpacks[0]->langcode);
+
+        $this->assertEquals('cs', $lateststats[2]->langcode);
+
+        $lateststats = $statsman->get_language_pack_ratio_stats(36);
+
+        $this->assertEquals(3, count($lateststats));
+        $this->assertEquals('en', $lateststats[0]->langcode);
+        $this->assertEquals('cs', $lateststats[1]->langcode);
+        $this->assertEquals('de', $lateststats[2]->langcode);
+    }
+
+    /**
      * Helper function for registering a known language in AMOS.
      *
      * @param string $code
-     * @param string $name
+     * @param string $thislanguageint
+     * @param string $thislanguage
+     * @param string $parent
      */
-    protected function helper_add_language($code, $name) {
+    protected function helper_add_language(string $code, string $thislanguageint, string $thislanguage = '', string $parent = '') {
 
         $stage = new mlang_stage();
-
-        foreach ([
-            mlang_version::by_branch('MOODLE_37_STABLE'),
-            mlang_version::by_branch('MOODLE_36_STABLE'),
-            mlang_version::by_branch('MOODLE_35_STABLE'),
-        ] as $mlangversion) {
-            $component = new mlang_component('langconfig', $code, $mlangversion);
-            $component->add_string(new mlang_string('thislanguageint', $name));
-            $stage->add($component);
-            $component->clear();
-        }
-
-        $stage->commit('Registering a new language '.$name, array('source' => 'unittest'));
+        $component = new mlang_component('langconfig', $code, mlang_version::oldest_version());
+        $component->add_string(new mlang_string('thislanguageint', $thislanguageint));
+        $component->add_string(new mlang_string('thislanguage', $thislanguage ?? $thislanguageint));
+        $component->add_string(new mlang_string('parentlanguage', $parent));
+        $stage->add($component);
+        $stage->commit('Registering language ' . $code, ['source' => 'unittest']);;
 
         // Rebuild the cache.
         mlang_tools::list_languages(true, false);
