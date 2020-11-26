@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_amos', get_string('pluginname', 'local_amos'));
+    $settings = new admin_settingpage('local_amos', get_string('manageamos', 'local_amos'));
 
     if ($ADMIN->fulltree) {
         $settings->add(new admin_setting_configtextarea(
@@ -65,5 +65,5 @@ if ($hassiteconfig) {
         ));
     }
 
-    $ADMIN->add('localplugins', $settings);
+    $ADMIN->add('root', $settings, 'registrationmoodleorg');
 }

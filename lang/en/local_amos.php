@@ -263,6 +263,7 @@ $string['logfilterstrings'] = 'String filter';
 $string['logfilterusergrp'] = 'Committer';
 $string['logfilterusergrpor'] = ' or ';
 $string['maintainers'] = 'Maintainers';
+$string['manageamos'] = 'Manage AMOS';
 $string['markuptodate'] = 'Marking the translation as up-to-date';
 $string['markuptodatelabel'] = 'mark as up-to-date';
 $string['messageprovider:checker'] = 'Language pack checker results';
