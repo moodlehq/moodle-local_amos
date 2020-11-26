@@ -53,6 +53,16 @@ $plugins = \local_amos\local\util::standard_components_tree();
 $stages = [];
 $cliresult = 0;
 
+// Load the location of standard plugin types and core subsystems.
+$componentsjson = (array) json_decode(implode(PHP_EOL, $git->exec('show origin/master:lib/components.json')), true);
+$plugintypelocations = $componentsjson['plugintypes'];
+
+foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), null, PREG_SPLIT_NO_EMPTY) as $line) {
+    if (preg_match('|^\s*([a-z][a-z0-9]*)\s+(.+)$|', $line, $matches)) {
+        $plugintypelocations[$matches[1]] = $matches[2];
+    }
+}
+
 cli_writeln('Seeking for differences between AMOS and Git');
 
 foreach ($plugins as $versioncode => $plugintypes) {
@@ -71,7 +81,6 @@ foreach ($plugins as $versioncode => $plugintypes) {
     cli_writeln('- Processing version ' . $version->label . ' on ' . $gitbranch);
 
     foreach ($plugintypes as $legacyname => $frankenstylename) {
-
         // Component moodle.org was replaced with a local plugin and strings were dropped from 2.0 and 2.1.
         if ($legacyname == 'moodle.org') {
             continue;
@@ -91,81 +100,22 @@ foreach ($plugins as $versioncode => $plugintypes) {
             $plugintype = substr($frankenstylename, 0, strpos($frankenstylename, '_'));
             $pluginname = substr($frankenstylename, strpos($frankenstylename, '_') + 1);
         }
-        // Very hacky way to get plugin basedirs for all versions.
-        // See core_component::fetch_plugintypes() in lib/classes/component.php when adding a new one.
-        $basedirs = [
-            'mod'                   => 'mod',
-            'auth'                  => 'auth',
-            'enrol'                 => 'enrol',
-            'message'               => 'message/output',
-            'block'                 => 'blocks',
-            'filter'                => 'filter',
-            'editor'                => 'lib/editor',
-            'format'                => 'course/format',
-            'profilefield'          => 'user/profile/field',
-            'report'                => 'report',
-            'coursereport'          => 'course/report',
-            'gradeexport'           => 'grade/export',
-            'gradeimport'           => 'grade/import',
-            'gradereport'           => 'grade/report',
-            'mnetservice'           => 'mnet/service',
-            'webservice'            => 'webservice',
-            'repository'            => 'repository',
-            'portfolio'             => 'portfolio',
-            'qtype'                 => 'question/type',
-            'qformat'               => 'question/format',
-            'qbehaviour'            => 'question/behaviour',
-            'plagiarism'            => 'plagiarism',
-            'theme'                 => 'theme',
-            'assignment'            => 'mod/assignment/type',
-            'datafield'             => 'mod/data/field',
-            'datapreset'            => 'mod/data/preset',
-            'quiz'                  => 'mod/quiz/report',
-            'quizaccess'            => 'mod/quiz/accessrule',
-            'scormreport'           => 'mod/scorm/report',
-            'workshopform'          => 'mod/workshop/form',
-            'workshopallocation'    => 'mod/workshop/allocation',
-            'workshopeval'          => 'mod/workshop/eval',
-            'local'                 => 'local',
-            'tool'                  => 'admin/tool',
-            'gradingform'           => 'grade/grading/form',
-            'assignsubmission'      => 'mod/assign/submission',
-            'assignfeedback'        => 'mod/assign/feedback',
-            'booktool'              => 'mod/book/tool',
-            'cachestore'            => 'cache/stores',
-            'cachelock'             => 'cache/locks',
-            'tinymce'               => 'lib/editor/tinymce/plugins',
-            'atto'                  => 'lib/editor/atto/plugins',
-            'calendartype'          => 'calendar/type',
-            'logstore'              => 'admin/tool/log/store',
-            'availability'          => 'availability/condition',
-            'ltisource'             => 'mod/lti/source',
-            'ltiservice'            => 'mod/lti/service',
-            'antivirus'             => 'lib/antivirus',
-            'dataformat'            => 'dataformat',
-            'search'                => 'search/engine',
-            'media'                 => 'media/player',
-            'fileconverter'         => 'files/converter',
-            'mlbackend'             => 'lib/mlbackend',
-            'customfield'           => 'customfield/field',
-            'forumreport'           => 'mod/forum/report',
-            'h5plib'                => 'h5p/h5plib',
-            'contenttype'           => 'contentbank/contenttype',
-        ];
 
         if ($version->code <= 21) {
-            // Since 2.2 beta, reports have moved.
-            $basedirs['report'] = 'admin/report';
+            // Before 2.2 beta, reports were originally under admin.
+            $plugintypelocations['report'] = 'admin/report';
         }
 
         if ($plugintype == 'core') {
-            $filepath = 'lang/en/'.$legacyname.'.php';
-        } else if (!isset($basedirs[$plugintype])) {
+            $filepath = 'lang/en/' . $legacyname . '.php';
+
+        } else if (!isset($plugintypelocations[$plugintype])) {
             cli_writeln("!! Unknown plugin type '{$plugintype}'", STDERR);
             $cliresult = 1;
             continue;
+
         } else {
-            $filepath = $basedirs[$plugintype].'/'.$pluginname.'/lang/en/'.$legacyname.'.php';
+            $filepath = $plugintypelocations[$plugintype] . '/' . $pluginname . '/lang/en/' . $legacyname . '.php';
         }
 
         // Get the most recent snapshot from the git repository.

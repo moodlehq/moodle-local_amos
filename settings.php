@@ -56,6 +56,34 @@ if ($hassiteconfig) {
             60, 10
         ));
 
+        $settings->add(new admin_setting_configtextarea(
+            'local_amos/plugintypelocations',
+            get_string('plugintypelocations', 'local_amos'),
+            get_string('plugintypelocations_desc', 'local_amos'),
+            implode(PHP_EOL, [
+                'assignment mod/assignment/type',
+                'datafield mod/data/field',
+                'datapreset mod/data/preset',
+                'quiz mod/quiz/report',
+                'quizaccess mod/quiz/accessrule',
+                'scormreport mod/scorm/report',
+                'workshopform mod/workshop/form',
+                'workshopallocation mod/workshop/allocation',
+                'workshopeval mod/workshop/eval',
+                'assignsubmission mod/assign/submission',
+                'assignfeedback mod/assign/feedback',
+                'booktool mod/book/tool',
+                'tinymce lib/editor/tinymce/plugins',
+                'atto lib/editor/atto/plugins',
+                'logstore admin/tool/log/store',
+                'ltisource mod/lti/source',
+                'ltiservice mod/lti/service',
+                'forumreport mod/forum/report',
+            ]),
+            PARAM_RAW_TRIMMED,
+            60, 10
+        ));
+
         $settings->add(new admin_setting_configtext(
             'local_amos/applangindexfile',
             get_string('applangindexfile', 'local_amos'),
