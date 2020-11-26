@@ -56,7 +56,6 @@ class local_amos_stats_manager {
         global $DB;
 
         $record = (object)[
-            // Always set this even when not actually changing the numofstrings - keeps the timestamp of the recent check.
             'timemodified' => time(),
             'branch' => $branch,
             'lang' => $lang,
@@ -68,11 +67,13 @@ class local_amos_stats_manager {
             'branch' => $record->branch,
             'lang' => $record->lang,
             'component' => $record->component,
-        ], 'id', IGNORE_MISSING);
+        ], 'id, numofstrings', IGNORE_MISSING);
 
         if ($current) {
-            $record->id = $current->id;
-            $DB->update_record('amos_stats', $record, true);
+            if ($current->numofstrings != $record->numofstrings) {
+                $record->id = $current->id;
+                $DB->update_record('amos_stats', $record, true);
+            }
 
         } else {
             $DB->insert_record('amos_stats', $record, false);
@@ -122,17 +123,20 @@ class local_amos_stats_manager {
         [$sqllangs, $paramlangs] = $DB->get_in_or_equal(array_keys($listlangs), SQL_PARAMS_NAMED);
         [$sqlcomponents, $paramcomponents] = $DB->get_in_or_equal(array_keys($listcomponents), SQL_PARAMS_NAMED);
 
-        $sql = "SELECT id, branch, lang, component
+        $sql = "SELECT id, branch, lang, component, numofstrings
                   FROM {amos_stats}
                  WHERE branch ${sqlbranches}
                    AND lang ${sqllangs}
                    AND component ${sqlcomponents}";
 
-        $ids = [];
+        $current = [];
         $rs = $DB->get_recordset_sql($sql, array_merge($parambranches, $paramlangs, $paramcomponents));
 
         foreach ($rs as $r) {
-            $ids[$r->branch][$r->lang][$r->component] = $r->id;
+            $current[$r->branch][$r->lang][$r->component] = [
+                'id' => $r->id,
+                'numofstrings' => $r->numofstrings,
+            ];
         }
 
         $rs->close();
@@ -142,15 +146,17 @@ class local_amos_stats_manager {
         foreach ($this->buffer as $branch => $langs) {
             foreach ($langs as $lang => $components) {
                 foreach ($components as $component => $numofstrings) {
-                    if ($id = $ids[$branch][$lang][$component] ?? null) {
-                        $DB->update_record('amos_stats', [
-                            'id' => $id,
-                            'branch' => $branch,
-                            'lang' => $lang,
-                            'component' => $component,
-                            'numofstrings' => $numofstrings,
-                            'timemodified' => $now,
-                        ], true);
+                    if ($id = $current[$branch][$lang][$component]['id'] ?? null) {
+                        if ($numofstrings != $current[$branch][$lang][$component]['numofstrings']) {
+                            $DB->update_record('amos_stats', [
+                                'id' => $id,
+                                'branch' => $branch,
+                                'lang' => $lang,
+                                'component' => $component,
+                                'numofstrings' => $numofstrings,
+                                'timemodified' => $now,
+                            ], true);
+                        }
 
                     } else {
                         $DB->insert_record('amos_stats', [
