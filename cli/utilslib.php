@@ -353,8 +353,12 @@ class amos_export_zip {
                 $english->clear();
             }
             $this->dump_component_into_temp($component);
-            $numberofstrings = $component->get_number_of_strings(true);
-            $this->statsman->add_to_buffer($component->version->code, $component->lang, $component->name, $numberofstrings);
+
+            if ($component->has_string()) {
+                $numberofstrings = $component->get_number_of_strings(true);
+                $this->statsman->add_to_buffer($component->version->code, $component->lang, $component->name, $numberofstrings);
+            }
+
             $component->clear();
             unset($component);
         }
