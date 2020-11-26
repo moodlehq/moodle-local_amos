@@ -59,6 +59,10 @@ if (!empty($message)) {
     list($numstrings, $listlanguages, $listcomponents) = mlang_stage::analyze($stage);
     $stage->commit($message, ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
         false, null, $clear);
+
+    // Invalidate the cache of all known languages.
+    cache::make('local_amos', 'lists')->delete('languages');
+
     $stage->store();
     // Automatically backport translations to lower versions if they apply.
     $listlanguages = array_filter(explode('/', $listlanguages));
