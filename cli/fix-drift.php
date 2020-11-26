@@ -43,6 +43,8 @@ if ($unrecognised) {
     cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
 }
 
+cli_writeln('Updating remote tracking branches in ' . AMOS_REPO_MOODLE);
+
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');
 
@@ -50,6 +52,8 @@ $plugins = \local_amos\local\util::standard_components_tree();
 
 $stages = [];
 $cliresult = 0;
+
+cli_writeln('Seeking for differences between AMOS and Git');
 
 foreach ($plugins as $versioncode => $plugintypes) {
     $version = mlang_version::by_code($versioncode);
@@ -61,9 +65,10 @@ foreach ($plugins as $versioncode => $plugintypes) {
         $gitbranch = 'origin/master';
 
     } else {
-        fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
-        exit(3);
+        cli_error('Git branch not found', 3);
     }
+
+    cli_writeln('- Processing version ' . $version->label . ' on ' . $gitbranch);
 
     foreach ($plugintypes as $legacyname => $frankenstylename) {
 
@@ -156,7 +161,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
         if ($plugintype == 'core') {
             $filepath = 'lang/en/'.$legacyname.'.php';
         } else if (!isset($basedirs[$plugintype])) {
-            fputs(STDERR, "!! Unknown plugin type '{$plugintype}'\n");
+            cli_writeln("!! Unknown plugin type '{$plugintype}'", STDERR);
             $cliresult = 1;
             continue;
         } else {
@@ -172,15 +177,14 @@ foreach ($plugins as $versioncode => $plugintypes) {
             // Previously we used to delete all the strings, it was a mistake. Better to fail loudly and let the site
             // admins to fix the list of standard plugins.
             if ($amoscomponent->has_string()) {
-                fputs(STDERR, "SUPPOSEDLY STANDARD COMPONENT '{$frankenstylename}' FILE '{$filepath}' NOT FOUND IN {$gitbranch}\n");
-                exit(2);
+                cli_error("Supposedly standard component '{$frankenstylename}' file '{$filepath}' not found in {$gitbranch}", 2);
             }
             // No string file and nothing in AMOS - that is correct.
             continue;
         }
 
         if ($gitstatus <> 0) {
-            fputs(STDERR, "FATAL ERROR {$gitstatus} EXECUTING {$gitcmd}\n");
+            cli_error("Fatal error {$gitstatus} executing {$gitcmd}\n");
             exit($gitstatus);
         }
 
@@ -194,7 +198,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
             $gitstring = $gitcomponent->get_string($amosstring->id);
 
             if (is_null($gitstring)) {
-                fputs(STDOUT, "<< AMOS ONLY: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
+                cli_writeln("<< AMOS ONLY: {$version->dir} [{$amosstring->id},{$frankenstylename}]");
                 $fixstring = clone($amosstring);
                 $fixstring->deleted = true;
                 $fixstring->clean_text();
@@ -203,7 +207,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
             }
 
             if ($gitstring->text !== $amosstring->text) {
-                fputs(STDOUT, "!= AMOS GIT DIFF: {$version->dir} [{$amosstring->id},{$frankenstylename}]\n");
+                cli_writeln("!= AMOS GIT DIFF: {$version->dir} [{$amosstring->id},{$frankenstylename}]");
                 $gitstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
@@ -214,7 +218,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
             $amosstring = $amoscomponent->get_string($gitstring->id);
 
             if (is_null($amosstring)) {
-                fputs(STDOUT, ">> GIT ONLY: {$version->dir} [{$gitstring->id},{$frankenstylename}]\n");
+                cli_writeln(">> GIT ONLY: {$version->dir} [{$gitstring->id},{$frankenstylename}]");
                 $gitstring->clean_text();
                 $fixcomponent->add_string($gitstring);
                 continue;
@@ -236,10 +240,11 @@ foreach ($stages as $versioncode => $stage) {
     [$x, $y, $z] = mlang_stage::analyze($stage);
 
     if ($x > 0) {
-        fputs(STDOUT, "There are {$x} string changes prepared for sync execution on branch {$versioncode}\n");
-        fputs(STDOUT, "JENKINS:SET-STATUS-UNSTABLE\n");
-        if ($options['execute']) {
-            fputs(STDOUT, "Executing\n");
+        cli_writeln("There are {$x} string changes prepared for sync execution on branch {$versioncode}");
+        cli_writeln("JENKINS:SET-STATUS-UNSTABLE");
+
+        if ($options['execute'] && $cliresult == 0) {
+            cli_writeln("Executing");
             $stage->commit('Fixing the drift between Git and AMOS repository', [
                 'source' => 'fixdrift',
                 'userinfo' => 'AMOS-bot <amos@moodle.org>',
