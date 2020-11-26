@@ -113,7 +113,8 @@ class local_amos_renderer extends plugin_renderer_base {
                         'placeholder' => get_string('commitmessage', 'local_amos'),
                         'name' => 'message',
                         'rows' => 3,
-                        'class' => 'form-control'
+                        'class' => 'form-control',
+                        'required' => 'required'
                     ))
                 );
                 $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
