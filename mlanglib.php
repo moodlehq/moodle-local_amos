@@ -416,8 +416,7 @@ class mlang_component implements IteratorAggregate, Countable {
         }
         fwrite($f, <<<EOF
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -430,22 +429,23 @@ class mlang_component implements IteratorAggregate, Countable {
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 
 EOF
         );
         if (empty($phpdoc)) {
-            $branch = $this->version->branch;
+            $version = $this->version->label;
             $lang   = $this->lang;
             $name   = $this->name;
             fwrite($f, <<<EOF
 /**
- * Strings for component '$name', language '$lang', branch '$branch'
+ * Strings for component '$name', language '$lang', version '$version'.
  *
- * @package   $this->name
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     $this->name
+ * @category    string
+ * @copyright   1999 Martin Dougiamas and contributors
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
