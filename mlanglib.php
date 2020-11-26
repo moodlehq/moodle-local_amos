@@ -411,9 +411,11 @@ class mlang_component implements IteratorAggregate, Countable {
      * @return false if unable to open a file
      */
     public function export_phpfile($filepath, $phpdoc = null) {
+
         if (! $f = fopen($filepath, 'w')) {
             return false;
         }
+
         fwrite($f, <<<EOF
 <?php
 // This file is part of Moodle - https://moodle.org/
@@ -451,12 +453,24 @@ EOF
 
 EOF
             );
+
         } else {
             fwrite($f, $phpdoc);
         }
+
         fwrite($f, "defined('MOODLE_INTERNAL') || die();\n\n");
         ksort($this->strings);
         foreach ($this as $string) {
+            if ($this->name === 'langconfig' && $string->id === 'parentlanguage') {
+                $knownlangs = mlang_tools::list_languages();
+                if (!isset($knownlangs[$string->text])) {
+                    fwrite($f, "// Warning: this parentlanguage value is not a valid language code!\n");
+                    fwrite($f, '// $string[\'' . $string->id . '\'] = ');
+                    fwrite($f, var_export($string->text, true));
+                    fwrite($f, ";\n");
+                    continue;
+                }
+            }
             fwrite($f, '$string[\'' . $string->id . '\'] = ');
             fwrite($f, var_export($string->text, true));
             fwrite($f, ";\n");
