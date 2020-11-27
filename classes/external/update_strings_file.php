@@ -93,13 +93,36 @@ class update_strings_file extends \external_api {
         // Load all known standard plugins and core subsystems.
         $standardplugins = \local_amos\local\util::standard_components_tree();
 
-        // Iterate over all passed components and process them.
+        // Reorder components to process low versions first.
+        usort($components, function($a, $b) {
+            $aver = \mlang_version::by_dir($a['moodlebranch']);
+            $bver = \mlang_version::by_dir($b['moodlebranch']);
+
+            if ($aver->code == $bver->code) {
+                return 0;
+
+            } else if ($aver->code < $bver->code) {
+                return -1;
+
+            } else {
+                return 1;
+            }
+        });
+
+        // Results to be returned.
         $results = [];
-        $stage = new \mlang_stage();
+
+        // List of processed components for later auto-merge.
+        $componentnames = [];
+
+        // Iterate over all passed components and process them.
         foreach ($components as $component) {
+            $stage = new \mlang_stage();
+
             if (substr($component['stringfilename'], -4) !== '.php') {
                 throw new \invalid_parameter_exception('The strings file name does not have .php extension');
             }
+
             $componentname = \mlang_component::name_from_filename($component['stringfilename']);
 
             if (empty($component['language'])) {
@@ -163,25 +186,26 @@ class update_strings_file extends \external_api {
 
             // Stage the component.
             $stage->add($mlangcomponent);
+
+            // Remember the names of components we processed.
+            foreach ($stage as $component) {
+                $componentnames[$component->name] = true;
+            }
+
+            // Rebase and mark missing strings as deleted.
+            $stage->rebase(null, true);
+
+            // The following will throw exception if the commit fails.
+            $stage->commit($message, ['source' => 'import', 'userinfo' => $userinfo], true);
+
             $mlangcomponent->clear();
             unset($mlangcomponent);
 
             $results[] = $result;
         }
 
-        // Populate the list of staged components for later auto-merge.
-        $componentnames = [];
-        foreach ($stage as $component) {
-            $componentnames[] = $component->name;
-        }
-
-        // Rebase and eventually commit the stage with string modifications.
-        $stage->rebase(null, true);
-        // The following will throw exception if the commit fails.
-        $stage->commit($message, ['source' => 'import', 'userinfo' => $userinfo], true);
-
         // Auto-merge updated components.
-        foreach ($componentnames as $componentname) {
+        foreach (array_keys($componentnames) as $componentname) {
             \mlang_tools::backport_translations($componentname);
         }
 
