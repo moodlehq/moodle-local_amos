@@ -34,29 +34,6 @@ privacy:
         - status
         - timecreated
         - timemodified
-      amos_filter_usage:
-        - timesubmitted
-        - userlang
-        - currentlang
-        - usercountry
-        - ismaintainer
-        - usesdefaultversion
-        - usesdefaultlang
-        - numofversions
-        - numoflanguages
-        - numofcomponents
-        - showmissingonly
-        - showoutdatedonly
-        - showexistingonly
-        - showhelpsonly
-        - withsubstring
-        - substringregex
-        - substringcasesensitive
-        - withstringid
-        - stringidpartial
-        - showstagedonly
-        - showgreylistedonly
-        - showwithoutgreylisted
     subsystems:
       - comment
     external:

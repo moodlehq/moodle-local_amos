@@ -307,62 +307,6 @@ class local_amos_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Render repository records
-     *
-     * @param local_amos_log $records of stdclass full amos repository records
-     * @return string HTML
-     */
-    protected function render_local_amos_log(local_amos_log $log) {
-
-        if ($log->numofcommits == 0) {
-            return $this->heading(get_string('nologsfound', 'local_amos'));
-        }
-
-        $a = (object)array('found' => $log->numofcommits, 'limit' => local_amos_log::LIMITCOMMITS);
-        if ($log->numofcommits > local_amos_log::LIMITCOMMITS) {
-            $output = $this->heading(get_string('numofcommitsabovelimit', 'local_amos', $a));
-        } else {
-            $output = $this->heading(get_string('numofcommitsunderlimit', 'local_amos', $a));
-        }
-
-        $a = (object)array('strings' => $log->numofstrings, 'commits' => count($log->commits));
-        $output .= $this->heading(get_string('numofmatchingstrings', 'local_amos', $a));
-
-        $standard = \local_amos\local\util::standard_components_list();
-
-        foreach ($log->commits as $commit) {
-            $o  = '';
-            $o .= "Date:      " . self::commit_datetime($commit->timecommitted) . "\n";
-            $o .= "Author:    " . s($commit->userinfo) . "\n";
-            $o .= "Source:    " . $commit->source . "\n";
-            if ($commit->source == 'git') {
-                $o .= "Commit:    " . $commit->commithash . "\n";
-            }
-            $o .= "\n";
-            $o .= s($commit->commitmsg);
-            $o .= "\n";
-            $o .= "\n";
-            foreach ($commit->strings as $string) {
-                if ($string->deleted) {
-                    $o .= "- ";
-                } else {
-                    $o .= "+ ";
-                }
-                if (isset($standard[$string->component])) {
-                    $component = $standard[$string->component];
-                } else {
-                    $component = $string->component;
-                }
-                $o .= sprintf('%4s', $string->branch) . ' ';
-                $o .= sprintf('%-8s', $string->lang) . ' ';
-                $o .= ' [' . $string->stringid . ',' . $component . "]\n";
-            }
-            $output .= html_writer::tag('pre', $o, array('class' => 'preformatted logrecord'));
-        }
-        return $output;
-    }
-
-    /**
      * Render stash information
      *
      * @param local_amos_stash $stash

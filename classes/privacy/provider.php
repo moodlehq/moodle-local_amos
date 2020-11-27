@@ -89,31 +89,6 @@ class provider implements
            'timemodified' => 'privacy:metadata:db:amoscontributions:timemodified',
         ], 'privacy:metadata:db:amoscontributions');
 
-        $collection->add_database_table('amos_filter_usage', [
-           'timesubmitted' => 'privacy:metadata:db:amosfilterusage:timesubmitted',
-           'userlang' => 'privacy:metadata:db:amosfilterusage:userlang',
-           'currentlang' => 'privacy:metadata:db:amosfilterusage:currentlang',
-           'usercountry' => 'privacy:metadata:db:amosfilterusage:usercountry',
-           'ismaintainer' => 'privacy:metadata:db:amosfilterusage:ismaintainer',
-           'usesdefaultversion' => 'privacy:metadata:db:amosfilterusage:usesdefaultversion',
-           'usesdefaultlang' => 'privacy:metadata:db:amosfilterusage:usesdefaultlang',
-           'numofversions' => 'privacy:metadata:db:amosfilterusage:numofversions',
-           'numoflanguages' => 'privacy:metadata:db:amosfilterusage:numoflanguages',
-           'numofcomponents' => 'privacy:metadata:db:amosfilterusage:numofcomponents',
-           'showmissingonly' => 'privacy:metadata:db:amosfilterusage:showmissingonly',
-           'showoutdatedonly' => 'privacy:metadata:db:amosfilterusage:showoutdatedonly',
-           'showexistingonly' => 'privacy:metadata:db:amosfilterusage:showexistingonly',
-           'showhelpsonly' => 'privacy:metadata:db:amosfilterusage:showhelpsonly',
-           'withsubstring' => 'privacy:metadata:db:amosfilterusage:withsubstring',
-           'substringregex' => 'privacy:metadata:db:amosfilterusage:substringregex',
-           'substringcasesensitive' => 'privacy:metadata:db:amosfilterusage:substringcasesensitive',
-           'withstringid' => 'privacy:metadata:db:amosfilterusage:withstringid',
-           'stringidpartial' => 'privacy:metadata:db:amosfilterusage:stringidpartial',
-           'showstagedonly' => 'privacy:metadata:db:amosfilterusage:showstagedonly',
-           'showgreylistedonly' => 'privacy:metadata:db:amosfilterusage:showgreylistedonly',
-           'showwithoutgreylisted' => 'privacy:metadata:db:amosfilterusage:showwithoutgreylisted',
-        ], 'privacy:metadata:db:amosfilterusage');
-
         $collection->add_subsystem_link('core_comment', [], 'privacy:metadata:subsystem:comment');
 
         $collection->add_external_location_link('languagepacks', [

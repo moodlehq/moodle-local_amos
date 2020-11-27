@@ -4,48 +4,6 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="amos_repository" COMMENT="All Moodle strings and their history">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="commitid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The commit thatt introduced this change"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for"/>
-        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative"/>
-        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string"/>
-        <FIELD NAME="textid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The effective timestamp of the change"/>
-        <FIELD NAME="timeupdated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1139218139" SEQUENCE="false" COMMENT="The timestamp of when this string has been marked as up-to-date."/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Is the string deleted? If not, it will be generated into the lang packs"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_commit" TYPE="foreign" FIELDS="commitid" REFTABLE="amos_commits" REFFIELDS="id"/>
-        <KEY NAME="fk_text" TYPE="foreign" FIELDS="textid" REFTABLE="amos_texts" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="ix_snapshot" UNIQUE="false" FIELDS="component, lang, branch" COMMENT="Optimised for getting a snapshot of all current strings in one component"/>
-        <INDEX NAME="ix_lang" UNIQUE="false" FIELDS="lang" COMMENT="For getting a list of all known components. In some cases, we need to filter English records only"/>
-        <INDEX NAME="ix_timemodified" UNIQUE="false" FIELDS="timemodified" COMMENT="This index allows to search for the recent records in the log output"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="amos_snapshot" COMMENT="Snapshot of most recent string versions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the branch this string is valid for"/>
-        <FIELD NAME="lang" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the language this string belongs to. Like en, cs or es"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the component this string belongs to. Like moodle or workshopform_accumulative"/>
-        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The code of the string"/>
-        <FIELD NAME="repoid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the record in the amos_repository table that represents the most recent version of this string."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="ix_repoid" TYPE="foreign" FIELDS="repoid" REFTABLE="amos_repository" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="ix_snapshot" UNIQUE="true" FIELDS="component, lang, branch, stringid"/>
-        <INDEX NAME="ix_lang" UNIQUE="false" FIELDS="lang" COMMENT="For getting a list of all known components. In some cases, we need to filter English records only"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="amos_commits" COMMENT="Keeps all commit related meta-data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -95,20 +53,6 @@
         <INDEX NAME="ix_hash" UNIQUE="true" FIELDS="hash"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="amos_greylist" COMMENT="Defines the strings that were greylisted, that is they were marked as candidates for removal in the next release.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="branch" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Branch code"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string"/>
-        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="uq_branch_component_stringid" UNIQUE="true" FIELDS="branch, component, stringid"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="amos_contributions" COMMENT="Contributed translations from the community">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -128,52 +72,6 @@
         <KEY NAME="fk_assignee" TYPE="foreign" FIELDS="assignee" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="fk_stash" TYPE="foreign" FIELDS="stashid" REFTABLE="amos_stashes" REFFIELDS="id"/>
       </KEYS>
-    </TABLE>
-    <TABLE NAME="amos_filter_usage" COMMENT="Log of AMOS translator filter usage">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="timesubmitted" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the filter form was submitted"/>
-        <FIELD NAME="sesskey" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The current user's sesskey"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User's id"/>
-        <FIELD NAME="userlang" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" COMMENT="User's preferred language from their profile"/>
-        <FIELD NAME="currentlang" TYPE="char" LENGTH="30" NOTNULL="true" SEQUENCE="false" COMMENT="The current session language as returned by current_language()"/>
-        <FIELD NAME="usercountry" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="User's country code as selected in their profile"/>
-        <FIELD NAME="ismaintainer" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Does the user have permission to commit to the AMOS repository"/>
-        <FIELD NAME="usesdefaultversion" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Did the user use the pre-selected versions in the form?"/>
-        <FIELD NAME="usesdefaultlang" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Did the user use the pre-selected languages?"/>
-        <FIELD NAME="numofversions" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of selected versions"/>
-        <FIELD NAME="numoflanguages" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of selected languages"/>
-        <FIELD NAME="numofcomponents" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Number of selected components"/>
-        <FIELD NAME="showmissingonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only missing and outdated strings be displayed?"/>
-        <FIELD NAME="showoutdatedonly" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Should only outdated strings be displayed?"/>
-        <FIELD NAME="showexistingonly" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Should only existing translations be displayed?"/>
-        <FIELD NAME="showhelpsonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only help strings be displayed?"/>
-        <FIELD NAME="withsubstring" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Was a substring to search for specified?"/>
-        <FIELD NAME="substringregex" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should the substring be considered as a regex?"/>
-        <FIELD NAME="substringcasesensitive" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should the substring be considered as case sensitive?"/>
-        <FIELD NAME="withstringid" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Was the stringid specified?"/>
-        <FIELD NAME="stringidpartial" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Is partial match for stringid requested?"/>
-        <FIELD NAME="showstagedonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only staged strings be displayed?"/>
-        <FIELD NAME="showgreylistedonly" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should only greylisted string be displayed?"/>
-        <FIELD NAME="showwithoutgreylisted" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" COMMENT="Should greylisted strings be removed from the results?"/>
-        <FIELD NAME="page" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The current page of results to be displayed"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="amos_texts" COMMENT="The storage of the actual string values">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="texthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="SHA1 hash of the string value"/>
-        <FIELD NAME="text" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The actual textual value of a string"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="ix_texthash" UNIQUE="true" FIELDS="texthash"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="amos_stats" COMMENT="Translation statistics">
       <FIELDS>
