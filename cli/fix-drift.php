@@ -104,6 +104,8 @@ foreach ($plugins as $versioncode => $plugintypes) {
         if ($version->code <= 21) {
             // Before 2.2 beta, reports were originally under admin.
             $plugintypelocations['report'] = 'admin/report';
+        } else {
+            $plugintypelocations['report'] = 'report';
         }
 
         if ($plugintype == 'core') {
