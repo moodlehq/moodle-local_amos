@@ -27,16 +27,14 @@ defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     'local_amos_update_strings_file' => [
-        'classname' => '\local_amos\external\api',
-        'methodname' => 'update_strings_file',
-        'classpath' => '',
+        'classname' => '\local_amos\external\update_strings_file',
+        'methodname' => 'execute',
         'description' => 'Imports strings from a string file.',
         'type' => 'write',
     ],
     'local_amos_plugin_translation_stats' => [
-        'classname' => '\local_amos\external\api',
-        'methodname' => 'plugin_translation_stats',
-        'classpath' => '',
+        'classname' => '\local_amos\external\plugin_translation_stats',
+        'methodname' => 'execute',
         'description' => 'Get translation statistics for the given component / plugin.',
         'type' => 'read',
     ],

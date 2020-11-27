@@ -15,43 +15,51 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link \local_amos\external\update_strings_file} trait.
+ * Provides class {@see \local_amos\external\update_strings_file}.
  *
- * @package   local_amos
- * @category  external
- * @copyright 2012, 2019 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    external
+ * @copyright   2012 David Mudrák <david@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_amos\external;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir.'/externallib.php');
+
 /**
- * Trait implementing the update_strings_file external function.
+ * Implements external function update_strings_file used e.g. by plugins directory to update plugin strings.
+ *
+ * @package     local_amos
+ * @category    external
+ * @copyright   2012, 2019, 2020 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-trait update_strings_file {
+class update_strings_file extends \external_api {
 
     /**
-     * Describes parameters of the {@link update_strings_file()} method
+     * Describes parameters of the {@link execute()} method
      */
-    public static function update_strings_file_parameters() {
+    public static function execute_parameters() {
+
         return new \external_function_parameters(
-            array(
+            [
                 'userinfo' => new \external_value(PARAM_RAW, 'Name and email of the author to record into AMOS commit'),
                 'message' => new \external_value(PARAM_RAW, 'Message describing the change to be committed into AMOS repository'),
                 'components' => new \external_multiple_structure(
                     new \external_single_structure(
-                        array(
+                        [
                             'componentname' => new \external_value(PARAM_COMPONENT, 'The full component name (eg. mod_stampcoll)'),
                             'moodlebranch' => new \external_value(PARAM_FILE, 'The Moodle branch for this component (eg. 2.3)'),
                             'language' => new \external_value(PARAM_SAFEDIR, 'The code of the language (eg. en)'),
                             'stringfilename' => new \external_value(PARAM_FILE, 'The name of the strings file (eg. stampcoll.php)'),
                             'stringfilecontent' => new \external_value(PARAM_RAW, 'The content of the strings file.'),
-                        )
+                        ]
                     )
                 )
-            )
+            ]
         );
     }
 
@@ -60,15 +68,16 @@ trait update_strings_file {
      *
      * @param string $components
      */
-    public static function update_strings_file($userinfo, $message, $components) {
+    public static function execute($userinfo, $message, $components) {
         global $CFG;
+
         require_once($CFG->dirroot.'/local/amos/locallib.php');
         require_once($CFG->dirroot.'/local/amos/mlanglib.php');
         require_once($CFG->dirroot.'/local/amos/mlangparser.php');
 
         // Validate parameters.
-        $params = self::validate_parameters(self::update_strings_file_parameters(),
-                array('userinfo' => $userinfo, 'message' => $message, 'components' => $components));
+        $params = self::validate_parameters(self::execute_parameters(),
+                ['userinfo' => $userinfo, 'message' => $message, 'components' => $components]);
 
         $userinfo = $params['userinfo'];
         $message = $params['message'];
@@ -85,7 +94,7 @@ trait update_strings_file {
         $standardplugins = \local_amos\local\util::standard_components_tree();
 
         // Iterate over all passed components and process them.
-        $results = array();
+        $results = [];
         $stage = new \mlang_stage();
         foreach ($components as $component) {
             if (substr($component['stringfilename'], -4) !== '.php') {
@@ -116,11 +125,11 @@ trait update_strings_file {
             }
 
             // Okay, this looks promising. Let's start tracking the result.
-            $result = array(
+            $result = [
                 'componentname' => $componentname,
                 'moodlebranch' => $componentversion->dir,
                 'language' => $componentlanguage
-            );
+            ];
 
             // Make sure we do not try to import English strings for a standard plugin.
             if ($componentlanguage === 'en') {
@@ -161,7 +170,7 @@ trait update_strings_file {
         }
 
         // Populate the list of staged components for later auto-merge.
-        $componentnames = array();
+        $componentnames = [];
         foreach ($stage as $component) {
             $componentnames[] = $component->name;
         }
@@ -169,7 +178,7 @@ trait update_strings_file {
         // Rebase and eventually commit the stage with string modifications.
         $stage->rebase(null, true);
         // The following will throw exception if the commit fails.
-        $stage->commit($message, array('source' => 'import', 'userinfo' => $userinfo), true);
+        $stage->commit($message, ['source' => 'import', 'userinfo' => $userinfo], true);
 
         // Auto-merge updated components.
         foreach ($componentnames as $componentname) {
@@ -181,14 +190,15 @@ trait update_strings_file {
     }
 
     /**
-     * Describes the return value of the {@link update_strings_file()} method
+     * Describes the return value of the {@link execute()} method
      *
      * @return external_description
      */
-    public static function update_strings_file_returns() {
+    public static function execute_returns() {
+
         return new \external_multiple_structure(
             new \external_single_structure(
-                array(
+                [
                     'componentname' => new \external_value(PARAM_COMPONENT, 'Component name as registered in AMOS (eg. stampcoll)'),
                     'moodlebranch' => new \external_value(PARAM_FILE, 'Moodle branch for this component (eg. 2.3)'),
                     'language' => new \external_value(PARAM_SAFEDIR, 'Language code (e.g. en)'),
@@ -196,7 +206,7 @@ trait update_strings_file {
                     'message' => new \external_value(PARAM_RAW, 'Additional status information', VALUE_OPTIONAL),
                     'found' => new \external_value(PARAM_INT, 'Number of detected strings in the given file', VALUE_OPTIONAL),
                     'changes' => new \external_value(PARAM_INT, 'Number of committed changes including removals', VALUE_OPTIONAL),
-                )
+                ]
             )
         );
     }

@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link \local_amos\external\plugin_translation_stats} trait.
+ * Provides class {@see \local_amos\external\plugin_translation_stats}.
  *
- * @package   local_amos
- * @category  external
- * @copyright 2019 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    external
+ * @copyright   2019 David Mudrak <david@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_amos\external;
@@ -28,14 +28,19 @@ namespace local_amos\external;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Trait implementing the plugin_translation_stats external function.
+ * Implements external function plugin_translation_stats used e.g. by plugins directory.
+ *
+ * @package     local_amos
+ * @category    external
+ * @copyright   2019, 2020 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-trait plugin_translation_stats {
+class plugin_translation_stats extends \external_api {
 
     /**
-     * Describes parameters of the {@link plugin_translation_stats()} method
+     * Describes parameters of the {@link execute()} method
      */
-    public static function plugin_translation_stats_parameters() {
+    public static function execute_parameters() {
         return new \external_function_parameters([
             'component' => new \external_value(PARAM_COMPONENT, 'Name of the component to obtain stats for'),
         ]);
@@ -47,10 +52,10 @@ trait plugin_translation_stats {
      * @param string $component
      * @return stdClass
      */
-    public static function plugin_translation_stats($component) {
+    public static function execute($component) {
 
         // Validate parameters.
-        $params = self::validate_parameters(self::plugin_translation_stats_parameters(), ['component' => $component]);
+        $params = self::validate_parameters(self::execute_parameters(), ['component' => $component]);
         $component = $params['component'];
 
         // Validate the context.
@@ -69,11 +74,11 @@ trait plugin_translation_stats {
     }
 
     /**
-     * Describes the return value of the {@link plugin_translation_stats()} method.
+     * Describes the return value of the {@link execute()} method.
      *
      * @return external_description
      */
-    public static function plugin_translation_stats_returns() {
+    public static function execute_returns() {
         return new \external_single_structure([
             'lastmodified' => new \external_value(PARAM_INT, 'Timestamp of when the data was last modified'),
             'langnames' => new \external_multiple_structure(
