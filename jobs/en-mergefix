@@ -2,6 +2,6 @@
 
 # Remove merged strings from en_fix
 # It removes strings from en_fix that are the same as their en originals.
-# upstream: en-orphan
+# upstream: en-fixdrift
 
 php $AMOSCLIROOT/enfix-cleanup.php --execute

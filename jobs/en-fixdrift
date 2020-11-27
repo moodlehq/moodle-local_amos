@@ -6,6 +6,6 @@
 # On detected drift, the status is set to UNSTABLE and e-mail is sent. The drift is then automatically
 # fixed so the next execution shoudl be stable again.
 # upstream: en-track
-# downstream: en-revclean
+# downstream: en-mergefix
 
 php $AMOSCLIROOT/fix-drift.php --execute

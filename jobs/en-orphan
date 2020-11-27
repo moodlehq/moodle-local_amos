@@ -1,8 +1,0 @@
-#!/bin/bash -e
-
-# Detect orphaned translated strings
-# It removes translation of strings that are not present in the English pack.
-# upstream: en-revclean
-# downstream: en-mergefix
-
-php $AMOSCLIROOT/intersect.php --execute
