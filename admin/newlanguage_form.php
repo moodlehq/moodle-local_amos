@@ -34,7 +34,7 @@ class local_amos_newlanguage_form extends moodleform {
 
         $mform->addElement('header', 'compulsory', 'New language');
 
-        $mform->addElement('text', 'langcode', 'Language code', array('size' => 5));
+        $mform->addElement('text', 'langcode', 'Language code', ['size' => 5]);
         $mform->setType('langcode', PARAM_SAFEDIR);
         $mform->addRule('langcode', get_string('err_required', 'form'), 'required', null, 'client');
 
@@ -60,7 +60,7 @@ class local_amos_newlanguage_form extends moodleform {
             $errors['langcode'] = 'Invalid language code format';
         }
 
-        if ($DB->record_exists('amos_repository', array('lang' => $data['langcode']))) {
+        if ($DB->record_exists('amos_translations', ['lang' => $data['langcode']])) {
             $errors['langcode'] = 'Already exists';
         }
 
