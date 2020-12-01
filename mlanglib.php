@@ -463,7 +463,7 @@ EOF
         foreach ($this as $string) {
             if ($this->name === 'langconfig' && $string->id === 'parentlanguage') {
                 $knownlangs = mlang_tools::list_languages();
-                if (!isset($knownlangs[$string->text])) {
+                if ($string->text !== '' && !isset($knownlangs[$string->text])) {
                     fwrite($f, "// Warning: this parentlanguage value is not a valid language code!\n");
                     fwrite($f, '// $string[\'' . $string->id . '\'] = ');
                     fwrite($f, var_export($string->text, true));
