@@ -171,6 +171,9 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
         fcmp.querySelectorAll(`${selectorComponentItem}[data-component-app]`).forEach(item => {
             item.checked = true;
         });
+
+        document.getElementById('amosfilter_fapp').checked = true;
+        showUsedAdvancedOptions();
     }
 
     if (action == 'selectall') {
