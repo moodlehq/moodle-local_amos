@@ -135,7 +135,10 @@ class import_workplace_plugins extends \core\task\scheduled_task {
 
         $result = [];
 
-        foreach ($this->git->list_local_branches() as $branchname) {
+        $listbranches = $this->git->list_local_branches();
+        sort($listbranches, SORT_NATURAL);
+
+        foreach ($listbranches as $branchname) {
             if ($branchname === 'master') {
                 continue;
             }
