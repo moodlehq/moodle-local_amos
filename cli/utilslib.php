@@ -486,7 +486,7 @@ class amos_export_zip {
     protected function rebuild_languages_md5(mlang_version $version) {
 
         $langnames = mlang_tools::list_languages(true, true, false, true);
-        $languagesmd5 = '';
+        $languagesmd5lines = [];
 
         foreach (new DirectoryIterator($this->outputdirroot . '/' . $version->dir) as $zipfile) {
             if (!$zipfile->isFile()) {
@@ -499,9 +499,19 @@ class amos_export_zip {
 
             $langcode = substr($zipfile->getFilename(), 0, -4);
             $md5 = md5_file($this->outputdirroot . '/' . $version->dir . '/' . $langcode . '.zip');
-            $languagesmd5 .= $langcode . ',' . $md5 . ',' . $langnames[$langcode]."\n";
+            $languagesmd5lines[] = [
+                'code' => $langcode,
+                'md5' => $md5,
+                'name' => $langnames[$langcode],
+            ];
         }
 
+        core_collator::asort_array_of_arrays_by_key($languagesmd5lines, 'name');
+
+        $languagesmd5 = '';
+        foreach ($languagesmd5lines as $line) {
+            $languagesmd5 .= $line['code'] . ',' . $line['md5'] . ',' . $line['name']."\n";
+        }
         file_put_contents($this->outputdirroot . '/' . $version->dir . '/languages.md5', $languagesmd5);
         $this->log($version->dir.'/languages.md5', amos_cli_logger::LEVEL_DEBUG);
     }
