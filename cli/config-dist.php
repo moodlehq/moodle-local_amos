@@ -52,6 +52,11 @@ define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');
 define('AMOS_EXPORT_INSTALLER_DIR', $CFG->dataroot . '/amos/export-install');
 
 /**
+ * Full path to the directory where AMOS generates en_fix files
+ */
+define('AMOS_EXPORT_ENFIX_DIR', $CFG->dataroot . '/amos/export-enfix');
+
+/**
  * S3 bucket where AMOS can write to
  * Does not have a default option as no default makes sense
  */
