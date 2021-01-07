@@ -294,7 +294,7 @@ class mlang_php_parser implements mlang_parser {
 
         if (substr($text, 0, 1) == "'" and substr($text, -1) == "'") {
             // single quoted string
-            $text = trim($text, "'");
+            $text = substr($text, 1, strlen($text) - 2);
             $text = str_replace("\'", "'", $text);
             $text = str_replace('\\\\', '\\', $text);
             return $text;
