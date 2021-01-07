@@ -83,10 +83,10 @@ class amos_cli_logger {
         $message = trim($message);
         switch ($level) {
         case self::LEVEL_ERROR:
-            $prefix = '[ERR] ';
+            $prefix = "\033[0;31m[ERR]\033[0m ";
             break;
         case self::LEVEL_WARNING:
-            $prefix = '[WRN] ';
+            $prefix = "\033[0;31m[WRN]\033[0m ";
             break;
         case self::LEVEL_DEBUG:
             $prefix = '[DBG] ';
