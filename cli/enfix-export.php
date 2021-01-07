@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,26 +24,10 @@
 
 define('CLI_SCRIPT', true);
 
-require(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir  . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
-
-cli_error('TODO - this needs to be updated to use the new storage system.');
-
-// Get an information about existing strings in the en_fix
-$sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
-          FROM {amos_repository}
-         WHERE deleted=0
-           AND lang='en_fix'
-      GROUP BY branch,lang,component
-      ORDER BY branch,lang,component";
-$rs = $DB->get_recordset_sql($sql);
-$tree = array();    // [branch][language][component] => numofstrings
-foreach ($rs as $record) {
-    $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
-}
-$rs->close();
 
 if (!defined('AMOS_EXPORT_ENFIX_DIR')) {
     cli_error('Target directory AMOS_EXPORT_ENFIX_DIR not defined!');
@@ -52,24 +35,31 @@ if (!defined('AMOS_EXPORT_ENFIX_DIR')) {
 
 remove_dir(AMOS_EXPORT_ENFIX_DIR, true);
 
-foreach ($tree as $vercode => $languages) {
-    $version = mlang_version::by_code($vercode);
-    foreach ($languages as $langcode => $components) {
-        if ($langcode !== 'en_fix') {
-            throw new coding_exception('Unexpected language');
+$standardcomponents = \local_amos\local\util::standard_components_tree();
+$supportedversions = mlang_version::list_supported();
+
+foreach ($supportedversions as $version) {
+    foreach (array_keys($standardcomponents[$version->code]) as $componentname) {
+        if ($componentname === 'langconfig') {
+            continue;
         }
-        foreach ($components as $componentname => $unused) {
-            $component = mlang_component::from_snapshot($componentname, $langcode, $version);
-            if ($component->has_string()) {
-                $file = AMOS_EXPORT_ENFIX_DIR.'/'.$version->dir.'/'.$component->name.'.php';
-                if (!file_exists(dirname($file))) {
-                    mkdir(dirname($file), 0755, true);
-                }
-                echo "$file\n";
-                $component->export_phpfile($file);
+        $component = mlang_component::from_snapshot($componentname, 'en_fix', $version);
+        $english = mlang_component::from_snapshot($componentname, 'en', $version);
+        $component->intersect($english);
+        $english->clear();
+
+        if ($component->has_string()) {
+            $file = AMOS_EXPORT_ENFIX_DIR . '/' . $version->dir . '/' . $component->name . '.php';
+
+            if (!file_exists(dirname($file))) {
+                mkdir(dirname($file), 0755, true);
             }
-            $component->clear();
+
+            echo "$file\n";
+            $component->export_phpfile($file);
         }
+        $component->clear();
     }
 }
+
 echo "DONE\n";
