@@ -49,7 +49,7 @@ foreach ($supportedversions as $version) {
         $english->clear();
 
         if ($component->has_string()) {
-            $file = AMOS_EXPORT_ENFIX_DIR . '/' . $version->dir . '/' . $component->name . '.php';
+            $file = AMOS_EXPORT_ENFIX_DIR . '/' . $version->code . '/' . $component->name . '.php';
 
             if (!file_exists(dirname($file))) {
                 mkdir(dirname($file), 0755, true);
