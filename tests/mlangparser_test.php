@@ -73,13 +73,14 @@ class mlangparser_test extends basic_testcase {
         $this->assertFalse($component->has_string('commented1'));
         $this->assertFalse($component->has_string('commented2'));
         $this->assertFalse($component->has_string('commented3'));
-        $this->assertEquals($component->get_number_of_strings(), 6);
+        $this->assertEquals($component->get_number_of_strings(), 7);
         $this->assertEquals($component->get_string('valid1')->text, 'This is {$a} valid string {$a->and} should be parsed');
         $this->assertEquals($component->get_string('valid2')->text, "Multiline\nstring");
         $this->assertEquals($component->get_string('valid3')->text, 'What \$a\'Pe%%\"be');
         $this->assertEquals($component->get_string('valid4')->text, "\$string['self'] = 'Eh?';");
         $this->assertEquals($component->get_string('valid5')->text, 'First');
         $this->assertEquals($component->get_string('valid6')->text, 'Second');
+        $this->assertEquals($component->get_string('valid7')->text, 'Course \'{$a}\'');
 
         // more complex example (format 1.x)
         $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata003.txt');

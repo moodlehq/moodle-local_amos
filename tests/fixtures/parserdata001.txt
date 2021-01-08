@@ -21,5 +21,6 @@ string';
 $string['valid3'] = 'What \$a\'Pe%%\\"be'; // comment
 $string[ 'valid4'   ]    = '$string[\'self\'] = \'Eh?\';'   ;
 $string['valid5'] = 'First';$string['valid6'] = 'Second';
+$string['valid7'] = 'Course \'{$a}\'';
 
 ?>
