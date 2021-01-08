@@ -621,6 +621,7 @@ class amos_merge_string_files {
             }
             if ($fromstrings[$changeid] !== $changetext) {
                 $changes++;
+                // This is known to have troubles to find the string if it contains certain characters such as backslashes.
                 $pattern = '/(^\s*\$string\s*\[\s*\''.preg_quote($changeid, '/').'\'\s*\]\s*=\s*)(\'|")'.preg_quote(str_replace("'", "\\'", $fromstrings[$changeid]), '/').'(\\2\s*)(;[^;]*\s*$)/m';
                 if (!preg_match($pattern, $filecontents)) {
                     $this->log('String "'.$changeid.'" not found', amos_cli_logger::LEVEL_DEBUG);
