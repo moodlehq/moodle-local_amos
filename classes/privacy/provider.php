@@ -134,10 +134,6 @@ class provider implements
         // AMOS contributors.
         $sql = "SELECT userid FROM {amos_translators}";
         $userlist->add_from_sql('userid', $sql, []);
-
-        // Filter usage.
-        $sql = "SELECT userid FROM {amos_filter_usage}";
-        $userlist->add_from_sql('userid', $sql, []);
     }
 
     /**
@@ -170,7 +166,6 @@ class provider implements
         static::export_user_data_contributions($user->id);
         static::export_user_data_credits($user->id);
         static::export_user_data_stashes($user->id);
-        static::export_user_data_filter_usage($user->id);
     }
 
     /**
@@ -182,11 +177,9 @@ class provider implements
         global $DB;
 
         $sql = "SELECT c.id AS commitid, c.commitmsg, c.timecommitted, c.userinfo, c.source, c.commithash,
-                       r.branch, r.lang, r.component, r.stringid, r.deleted,
-                       t.text AS stringtext
+                       t.since, t.lang, t.component, t.strname, t.strtext
                   FROM {amos_commits} c
-             LEFT JOIN {amos_repository} r ON r.commitid = c.id
-                  JOIN {amos_texts} t ON r.textid = t.id
+                  JOIN {amos_translations} t ON t.commitid = c.id
                  WHERE c.userid = :userid
               ORDER BY c.timecommitted";
 
@@ -223,12 +216,12 @@ class provider implements
             }
 
             $data->strings[] = [
-                'branch' => $r->branch,
+                'since' => $r->since,
                 'lang' => $r->lang,
                 'component' => $r->component,
-                'deleted' => transform::yesno($r->deleted),
-                'stringid' => $r->stringid,
-                'stringtext' => $r->stringtext,
+                'deleted' => transform::yesno($r->strtext === null),
+                'stringname' => $r->strname,
+                'strtext' => $r->strtext,
             ];
         }
 
@@ -383,38 +376,6 @@ class provider implements
             if ($strings) {
                 $writer->export_related_data($subcontext, 'strings', $strings);
             }
-        }
-    }
-
-    /**
-     * Export user's filter usage logs.
-     *
-     * @param int $userid
-     */
-    protected static function export_user_data_filter_usage(int $userid) {
-        global $DB;
-
-        $writer = writer::with_context(\context_system::instance());
-
-        $records = $DB->get_records('amos_filter_usage', ['userid' => $userid], 'timesubmitted', 'id, timesubmitted,
-            userlang, currentlang, usercountry, ismaintainer, usesdefaultversion, usesdefaultlang, numofversions,
-            numoflanguages, numofcomponents, showmissingonly, showoutdatedonly, showexistingonly, showhelpsonly,
-            withsubstring, substringregex, substringcasesensitive, withstringid, stringidpartial, showstagedonly,
-            showgreylistedonly, showwithoutgreylisted');
-
-        foreach ($records as $record) {
-            $rid = $record->id;
-            $timesubmitted = $record->timesubmitted;
-            $subcontext = [
-                'AMOS',
-                get_string('privacy:filterusage', 'local_amos'),
-                date('Y-m-d', $timesubmitted),
-            ];
-
-            unset($record->id);
-            $record->timesubmitted = transform::datetime($record->timesubmitted);
-
-            $writer->export_related_data($subcontext, $timesubmitted.'-'.$rid, $record);
         }
     }
 
