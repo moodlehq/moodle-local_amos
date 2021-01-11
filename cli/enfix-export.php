@@ -41,6 +41,7 @@ $supportedversions = mlang_version::list_supported();
 foreach ($supportedversions as $version) {
     foreach (array_keys($standardcomponents[$version->code]) as $componentname) {
         if ($componentname === 'langconfig') {
+            // Better not to mess up with langconfig via en_fix - make a proper MDL instead.
             continue;
         }
         $component = mlang_component::from_snapshot($componentname, 'en_fix', $version);
