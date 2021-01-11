@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -25,86 +24,87 @@
 
 define('CLI_SCRIPT', true);
 
-require(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
+require(__DIR__ . '/../../..//config.php');
 require_once($CFG->libdir  . '/clilib.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-cli_error('TODO - this needs to be updated to use the new storage system.');
+[$options, $unrecognised] = cli_get_params([
+    'verbose' => false,
+    'execute' => false,
+    'aggresive' => false,
+]);
 
-list($options, $unrecognized) = cli_get_params(array('execute' => false, 'aggresive' => false));
+if ($unrecognised) {
+    $unrecognised = implode(PHP_EOL . '  ', $unrecognised);
+    cli_error(get_string('cliunknowoption', 'core_admin', $unrecognised));
+}
 
 fputs(STDOUT, "*****************************************\n");
 fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " ENFIX CLEANUP JOB STARTED\n");
 
-// Get an information about existing strings in the en_fix
-$sql = "SELECT branch,lang,component,COUNT(stringid) AS numofstrings
-          FROM {amos_repository}
-         WHERE deleted=0
-           AND lang='en_fix'
-      GROUP BY branch,lang,component
-      ORDER BY branch,lang,component";
-$rs = $DB->get_recordset_sql($sql);
-$tree = array();    // [branch][language][component] => numofstrings
-foreach ($rs as $record) {
-    $tree[$record->branch][$record->lang][$record->component] = $record->numofstrings;
-}
-$rs->close();
-
+$standardcomponents = \local_amos\local\util::standard_components_tree();
+$supportedversions = mlang_version::list_all();
 $stage = new mlang_stage();
 
-foreach ($tree as $vercode => $languages) {
-    $version = mlang_version::by_code($vercode);
-    foreach ($languages as $langcode => $components) {
-        if ($langcode !== 'en_fix') {
-            throw new coding_exception('Unexpected language');
+foreach ($supportedversions as $version) {
+    foreach (array_keys($standardcomponents[$version->code]) as $componentname) {
+        if ($componentname === 'langconfig') {
+            continue;
         }
-        foreach ($components as $componentname => $unused) {
-            $en = mlang_component::from_snapshot($componentname, 'en', $version);
-            $enfix = mlang_component::from_snapshot($componentname, $langcode, $version);
-            $enfix->intersect($en);
-            $removed = $enfix->complement($en);
+        $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
+        $en = mlang_component::from_snapshot($componentname, 'en', $version);
+        $enfix->intersect($en);
 
-            if ($options['aggresive']) {
-                foreach ($enfix as $enfixstring) {
-                    $enstring = $en->get_string($enfixstring->id);
-                    if ($enstring === null) {
-                        fputs(STDERR, 'orphaned string '.$enfixstring->id.' in '.$componentname.' '.$version->label.PHP_EOL);
-                        continue;
-                    }
-                    if ($enstring->timemodified > $enfixstring->timemodified) {
-                        fputs(STDERR, 'string '.$enfixstring->id.' outdated in '.$componentname.' '.$version->label.PHP_EOL);
-                        $enfix->unlink_string($enfixstring->id);
-                        $removed++;
-                    }
+        if (!$enfix->has_string()) {
+            continue;
+        }
+
+        $removed = $enfix->complement($en);
+
+        if ($options['aggresive']) {
+            foreach ($enfix as $enfixstring) {
+                $enstring = $en->get_string($enfixstring->id);
+                if ($enstring === null) {
+                    fputs(STDERR,
+                        'orphaned string ' . $enfixstring->id . ' in ' . $componentname . ' ' . $version->label . PHP_EOL);
+                    continue;
+                }
+                if ($enstring->timemodified > $enfixstring->timemodified) {
+                    fputs(STDERR,
+                        'string ' . $enfixstring->id . ' outdated in ' . $componentname . ' ' . $version->label . PHP_EOL);
+                    $enfix->unlink_string($enfixstring->id);
+                    $removed++;
                 }
             }
+        }
 
-            if ($removed) {
-
-                if ($options['execute']) {
-                    $action = 'removing';
-                } else {
-                    $action = 'would remove';
-                }
-
-                fputs(STDERR, $action.' '.$removed.' string(s) from '.$componentname.' '.$version->label.PHP_EOL);
-
-                if ($options['execute']) {
-                    $stage->add($enfix);
-                    $stage->rebase(null, true);
-                    $msg = 'Clean-up strings that were merged into the English pack';
-                    $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
-                } else {
-                    $stage->clear();
-                }
+        if ($removed) {
+            if ($options['execute']) {
+                $action = 'removing';
             } else {
-                fputs(STDERR, 'nothing to do in '.$componentname.' '.$version->label.PHP_EOL);
+                $action = 'would remove';
             }
-            $en->clear();
-            $enfix->clear();
+
+            fputs(STDERR, $action . ' ' . $removed . ' string(s) from ' . $componentname . ' ' . $version->label . PHP_EOL);
+            fputs(STDERR, '- ' . implode(', ', $enfix->get_string_keys()) . PHP_EOL);
+
+            if ($options['execute']) {
+                $stage->add($enfix);
+                $stage->rebase(null, true);
+                $msg = 'Clean-up strings that were merged into the English pack';
+                $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
+            } else {
+                $stage->clear();
+            }
+        } else {
+            if ($options['verbose']) {
+                fputs(STDERR, 'nothing to do in ' . $componentname . ' ' . $version->label . PHP_EOL);
+            }
         }
+        $en->clear();
+        $enfix->clear();
     }
 }
 
