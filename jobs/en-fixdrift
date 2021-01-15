@@ -9,3 +9,8 @@
 # downstream: en-mergefix
 
 php $AMOSCLIROOT/fix-drift.php --execute
+
+# Run it once again - this is to handle special cases such as string added to
+# security only branches like 3.5, 3.8, 3.9. In that case, AMOS would see
+# string disappear from 3.6+, so the second run will find it again at 3.8+.
+php $AMOSCLIROOT/fix-drift.php --execute
