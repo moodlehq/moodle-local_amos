@@ -559,10 +559,12 @@ EOF
      * affected.
      *
      * @param mlang_component $reference master component to compare strings with
-     * @return int number of removed strings
+     * @return array list of removed string ids
      */
     public function complement(mlang_component $reference) {
-        $removed = 0;
+
+        $removed = [];
+
         foreach ($this->strings as $id => $string) {
             if ($string->deleted) {
                 // Do not affect our strings that are already deleted.
@@ -578,9 +580,11 @@ EOF
                 // in the $reference.
                 continue;
             }
+
             $this->unlink_string($id);
-            $removed++;
+            $removed[] = $id;
         }
+
         return $removed;
     }
 

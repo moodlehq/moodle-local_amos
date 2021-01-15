@@ -75,7 +75,7 @@ foreach ($supportedversions as $version) {
                     fputs(STDERR,
                         'string ' . $enfixstring->id . ' outdated in ' . $componentname . ' ' . $version->label . PHP_EOL);
                     $enfix->unlink_string($enfixstring->id);
-                    $removed++;
+                    $removed[] = $enfixstring->id;
                 }
             }
         }
@@ -87,8 +87,8 @@ foreach ($supportedversions as $version) {
                 $action = 'would remove';
             }
 
-            fputs(STDERR, $action . ' ' . $removed . ' string(s) from ' . $componentname . ' ' . $version->label . PHP_EOL);
-            fputs(STDERR, '- ' . implode(', ', $enfix->get_string_keys()) . PHP_EOL);
+            fputs(STDERR, $action . ' ' . count($removed) . ' string(s) from ' . $componentname . ' ' . $version->label . PHP_EOL);
+            fputs(STDERR, '- ' . implode(', ', $removed) . PHP_EOL);
 
             if ($options['execute']) {
                 $stage->add($enfix);

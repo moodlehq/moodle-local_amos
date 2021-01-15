@@ -1404,12 +1404,13 @@ AMOS END';
         $en = mlang_component::from_snapshot($componentname, 'en', $version);
         $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
         $enfix->intersect($en);
-        $enfix->complement($en);
+        $removed = $enfix->complement($en);
         $stage->add($enfix);
         $stage->rebase(null, true);
         $stage->commit('Removing strings merged into the English', null, true);
 
         // Check the result
+        $this->assertEqualsCanonicalizing(['second', 'third'], $removed);
         $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
         $this->assertEquals(2, $enfix->get_number_of_strings());
         $this->assertEquals('First', $enfix->get_string('first')->text);
