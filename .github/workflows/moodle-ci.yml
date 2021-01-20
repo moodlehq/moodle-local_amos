@@ -1,0 +1,115 @@
+name: Moodle Plugin CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+      mariadb:
+        image: mariadb:10
+        env:
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '7.3'
+            moodle-branch: 'MOODLE_310_STABLE'
+            database: mariadb
+          - php: '7.3'
+            moodle-branch: 'MOODLE_310_STABLE'
+            database: pgsql
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          path: plugin
+
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.15.0'
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install moodle-plugin-ci
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+          IGNORE_PATHS: 'ignore'
+          IGNORE_NAMES: 'ignore_name.php'
+          MUSTACHE_IGNORE_NAMES: 'broken.mustache'
+
+      - name: PHPLint
+        if: ${{ always() }}
+        run: moodle-plugin-ci phplint
+
+#      - name: Code checker
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci codechecker
+
+#      - name: PHPdoc check
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci phpdoc
+
+#      - name: Validate
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci validate
+
+      - name: Savepoints
+        if: ${{ always() }}
+        run: moodle-plugin-ci savepoints
+
+#      - name: Mustache
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci mustache
+
+#      - name: Grunt
+#        if: ${{ always() }}
+#        run: moodle-plugin-ci grunt # TODO does not work because it can not invoke parent methods
+
+      - name: Unit tests
+        if: ${{ always() }}
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git config --global init.defaultBranch master
+          moodle-plugin-ci phpunit
+          cd moodle
+          vendor/bin/phpunit --fail-on-risky --disallow-test-output -v admin/tool/dataprivacy/tests/metadata_registry_test.php
+          vendor/bin/phpunit --fail-on-risky --disallow-test-output -v lib/tests/externallib_test.php
+
+#          vendor/bin/phpunit --fail-on-risky --disallow-test-output -v privacy/tests/provider_test.php # TODO failing
+
+#      - name: Behat
+#        if: ${{ always() }}
+#        run: |
+#          moodle-plugin-ci behat --profile chrome
