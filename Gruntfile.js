@@ -1,6 +1,7 @@
 "use strict";
 
 module.exports = function (grunt) {
+    const sass = require('node-sass');
 
     grunt.initConfig({
         watch: {
@@ -21,7 +22,10 @@ module.exports = function (grunt) {
                 files: {
                     "styles.css": "scss/styles.scss"
                 }
-            }
+            },
+            options: {
+                implementation: sass,
+            },
         },
     });
 
