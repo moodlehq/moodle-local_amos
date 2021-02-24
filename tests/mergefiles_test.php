@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,21 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for {@link amos_merge_string_files} class
+ * Unit tests for {@see amos_merge_string_files} class
  *
- * @package   local_amos
- * @category  phpunit
- * @copyright 2013 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    test
+ * @copyright   2013 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/amos/cli/utilslib.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 
 /**
  * Test cases for the merge strings file helper class
@@ -59,6 +58,7 @@ class mergefiles_test extends basic_testcase {
         $expected = "\$string['foo'] = 'Bar';";
         $this->assertEquals($expected, $filecontents);
 
+        // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings
         $filecontents = '<?php
 /**
  * GNU rocks!
@@ -71,6 +71,8 @@ $string [ \'foo\'  ]=  \'Foo \\\'man\\\' oh
 
 $string[\'baz\'] = \'Baz\';
 ';
+        //phpcs:enable
+
         $fromstrings = array(
             'foo' => "Foo 'man' oh\n {\$a->f} matic ",
             'bar' => "Rock'n'roll! dude ",
@@ -82,6 +84,7 @@ $string[\'baz\'] = \'Baz\';
         );
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
         $this->assertEquals(1, $count);
+        // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings
         $expected = '<?php
 /**
  * GNU rocks!
@@ -95,6 +98,7 @@ Bar\';  // @todo
 
 $string[\'baz\'] = \'Baz\';
 ';
+        //phpcs:enable
         $this->assertEquals($expected, $filecontents);
 
         $filecontents = file_get_contents(dirname(__FILE__).'/fixtures/merge003.php');

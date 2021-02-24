@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,20 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Displays maintainers and contributors per language
+ * Displays maintainers and contributors per language.
  *
- * @package   local_amos
- * @copyright 2013 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2013 David Mudrak <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__.'/../../config.php');
-require_once($CFG->dirroot.'/local/amos/locallib.php');
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
-require_once($CFG->dirroot.'/local/amos/renderer.php');
+// phpcs:ignore moodle.Files.RequireLogin
+require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 $editmode = optional_param('editmode', false, PARAM_BOOL);
 $canedit = has_capability('local/amos:manage', context_system::instance());
@@ -46,10 +46,10 @@ $PAGE->set_title(get_string('creditstitleshort', 'local_amos'));
 $PAGE->set_heading(get_string('creditstitlelong', 'local_amos'));
 
 if ($canedit and $editmode) {
-    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, array('editmode' => 0)), get_string('turneditingoff'), 'get'));
-    $PAGE->set_url(new moodle_url($PAGE->url, array('editmode' => 1)));
+    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, ['editmode' => 0]), get_string('turneditingoff'), 'get'));
+    $PAGE->set_url(new moodle_url($PAGE->url, ['editmode' => 1]));
 } else if ($canedit and !$editmode) {
-    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, array('editmode' => 1)), get_string('turneditingon'), 'get'));
+    $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, ['editmode' => 1]), get_string('turneditingon'), 'get'));
 }
 
 $languages = mlang_tools::list_languages(false, true, false);
@@ -57,7 +57,7 @@ $languages = mlang_tools::list_languages(false, true, false);
 // Get the list of known languages.
 
 foreach ($languages as $langcode => $langname) {
-    $list[$langcode] = (object)array('langname' => $langname, 'maintainers' => array(), 'contributors' => array());
+    $list[$langcode] = (object)['langname' => $langname, 'maintainers' => [], 'contributors' => []];
 }
 
 // Get the list of maintainers, explicitly assigned contributors and
@@ -82,20 +82,19 @@ $sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable, {
 
       ORDER BY amoslang, contribstatus, {$sortsql}, iseditable";
 
-$rs = $DB->get_recordset_sql($sql, array_merge($sortparams,
-    array('status' => local_amos_contribution::STATE_ACCEPTED)));
+$rs = $DB->get_recordset_sql($sql, array_merge($sortparams, ['status' => local_amos_contribution::STATE_ACCEPTED]));
 
 // Track credits with unexpected data.
-$issues = array();
+$issues = [];
 
 foreach ($rs as $user) {
 
     $lang = $user->amoslang;
     if (empty($lang)) {
-        $issues[] = (object)array(
+        $issues[] = (object)[
             'problem' => 'Empty contribution language',
             'record' => $user,
-        );
+        ];
         continue;
     }
     unset($user->amoslang);
@@ -104,10 +103,10 @@ foreach ($rs as $user) {
     unset($user->contribstatus);
 
     if (empty($list[$lang])) {
-        $issues[] = (object)array(
+        $issues[] = (object)[
             'problem' => 'Unknown language',
             'record' => $user,
-        );
+        ];
         continue;
     }
 
@@ -122,17 +121,16 @@ foreach ($rs as $user) {
         }
 
     } else {
-        $issues[] = (object)array(
+        $issues[] = (object)[
             'problem' => 'Unknown credit status',
             'record' => $user,
-        );
+        ];
         continue;
     }
 }
 
 $rs->close();
 
-// Output starts here
 echo $OUTPUT->header();
 
 $output = $PAGE->get_renderer('local_amos');

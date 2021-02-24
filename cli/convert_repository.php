@@ -170,9 +170,11 @@ while (!$done) {
                 printf(" timesameorlater %d, valuematch %d, commitmatch %d, branchsameorlater %d\n",
                     $timesameorlater, $valuematch, $commitmatch, $branchsameorlater);
 
+                // phpcs:disable moodle.PHP.ForbiddenFunctions
                 print_object($latest);
                 print_object($r);
                 die();
+                // phpcs:enable
             }
         }
     }

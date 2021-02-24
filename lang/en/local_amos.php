@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,15 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * English strings for AMOS local module
+ * English strings for AMOS.
  *
- * @package    local
- * @subpackage amos
- * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -224,6 +223,7 @@ $string['foundmissing'] = '{$a} missing';
 $string['foundmissingonthispage'] = '{$a} on this page';
 $string['googletranslate'] = 'ask google';
 $string['importfile'] = 'Import translated strings from file';
+// phpcs:disable moodle.Strings.ForbiddenStrings
 $string['importfile_help'] = 'If you have your strings translated offline, you can stage them via this form.
 
 * The file must be valid Moodle PHP strings definition file. Look at `/lang/en/` directory of your Moodle installation for examples.
@@ -232,6 +232,7 @@ $string['importfile_help'] = 'If you have your strings translated offline, you c
 All strings found in the file will be staged for the selected version and language.
 
 Multiple PHP files can be processed at once if you put them into a ZIP file.';
+// phpcs:enable
 $string['importfile_link'] = 'local/amos/importfile';
 $string['language'] = 'Language';
 $string['languagepacks'] = 'Additional language packs may be installed on your Moodle site via <em>Administration > Site administration > Language > Language packs</em>, or manually. For more details, see the <a href="https://docs.moodle.org/en/Language_packs">Language packs documentation</a>.';
@@ -403,11 +404,13 @@ $string['stagetranslation_help'] = 'Displays the staged translation to be commit
 * No color - the staged translation is the same as the current one and therefore will not be committed.';
 $string['stageunstageall'] = 'Unstage all';
 $string['standardcomponents'] = 'List of standard components';
+// phpcs:disable moodle.Strings.ForbiddenStrings
 $string['standardcomponents_desc'] = 'List of Moodle standard components. The optional number indicates the version code since when the component is standard. If the number is negative, it indicates the last version when the component was present as standard one. Both numbers can be present. Example:
 
 * `mod_workshop` - with no versions, this component is considered as standard one on all versions
 * `report_infectedfiles 310` - indicates a component that should be considered as standard starting with Moodle 3.10
 * `theme_clean 25 -36` - standard component starting from Moodle 2.5 up to 3.6 inclusive';
+// phpcs:enable
 $string['stashactions'] = 'Save work in progress';
 $string['stashactions_help'] = 'Stash is a snapshot of the current stage. Stashes can be submitted to the official language pack maintainers for inclusion into the language pack.';
 $string['stashapply'] = 'Apply';

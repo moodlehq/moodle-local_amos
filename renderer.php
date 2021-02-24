@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,14 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * AMOS renderer class is defined here
+ * AMOS renderer class is defined here.
  *
- * @package   local_amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -62,7 +61,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 html_writer::link(
                     new moodle_url('/local/amos/view.php'),
                     get_string('translatortoolopen', 'local_amos'),
-                    array('class' => 'btn btn-success')
+                    ['class' => 'btn btn-success']
                 ),
                 'stagetool simple opentranslator'
             );
@@ -99,7 +98,7 @@ class local_amos_renderer extends plugin_renderer_base {
                 $output .= $this->heading_with_help(get_string('contribstaged', 'local_amos', $stage->stagedcontribution),
                     'contribstagedinfo', 'local_amos');
             }
-            $a = (object)array('staged' => count($stage->strings), 'committable' => $committable);
+            $a = (object)['staged' => count($stage->strings), 'committable' => $committable];
             if ($committable) {
                 $output .= $this->heading(get_string('stagestringssome', 'local_amos', $a), 2, 'main', 'numberofstagedstrings');
             } else {
@@ -109,15 +108,15 @@ class local_amos_renderer extends plugin_renderer_base {
 
             if ($committable and $stage->cancommit) {
                 $commitform = html_writer::div(
-                    html_writer::tag('textarea', s($stage->presetmessage), array(
+                    html_writer::tag('textarea', s($stage->presetmessage), [
                         'placeholder' => get_string('commitmessage', 'local_amos'),
                         'name' => 'message',
                         'rows' => 3,
                         'class' => 'form-control',
                         'required' => 'required'
-                    ))
+                    ])
                 );
-                $commitform .= html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
+                $commitform .= html_writer::empty_tag('input', ['name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden']);
 
                 $commitform .= html_writer::div(
                     html_writer::checkbox('keepstaged', 1, false, get_string('commitkeepstaged', 'local_amos'), [],
@@ -125,13 +124,16 @@ class local_amos_renderer extends plugin_renderer_base {
                 );
 
                 $commitform .= html_writer::div(
-                    html_writer::tag('button', get_string('commitbutton', 'local_amos'), array(
+                    html_writer::tag('button', get_string('commitbutton', 'local_amos'), [
                         'type' => 'submit',
                         'class' => 'btn btn-success'
-                    ))
+                    ])
                 );
                 $commitform = html_writer::div($commitform, 'protected');
-                $commitform = html_writer::tag('form', $commitform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stage.php'));
+                $commitform = html_writer::tag('form', $commitform, [
+                    'method' => 'post',
+                    'action' => $CFG->wwwroot . '/local/amos/stage.php',
+                ]);
 
                 $output .= $this->collapsible_stage_tool(
                     get_string('commitstage', 'local_amos'),
@@ -142,41 +144,41 @@ class local_amos_renderer extends plugin_renderer_base {
                 );
             }
 
-            // Submit strings to language pack maintainers
+            // Submit strings to language pack maintainers.
             if ($stage->canstash and $committable == 0) {
                 $output .= html_writer::div(
                     html_writer::link(
-                        new moodle_url('/local/amos/stage.php', array('submit' => 1, 'sesskey' => sesskey())),
+                        new moodle_url('/local/amos/stage.php', ['submit' => 1, 'sesskey' => sesskey()]),
                         get_string('stagesubmit', 'local_amos'),
-                        array('class' => 'btn btn-success')
+                        ['class' => 'btn btn-success']
                     ),
                     'stagetool simple'
                 );
             }
 
-            // Stage actions
+            // Stage actions.
             $prunebutton = html_writer::link(
-                new moodle_url('/local/amos/stage.php', array('prune' => 1, 'sesskey' => sesskey())),
+                new moodle_url('/local/amos/stage.php', ['prune' => 1, 'sesskey' => sesskey()]),
                 '<i class="fa fa-eraser"></i> '.get_string('stageprune', 'local_amos'),
-                array('class' => 'btn btn-warning protected prune')
+                ['class' => 'btn btn-warning protected prune']
             );
 
             $rebasebutton = html_writer::link(
-                new moodle_url('/local/amos/stage.php', array('rebase' => 1, 'sesskey' => sesskey())),
+                new moodle_url('/local/amos/stage.php', ['rebase' => 1, 'sesskey' => sesskey()]),
                 '<i class="fa fa-code-fork"></i> '.get_string('stagerebase', 'local_amos'),
-                array('class' => 'btn btn-warning protected rebase')
+                ['class' => 'btn btn-warning protected rebase']
             );
 
             $unstageallbutton = html_writer::link(
-                new moodle_url('/local/amos/stage.php', array('unstageall' => 1, 'sesskey' => sesskey())),
+                new moodle_url('/local/amos/stage.php', ['unstageall' => 1, 'sesskey' => sesskey()]),
                 '<i class="fa fa-eject"></i> '.get_string('stageunstageall', 'local_amos'),
-                array('class' => 'btn btn-danger protected unstageall')
+                ['class' => 'btn btn-danger protected unstageall']
             );
 
             $downloadbutton = html_writer::link(
-                new moodle_url('/local/amos/stage.php', array('download' => 1, 'sesskey' => sesskey())),
+                new moodle_url('/local/amos/stage.php', ['download' => 1, 'sesskey' => sesskey()]),
                 '<i class="fa fa-download"></i> '.get_string('stagedownload', 'local_amos'),
-                array('class' => 'btn')
+                ['class' => 'btn']
             );
 
             $params['flast'] = $stage->filterfields->flast;
@@ -198,7 +200,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $editbutton = html_writer::link(
                 new moodle_url('/local/amos/view.php', $params),
                 '<i class="fa fa-edit"></i> '.get_string('stageedit', 'local_amos'),
-                array('class' => 'btn btn-info edit')
+                ['class' => 'btn btn-info edit']
             );
 
             $actionbuttons = $editbutton.$rebasebutton;
@@ -215,26 +217,30 @@ class local_amos_renderer extends plugin_renderer_base {
                 'stageactions'
             );
 
-            // Save work in progress
+            // Save work in progress.
             if ($stage->canstash) {
-                $a = array(
+                $a = [
                     'time' => userdate(time(), get_string('strftimedaydatetime', 'langconfig'))
-                );
+                ];
                 $stashtitle = get_string('stashtitledefault', 'local_amos', $a);
 
-                $stashform = html_writer::empty_tag('input', array('name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden'));
-                $stashform .= html_writer::empty_tag('input', array('name' => 'new', 'value' => 1, 'type' => 'hidden'));
-                $stashform .= html_writer::empty_tag('input', array('name' => 'name',
+                $stashform = html_writer::empty_tag('input', ['name' => 'sesskey', 'value' => sesskey(), 'type' => 'hidden']);
+                $stashform .= html_writer::empty_tag('input', ['name' => 'new', 'value' => 1, 'type' => 'hidden']);
+                $stashform .= html_writer::empty_tag('input', ['name' => 'name',
                                                                     'value' => $stashtitle,
                                                                     'placeholder' => get_string('stashtitle', 'local_amos'),
                                                                     'type' => 'text',
                                                                     'size' => 50,
                                                                     'id' => 'stashtitle',
                                                                     'class' => 'form-control',
-                                                                    'maxlength' => 255));
-                $stashform .= html_writer::tag('button',  '<i class="fa fa-fast-forward"></i> '.get_string('stashpush', 'local_amos'), array('type' => 'submit', 'class' => 'btn btn-light'));
+                                                                    'maxlength' => 255]);
+                $stashform .= html_writer::tag('button', '<i class="fa fa-fast-forward"></i> ' .
+                    get_string('stashpush', 'local_amos'), ['type' => 'submit', 'class' => 'btn btn-light']);
                 $stashform  = html_writer::div($stashform);
-                $stashform  = html_writer::tag('form', $stashform, array('method' => 'post', 'action' => $CFG->wwwroot . '/local/amos/stash.php'));
+                $stashform  = html_writer::tag('form', $stashform, [
+                    'method' => 'post',
+                    'action' => $CFG->wwwroot . '/local/amos/stash.php',
+                ]);
                 $output .= $this->collapsible_stage_tool(
                     get_string('stashactions', 'local_amos'),
                     $stashform,
@@ -265,11 +271,11 @@ class local_amos_renderer extends plugin_renderer_base {
     protected function collapsible_stage_tool($title, $content, $helpicon = '', $expanded = false, $extraclasses = '') {
 
         if ($expanded) {
-            $attr = array('aria-expanded' => 'true');
+            $attr = ['aria-expanded' => 'true'];
             $collapsed = '';
             $collapse = ' show';
         } else {
-            $attr = array('aria-expanded' => 'false');
+            $attr = ['aria-expanded' => 'false'];
             $collapsed = ' collapsed';
             $collapse = '';
         }
@@ -283,8 +289,8 @@ class local_amos_renderer extends plugin_renderer_base {
             html_writer::span($title, 'stagetool-title').html_writer::span($helpicon, 'stagetool-helpicon'),
             'stagetool-heading'.$collapsed, $attr
         );
-        $output .= html_writer::div($content, 'stagetool-content collapse'.$collapse, array('id' => $attr['aria-controls']));
-        $output .= html_writer::end_div(); // $classes;
+        $output .= html_writer::div($content, 'stagetool-content collapse'.$collapse, ['id' => $attr['aria-controls']]);
+        $output .= html_writer::end_div();
 
         return $output;
     }
@@ -314,7 +320,7 @@ class local_amos_renderer extends plugin_renderer_base {
      */
     protected function render_local_amos_stash(local_amos_stash $stash) {
 
-        $output  = html_writer::start_tag('div', array('class' => 'stash'));
+        $output  = html_writer::start_tag('div', ['class' => 'stash']);
         if ($stash->isautosave) {
             $output .= html_writer::tag('h3', get_string('stashautosave', 'local_amos'));
             $extraclasses = ' autosave';
@@ -328,23 +334,25 @@ class local_amos_renderer extends plugin_renderer_base {
             'size' => 21,
         ]);
         $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
-                                    array('class' => 'timecreated'));
+                                    ['class' => 'timecreated']);
         $output .= html_writer::tag('div', get_string('stashstrings', 'local_amos', $stash->strings),
-                                    array('class' => 'strings'));
+                                    ['class' => 'strings']);
         $output .= html_writer::tag('div', get_string('stashlanguages', 'local_amos', s(implode(', ', $stash->languages))),
-                                    array('class' => 'languages'));
+                                    ['class' => 'languages']);
         $output .= html_writer::tag('div', get_string('stashcomponents', 'local_amos', s(implode(', ', $stash->components))),
-                                    array('class' => 'components'));
+                                    ['class' => 'components']);
 
         $output .= html_writer::end_tag('div');
 
         $actions = '';
         foreach ($stash->get_actions() as $action) {
-            $actions .= $this->output->single_button($action->url, $action->label, 'post', array('class'=>'singlebutton '.$action->id));
+            $actions .= $this->output->single_button($action->url, $action->label, 'post', [
+                'class' => 'singlebutton ' . $action->id,
+            ]);
         }
         if ($actions) {
             $actions .= $this->output->help_icon('ownstashactions', 'local_amos');
-            $actions = html_writer::tag('div', $actions, array('class' => 'actions'));
+            $actions = html_writer::tag('div', $actions, ['class' => 'actions']);
         }
         $output = $this->output->box($output . $actions, 'generalbox stashwrapper'.$extraclasses);
 
@@ -363,25 +371,28 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
         $output .= $this->output->heading('#'.$contrib->info->id.' '.s($contrib->info->subject), 3, 'subject');
         $output .= $this->output->container($this->output->user_picture($contrib->author) . fullname($contrib->author), 'author');
-        $output .= $this->output->container(userdate($contrib->info->timecreated, get_string('strftimedaydatetime', 'langconfig')), 'timecreated');
+        $output .= $this->output->container(userdate($contrib->info->timecreated,
+            get_string('strftimedaydatetime', 'langconfig')), 'timecreated');
         $output .= $this->output->container(format_text($contrib->info->message), 'message');
         $output = $this->box($output, 'generalbox source');
 
         $table = new html_table();
         $table->attributes['class'] = 'generaltable details';
 
-        $row = new html_table_row(array(
+        $row = new html_table_row([
             get_string('contribstatus', 'local_amos'),
-            get_string('contribstatus'.$contrib->info->status, 'local_amos') . $this->output->help_icon('contribstatus', 'local_amos')));
+            get_string('contribstatus' . $contrib->info->status, 'local_amos') .
+            $this->output->help_icon('contribstatus', 'local_amos')
+        ]);
         $row->attributes['class'] = 'status'.$contrib->info->status;
         $table->data[] = $row;
 
         if ($contrib->assignee) {
-            $assignee = $this->output->user_picture($contrib->assignee, array('size' => 16)) . fullname($contrib->assignee);
+            $assignee = $this->output->user_picture($contrib->assignee, ['size' => 16]) . fullname($contrib->assignee);
         } else {
             $assignee = get_string('contribassigneenone', 'local_amos');
         }
-        $row = new html_table_row(array(get_string('contribassignee', 'local_amos'), $assignee));
+        $row = new html_table_row([get_string('contribassignee', 'local_amos'), $assignee]);
         if ($contrib->assignee) {
             if ($contrib->assignee->id == $USER->id) {
                 $row->attributes['class'] = 'assignment self';
@@ -412,21 +423,29 @@ class local_amos_renderer extends plugin_renderer_base {
                 get_string('contriblanguagewrong', 'local_amos'));
         }
 
-        $row = new html_table_row(array(get_string('contriblanguage', 'local_amos'), $languagename));
+        $row = new html_table_row([get_string('contriblanguage', 'local_amos'), $languagename]);
         $table->data[] = $row;
 
-        $row = new html_table_row(array(get_string('contribcomponents', 'local_amos'), $contrib->components));
+        $row = new html_table_row([get_string('contribcomponents', 'local_amos'), $contrib->components]);
         $table->data[] = $row;
 
-        $a = array('orig'=>$contrib->strings, 'new'=>$contrib->stringsreb, 'same'=>($contrib->strings - $contrib->stringsreb));
+        $a = [
+            'orig' => $contrib->strings,
+            'new' => $contrib->stringsreb,
+            'same' => ($contrib->strings - $contrib->stringsreb),
+        ];
+
         if ($contrib->stringsreb == 0) {
             $s = get_string('contribstringsnone', 'local_amos', $a);
+
         } else if ($contrib->strings == $contrib->stringsreb) {
             $s = get_string('contribstringseq', 'local_amos', $a);
+
         } else {
             $s = get_string('contribstringssome', 'local_amos', $a);
         }
-        $row = new html_table_row(array(get_string('contribstrings', 'local_amos'), $s));
+
+        $row = new html_table_row([get_string('contribstrings', 'local_amos'), $s]);
         $table->data[] = $row;
 
         $output .= html_writer::table($table);
@@ -454,10 +473,10 @@ class local_amos_renderer extends plugin_renderer_base {
         $out .= $this->output->container(get_string('creditsthanks', 'local_amos'), 'p-1 thanks');
 
         $out .= $this->output->container_start('small quicklinks p-2');
-        $links = array();
+        $links = [];
         foreach ($people as $langcode => $langdata) {
             if ($langcode === $currentlanguage) {
-                $attributes = array('class' => 'current');
+                $attributes = ['class' => 'current'];
             } else {
                 $attributes = null;
             }
@@ -476,7 +495,7 @@ class local_amos_renderer extends plugin_renderer_base {
             $out .= $this->output->container_start('maintainers');
             if (empty($langdata->maintainers)) {
                 $out .= $this->output->container(
-                    get_string('creditsnomaintainer', 'local_amos', array('url' => 'https://docs.moodle.org/dev/Translation')),
+                    get_string('creditsnomaintainer', 'local_amos', ['url' => 'https://docs.moodle.org/dev/Translation']),
                     'alert alert-warning'
                 );
             } else {
@@ -485,25 +504,25 @@ class local_amos_renderer extends plugin_renderer_base {
                 $out .= $this->output->container_start('d-flex align-items-stretch');
                 foreach ($langdata->maintainers as $maintainer) {
                     $out .= $this->output->container_start('maintainer bg-light p-3 border mr-2 mb-2');
-                    $out .= $this->output->user_picture($maintainer, array('size' => 50));
+                    $out .= $this->output->user_picture($maintainer, ['size' => 50]);
                     $out .= $this->output->container(fullname($maintainer), 'fullname my-1');
                     $out .= $this->output->action_icon(
-                        new moodle_url('/message/index.php', array('id' => $maintainer->id)),
+                        new moodle_url('/message/index.php', ['id' => $maintainer->id]),
                         new pix_icon('t/message', get_string('creditscontact', 'local_amos')),
                         null,
-                        array('class' => 'action contact')
+                        ['class' => 'action contact']
                     );
                     if ($editmode) {
                         $out .= $this->output->action_icon(
-                            new moodle_url('/local/amos/admin/translators.php', array(
+                            new moodle_url('/local/amos/admin/translators.php', [
                                 'action' => 'del',
                                 'status' => AMOS_USER_MAINTAINER,
                                 'langcode' => $langcode,
                                 'user' => $maintainer->id
-                            )),
+                            ]),
                             new pix_icon('t/delete', get_string('remove')),
                             null,
-                            array('class' => 'action delete')
+                            ['class' => 'action delete']
                         );
                     }
                     $out .= $this->output->container_end();
@@ -512,13 +531,13 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             if ($editmode) {
                 $out .= html_writer::link(
-                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_MAINTAINER,
-                        'langcode' => $langcode)),
+                    new moodle_url('/local/amos/admin/translators.php', ['action' => 'add', 'status' => AMOS_USER_MAINTAINER,
+                        'langcode' => $langcode]),
                     get_string('creditsaddmaintainer', 'local_amos'),
-                    array('class' => 'btn btn-secondary m-1')
+                    ['class' => 'btn btn-secondary m-1']
                 );
             }
-            $out .= $this->output->container_end(); // .maintainers
+            $out .= $this->output->container_end();
 
             $out .= $this->output->container_start('contributors');
             if (!empty($langdata->contributors)) {
@@ -526,35 +545,40 @@ class local_amos_renderer extends plugin_renderer_base {
                     'contributors-title font-weight-bold py-1');
                 foreach ($langdata->contributors as $contributor) {
                     $out .= $this->output->container_start('contributor d-inline-block border m-1 p-1 bg-light');
-                    $out .= $this->output->user_picture($contributor, array('size' => 16, 'class' => 'd-inline-block m-1'));
+                    $out .= $this->output->user_picture($contributor, ['size' => 16, 'class' => 'd-inline-block m-1']);
                     $out .= $this->output->container(fullname($contributor), 'fullname d-inline-block');
                     if ($editmode and $contributor->iseditable) {
                         $out .= $this->output->action_icon(
-                            new moodle_url('/local/amos/admin/translators.php', array(
+                            new moodle_url('/local/amos/admin/translators.php', [
                                 'action' => 'del',
                                 'status' => AMOS_USER_CONTRIBUTOR,
                                 'langcode' => $langcode,
                                 'user' => $contributor->id
-                            )),
+                            ]),
                             new pix_icon('t/delete', get_string('remove')),
                             null,
-                            array('class' => 'action delete')
+                            ['class' => 'action delete']
                         );
                     }
                     $out .= $this->output->container_end();
                 }
             }
+
             if ($editmode) {
                 $out .= html_writer::link(
-                    new moodle_url('/local/amos/admin/translators.php', array('action' => 'add', 'status' => AMOS_USER_CONTRIBUTOR, 'langcode' => $langcode)),
+                    new moodle_url('/local/amos/admin/translators.php', [
+                        'action' => 'add',
+                        'status' => AMOS_USER_CONTRIBUTOR,
+                        'langcode' => $langcode,
+                    ]),
                     get_string('creditsaddcontributor', 'local_amos'),
-                    array('class' => 'btn btn-secondary m-1')
+                    ['class' => 'btn btn-secondary m-1']
                 );
             }
-            $out .= $this->output->container_end(); // .contributors
 
-            $out .= $this->output->container_end(); // .card-body
-            $out .= $this->output->container_end(); // .card
+            $out .= $this->output->container_end();
+            $out .= $this->output->container_end();
+            $out .= $this->output->container_end();
         }
 
         return $out;

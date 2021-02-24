@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Populate a local AMOS repository with fake data
@@ -50,7 +49,7 @@ if ($whoami !== 'apache') {
     cli_error('You better should execute this as: sudo -u apache php makefake.php');
 }
 
-// Check that the AMOS tables are empty
+// Check that the AMOS tables are empty.
 $dbman = $DB->get_manager();
 
 $amosxmldbfile = new xmldb_file($CFG->dirroot.'/local/amos/db/install.xml');
@@ -67,12 +66,11 @@ foreach ($tables as $table) {
 
 foreach ($tablenames as $tablename) {
     if ($DB->count_records($tablename)) {
-        //cli_error('Error: some existing records found in '.$tablename);
         cli_problem('Error: some existing records found in '.$tablename);
     }
 }
 
-// Register English language at 2.3 branch
+// Register English language at 2.3 branch.
 $component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_23_STABLE'));
 $component->add_string(new mlang_string('thislanguage', 'English'));
 $component->add_string(new mlang_string('thislanguageint', 'English'));
@@ -81,7 +79,7 @@ $stage->add($component);
 $stage->commit('Registering the English language', array('source' => 'bot'), true);
 $component->clear();
 
-// Register Czech language at 2.3 branch
+// Register Czech language at 2.3 branch.
 $component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_23_STABLE'));
 $component->add_string(new mlang_string('thislanguage', 'Čeština'));
 $component->add_string(new mlang_string('thislanguageint', 'Czech'));
@@ -90,19 +88,22 @@ $stage->add($component);
 $stage->commit('Registering the Czech language', array('source' => 'bot'), true);
 $component->clear();
 
-// Import English core component into 2.3
-cli_exec('import-strings.php --version=MOODLE_23_STABLE --message="Core strings - initial import" '.$CFG->dirroot.'/lang/en/moodle.php');
+// Import English core component into 2.3.
+cli_exec('import-strings.php --version=MOODLE_23_STABLE --message="Core strings - initial import" ' .
+    $CFG->dirroot.'/lang/en/moodle.php');
 
-// Import English Workshop module into 2.3
-cli_exec('import-strings.php --version=MOODLE_23_STABLE --message="Workshop strings - initial import" '.$CFG->dirroot.'/mod/workshop/lang/en/workshop.php');
+// Import English Workshop module into 2.3.
+cli_exec('import-strings.php --version=MOODLE_23_STABLE --message="Workshop strings - initial import" ' .
+    $CFG->dirroot.'/mod/workshop/lang/en/workshop.php');
 
-// Fork 2.4 branch
+// Fork 2.4 branch.
 cli_exec('make-branch.php --from=MOODLE_23_STABLE --to=MOODLE_24_STABLE');
 
-// Import English Book module into 2.4
-cli_exec('import-strings.php --version=MOODLE_24_STABLE --message="Book strings - initial import" '.$CFG->dirroot.'/mod/book/lang/en/book.php');
+// Import English Book module into 2.4.
+cli_exec('import-strings.php --version=MOODLE_24_STABLE --message="Book strings - initial import" ' .
+    $CFG->dirroot.'/mod/book/lang/en/book.php');
 
-// Register a contrib component into 2.3
+// Register a contrib component into 2.3.
 $component = new mlang_component('stampcoll', 'en', mlang_version::by_branch('MOODLE_23_STABLE'));
 $component->add_string(new mlang_string('pluginname', 'Stamp colletion'));
 $component->add_string(new mlang_string('stamp', 'Stamp'));
@@ -111,7 +112,7 @@ $stage->add($component);
 $stage->commit('Registering the Stamp collection strings', array('source' => 'bot'), true);
 $component->clear();
 
-// Provide a translation of Stamp collection in 2.3
+// Provide a translation of Stamp collection in 2.3.
 $component = new mlang_component('stampcoll', 'cs', mlang_version::by_branch('MOODLE_23_STABLE'));
 $component->add_string(new mlang_string('pluginname', 'Sbírka razítek'));
 $stage = new mlang_stage();
@@ -119,7 +120,7 @@ $stage->add($component);
 $stage->commit('Translating the Stamp collection strings', array('source' => 'bot'), true);
 $component->clear();
 
-// Register a component at 2.4 and delete it
+// Register a component at 2.4 and delete it.
 $component = new mlang_component('delete', 'en', mlang_version::by_branch('MOODLE_24_STABLE'));
 $component->add_string(new mlang_string('invalid', 'Just experimenting'));
 $stage = new mlang_stage();

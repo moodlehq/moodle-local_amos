@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Library of helper classes used for AMOS cli jobs
@@ -20,7 +20,7 @@
  * @package     local_amos
  * @subpackage  cli
  * @copyright   2012 David Mudrak <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,6 +32,7 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/renderer.php');
 
 if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
+    // phpcs:ignore moodle.Files.RequireLogin
     require_once($CFG->dirroot . '/local/amos/cli/config.php');
 
 } else {
@@ -48,10 +49,10 @@ if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
  */
 class amos_cli_logger {
 
-    const LEVEL_ERROR           = 100;  // serious error
-    const LEVEL_WARNING         = 200;  // may need attention
-    const LEVEL_INFO            = 300;  // normal progress message
-    const LEVEL_DEBUG           = 400;  // more detailed debugging message
+    const LEVEL_ERROR = 100;
+    const LEVEL_WARNING = 200;
+    const LEVEL_INFO = 300;
+    const LEVEL_DEBUG = 400;
 
     /**
      * Logs a message
@@ -67,8 +68,6 @@ class amos_cli_logger {
         fwrite($output, $formatted);
     }
 
-    // End of external API /////////////////////////////////////////////////////
-
     /**
      * Prepares the log message to print
      *
@@ -82,17 +81,17 @@ class amos_cli_logger {
         $job = trim($job);
         $message = trim($message);
         switch ($level) {
-        case self::LEVEL_ERROR:
-            $prefix = "\033[0;31m[ERR]\033[0m ";
-            break;
-        case self::LEVEL_WARNING:
-            $prefix = "\033[0;31m[WRN]\033[0m ";
-            break;
-        case self::LEVEL_DEBUG:
-            $prefix = '[DBG] ';
-            break;
-        default:
-            $prefix = '[INF] ';
+            case self::LEVEL_ERROR:
+                $prefix = "\033[0;31m[ERR]\033[0m ";
+                break;
+            case self::LEVEL_WARNING:
+                $prefix = "\033[0;31m[WRN]\033[0m ";
+                break;
+            case self::LEVEL_DEBUG:
+                $prefix = '[DBG] ';
+                break;
+            default:
+                $prefix = '[INF] ';
         }
 
         return $prefix . $job . ': ' . $message . PHP_EOL;
@@ -227,8 +226,6 @@ class amos_export_zip {
             $this->rebuild_download_page($version);
         }
     }
-
-    // End of external API /////////////////////////////////////////////////////
 
     /**
      * Returns the list of mlang_versions that we should process
@@ -379,7 +376,7 @@ class amos_export_zip {
         $target = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
 
         if (!file_exists($source)) {
-            // nothing to do, there was nothing generated for this branch
+            // Nothing to do, there was nothing generated for this branch.
             return;
         }
 
@@ -622,7 +619,8 @@ class amos_merge_string_files {
             if ($fromstrings[$changeid] !== $changetext) {
                 $changes++;
                 // This is known to have troubles to find the string if it contains certain characters such as backslashes.
-                $pattern = '/(^\s*\$string\s*\[\s*\''.preg_quote($changeid, '/').'\'\s*\]\s*=\s*)(\'|")'.preg_quote(str_replace("'", "\\'", $fromstrings[$changeid]), '/').'(\\2\s*)(;[^;]*\s*$)/m';
+                $pattern = '/(^\s*\$string\s*\[\s*\'' . preg_quote($changeid, '/') . '\'\s*\]\s*=\s*)(\'|")' .
+                    preg_quote(str_replace("'", "\\'", $fromstrings[$changeid]), '/') . '(\\2\s*)(;[^;]*\s*$)/m';
                 if (!preg_match($pattern, $filecontents)) {
                     $this->log('String "'.$changeid.'" not found', amos_cli_logger::LEVEL_DEBUG);
                     continue;

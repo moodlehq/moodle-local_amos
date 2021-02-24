@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,21 +12,20 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Executes the passed AMOScript and stages the result
  *
- * @package    local
- * @subpackage amos
- * @copyright  2011 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2011 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/mlanglib.php');
-require_once(dirname(__FILE__).'/execute_form.php');
+require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/execute_form.php');
 
 require_login(SITEID, false);
 require_capability('local/amos:execute', context_system::instance());
@@ -53,7 +51,7 @@ if ($data = $executeform->get_data()) {
                     $stage->add($component, true);
                 }
                 $changes->clear();
-            } elseif ($changes < 0) {
+            } else if ($changes < 0) {
                 throw new moodle_exception('error_during_amoscript_execution', 'local_amos', '', null, $changes);
             }
             unset($changes);

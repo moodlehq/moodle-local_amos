@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,18 +12,18 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * AMOS home page
+ * AMOS home page.
  *
- * @package   local-amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
 
 require_login(SITEID, false);
 
@@ -35,7 +34,7 @@ $PAGE->set_heading('AMOS');
 
 $output = $PAGE->get_renderer('local_amos');
 
-/// Output starts here
+// Output starts here.
 echo $output->header();
 
 $amosroot = $PAGE->navigation->get('amos_root');
@@ -51,35 +50,44 @@ foreach ($amosroot->get_children_key_list() as $childkey) {
         html_writer::link(
             $child->action,
             $child->text,
-            array('class' => 'btn btn-primary btn-large')
+            ['class' => 'btn btn-primary btn-large']
         ),
         'well amostool amostool-'.$child->key
     );
 }
 
-echo html_writer::end_div(); // .amostools
+echo html_writer::end_div();
 
 echo $output->heading(get_string('privileges', 'local_amos'));
-$caps = array();
+$caps = [];
+
 if (has_capability('local/amos:manage', context_system::instance())) {
     $caps[] = get_string('amos:manage', 'local_amos');
 }
+
 if (has_capability('local/amos:stage', context_system::instance())) {
     $caps[] = get_string('amos:stage', 'local_amos');
 }
+
 if (has_capability('local/amos:commit', context_system::instance())) {
     $allowed = mlang_tools::list_allowed_languages();
+
     if (empty($allowed)) {
         $allowed = get_string('committablenone', 'local_amos');
-    } elseif (!empty($allowed['X'])) {
+
+    } else if (!empty($allowed['X'])) {
         $allowed = get_string('committableall', 'local_amos');
+
     } else {
         $allowed = implode(', ', $allowed);
     }
+
     $caps[] = get_string('amos:commit', 'local_amos') . ' (' . $allowed . ')';
 }
+
 if (empty($caps)) {
     get_string('privilegesnone', 'local_amos');
+
 } else {
     $caps = '<li>' . implode("</li>\n<li>", $caps) . '</li>';
     echo html_writer::tag('ul', $caps);

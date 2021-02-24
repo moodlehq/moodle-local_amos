@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,14 +12,19 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * @package     local_amos
- * @subpackage  enfix
  * @copyright   2013 David Mudrak <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+define('CLI_SCRIPT', true);
+
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 
 $help =
 "Merges en_fix strings into the Git working directory.
@@ -34,22 +38,16 @@ Options:
 --help, -h      Print out this help
 
 Example:
-\$ php enfix-merge.php --symlinksdir=/home/mudrd8mz/public_html/moodle25/amos --enfixdir=/home/mudrd8mz/moodledata/moodle24amos/amos/export-enfix/2.5
+\$ php enfix-merge.php --symlinksdir=/path/to/moodle --enfixdir=/tmp/export-enfix
 ";
 
-define('CLI_SCRIPT', true);
-
-require_once(dirname(dirname(dirname(dirname(__FILE__)))) . '/config.php');
-require_once($CFG->dirroot . '/local/amos/mlanglib.php');
-require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
-
-list($options, $unrecognized) = cli_get_params(
-    array(
-        'symlinksdir' => '',
-        'enfixdir' => '',
-        'help' => false),
-    array('h' => 'help'));
-
+list($options, $unrecognized) = cli_get_params([
+    'symlinksdir' => '',
+    'enfixdir' => '',
+    'help' => false,
+], [
+    'h' => 'help',
+]);
 
 if ($options['help'] or empty($options['symlinksdir']) or empty($options['enfixdir'])) {
     cli_error($help, 2);
@@ -94,10 +92,12 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     $filecontents = file_get_contents($options['symlinksdir'].'/'.$filename);
 
     $fromstrings = $helper->load_strings_from_file($options['symlinksdir'].'/'.$filename);
-    $logger->log('enfix-merge', count($fromstrings).' string(s) found in '.$options['symlinksdir'].'/'.$filename, amos_cli_logger::LEVEL_DEBUG);
+    $logger->log('enfix-merge', count($fromstrings) . ' string(s) found in ' . $options['symlinksdir'] . '/' . $filename,
+        amos_cli_logger::LEVEL_DEBUG);
 
-    $tostrings = $helper->load_strings_from_file($options['enfixdir'].'/'.$filename);
-    $logger->log('enfix-merge', count($tostrings).' string(s) found in '.$options['enfixdir'].'/'.$filename, amos_cli_logger::LEVEL_DEBUG);
+    $tostrings = $helper->load_strings_from_file($options['enfixdir'] . '/' . $filename);
+    $logger->log('enfix-merge', count($tostrings) . ' string(s) found in ' . $options['enfixdir'] . '/' . $filename,
+        amos_cli_logger::LEVEL_DEBUG);
 
     $changes = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
 
@@ -112,4 +112,4 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     }
 }
 
-$logger->log('enfix-merge', 'Finished! Total of '.$total.' string(s) merged.');
+$logger->log('enfix-merge', 'Finished! Total of ' . $total . ' string(s) merged.');

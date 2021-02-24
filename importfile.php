@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,22 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Import strings from uploaded file and stage them
+ * Import strings from uploaded file and stage them.
  *
- * @package    local
- * @subpackage amos
- * @copyright  2010 David Mudrak <david.mudrak@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/mlanglib.php');
-require_once(dirname(__FILE__).'/mlangparser.php');
-require_once(dirname(__FILE__).'/importfile_form.php');
+require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/mlangparser.php');
+require_once($CFG->dirroot . '/local/amos/importfile_form.php');
 
 require_login(SITEID, false);
 require_capability('local/amos:importfile', context_system::instance());
@@ -64,7 +62,8 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', con
             } else {
                 foreach ($zipcontents as $zipfilename => $zipfilestatus) {
                     // We want PHP files in the root of the ZIP only.
-                    if ($zipfilestatus === true and basename($zipfilename) === $zipfilename and strtolower(substr($zipfilename, -4)) === '.php') {
+                    if ($zipfilestatus === true and basename($zipfilename) === $zipfilename &&
+                            strtolower(substr($zipfilename, -4)) === '.php') {
                         $stringfiles[$zipfilename] = $tmpzipdir . '/' . $zipfilename;
                     }
                 }

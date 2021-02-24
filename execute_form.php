@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,23 +12,35 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * @package    local
- * @subpackage amos
- * @copyright  2011 David Mudrak <david@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Provides {@see local_amos_execute_form} class.
+ *
+ * @package     local_amos
+ * @copyright   2011 David Mudrak <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * AMOScript execution form.
+ *
+ * @package     local_amos
+ * @copyright   2011 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_amos_execute_form extends moodleform {
 
+    /**
+     * Define form fields.
+     */
     public function definition() {
-        $mform =& $this->_form;
+
+        $mform = $this->_form;
 
         $mform->addElement('select', 'version', get_string('version', 'local_amos'), $this->_customdata['versions']);
         $mform->setDefault('version', $this->_customdata['versioncurrent']);

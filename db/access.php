@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,90 +12,88 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Capability definitions for AMOS local plugin
  *
- * @package   local_amos
- * @copyright 2010 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-
-    // Ability to set-up AMOS portal and assign translators of languages
-    'local/amos:manage' => array(
+$capabilities = [
+    // Ability to set-up AMOS portal and assign translators of languages.
+    'local/amos:manage' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
-    ),
+        'legacy' => [],
+    ],
 
-    // Ability to stage translations using the translation tool
-    'local/amos:stage' => array(
+    // Ability to stage translations using the translation tool.
+    'local/amos:stage' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'legacy' => [
             'user' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    // Ability to execute a given AMOScript and get the result in the stage
-    'local/amos:execute' => array(
+    // Ability to execute a given AMOScript and get the result in the stage.
+    'local/amos:execute' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
-    ),
+        'legacy' => [],
+    ],
 
-    // Ability to commit the stage into AMOS repository
-    'local/amos:commit' => array(
+    // Ability to commit the stage into AMOS repository.
+    'local/amos:commit' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
-    ),
+        'legacy' => [],
+    ],
 
-    // Ability to stash a stage and to contribute
-    'local/amos:stash' => array(
+    // Ability to stash a stage and to contribute.
+    'local/amos:stash' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'legacy' => [
             'user' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    // Ability to import translated strings from uploaded file and stage them
-    'local/amos:importfile' => array(
+    // Ability to import translated strings from uploaded file and stage them.
+    'local/amos:importfile' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'legacy' => [
             'user' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    // Ability to import strings (including the English ones) directly into the repository
-    // (this is intended mainly for the web service users)
-    'local/amos:importstrings' => array(
+    // Ability to import strings (including the English ones) directly into the repository.
+    // This is intended mainly for the web service users.
+    'local/amos:importstrings' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
-    ),
+        'legacy' => [],
+    ],
 
-    // Ability to use Google Translate services
-    'local/amos:usegoogle' => array(
+    // Ability to use Google Translate services.
+    'local/amos:usegoogle' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'legacy' => [
             'user' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    // Ability to convert an existing contribution to a new contribution with
-    // different language
-    'local/amos:changecontriblang' => array(
+    // Ability to convert an existing contribution to a new contribution with different language.
+    'local/amos:changecontriblang' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array()
-    ),
-);
+        'legacy' => [],
+    ],
+];

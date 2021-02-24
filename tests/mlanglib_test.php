@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,15 +12,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Unit tests for Moodle language manipulation library defined in mlanglib.php
  *
- * @package   local_amos
- * @category  phpunit
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    test
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -32,6 +32,8 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * Makes protected method accessible for testing purposes
  */
 class testable_mlang_tools extends mlang_tools {
+
+    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
     public static function legacy_component_name($newstyle) {
         return parent::legacy_component_name($newstyle);
     }
@@ -303,7 +305,7 @@ class mlang_test extends local_amos_testcase {
         $this->resetAfterTest();
 
         $now = time();
-        // get the initial strings from a file
+        // Get the initial strings from a file.
         $filecontents = <<<EOF
 <?php
 \$string['welcome'] = 'Welcome';
@@ -328,7 +330,7 @@ EOF;
 EOF;
         file_put_contents($filepath, $filecontents);
 
-        // commit modified file with the same timestamp
+        // Commit modified file with the same timestamp.
         $component = mlang_component::from_phpfile($filepath, 'en', mlang_version::by_branch('MOODLE_20_STABLE'), $now, 'test', 2);
         $stage->add($component);
         $stage->commit('The string modified in the same timestamp', array('source' => 'unittest'), true);
@@ -337,7 +339,7 @@ EOF;
         unset($stage);
         unlink($filepath);
 
-        // now make sure that the more recently committed string wins
+        // Now make sure that the more recently committed string wins.
         $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->assertEquals($component->get_string('welcome')->text, 'Welcome!');
         $component->clear();
@@ -399,25 +401,25 @@ EOF;
 
     public function test_explicit_rebasing() {
         $this->resetAfterTest();
-        // prepare the "cap" (base for rebasing)
+        // Prepare the "cap" (base for rebasing).
         $stage = new mlang_stage();
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $component->add_string(new mlang_string('one', 'One'));
         $component->add_string(new mlang_string('two', 'Two'));
-        $component->add_string(new mlang_string('three', 'Tree')); // typo here
+        $component->add_string(new mlang_string('three', 'Tree'));
         $stage->add($component);
         $stage->commit('Initial commit', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
 
-        // rebasing without string removal - the stage is not complete
+        // Rebasing without string removal - the stage is not complete.
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('one', 'One')); // same as the current
-        $component->add_string(new mlang_string('two', 'Two')); // same as the current
-        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $component->add_string(new mlang_string('one', 'One'));
+        $component->add_string(new mlang_string('two', 'Two'));
+        $component->add_string(new mlang_string('three', 'Three'));
         $stage->add($component);
         $stage->rebase();
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
@@ -436,9 +438,9 @@ EOF;
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('one', 'One')); // same as the current
-        $component->add_string(new mlang_string('two', 'Two')); // same as the current
-        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $component->add_string(new mlang_string('one', 'One'));
+        $component->add_string(new mlang_string('two', 'Two'));
+        $component->add_string(new mlang_string('three', 'Three'));
         $stage->add($component);
         $stage->rebase();
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -453,13 +455,13 @@ EOF;
         unset($component);
         unset($stage);
 
-        // rebasing with string removal - the stage is considered to be the full snapshot of the state
+        // Rebasing with string removal - the stage is considered to be the full snapshot of the state.
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('one', 'One')); // same as the current
-        // string 'two' is missing and we want it to be removed from repository
-        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $component->add_string(new mlang_string('one', 'One'));
+        // String 'two' is missing and we want it to be removed from repository.
+        $component->add_string(new mlang_string('three', 'Three'));
         $stage->add($component);
         $stage->rebase(null, true);
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
@@ -480,9 +482,9 @@ EOF;
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
-        $component->add_string(new mlang_string('one', 'One')); // same as the current
-        // Rtring 'two' is missing and we want it to be removed from repository.
-        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $component->add_string(new mlang_string('one', 'One'));
+        // String 'two' is missing and we want it to be removed from repository.
+        $component->add_string(new mlang_string('three', 'Three'));
         $stage->add($component);
         $stage->rebase(null, true);
         $rebased = $stage->get_component('numbers', 'en', mlang_version::by_branch('MOODLE_21_STABLE'));
@@ -505,7 +507,7 @@ EOF;
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('trash', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('delme', 'Del me', time() - 1000, true));    // deleted string
+        $component->add_string(new mlang_string('delme', 'Del me', time() - 1000, true));
         $stage->add($component);
         $stage->commit('The string was already born deleted... sad');
         $this->assertFalse($stage->has_component());
@@ -513,7 +515,7 @@ EOF;
 
         $stage = new mlang_stage();
         $component = new mlang_component('trash', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('delme', 'Del me', null, true));    // already deleted string
+        $component->add_string(new mlang_string('delme', 'Del me', null, true));
         $stage->add($component);
         $stage->rebase();
         $this->assertFalse($stage->has_component());
@@ -524,38 +526,38 @@ EOF;
 
         $this->resetAfterTest();
 
-        // prepare the "cap" (base for rebasing)
+        // Prepare the "cap" (base for rebasing).
         $stage = new mlang_stage();
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $component->add_string(new mlang_string('one', 'One'));
         $component->add_string(new mlang_string('two', 'Two'));
-        $component->add_string(new mlang_string('three', 'Tree')); // typo here
+        $component->add_string(new mlang_string('three', 'Tree'));
         $stage->add($component);
         $stage->commit('Initial commit', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
 
-        // commit the fix of the string
+        // Commit the fix of the string.
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $component->add_string(new mlang_string('one', 'One')); // same as the current
-        $component->add_string(new mlang_string('two', 'Two')); // same as the current
-        $component->add_string(new mlang_string('three', 'Three')); // changed
+        $component->add_string(new mlang_string('one', 'One'));
+        $component->add_string(new mlang_string('two', 'Two'));
+        $component->add_string(new mlang_string('three', 'Three'));
         $stage->add($component);
         $stage->commit('Fixed typo Tree > Three', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
 
-        // get the most recent version (so called "cap") of the component
+        // Get the most recent version (so called "cap") of the component.
         $cap = mlang_component::from_snapshot('numbers', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
         $concat = '';
         foreach ($cap as $s) {
             $concat .= $s->text;
         }
-        // strings in the cap shall be ordered by stringid
+        // Strings in the cap shall be ordered by stringid.
         $this->assertEquals('OneThreeTwo', $concat);
     }
 
@@ -567,26 +569,26 @@ EOF;
 
         $this->resetAfterTest();
 
-        // firstly commit the most recent version
+        // Firstly commit the most recent version.
         $today = time();
         $stage = new mlang_stage();
         $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('foo', 'Today Foo', $today));   // changed today
-        $component->add_string(new mlang_string('bar', 'New Bar', $today));     // new today
-        $component->add_string(new mlang_string('job', 'Boring', $today));      // not changed
+        $component->add_string(new mlang_string('foo', 'Today Foo', $today));
+        $component->add_string(new mlang_string('bar', 'New Bar', $today));
+        $component->add_string(new mlang_string('job', 'Boring', $today));
         $stage->add($component);
         $stage->commit('Initial commit', array('source' => 'unittest'));
         $component->clear();
         unset($component);
         unset($stage);
 
-        // we are re-importing the history - let us commit the version that was actually created yesterday
+        // We are re-importing the history - let us commit the version that was actually created yesterday.
         $yesterday = time() - DAYSECS;
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));         // as it was yesterday
-        $component->add_string(new mlang_string('job', 'Boring', $yesterday));      // still the same
+        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));
+        $component->add_string(new mlang_string('job', 'Boring', $yesterday));
         $stage->add($component);
         $stage->rebase($yesterday, true, $yesterday);
         $rebased = $stage->get_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -598,12 +600,12 @@ EOF;
         $this->assertFalse($rebased->has_string('bar'));
         $this->assertTrue($rebased->has_string('job'));
 
-        // and the same case using rebase() without deleting
+        // And the same case using rebase() without deleting.
         $stage = new mlang_stage();
         $this->assertFalse($stage->has_component());
         $component = new mlang_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));         // as it was yesterday
-        $component->add_string(new mlang_string('job', 'Boring', $yesterday));      // still the same
+        $component->add_string(new mlang_string('foo', 'Foo', $yesterday));
+        $component->add_string(new mlang_string('job', 'Boring', $yesterday));
         $stage->add($component);
         $stage->rebase($yesterday);
         $rebased = $stage->get_component('things', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -631,7 +633,8 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("Mac\rsucks", 1), "Mac\nsucks");
         $this->assertEquals(mlang_string::fix_syntax("LINE TABULATION\x0Bnewline", 1), "LINE TABULATION\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("FORM FEED\x0Cnewline", 1), "FORM FEED\nnewline");
-        $this->assertEquals(mlang_string::fix_syntax("END OF TRANSMISSION BLOCK\x17newline", 1), "END OF TRANSMISSION BLOCK\nnewline");
+        $this->assertEquals(mlang_string::fix_syntax("END OF TRANSMISSION BLOCK\x17newline", 1),
+            "END OF TRANSMISSION BLOCK\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("END OF MEDIUM\x19newline", 1), "END OF MEDIUM\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("SUBSTITUTE\x1Anewline", 1), "SUBSTITUTE\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("BREAK PERMITTED HERE\xC2\x82newline", 1), "BREAK PERMITTED HERE\nnewline");
@@ -641,7 +644,8 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zl\xE2\x80\xA8newline", 1), "Unicode Zl\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zp\xE2\x80\xA9newline", 1), "Unicode Zp\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 1), "Empty\n\nlines");
-        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace \t \nat \nmultilines  ", 1), "Trailing\n  whitespace\nat\nmultilines");
+        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace \t \nat \nmultilines  ", 1),
+            "Trailing\n  whitespace\nat\nmultilines");
         $this->assertEquals(mlang_string::fix_syntax('Escape $variable names', 1), 'Escape \$variable names');
         $this->assertEquals(mlang_string::fix_syntax('Escape $alike names', 1), 'Escape \$alike names');
         $this->assertEquals(mlang_string::fix_syntax('String $a placeholder', 1), 'String $a placeholder');
@@ -649,63 +653,112 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax('Wrapped {$a}', 1), 'Wrapped {$a}');
         $this->assertEquals(mlang_string::fix_syntax('Trailing $a', 1), 'Trailing $a');
         $this->assertEquals(mlang_string::fix_syntax('$a leading', 1), '$a leading');
-        $this->assertEquals(mlang_string::fix_syntax('Hit $a-times', 1), 'Hit $a-times'); // this is placeholder',
-        $this->assertEquals(mlang_string::fix_syntax('This is $a_book', 1), 'This is \$a_book'); // this is not
+        $this->assertEquals(mlang_string::fix_syntax('Hit $a-times', 1), 'Hit $a-times');
+        $this->assertEquals(mlang_string::fix_syntax('This is $a_book', 1), 'This is \$a_book');
         $this->assertEquals(mlang_string::fix_syntax('Bye $a, ttyl', 1), 'Bye $a, ttyl');
         $this->assertEquals(mlang_string::fix_syntax('Object $a->foo placeholder', 1), 'Object $a->foo placeholder');
         $this->assertEquals(mlang_string::fix_syntax('Trailing $a->bar', 1), 'Trailing $a->bar');
         $this->assertEquals(mlang_string::fix_syntax('<strong>AMOS</strong>', 1), '<strong>AMOS</strong>');
-        $this->assertEquals(mlang_string::fix_syntax('<a href="http://localhost">AMOS</a>', 1), '<a href=\"http://localhost\">AMOS</a>');
-        $this->assertEquals(mlang_string::fix_syntax('<a href=\"http://localhost\">AMOS</a>', 1), '<a href=\"http://localhost\">AMOS</a>');
-        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote", 1), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEquals(mlang_string::fix_syntax('<a href="http://localhost">AMOS</a>', 1),
+            '<a href=\"http://localhost\">AMOS</a>');
+        $this->assertEquals(mlang_string::fix_syntax('<a href=\"http://localhost\">AMOS</a>', 1),
+            '<a href=\"http://localhost\">AMOS</a>');
+        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote", 1), "'Murder!', she wrote");
         $this->assertEquals(mlang_string::fix_syntax("\t  Trim Hunter  \t\t", 1), 'Trim Hunter');
         $this->assertEquals(mlang_string::fix_syntax('Delete role "$a->role"?', 1), 'Delete role \"$a->role\"?');
         $this->assertEquals(mlang_string::fix_syntax('Delete role \"$a->role\"?', 1), 'Delete role \"$a->role\"?');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 1), 'Delete ASCII NULL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character", 1), 'Delete ASCII ENQUIRY control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 1), 'Delete ASCII ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 1), 'Delete ASCII BELL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 1), 'Delete ASCII SHIFT OUT control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 1), 'Delete ASCII SHIFT IN control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 1), 'Delete ASCII DATA LINK ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 1), 'Delete ASCII DEVICE CONTROL ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 1), 'Delete ASCII DEVICE CONTROL TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 1), 'Delete ASCII DEVICE CONTROL THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 1), 'Delete ASCII DEVICE CONTROL FOUR control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 1), 'Delete ASCII ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 1), 'Delete ASCII DELETE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 1), 'Delete ISO 8859 PADDING CHARACTER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 1), 'Delete ISO 8859 NO BREAK HERE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 1), 'Delete ISO 8859 INDEX control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 1), 'Delete ISO 8859 START OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 1), 'Delete ISO 8859 END OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 1), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 1), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 1), 'Delete ISO 8859 LINE TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 1), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character", 1), 'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character", 1), 'Delete ISO 8859 REVERSE LINE FEED control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character", 1), 'Delete ISO 8859 SINGLE SHIFT TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character", 1), 'Delete ISO 8859 SINGLE SHIFT THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 1), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 1), 'Delete ISO 8859 PRIVATE USE ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 1), 'Delete ISO 8859 PRIVATE USE TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 1), 'Delete ISO 8859 SET TRANSMIT STATE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 1), 'Delete ISO 8859 MESSAGE WAITING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 1), 'Delete ISO 8859 START OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 1), 'Delete ISO 8859 END OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 1), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character", 1), 'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 1), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 1), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 1), 'Delete ISO 8859 PRIVACY MESSAGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 1), 'Delete Unicode ZERO WIDTH SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 1), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 1),
+            'Delete ASCII NULL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character", 1),
+            'Delete ASCII ENQUIRY control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 1),
+            'Delete ASCII ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 1),
+            'Delete ASCII BELL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 1),
+            'Delete ASCII SHIFT OUT control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 1),
+            'Delete ASCII SHIFT IN control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 1),
+            'Delete ASCII DATA LINK ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 1),
+            'Delete ASCII DEVICE CONTROL ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 1),
+            'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 1),
+            'Delete ASCII DEVICE CONTROL THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 1),
+            'Delete ASCII DEVICE CONTROL FOUR control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 1),
+            'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 1),
+            'Delete ASCII SYNCHRONOUS IDLE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 1),
+            'Delete ASCII ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 1),
+            'Delete ASCII DELETE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 1),
+            'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 1),
+            'Delete ISO 8859 HIGH OCTET PRESET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 1),
+            'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 1),
+            'Delete ISO 8859 INDEX control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 1),
+            'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 1),
+            'Delete ISO 8859 END OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 1),
+            'Delete ISO 8859 CHARACTER TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 1),
+            'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 1),
+            'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 1),
+            'Delete ISO 8859 PARTIAL LINE FORWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character", 1),
+            'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character", 1),
+            'Delete ISO 8859 REVERSE LINE FEED control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character", 1),
+            'Delete ISO 8859 SINGLE SHIFT TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character", 1),
+            'Delete ISO 8859 SINGLE SHIFT THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 1),
+            'Delete ISO 8859 DEVICE CONTROL STRING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 1),
+            'Delete ISO 8859 PRIVATE USE ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 1),
+            'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 1),
+            'Delete ISO 8859 SET TRANSMIT STATE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 1),
+            'Delete ISO 8859 MESSAGE WAITING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 1),
+            'Delete ISO 8859 START OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 1),
+            'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 1),
+            'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character", 1),
+            'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 1),
+            'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 1),
+            'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 1),
+            'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 1),
+            'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 1),
+            'Delete Unicode ZERO WIDTH SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 1),
+            'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 1),
+            'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     /**
@@ -718,7 +771,7 @@ EOF;
     public function test_fix_syntax_sanity_v2_strings() {
         $this->assertEquals(mlang_string::fix_syntax('No change'), 'No change');
         $this->assertEquals(mlang_string::fix_syntax('Completed 100% of work'), 'Completed 100% of work');
-        $this->assertEquals(mlang_string::fix_syntax('%%%% HEADER %%%%'), '%%%% HEADER %%%%'); // was not possible before
+        $this->assertEquals(mlang_string::fix_syntax('%%%% HEADER %%%%'), '%%%% HEADER %%%%');
         $this->assertEquals(mlang_string::fix_syntax("Windows\r\nsucks"), "Windows\nsucks");
         $this->assertEquals(mlang_string::fix_syntax("Linux\nsucks"), "Linux\nsucks");
         $this->assertEquals(mlang_string::fix_syntax("Mac\rsucks"), "Mac\nsucks");
@@ -733,8 +786,9 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("STRING TERMINATOR\xC2\x9Cnewline"), "STRING TERMINATOR\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zl\xE2\x80\xA8newline"), "Unicode Zl\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zp\xE2\x80\xA9newline"), "Unicode Zp\nnewline");
-        $this->assertEquals(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines"), "Empty\n\n\nlines"); // now allows up to two empty lines
-        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace\t\nat \nmultilines  "), "Trailing\n  whitespace\nat\nmultilines");
+        $this->assertEquals(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines"), "Empty\n\n\nlines");
+        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace\t\nat \nmultilines  "),
+            "Trailing\n  whitespace\nat\nmultilines");
         $this->assertEquals(mlang_string::fix_syntax('Do not escape $variable names'), 'Do not escape $variable names');
         $this->assertEquals(mlang_string::fix_syntax('Do not escape $alike names'), 'Do not escape $alike names');
         $this->assertEquals(mlang_string::fix_syntax('Not $a placeholder'), 'Not $a placeholder');
@@ -748,55 +802,102 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax('Trailing $a->bar'), 'Trailing $a->bar');
         $this->assertEquals(mlang_string::fix_syntax('Invalid $a-> placeholder'), 'Invalid $a-> placeholder');
         $this->assertEquals(mlang_string::fix_syntax('<strong>AMOS</strong>'), '<strong>AMOS</strong>');
-        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote"), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote"), "'Murder!', she wrote");
         $this->assertEquals(mlang_string::fix_syntax("\t  Trim Hunter  \t\t"), 'Trim Hunter');
         $this->assertEquals(mlang_string::fix_syntax('Delete role "$a->role"?'), 'Delete role "$a->role"?');
         $this->assertEquals(mlang_string::fix_syntax('Delete role \"$a->role\"?'), 'Delete role \"$a->role\"?');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character"), 'Delete ASCII NULL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character"), 'Delete ASCII ENQUIRY control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character"), 'Delete ASCII ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character"), 'Delete ASCII BELL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character"), 'Delete ASCII SHIFT OUT control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character"), 'Delete ASCII SHIFT IN control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character"), 'Delete ASCII DATA LINK ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character"), 'Delete ASCII DEVICE CONTROL ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character"), 'Delete ASCII DEVICE CONTROL TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character"), 'Delete ASCII DEVICE CONTROL THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character"), 'Delete ASCII DEVICE CONTROL FOUR control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character"), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character"), 'Delete ASCII SYNCHRONOUS IDLE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character"), 'Delete ASCII ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character"), 'Delete ASCII DELETE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character"), 'Delete ISO 8859 PADDING CHARACTER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character"), 'Delete ISO 8859 HIGH OCTET PRESET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character"), 'Delete ISO 8859 NO BREAK HERE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character"), 'Delete ISO 8859 INDEX control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character"), 'Delete ISO 8859 START OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character"), 'Delete ISO 8859 END OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character"), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character"), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character"), 'Delete ISO 8859 LINE TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character"), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character"), 'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character"), 'Delete ISO 8859 REVERSE LINE FEED control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character"), 'Delete ISO 8859 SINGLE SHIFT TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character"), 'Delete ISO 8859 SINGLE SHIFT THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character"), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character"), 'Delete ISO 8859 PRIVATE USE ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character"), 'Delete ISO 8859 PRIVATE USE TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character"), 'Delete ISO 8859 SET TRANSMIT STATE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character"), 'Delete ISO 8859 MESSAGE WAITING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character"), 'Delete ISO 8859 START OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character"), 'Delete ISO 8859 END OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character"), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character"), 'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character"), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character"), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character"), 'Delete ISO 8859 PRIVACY MESSAGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character"), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character"), 'Delete Unicode ZERO WIDTH SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character"), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character"), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character"),
+            'Delete ASCII NULL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character"),
+            'Delete ASCII ENQUIRY control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character"),
+            'Delete ASCII ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character"),
+            'Delete ASCII BELL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character"),
+            'Delete ASCII SHIFT OUT control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character"),
+            'Delete ASCII SHIFT IN control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character"),
+            'Delete ASCII DATA LINK ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character"),
+            'Delete ASCII DEVICE CONTROL ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character"),
+            'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character"),
+            'Delete ASCII DEVICE CONTROL THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character"),
+            'Delete ASCII DEVICE CONTROL FOUR control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character"),
+            'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character"),
+            'Delete ASCII SYNCHRONOUS IDLE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character"),
+            'Delete ASCII ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character"),
+            'Delete ASCII DELETE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character"),
+            'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character"),
+            'Delete ISO 8859 HIGH OCTET PRESET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character"),
+            'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character"),
+            'Delete ISO 8859 INDEX control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character"),
+            'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character"),
+            'Delete ISO 8859 END OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character"),
+            'Delete ISO 8859 CHARACTER TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character"),
+            'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character"),
+            'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character"),
+            'Delete ISO 8859 PARTIAL LINE FORWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character"),
+            'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character"),
+            'Delete ISO 8859 REVERSE LINE FEED control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character"),
+            'Delete ISO 8859 SINGLE SHIFT TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character"),
+            'Delete ISO 8859 SINGLE SHIFT THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character"),
+            'Delete ISO 8859 DEVICE CONTROL STRING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character"),
+            'Delete ISO 8859 PRIVATE USE ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character"),
+            'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character"),
+            'Delete ISO 8859 SET TRANSMIT STATE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character"),
+            'Delete ISO 8859 MESSAGE WAITING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character"),
+            'Delete ISO 8859 START OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character"),
+            'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character"),
+            'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character"),
+            'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character"),
+            'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character"),
+            'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character"),
+            'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character"),
+            'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character"),
+            'Delete Unicode ZERO WIDTH SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character"),
+            'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character"),
+            'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     /**
@@ -815,7 +916,8 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("Mac\rsucks", 2, 1), "Mac\nsucks");
         $this->assertEquals(mlang_string::fix_syntax("LINE TABULATION\x0Bnewline", 2, 1), "LINE TABULATION\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("FORM FEED\x0Cnewline", 2, 1), "FORM FEED\nnewline");
-        $this->assertEquals(mlang_string::fix_syntax("END OF TRANSMISSION BLOCK\x17newline", 2, 1), "END OF TRANSMISSION BLOCK\nnewline");
+        $this->assertEquals(mlang_string::fix_syntax("END OF TRANSMISSION BLOCK\x17newline", 2, 1),
+            "END OF TRANSMISSION BLOCK\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("END OF MEDIUM\x19newline", 2, 1), "END OF MEDIUM\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("SUBSTITUTE\x1Anewline", 2, 1), "SUBSTITUTE\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("BREAK PERMITTED HERE\xC2\x82newline", 2, 1), "BREAK PERMITTED HERE\nnewline");
@@ -825,7 +927,8 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zl\xE2\x80\xA8newline", 2, 1), "Unicode Zl\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Unicode Zp\xE2\x80\xA9newline", 2, 1), "Unicode Zp\nnewline");
         $this->assertEquals(mlang_string::fix_syntax("Empty\n\n\n\n\n\nlines", 2, 1), "Empty\n\n\nlines");
-        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace\t\nat \nmultilines  ", 2, 1), "Trailing\n  whitespace\nat\nmultilines");
+        $this->assertEquals(mlang_string::fix_syntax("Trailing   \n  whitespace\t\nat \nmultilines  ", 2, 1),
+            "Trailing\n  whitespace\nat\nmultilines");
         $this->assertEquals(mlang_string::fix_syntax('Do not escape $variable names', 2, 1), 'Do not escape $variable names');
         $this->assertEquals(mlang_string::fix_syntax('Do not escape \$variable names', 2, 1), 'Do not escape $variable names');
         $this->assertEquals(mlang_string::fix_syntax('Do not escape $alike names', 2, 1), 'Do not escape $alike names');
@@ -845,59 +948,107 @@ EOF;
         $this->assertEquals(mlang_string::fix_syntax('Object {$a->foo} placeholder', 2, 1), 'Object {$a->foo} placeholder');
         $this->assertEquals(mlang_string::fix_syntax('Trailing $a->bar', 2, 1), 'Trailing {$a->bar}');
         $this->assertEquals(mlang_string::fix_syntax('Trailing {$a->bar}', 2, 1), 'Trailing {$a->bar}');
-        $this->assertEquals(mlang_string::fix_syntax('Invalid $a-> placeholder', 2, 1), 'Invalid {$a}-> placeholder'); // weird but BC
+        $this->assertEquals(mlang_string::fix_syntax('Invalid $a-> placeholder', 2, 1), 'Invalid {$a}-> placeholder');
         $this->assertEquals(mlang_string::fix_syntax('<strong>AMOS</strong>', 2, 1), '<strong>AMOS</strong>');
-        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote", 2, 1), "'Murder!', she wrote"); // will be escaped by var_export()
-        $this->assertEquals(mlang_string::fix_syntax("\'Murder!\', she wrote", 2, 1), "'Murder!', she wrote"); // will be escaped by var_export()
+        $this->assertEquals(mlang_string::fix_syntax("'Murder!', she wrote", 2, 1), "'Murder!', she wrote");
+        $this->assertEquals(mlang_string::fix_syntax("\'Murder!\', she wrote", 2, 1), "'Murder!', she wrote");
         $this->assertEquals(mlang_string::fix_syntax("\t  Trim Hunter  \t\t", 2, 1), 'Trim Hunter');
         $this->assertEquals(mlang_string::fix_syntax('Delete role "$a->role"?', 2, 1), 'Delete role "{$a->role}"?');
         $this->assertEquals(mlang_string::fix_syntax('Delete role \"$a->role\"?', 2, 1), 'Delete role "{$a->role}"?');
         $this->assertEquals(mlang_string::fix_syntax('See &#36;CFG->foo', 2, 1), 'See $CFG->foo');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 2, 1), 'Delete ASCII NULL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character", 2, 1), 'Delete ASCII ENQUIRY control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 2, 1), 'Delete ASCII ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 2, 1), 'Delete ASCII BELL control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 2, 1), 'Delete ASCII SHIFT OUT control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 2, 1), 'Delete ASCII SHIFT IN control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 2, 1), 'Delete ASCII DATA LINK ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 2, 1), 'Delete ASCII DEVICE CONTROL ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 2, 1), 'Delete ASCII DEVICE CONTROL TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 2, 1), 'Delete ASCII DEVICE CONTROL THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 2, 1), 'Delete ASCII DEVICE CONTROL FOUR control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 2, 1), 'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 2, 1), 'Delete ASCII SYNCHRONOUS IDLE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 2, 1), 'Delete ASCII ESCAPE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 2, 1), 'Delete ASCII DELETE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 2, 1), 'Delete ISO 8859 PADDING CHARACTER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 2, 1), 'Delete ISO 8859 HIGH OCTET PRESET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 2, 1), 'Delete ISO 8859 NO BREAK HERE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 2, 1), 'Delete ISO 8859 INDEX control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 2, 1), 'Delete ISO 8859 START OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 2, 1), 'Delete ISO 8859 END OF SELECTED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 2, 1), 'Delete ISO 8859 CHARACTER TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 2, 1), 'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 2, 1), 'Delete ISO 8859 LINE TABULATION SET control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 2, 1), 'Delete ISO 8859 PARTIAL LINE FORWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character", 2, 1), 'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character", 2, 1), 'Delete ISO 8859 REVERSE LINE FEED control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character", 2, 1), 'Delete ISO 8859 SINGLE SHIFT TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character", 2, 1), 'Delete ISO 8859 SINGLE SHIFT THREE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 2, 1), 'Delete ISO 8859 DEVICE CONTROL STRING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 2, 1), 'Delete ISO 8859 PRIVATE USE ONE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 2, 1), 'Delete ISO 8859 PRIVATE USE TWO control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 2, 1), 'Delete ISO 8859 SET TRANSMIT STATE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 2, 1), 'Delete ISO 8859 MESSAGE WAITING control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 2, 1), 'Delete ISO 8859 START OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 2, 1), 'Delete ISO 8859 END OF GUARDED AREA control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 2, 1), 'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character", 2, 1), 'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 2, 1), 'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 2, 1), 'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 2, 1), 'Delete ISO 8859 PRIVACY MESSAGE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 2, 1), 'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 2, 1), 'Delete Unicode ZERO WIDTH SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 2, 1), 'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
-        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 2, 1), 'Delete Unicode REPLACEMENT CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\0 NULL control character", 2, 1),
+            'Delete ASCII NULL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x05 ENQUIRY control character", 2, 1),
+            'Delete ASCII ENQUIRY control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x06 ACKNOWLEDGE control character", 2, 1),
+            'Delete ASCII ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x07 BELL control character", 2, 1),
+            'Delete ASCII BELL control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0E SHIFT OUT control character", 2, 1),
+            'Delete ASCII SHIFT OUT control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x0F SHIFT IN control character", 2, 1),
+            'Delete ASCII SHIFT IN control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x10 DATA LINK ESCAPE control character", 2, 1),
+            'Delete ASCII DATA LINK ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x11 DEVICE CONTROL ONE control character", 2, 1),
+            'Delete ASCII DEVICE CONTROL ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x12 DEVICE CONTROL TWO control character", 2, 1),
+            'Delete ASCII DEVICE CONTROL TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x13 DEVICE CONTROL THREE control character", 2, 1),
+            'Delete ASCII DEVICE CONTROL THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x14 DEVICE CONTROL FOUR control character", 2, 1),
+            'Delete ASCII DEVICE CONTROL FOUR control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x15 NEGATIVE ACKNOWLEDGE control character", 2, 1),
+            'Delete ASCII NEGATIVE ACKNOWLEDGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x16 SYNCHRONOUS IDLE control character", 2, 1),
+            'Delete ASCII SYNCHRONOUS IDLE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x1B ESCAPE control character", 2, 1),
+            'Delete ASCII ESCAPE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ASCII\x7F DELETE control character", 2, 1),
+            'Delete ASCII DELETE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x80 PADDING CHARACTER control character", 2, 1),
+            'Delete ISO 8859 PADDING CHARACTER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x81 HIGH OCTET PRESET control character", 2, 1),
+            'Delete ISO 8859 HIGH OCTET PRESET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x83 NO BREAK HERE control character", 2, 1),
+            'Delete ISO 8859 NO BREAK HERE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x84 INDEX control character", 2, 1),
+            'Delete ISO 8859 INDEX control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x86 START OF SELECTED AREA control character", 2, 1),
+            'Delete ISO 8859 START OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x87 END OF SELECTED AREA control character", 2, 1),
+            'Delete ISO 8859 END OF SELECTED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x88 CHARACTER TABULATION SET control character", 2, 1),
+            'Delete ISO 8859 CHARACTER TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x89 CHARACTER TABULATION WITH JUSTIFICATION control character", 2, 1),
+            'Delete ISO 8859 CHARACTER TABULATION WITH JUSTIFICATION control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8A LINE TABULATION SET control character", 2, 1),
+            'Delete ISO 8859 LINE TABULATION SET control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8B PARTIAL LINE FORWARD control character", 2, 1),
+            'Delete ISO 8859 PARTIAL LINE FORWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8C PARTIAL LINE BACKWARD control character", 2, 1),
+            'Delete ISO 8859 PARTIAL LINE BACKWARD control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8D REVERSE LINE FEED control character", 2, 1),
+            'Delete ISO 8859 REVERSE LINE FEED control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8E SINGLE SHIFT TWO control character", 2, 1),
+            'Delete ISO 8859 SINGLE SHIFT TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x8F SINGLE SHIFT THREE control character", 2, 1),
+            'Delete ISO 8859 SINGLE SHIFT THREE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x90 DEVICE CONTROL STRING control character", 2, 1),
+            'Delete ISO 8859 DEVICE CONTROL STRING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x91 PRIVATE USE ONE control character", 2, 1),
+            'Delete ISO 8859 PRIVATE USE ONE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x92 PRIVATE USE TWO control character", 2, 1),
+            'Delete ISO 8859 PRIVATE USE TWO control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x93 SET TRANSMIT STATE control character", 2, 1),
+            'Delete ISO 8859 SET TRANSMIT STATE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x95 MESSAGE WAITING control character", 2, 1),
+            'Delete ISO 8859 MESSAGE WAITING control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x96 START OF GUARDED AREA control character", 2, 1),
+            'Delete ISO 8859 START OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x97 END OF GUARDED AREA control character", 2, 1),
+            'Delete ISO 8859 END OF GUARDED AREA control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete ISO 8859\xC2\x99 SINGLE GRAPHIC CHARACTER INTRODUCER control character", 2, 1),
+            'Delete ISO 8859 SINGLE GRAPHIC CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9A SINGLE CHARACTER INTRODUCER control character", 2, 1),
+            'Delete ISO 8859 SINGLE CHARACTER INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9B CONTROL SEQUENCE INTRODUCER control character", 2, 1),
+            'Delete ISO 8859 CONTROL SEQUENCE INTRODUCER control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9D OPERATING SYSTEM COMMAND control character", 2, 1),
+            'Delete ISO 8859 OPERATING SYSTEM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9E PRIVACY MESSAGE control character", 2, 1),
+            'Delete ISO 8859 PRIVACY MESSAGE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete ISO 8859\xC2\x9F APPLICATION PROGRAM COMMAND control character", 2, 1),
+            'Delete ISO 8859 APPLICATION PROGRAM COMMAND control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xE2\x80\x8B ZERO WIDTH SPACE control character", 2, 1),
+            'Delete Unicode ZERO WIDTH SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax(
+            "Delete Unicode\xEF\xBB\xBF ZERO WIDTH NO-BREAK SPACE control character", 2, 1),
+            'Delete Unicode ZERO WIDTH NO-BREAK SPACE control character');
+        $this->assertEquals(mlang_string::fix_syntax("Delete Unicode\xEF\xBF\xBD REPLACEMENT CHARACTER control character", 2, 1),
+            'Delete Unicode REPLACEMENT CHARACTER control character');
     }
 
     public function test_clean_text() {
@@ -905,7 +1056,8 @@ EOF;
         $component->add_string(new mlang_string('first', "Line\n\n\n\n\n\n\nline"));
         $component->add_string(new mlang_string('second', 'This \really \$a sucks'));
         $component->clean_texts();
-        $this->assertEquals("Line\n\nline", $component->get_string('first')->text); // one blank line allowed in format 1
+        // One blank line allowed in format 1..
+        $this->assertEquals("Line\n\nline", $component->get_string('first')->text);
         $this->assertEquals('This really \$a sucks', $component->get_string('second')->text);
         $component->clear();
         unset($component);
@@ -915,7 +1067,8 @@ EOF;
         $component->add_string(new mlang_string('second', 'This \really \$a sucks. Yes {$a}, it {$a->does}'));
         $component->add_string(new mlang_string('third', "Multi   line  \n  trailing  "));
         $component->clean_texts();
-        $this->assertEquals("Line\n\n\nline", $component->get_string('first')->text); // two blank lines allowed in format 2
+        // Two blank lines allowed in format 2.
+        $this->assertEquals("Line\n\n\nline", $component->get_string('first')->text);
         $this->assertEquals('This \really \$a sucks. Yes {$a}, it {$a->does}', $component->get_string('second')->text);
         $this->assertEquals("Multi   line\n  trailing", $component->get_string('third')->text);
         $component->clear();
@@ -945,34 +1098,6 @@ EOF;
         $component->clear();
         unset($component);
     }
-
-    /*
-    public function test_get_phpfile_location() {
-        $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $this->assertEquals('lang/en_utf8/moodle.php', $component->get_phpfile_location());
-
-        $component = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEquals('lang/en/moodle.php', $component->get_phpfile_location());
-
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $this->assertEquals('lang/en_utf8/workshop.php', $component->get_phpfile_location());
-
-        $component = new mlang_component('workshop', 'en', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEquals('mod/workshop/lang/en/workshop.php', $component->get_phpfile_location());
-        $this->assertEquals('lang/en/workshop.php', $component->get_phpfile_location(false));
-
-        $component = new mlang_component('workshopform_accumulative', 'cs', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEquals('mod/workshop/form/accumulative/lang/cs/workshopform_accumulative.php', $component->get_phpfile_location());
-        $this->assertEquals('lang/cs/workshopform_accumulative.php', $component->get_phpfile_location(false));
-
-        $component = new mlang_component('gradeexport_xml', 'en', mlang_version::by_branch('MOODLE_19_STABLE'));
-        $this->assertEquals('lang/en_utf8/gradeexport_xml.php', $component->get_phpfile_location());
-
-        $component = new mlang_component('gradeexport_xml', 'es', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->assertEquals('grade/export/xml/lang/es/gradeexport_xml.php', $component->get_phpfile_location());
-        $this->assertEquals('lang/es/gradeexport_xml.php', $component->get_phpfile_location(false));
-    }
-     */
 
     public function test_get_string_keys() {
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -1012,26 +1137,29 @@ EOF;
         $emptyarray = mlang_tools::extract_script_from_text($noscript);
         $this->assertTrue(empty($emptyarray));
 
-        $oneliner = 'MDL-12345 Some message AMOS   BEGIN  MOV   [a,  b],[c,d] CPY [e,f], [g ,h]  AMOS'."\t".'END BEGIN ignore AMOS   ';
+        $oneliner = 'MDL-12345 Some message AMOS   BEGIN  MOV   [a,  b],[c,d] CPY [e,f], [g ,h]  AMOS' .
+            "\t" . 'END BEGIN ignore AMOS   ';
         $script = mlang_tools::extract_script_from_text($oneliner);
         $this->assertEquals(gettype($script), 'array');
         $this->assertEquals(2, count($script));
         $this->assertEquals('MOV [a, b],[c,d]', $script[0]);
         $this->assertEquals('CPY [e,f], [g ,h]', $script[1]);
 
+        // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings
         $multiline = 'This is a typical usage of AMOS script in a commit message
                     AMOS BEGIN
                      MOV a,b  
                      CPY  c,d
                     AMOS END
                    Here it can continue';
+        // phpcs:enable
         $script = mlang_tools::extract_script_from_text($multiline);
         $this->assertEquals(gettype($script), 'array');
         $this->assertEquals(2, count($script));
         $this->assertEquals('MOV a,b', $script[0]);
         $this->assertEquals('CPY c,d', $script[1]);
 
-        // if there is no empty line between commit subject and AMOS script:
+        // If there is no empty line between commit subject and AMOS script:.
         $oneliner2 = 'Blah blah blah AMOS   BEGIN  CMD AMOS END blah blah';
         $script = mlang_tools::extract_script_from_text($oneliner2);
         $this->assertEquals(gettype($script), 'array');
@@ -1144,9 +1272,10 @@ EOF;
 
         $stage = new mlang_stage();
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
-        // this is to prevent situation where a string is added and immediately removed in the same second. Such
-        // situations are not supported yet very well in AMOS as it would require to rewrite well tuned getting
-        // component from snapshot
+
+        // This is to prevent situation where a string is added and immediately removed in the same second. Such
+        // situations are not supported yet very well in AMOS. It would require to rewrite well tuned getting component
+        // from snapshot.
         $past = time() - 1;
         $component = new mlang_component('auth', 'en', $version);
         $component->add_string(new mlang_string('authenticate', 'Authenticate', $past));
@@ -1202,7 +1331,7 @@ EOF;
         $version = mlang_version::by_branch('MOODLE_20_STABLE');
         $now = time();
 
-        // this block emulates parse-core.php
+        // This block emulates parse-core.php.
         $component = new mlang_component('admin', 'en', $version);
         $component->add_string(new mlang_string('configsitepolicy', 'OLD', $now - 2));
         $stage->add($component);
@@ -1211,7 +1340,7 @@ EOF;
         $component->clear();
         unset($component);
 
-        // this block emulates parse-lang.php
+        // This block emulates parse-lang.php.
         $component = new mlang_component('admin', 'cs', $version);
         $component->add_string(new mlang_string('configsitepolicy', 'OLD in cs', $now - 1));
         $stage->add($component);
@@ -1220,9 +1349,9 @@ EOF;
         $component->clear();
         unset($component);
 
-        // this block emulates parse-core.php again later
-        // now the string is moved in the English pack by the developer who provides AMOS script in commit message
-        // this happened in b593d49d593ee778f525b4074f5ee7978c5e2960
+        // This block emulates parse-core.php again later.
+        // Now the string is moved in the English pack by the developer who provides AMOS script in commit message.
+        // This happened in b593d49d593ee778f525b4074f5ee7978c5e2960.
         $component = new mlang_component('admin', 'en', $version);
         $component->add_string(new mlang_string('sitepolicy_help', 'NEW', $now));
         $component->add_string(new mlang_string('configsitepolicy', 'OLD', $now, true));
@@ -1236,7 +1365,7 @@ AMOS END';
         $component->clear();
         unset($component);
 
-        // execute AMOS script if the commit message contains some
+        // Execute AMOS script if the commit message contains some.
         if ($version->code >= 20) {
             $instructions = mlang_tools::extract_script_from_text($commitmsg);
             if (!empty($instructions)) {
@@ -1249,7 +1378,7 @@ AMOS END';
             }
         }
 
-        // check the results
+        // Check the results.
         $component = mlang_component::from_snapshot('admin', 'cs', $version, $now);
         $this->assertTrue($component->has_string('sitepolicy_help'));
         $this->assertEquals('OLD in cs', $component->get_string('sitepolicy_help')->text);
@@ -1283,7 +1412,7 @@ AMOS END';
     }
 
     public function test_merge_strings_from_another_component() {
-        // prepare two components with some strings
+        // Prepare two components with some strings.
         $component19 = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_19_STABLE'));
         $component19->add_string(new mlang_string('first', 'First $a'));
         $component19->add_string(new mlang_string('second', 'Second \"string\"'));
@@ -1294,9 +1423,9 @@ AMOS END';
         $component20->add_string(new mlang_string('second', '*deleted*', null, true));
         $component20->add_string(new mlang_string('third', 'Third already merged'));
         $component20->add_string(new mlang_string('fourth', 'Fourth only in component20'));
-        // merge component19 into component20
+        // Merge component19 into component20.
         mlang_tools::merge($component19, $component20);
-        // check the results
+        // Check the results.
         $this->assertEquals(4, $component19->get_number_of_strings());
         $this->assertEquals(5, $component20->get_number_of_strings());
         $this->assertEquals('First {$a}', $component20->get_string('first')->text);
@@ -1306,7 +1435,7 @@ AMOS END';
         $this->assertEquals('Fourth only in component20', $component20->get_string('fourth')->text);
         $this->assertFalse($component19->has_string('fourth'));
         $this->assertEquals('Fifth "string"', $component20->get_string('fifth')->text);
-        // clear source component and make sure that strings are still in the new one
+        // Clear source component and make sure that strings are still in the new one.
         $component19->clear();
         unset($component19);
         $this->assertEquals(5, $component20->get_number_of_strings());
@@ -1360,7 +1489,7 @@ AMOS END';
         $componentname = 'test';
         $version = mlang_version::by_branch('MOODLE_24_STABLE');
 
-        // Prepare the initial state of the reference component
+        // Prepare the initial state of the reference component.
         $component = new mlang_component($componentname, 'en', $version);
         $component->add_string(new mlang_string('first', 'First $a', $now - 4 * WEEKSECS));
         $component->add_string(new mlang_string('second', 'Second \"string\"', $now - 4 * WEEKSECS));
@@ -1371,18 +1500,18 @@ AMOS END';
         unset($component);
         $stage->commit('First version of en', array('source' => 'unittest'));
 
-        // Prepare the component that is supposed to contain fixes for the reference component
+        // Prepare the component that is supposed to contain fixes for the reference component.
         $component = new mlang_component($componentname, 'en_fix', $version);
-        $component->add_string(new mlang_string('second', 'Second', $now - 3 * WEEKSECS)); // Real change
-        $component->add_string(new mlang_string('third', 'Third', $now - 3 * WEEKSECS)); // No real change
-        $component->add_string(new mlang_string('fourth', 'Fourth', $now - 3 * WEEKSECS)); // Only in en_fix (unexpected)
-        $component->add_string(new mlang_string('fifth', 'Modified', $now - 3 * WEEKSECS)); // Real change
+        $component->add_string(new mlang_string('second', 'Second', $now - 3 * WEEKSECS));
+        $component->add_string(new mlang_string('third', 'Third', $now - 3 * WEEKSECS));
+        $component->add_string(new mlang_string('fourth', 'Fourth', $now - 3 * WEEKSECS));
+        $component->add_string(new mlang_string('fifth', 'Modified', $now - 3 * WEEKSECS));
         $stage->add($component);
         $component->clear();
         unset($component);
         $stage->commit('First version of en_fix', array('source' => 'unittest'));
 
-        // Simulate the result of merging en_fix into en
+        // Simulate the result of merging en_fix into en.
         $component = new mlang_component($componentname, 'en', $version);
         $component->add_string(new mlang_string('second', 'Second', $now - 2 * WEEKSECS));
         $component->add_string(new mlang_string('fifth', 'Modified', $now - 2 * WEEKSECS));
@@ -1391,16 +1520,16 @@ AMOS END';
         unset($component);
         $stage->commit('Merge en_fix into en', array('source' => 'unittest'));
 
-        // Perform more changes at en_fix
+        // Perform more changes at en_fix.
         $component = new mlang_component($componentname, 'en_fix', $version);
-        $component->add_string(new mlang_string('first', 'First', $now - WEEKSECS)); // New real change
-        $component->add_string(new mlang_string('fifth', 'Fifth \"string\"', $now - WEEKSECS)); // Undo the change
+        $component->add_string(new mlang_string('first', 'First', $now - WEEKSECS));
+        $component->add_string(new mlang_string('fifth', 'Fifth \"string\"', $now - WEEKSECS));
         $stage->add($component);
         $component->clear();
         unset($component);
         $stage->commit('Another version of en_fix', array('source' => 'unittest'));
 
-        // Simulate the enfix-cleanup.php execution
+        // Simulate the enfix-cleanup.php execution.
         $en = mlang_component::from_snapshot($componentname, 'en', $version);
         $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
         $enfix->intersect($en);
@@ -1409,7 +1538,7 @@ AMOS END';
         $stage->rebase(null, true);
         $stage->commit('Removing strings merged into the English', null, true);
 
-        // Check the result
+        // Check the result.
         $this->assertEqualsCanonicalizing(['second', 'third'], $removed);
         $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
         $this->assertEquals(2, $enfix->get_number_of_strings());
@@ -1453,8 +1582,8 @@ AMOS END';
         // Change one and add one string in 2.4.
         $component = new mlang_component('foo', 'en', $version24);
         $component->add_string(new mlang_string('modulename', 'Foo', $time - 90 * DAYSECS));
-        $component->add_string(new mlang_string('done', 'Finished', $time - 90 * DAYSECS)); // Changed in 2.4
-        $component->add_string(new mlang_string('end', 'End', $time - 90 * DAYSECS)); // New in 2.4
+        $component->add_string(new mlang_string('done', 'Finished', $time - 90 * DAYSECS));
+        $component->add_string(new mlang_string('end', 'End', $time - 90 * DAYSECS));
         $component->add_string(new mlang_string('aaa', 'AAA', $time - 90 * DAYSECS));
         $component->add_string(new mlang_string('bbb', 'BBB', $time - 90 * DAYSECS));
         $stage->add($component);

@@ -103,7 +103,7 @@ class stage implements \renderable, \templatable {
         // The stage we are visualising.
         $stage = \mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
 
-        foreach($stage as $component) {
+        foreach ($stage as $component) {
             foreach ($component as $staged) {
                 if (!isset($needed[$component->version->code][$component->lang][$component->name])) {
                     $needed[$component->version->code][$component->lang][$component->name] = [];
@@ -180,10 +180,11 @@ class stage implements \renderable, \templatable {
                 $string->original = $needed[$string->sincecode]['en'][$string->component]->get_string($string->stringid)->text;
             }
 
-            if ($needed[$string->sincecode][$string->language][$string->component] instanceof \mlang_component) {
-                $string->current = $needed[$string->sincecode][$string->language][$string->component]->get_string($string->stringid);
-                if ($string->current instanceof \mlang_string) {
-                    $string->current = $string->current->text;
+            $translation = $needed[$string->sincecode][$string->language][$string->component] ?: null;
+
+            if ($translation instanceof \mlang_component) {
+                if ($translation->has_string($string->stringid)) {
+                    $string->current = $translation->get_string($string->stringid)->text;
                 }
             }
 
@@ -266,7 +267,7 @@ class stage implements \renderable, \templatable {
                 $diff = local_amos_simplediff($x1, $x2);
                 $numd = 0;
                 $numi = 0;
-                foreach ($diff as $k) { // $diff is a sequence of chunks (words) $k
+                foreach ($diff as $k) {
                     if (is_array($k)) {
                         if (!empty($k['d'])) {
                             $kd = implode(' ', $k['d']);

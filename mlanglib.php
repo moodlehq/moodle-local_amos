@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Moodle language manipulation library
@@ -101,13 +101,14 @@ class mlang_component implements IteratorAggregate, Countable {
             if (empty($timemodified)) {
                 $timemodified = filemtime($filepath);
             }
-            $a = ''; // empty placeholder to prevent PHP notices
+            // Empty placeholder to prevent PHP notices.
+            $a = '';
             include($filepath);
         } else {
             throw new Exception('Strings definition file ' . $filepath . ' not readable');
         }
         if ($version->code <= 19) {
-            // we are going to import strings for 1.x branch
+            // We are going to import strings for 1.x branch.
             $target = 1;
             if (is_null($format)) {
                 $format = 1;
@@ -116,7 +117,7 @@ class mlang_component implements IteratorAggregate, Countable {
                 throw new coding_exception('For Moodle 1.x, only strings in legacy format are supported.');
             }
         } else {
-            // we are going to import strings for 2.x branch
+            // We are going to import strings for 2.x branch.
             $target = 2;
             if (is_null($format)) {
                 $format = 2;
@@ -285,6 +286,8 @@ class mlang_component implements IteratorAggregate, Countable {
         return self::calculate_identifier($this->name, $this->lang, $this->version);
     }
 
+    // phpcs:disable moodle.NamingConventions.ValidFunctionName
+
     /**
      * Returns an external iterator over strings in the component.
      *
@@ -293,6 +296,8 @@ class mlang_component implements IteratorAggregate, Countable {
     public function getIterator() {
         return new ArrayIterator($this->strings);
     }
+
+    // phpcs:enable
 
     /**
      * Return the number of strings in the component.
@@ -375,8 +380,10 @@ class mlang_component implements IteratorAggregate, Countable {
      * @return void
      */
     public function add_string(mlang_string $string, $force=false) {
+
         if (!$force && isset($this->strings[$string->id])) {
-            throw new coding_exception('You are trying to add a string \''.$string->id.'\' that already exists in this component. If this is intentional, use the \'force\' parameter');
+            throw new coding_exception('You are trying to add a string \'' . $string->id .
+                '\' that already exists in this component. If this is intentional, use the \'force\' parameter');
         }
         $this->strings[$string->id] = $string;
         $string->component = $this;
@@ -497,11 +504,11 @@ EOF
         global $CFG;
 
         if ($this->version->code <= 19) {
-            // Moodle 1.x
+            // Moodle 1.x.
             return 'lang/' . $this->lang . '_utf8/' . $this->name . '.php';
 
         } else {
-            // Moodle 2.x
+            // Moodle 2.x.
             if ($treeish) {
                 debugging('The method get_phpfile_location() may produce wrong results as '.
                     'it is unable to differentiate core plugins from activity modules. '.
@@ -750,19 +757,20 @@ class mlang_string {
             $from = $format;
         }
 
-        // common filter
+        // Common filter.
         $clean = trim($text);
         $search = array(
-            // remove \r if it is part of \r\n
+            // phpcs:disable moodle.Commenting.InlineComment
+            // Remove \r if it is part of \r\n.
             '/\r(?=\n)/',
 
-            // control characters to be replaced with \n
+            // Control characters to be replaced with \n.
             // LINE TABULATION, FORM FEED, CARRIAGE RETURN, END OF TRANSMISSION BLOCK,
             // END OF MEDIUM, SUBSTITUTE, BREAK PERMITTED HERE, NEXT LINE, START OF STRING,
             // STRING TERMINATOR and Unicode character categorys Zl and Zp
             '/[\x{0B}-\r\x{17}\x{19}\x{1A}\x{82}\x{85}\x{98}\x{9C}\p{Zl}\p{Zp}]/u',
 
-            // control characters to be removed
+            // Control characters to be removed.
             // NULL, ENQUIRY, ACKNOWLEDGE, BELL, SHIFT {OUT,IN}, DATA LINK ESCAPE,
             // DEVICE CONTROL {ONE,TWO,THREE,FOUR}, NEGATIVE ACKNOWLEDGE, SYNCHRONOUS IDLE, ESCAPE,
             // DELETE, PADDING CHARACTER, HIGH OCTET PRESET, NO BREAK HERE, INDEX,
@@ -773,10 +781,12 @@ class mlang_string {
             // {SINGLE {GRAPHIC,} CHARACTER,CONTROL SEQUENCE} INTRODUCER, OPERATING SYSTEM COMMAND,
             // PRIVACY MESSAGE, APPLICATION PROGRAM COMMAND, ZERO WIDTH {,NO-BREAK} SPACE,
             // REPLACEMENT CHARACTER
-            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
+            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}' .
+                '\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
 
-            // remove trailing whitespace at the end of lines in a multiline string
+            // Remove trailing whitespace at the end of lines in a multiline string.
             '/[ \t]+(?=\n)/',
+            // phpcs:enable
         );
         $replace = array(
             '',
@@ -787,31 +797,30 @@ class mlang_string {
         $clean = preg_replace($search, $replace, $clean);
 
         if (($format === 2) && ($from === 2)) {
-            // sanity translations of 2.x strings
-            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
+            // Clean up translations of 2.x strings.
+            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean);
 
-        } elseif (($format === 2) && ($from === 1)) {
-            // convert 1.x string into 2.x format
-            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean); // collapse runs of blank lines
-            $clean = preg_replace('/%+/', '%', $clean); // collapse % characters
-            $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean); // remember for later
-            $clean = str_replace("\\", '', $clean); // delete all slashes
-            $clean = preg_replace('/(^|[^{])\$a\b(\->[a-zA-Z0-9_]+)?/', '\\1{$a\\2}', $clean); // wrap placeholders
+        } else if (($format === 2) && ($from === 1)) {
+            // Convert 1.x string into 2.x format.
+            $clean = preg_replace("/\n{3,}/", "\n\n\n", $clean);
+            $clean = preg_replace('/%+/', '%', $clean);
+            $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean);
+            $clean = str_replace("\\", '', $clean);
+            $clean = preg_replace('/(^|[^{])\$a\b(\->[a-zA-Z0-9_]+)?/', '\\1{$a\\2}', $clean);
             $clean = str_replace('@@@___XXX_ESCAPED_DOLLAR__@@@', '$', $clean);
             $clean = str_replace('&#36;', '$', $clean);
 
-        } elseif (($format === 1) && ($from === 1)) {
-            // sanity legacy 1.x strings
-            $clean = preg_replace("/\n{3,}/", "\n\n", $clean); // collapse runs of blank lines
+        } else if (($format === 1) && ($from === 1)) {
+            // Clean up legacy 1.x strings.
+            $clean = preg_replace("/\n{3,}/", "\n\n", $clean);
             $clean = str_replace('\$', '@@@___XXX_ESCAPED_DOLLAR__@@@', $clean);
-            $clean = str_replace("\\", '', $clean); // delete all slashes
-            $clean = str_replace('$', '\$', $clean); // escape all embedded variables
-            // unescape placeholders: only $a and $a->something are allowed. All other $variables are left escaped
-            $clean = preg_replace('/\\\\\$a\b(\->[a-zA-Z0-9_]+)?/', '$a\\1', $clean); // unescape placeholders
+            $clean = str_replace("\\", '', $clean);
+            $clean = str_replace('$', '\$', $clean);
+            $clean = preg_replace('/\\\\\$a\b(\->[a-zA-Z0-9_]+)?/', '$a\\1', $clean);
             $clean = str_replace('@@@___XXX_ESCAPED_DOLLAR__@@@', '\$', $clean);
-            $clean = str_replace('"', "\\\"", $clean); // add slashes for "
-            $clean = preg_replace('/%+/', '%', $clean); // collapse % characters
-            $clean = str_replace('%', '%%', $clean); // duplicate %
+            $clean = str_replace('"', "\\\"", $clean);
+            $clean = preg_replace('/%+/', '%', $clean);
+            $clean = str_replace('%', '%%', $clean);
 
         } else {
             throw new mlang_exception('Unknown get_string() format version');
@@ -827,16 +836,17 @@ class mlang_string {
      */
     public static function fix_syntax_minimal($text) {
         $search = array(
-            // remove \r if it is part of \r\n
+            // phpcs:disable moodle.Commenting.InlineComment
+            // Remove \r if it is part of \r\n.
             '/\r(?=\n)/',
 
-            // control characters to be replaced with \n
+            // Control characters to be replaced with \n.
             // LINE TABULATION, FORM FEED, CARRIAGE RETURN, END OF TRANSMISSION BLOCK,
             // END OF MEDIUM, SUBSTITUTE, BREAK PERMITTED HERE, NEXT LINE, START OF STRING,
             // STRING TERMINATOR and Unicode character categorys Zl and Zp
             '/[\x{0B}-\r\x{17}\x{19}\x{1A}\x{82}\x{85}\x{98}\x{9C}\p{Zl}\p{Zp}]/u',
 
-            // control characters to be removed
+            // Control characters to be removed.
             // NULL, ENQUIRY, ACKNOWLEDGE, BELL, SHIFT {OUT,IN}, DATA LINK ESCAPE,
             // DEVICE CONTROL {ONE,TWO,THREE,FOUR}, NEGATIVE ACKNOWLEDGE, SYNCHRONOUS IDLE, ESCAPE,
             // DELETE, PADDING CHARACTER, HIGH OCTET PRESET, NO BREAK HERE, INDEX,
@@ -847,7 +857,9 @@ class mlang_string {
             // {SINGLE {GRAPHIC,} CHARACTER,CONTROL SEQUENCE} INTRODUCER, OPERATING SYSTEM COMMAND,
             // PRIVACY MESSAGE, APPLICATION PROGRAM COMMAND, ZERO WIDTH {,NO-BREAK} SPACE,
             // REPLACEMENT CHARACTER
-            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
+            // phpcs:enable
+            '/[\0\x{05}-\x{07}\x{0E}-\x{16}\x{1B}\x{7F}\x{80}\x{81}\x{83}\x{84}\x{86}-\x{93}\x{95}-\x{97}\x{99}-\x{9B}' .
+                '\x{9D}-\x{9F}\x{200B}\x{FEFF}\x{FFFD}]++/u',
         );
         $replace = array(
             '',
@@ -924,9 +936,11 @@ class mlang_stage implements IteratorAggregate, Countable {
      * @param int $deletetimestamp if $deletemissing is true, what timestamp to use when removing strings (defaults to current)
      */
     public function rebase($basetimestamp=null, $deletemissing=false, $deletetimestamp=null) {
-        if(!is_bool($deletemissing)) {
+
+        if (!is_bool($deletemissing)) {
             throw new coding_exception('Incorrect type of the parameter $deletemissing');
         }
+
         foreach ($this->components as $cx => $component) {
             $cap = mlang_component::from_snapshot($component->name, $component->lang, $component->version, $basetimestamp, true);
             if ($deletemissing) {
@@ -946,29 +960,29 @@ class mlang_stage implements IteratorAggregate, Countable {
             foreach ($component as $stagedstring) {
                 $capstring = $cap->get_string($stagedstring->id);
                 if (is_null($capstring)) {
-                    // the staged string does not exist in the repository yet - will be committed
+                    // The staged string does not exist in the repository yet - will be committed.
                     continue;
                 }
                 if ($stagedstring->deleted && empty($capstring->deleted)) {
-                    // the staged string object is the removal record - will be committed
+                    // The staged string object is the removal record - will be committed.
                     continue;
                 }
                 if (empty($stagedstring->deleted) && $capstring->deleted) {
-                    // re-adding a deleted string - will be committed
+                    // Re-adding a deleted string - will be committed.
                     continue;
                 }
                 if (!mlang_string::differ($stagedstring, $capstring)) {
-                    // the staged string is the same as the most recent one in the repository
+                    // The staged string is the same as the most recent one in the repository.
                     $component->unlink_string($stagedstring->id);
                     continue;
                 }
                 if ($stagedstring->timemodified < $capstring->timemodified) {
-                    // the staged string is older than the cap, do not keep it
+                    // The staged string is older than the cap, do not keep it.
                     $component->unlink_string($stagedstring->id);
                     continue;
                 }
             }
-            // unstage the whole component if it is empty
+            // Unstage the whole component if it is empty.
             if (!$component->has_string()) {
                 unset($this->components[$cx]);
             }
@@ -1070,7 +1084,7 @@ class mlang_stage implements IteratorAggregate, Countable {
     public function prune(array $keeplangs) {
         foreach ($this->components as $cx => $component) {
             if (empty($component->version->translatable)) {
-                // commits not allowed into this branch via AMOS web interface
+                // Commits not allowed into this branch via AMOS web interface.
                 $component->clear();
                 unset($this->components[$cx]);
                 continue;
@@ -1083,6 +1097,8 @@ class mlang_stage implements IteratorAggregate, Countable {
         }
     }
 
+    // phpcs:disable moodle.NamingConventions.ValidFunctionName
+
     /**
      * Returns an external iterator over components in the stage.
      *
@@ -1091,6 +1107,8 @@ class mlang_stage implements IteratorAggregate, Countable {
     public function getIterator() {
         return new ArrayIterator($this->components);
     }
+
+    // phpcs:enable
 
     /**
      * Return the count of components in the stage.
@@ -1193,7 +1211,8 @@ class mlang_stage implements IteratorAggregate, Countable {
         check_dir_exists($tmpdir);
 
         $files = array();
-        foreach($this as $component) {
+
+        foreach ($this as $component) {
             if ($component->get_number_of_strings() > 0) {
                 $zipfilepath = $component->version->dir . '/' . $component->lang . '/' . $component->name . '.php';
                 $realfilepath = $tmpdir . '/' . $zipfilepath;
@@ -1322,8 +1341,6 @@ class mlang_stash {
 
     /** @var string serialized $stage */
     protected $stageserialized;
-
-    // PUBLIC API
 
     /**
      * Factory method returning new instance of the stash from the passed stage
@@ -1462,7 +1479,7 @@ class mlang_stash {
         }
 
         $DB->delete_records('amos_stashes', array('id' => $this->id, 'hash' => $this->hash, 'ownerid' => $this->ownerid));
-        // if the stash file is not referenced any more, delete it
+        // If the stash file is not referenced any more, delete it.
         if (!$DB->record_exists('amos_stashes', array('hash' => $this->hash))) {
             $filename = $this->get_storage_filename();
             unlink($filename);
@@ -1502,10 +1519,8 @@ class mlang_stash {
         $this->stage->send_zip($filename);
     }
 
-    // INTERNAL API
-
     /**
-     * Public construction not allowed, use a factory method
+     * Public construction not allowed, use a factory method.
      */
     protected function __construct($ownerid) {
         $this->ownerid = $ownerid;
@@ -1778,9 +1793,9 @@ class mlang_version {
 class mlang_tools {
 
     /** return stati of {@see self::execute()} */
-    const STATUS_OK                     =  0;
-    const STATUS_SYNTAX_ERROR           = -1;
-    const STATUS_UNKNOWN_INSTRUCTION    = -2;
+    const STATUS_OK = 0;
+    const STATUS_SYNTAX_ERROR = -1;
+    const STATUS_UNKNOWN_INSTRUCTION = -2;
 
     /**
      * Returns a list of all languages known in the strings repository
@@ -1937,13 +1952,13 @@ class mlang_tools {
             return array();
         }
 
-        // collapse all whitespace into single space
+        // Collapse all whitespace into single space.
         $script = preg_replace('/\s+/', ' ', trim($matches[2]));
 
-        // we need explicit list of known commands so that this parser can handle onliners well
+        // We need explicit list of known commands so that this parser can handle one-liners well.
         $cmds = array('MOV', 'CPY', 'FCP', 'HLP', 'REM');
 
-        // put new line character before every known command
+        // Put new line character before every known command.
         $cmdsfrom = array();
         $cmdsto   = array();
         foreach ($cmds as $cmd) {
@@ -1952,7 +1967,7 @@ class mlang_tools {
         }
         $script = str_replace($cmdsfrom, $cmdsto, $script);
 
-        // make array of non-empty lines
+        // Make array of non-empty lines.
         $lines = array_filter(array_map('trim', explode("\n", $script)));
 
         return array_values($lines);
@@ -1980,79 +1995,82 @@ class mlang_tools {
             $arg = trim(substr($instruction, $spcpos + 1));
         }
         switch ($cmd) {
-        case 'CPY':
-            // CPY [sourcestring,sourcecomponent],[targetstring,targetcomponent]
-            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
-                array_map('trim', $matches);
-                $fromcomponent = self::legacy_component_name($matches[2]);
-                $tocomponent = self::legacy_component_name($matches[4]);
-                if ($fromcomponent and $tocomponent) {
-                    return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+            // phpcs:disable Squiz.PHP.CommentedOutCode
+            case 'CPY':
+                // CPY [sourcestring,sourcecomponent],[targetstring,targetcomponent].
+                if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                    array_map('trim', $matches);
+                    $fromcomponent = self::legacy_component_name($matches[2]);
+                    $tocomponent = self::legacy_component_name($matches[4]);
+                    if ($fromcomponent and $tocomponent) {
+                        return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                    } else {
+                        return self::STATUS_SYNTAX_ERROR;
+                    }
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
-            } else {
-                return self::STATUS_SYNTAX_ERROR;
-            }
-            break;
-        case 'FCP':
-            // FCP [sourcestring,sourcecomponent],[targetstring,targetcomponent]
-            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
-                array_map('trim', $matches);
-                $fromcomponent = self::legacy_component_name($matches[2]);
-                $tocomponent = self::legacy_component_name($matches[4]);
-                if ($fromcomponent and $tocomponent) {
-                    return self::forced_copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                break;
+            case 'FCP':
+                // FCP [sourcestring,sourcecomponent],[targetstring,targetcomponent].
+                if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                    array_map('trim', $matches);
+                    $fromcomponent = self::legacy_component_name($matches[2]);
+                    $tocomponent = self::legacy_component_name($matches[4]);
+                    if ($fromcomponent and $tocomponent) {
+                        return self::forced_copy_string($version, $matches[1], $fromcomponent,
+                            $matches[3], $tocomponent, $timestamp);
+                    } else {
+                        return self::STATUS_SYNTAX_ERROR;
+                    }
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
-            } else {
-                return self::STATUS_SYNTAX_ERROR;
-            }
-            break;
-        case 'MOV':
-            // MOV [sourcestring,sourcecomponent],[targetstring,targetcomponent]
-            if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
-                array_map('trim', $matches);
-                $fromcomponent = self::legacy_component_name($matches[2]);
-                $tocomponent = self::legacy_component_name($matches[4]);
-                if ($fromcomponent and $tocomponent) {
-                    return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                break;
+            case 'MOV':
+                // MOV [sourcestring,sourcecomponent],[targetstring,targetcomponent].
+                if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                    array_map('trim', $matches);
+                    $fromcomponent = self::legacy_component_name($matches[2]);
+                    $tocomponent = self::legacy_component_name($matches[4]);
+                    if ($fromcomponent and $tocomponent) {
+                        return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
+                    } else {
+                        return self::STATUS_SYNTAX_ERROR;
+                    }
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
-            } else {
-                return self::STATUS_SYNTAX_ERROR;
-            }
-            break;
-        case 'HLP':
-            // HLP feedback/preview.html,[preview_hlp,mod_feedback]
-            if (preg_match('/(.+),\s*\[(.+),(.+)\]/', $arg, $matches)) {
-                array_map('trim', $matches);
-                $helpfile = clean_param($matches[1], PARAM_PATH);
-                $tocomponent = self::legacy_component_name($matches[3]);
-                $tostring = $matches[2];
-                if ($tostring !== clean_param($tostring, PARAM_STRINGID)) {
-                    return self::STATUS_SYNTAX_ERROR;
-                }
-                if ($helpfile and $tocomponent and $tostring) {
-                    return self::migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp);
+                break;
+            case 'HLP':
+                // HLP feedback/preview.html,[preview_hlp,mod_feedback].
+                if (preg_match('/(.+),\s*\[(.+),(.+)\]/', $arg, $matches)) {
+                    array_map('trim', $matches);
+                    $helpfile = clean_param($matches[1], PARAM_PATH);
+                    $tocomponent = self::legacy_component_name($matches[3]);
+                    $tostring = $matches[2];
+                    if ($tostring !== clean_param($tostring, PARAM_STRINGID)) {
+                        return self::STATUS_SYNTAX_ERROR;
+                    }
+                    if ($helpfile and $tocomponent and $tostring) {
+                        return self::migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp);
+                    } else {
+                        return self::STATUS_SYNTAX_ERROR;
+                    }
                 } else {
                     return self::STATUS_SYNTAX_ERROR;
                 }
-            } else {
-                return self::STATUS_SYNTAX_ERROR;
-            }
-            break;
-        case 'REM':
-            // todo send message to subscribed users
-            return self::STATUS_OK;
-            break;
-        // WARNING: If a new command is added here, it must be also put into the list of known
-        // commands in self::extract_script_from_text(). It is not nice but we use new line
-        // as the delimiter and git may strip new lines if the script is part of the subject line.
-        default:
-            return self::STATUS_UNKNOWN_INSTRUCTION;
+                break;
+            case 'REM':
+                // Todo send message to subscribed users.
+                return self::STATUS_OK;
+                break;
+                // WARNING: If a new command is added here, it must be also put into the list of known
+                // commands in self::extract_script_from_text(). It is not nice but we use new line
+                // as the delimiter and git may strip new lines if the script is part of the subject line.
+            default:
+                return self::STATUS_UNKNOWN_INSTRUCTION;
+            // phpcs:enable
         }
     }
 
@@ -2230,10 +2248,6 @@ class mlang_tools {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Internal implementation
-    ////////////////////////////////////////////////////////////////////////////
-
     /**
      * Copy one string to another at the given version branch for all languages in the repository
      *
@@ -2248,7 +2262,9 @@ class mlang_tools {
      * @param int $timestamp effective timestamp of the copy, null for now
      * @return mlang_stage to be committed
      */
-    protected static function copy_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+    protected static function copy_string(mlang_version $version, $fromstring, $fromcomponent,
+            $tostring, $tocomponent, $timestamp=null) {
+
         $stage = new mlang_stage();
         foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
@@ -2277,7 +2293,9 @@ class mlang_tools {
      * @param int $timestamp effective timestamp of the copy, null for now
      * @return mlang_stage to be committed
      */
-    protected static function forced_copy_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+    protected static function forced_copy_string(mlang_version $version, $fromstring, $fromcomponent,
+            $tostring, $tocomponent, $timestamp=null) {
+
         $stage = new mlang_stage();
         foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
@@ -2306,7 +2324,9 @@ class mlang_tools {
      * @param int $timestamp effective timestamp of the move, null for now
      * @return mlang_stage to be committed
      */
-    protected static function move_string(mlang_version $version, $fromstring, $fromcomponent, $tostring, $tocomponent, $timestamp=null) {
+    protected static function move_string(mlang_version $version, $fromstring, $fromcomponent,
+            $tostring, $tocomponent, $timestamp=null) {
+
         $stage = new mlang_stage();
         foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, array($fromstring));
@@ -2339,6 +2359,7 @@ class mlang_tools {
      */
     protected static function migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp=null) {
         global $CFG;
+        // phpcs:ignore moodle.Files.RequireLogin
         require_once($CFG->dirroot . '/local/amos/cli/config.php');
 
         $stage = new mlang_stage();

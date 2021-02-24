@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,19 +12,19 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Register new language
  *
- * @package   local-amos
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
-require_once(dirname(dirname(__FILE__)).'/mlanglib.php');
-require_once(dirname(__FILE__).'/newlanguage_form.php');
+require(__DIR__ . '/../../../config.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/admin/newlanguage_form.php');
 
 require_login(SITEID, false);
 require_capability('local/amos:manage', context_system::instance());
@@ -52,7 +51,6 @@ if ($data = $form->get_data()) {
     redirect(new moodle_url('/local/amos/stage.php'));
 }
 
-/// Output starts here
 echo $OUTPUT->header();
 $form->display();
 echo $OUTPUT->footer();

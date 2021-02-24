@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,21 +12,21 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Unit tests for Moodle string file parsers defined in mlangparser.php
  *
- * @package   local_amos
- * @category  phpunit
- * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_amos
+ * @category    test
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-require_once($CFG->dirroot . '/local/amos/mlangparser.php'); // Include the code to test
+require_once($CFG->dirroot . '/local/amos/mlangparser.php');
 
 /**
  * Test cases for the parsers api
@@ -48,24 +47,24 @@ class mlangparser_test extends basic_testcase {
         $parser = mlang_parser_factory::get_parser('php');
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
 
-        // empty string does nothing
+        // Empty string does nothing.
         $parser->parse('', $component);
         $this->assertFalse($component->has_string());
         $component->clear();
 
-        // data must be valid PHP code started with PHP start tag
+        // Data must be valid PHP code started with PHP start tag.
         $data = '$string[\'none\'] = \'None\';';
         $component->clear();
         $parser->parse($data, $component);
         $this->assertFalse($component->has_string());
 
-        // trivial string to parse
+        // Trivial string to parse.
         $data = '<?php $string[\'one\'] = \'One\';';
         $component->clear();
         $parser->parse($data, $component);
         $this->assertEquals('One', $component->get_string('one')->text);
 
-        // more complex example
+        // More complex example.
         $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata001.txt');
         $component->clear();
         $parser->parse($data, $component);
@@ -82,7 +81,7 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals($component->get_string('valid6')->text, 'Second');
         $this->assertEquals($component->get_string('valid7')->text, 'Course \'{$a}\'');
 
-        // more complex example (format 1.x)
+        // More complex example (format 1.x).
         $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata003.txt');
         $component->clear();
         $parser->parse($data, $component, 1);
@@ -91,13 +90,13 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals($component->get_string('valid2')->text, "Multiline\nstring");
         $this->assertEquals($component->get_string('valid3')->text, 'What $a\'Pe%"be');
 
-        // double quotes are allowed only if they do not contain dollar sign
+        // Double quotes are allowed only if they do not contain dollar sign.
         $data = '<?php $string["id"] = "No dollar here";';
         $component->clear();
         $parser->parse($data, $component);
         $this->assertEquals($component->get_string('id')->text, 'No dollar here');
 
-        // only strings conforming to PARAM_STRINGID are accepted
+        // Only strings conforming to PARAM_STRINGID are accepted.
         $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata004.txt');
         $component->clear();
         $parser->parse($data, $component);
@@ -121,9 +120,9 @@ class mlangparser_test extends basic_testcase {
     }
 
     public function test_php_parser_security_variable_expansion() {
-        // security issues
+        // Security issues.
         $parser = mlang_parser_factory::get_parser('php');
-        $data = '<?php $string[\'dbpass\'] = $CFG->dbpass;'; // this would give the user sensitive data about AMOS portal
+        $data = '<?php $string[\'dbpass\'] = $CFG->dbpass;';
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
         $this->expectException('mlang_parser_exception');
         $parser->parse($data, $component);
