@@ -39,8 +39,13 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  */
 class amos_checker {
 
+    /** Successful check result code. */
     const RESULT_SUCCESS = 0;
+
+    /** Failed check result code. */
     const RESULT_FAILURE = 1;
+
+    /** Error when processing the check. */
     const RESULT_PARAMS = 2;
 
     /** @var string checker task to execute via $this->check_{task} call */

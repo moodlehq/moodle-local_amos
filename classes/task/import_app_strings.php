@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link \local_amos\task\import_app_strings} class.
+ * Provides the {@see \local_amos\task\import_app_strings} class.
  *
  * @package     local_amos
  * @category    task

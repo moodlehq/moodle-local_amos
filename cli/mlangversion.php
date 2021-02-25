@@ -18,7 +18,6 @@
  * Provides CLI access to {@see mlang_version} class features.
  *
  * @package     local_amos
- * @category    cli
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

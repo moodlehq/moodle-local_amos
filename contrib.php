@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Displays and manages submitted contributions.
  *
@@ -23,6 +21,8 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2011 David Mudrak <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');

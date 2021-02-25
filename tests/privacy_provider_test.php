@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link local_amos_privacy_provider_testcase} class.
+ * Provides the {@see local_amos_privacy_provider_testcase} class.
  *
  * @package     local_amos
  * @category    test
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 /**
- * Unit tests for the {@link \local_amos\privacy\provider} class.
+ * Unit tests for the {@see \local_amos\privacy\provider} class.
  *
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,7 @@ global $CFG;
 class local_amos_privacy_provider_testcase extends advanced_testcase {
 
     /**
-     * Test {@link \local_amos\privacy\provider::get_users_in_context()} implementation.
+     * Test {@see \local_amos\privacy\provider::get_users_in_context()} implementation.
      */
     public function test_get_users_in_context() {
         global $DB;

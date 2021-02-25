@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Merges en_fix strings into the Git working directory.
+ *
  * @package     local_amos
  * @copyright   2013 David Mudrak <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

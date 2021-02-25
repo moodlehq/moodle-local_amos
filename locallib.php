@@ -55,7 +55,7 @@ class local_amos_stash implements renderable {
     protected $actions = array();
 
     /**
-     * Factory method using an instance if {@link mlang_stash} as a data source
+     * Factory method using an instance if {@see mlang_stash} as a data source
      *
      * @param mlang_stash $stash
      * @param stdClass $owner owner user data
@@ -160,10 +160,17 @@ class local_amos_stash implements renderable {
  */
 class local_amos_contribution implements renderable {
 
-    const STATE_NEW         = 0;
-    const STATE_REVIEW      = 10;
-    const STATE_REJECTED    = 20;
-    const STATE_ACCEPTED    = 30;
+    /** Newly submitted contribution. */
+    const STATE_NEW = 0;
+
+    /** Contribution under review. */
+    const STATE_REVIEW = 10;
+
+    /** Rejected contribution. */
+    const STATE_REJECTED = 20;
+
+    /** Accepted submission. */
+    const STATE_ACCEPTED = 30;
 
     /** @var stdClass */
     public $info;
@@ -180,6 +187,13 @@ class local_amos_contribution implements renderable {
     /** @var int number of strings after rebase */
     public $stringsreb;
 
+    /**
+     * Constructor.
+     *
+     * @param stdClass $info Contribution data.
+     * @param stdClass $author Contributor user record, if known.
+     * @param stdClass $assignee Assignee user record, if known.
+     */
     public function __construct(stdClass $info, stdClass $author=null, stdClass $assignee=null) {
         global $DB;
 
@@ -241,7 +255,7 @@ function local_amos_applist_strings() {
 }
 
 /**
- * Returns the options used for {@link importfile_form.php}
+ * Returns the options used for {@see local_amos_importfile_form}
  *
  * @return array
  */
@@ -268,7 +282,7 @@ function local_amos_importfile_options() {
 }
 
 /**
- * Returns the options used for {@link execute_form.php}
+ * Returns the options used for {@see local_amos_execute_form}
  *
  * @return array
  */
@@ -302,7 +316,6 @@ function local_amos_execute_options() {
  * @copyright (C) Paul Butler 2007 <http://www.paulbutler.org/>
  * @license May be used and distributed under the zlib/libpng license
  * @link https://github.com/paulgb/simplediff
- * @version 26f97a48598d7b306ae9
  * @param array $old array of words
  * @param array $new array of words
  * @return array

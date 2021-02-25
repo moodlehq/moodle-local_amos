@@ -479,6 +479,8 @@ class filter implements \renderable, \templatable {
     /**
      * Export template data for language selector.
      *
+     * @param \renderer_base $outpup
+     * @param object $filterdata
      * @return array
      */
     protected function export_for_template_flng(\renderer_base $outpup, object $filterdata): array {
@@ -514,6 +516,8 @@ class filter implements \renderable, \templatable {
     /**
      * Export template data for component selector.
      *
+     * @param \renderer_base $outpup
+     * @param object $filterdata
      * @return array
      */
     protected function export_for_template_fcmp(\renderer_base $outpup, object $filterdata): array {
@@ -591,6 +595,8 @@ class filter implements \renderable, \templatable {
     /**
      * Export template data for version selector.
      *
+     * @param \renderer_base $outpup
+     * @param object $filterdata
      * @return array
      */
     protected function export_for_template_fver(\renderer_base $outpup, object $filterdata): array {
@@ -618,6 +624,8 @@ class filter implements \renderable, \templatable {
 
     /**
      * Set the current filter data as the user's default data for this session.
+     *
+     * @param object $data
      */
     protected function set_data_session_default(object $data) {
         global $SESSION;
@@ -653,6 +661,7 @@ class filter implements \renderable, \templatable {
     /**
      * Set the current filter data as the user's default data.
      *
+     * @param object $data
      */
     protected function set_data_user_default(object $data) {
         global $DB, $USER, $SESSION;

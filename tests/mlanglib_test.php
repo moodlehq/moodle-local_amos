@@ -33,8 +33,12 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  */
 class testable_mlang_tools extends mlang_tools {
 
-    // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
-    public static function legacy_component_name($newstyle) {
+    /**
+     * Turn protected method to public to be able to test it directly.
+     *
+     * @param string $newstyle
+     */
+    public static function legacy_component_name($newstyle) { // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
         return parent::legacy_component_name($newstyle);
     }
 }
@@ -1730,7 +1734,7 @@ AMOS END';
     }
 
     /**
-     * Test the {@link mlang_string::should_be_included_in_stats()} results.
+     * Test the {@see mlang_string::should_be_included_in_stats()} results.
      */
     public function test_should_be_included_in_stats() {
         $this->resetAfterTest();
@@ -1741,7 +1745,7 @@ AMOS END';
     }
 
     /**
-     * Test the {@link mlang_component::get_number_of_strings()} results.
+     * Test the {@see mlang_component::get_number_of_strings()} results.
      */
     public function test_get_number_of_strings() {
         $this->resetAfterTest();

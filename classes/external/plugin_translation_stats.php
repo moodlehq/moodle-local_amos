@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 class plugin_translation_stats extends \external_api {
 
     /**
-     * Describes parameters of the {@link execute()} method
+     * Describes parameters of the {@see execute()} method
      */
     public static function execute_parameters() {
         return new \external_function_parameters([
@@ -74,7 +74,7 @@ class plugin_translation_stats extends \external_api {
     }
 
     /**
-     * Describes the return value of the {@link execute()} method.
+     * Describes the return value of the {@see execute()} method.
      *
      * @return external_description
      */

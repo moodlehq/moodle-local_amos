@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines {@link \local_amos\privacy\provider} class.
+ * Defines {@see \local_amos\privacy\provider} class.
  *
  * @package     local_amos
  * @category    privacy

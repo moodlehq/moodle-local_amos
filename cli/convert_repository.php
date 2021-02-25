@@ -183,6 +183,12 @@ while (!$done) {
     $chunk++;
 }
 
+/**
+ * Helper function to save a string into the given storage table.
+ *
+ * @param string $t Table
+ * @param object $r String
+ */
 function amos_convert_repository_insert($t, $r) {
     global $DB;
 

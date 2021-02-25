@@ -31,7 +31,10 @@ defined('MOODLE_INTERNAL') || die();
  * Base exception thrown by low level language manipulation operations
  */
 class mlang_exception extends moodle_exception {
+
     /**
+     * Constructor.
+     *
      * @param string $hint short description of problem
      * @param string $debuginfo detailed information how to fix problem
      */
@@ -45,7 +48,7 @@ class mlang_exception extends moodle_exception {
  */
 class mlang_component implements IteratorAggregate, Countable {
 
-    /** @var the name of the component, what {@link string_manager::get_string()} uses as the second param */
+    /** @var the name of the component, what {@see string_manager::get_string()} uses as the second param */
     public $name;
 
     /** @var string language code we are part of */
@@ -58,11 +61,14 @@ class mlang_component implements IteratorAggregate, Countable {
     protected $strings = array();
 
     /**
+     * Constructor.
+     *
      * @param string $name the name of the component, eg. 'role', 'glossary', 'datafield_text' etc.
      * @param string $lang
      * @param mlang_version $version
      */
     public function __construct($name, $lang, mlang_version $version) {
+
         $this->name     = $name;
         $this->lang     = $lang;
         $this->version  = $version;
@@ -88,7 +94,7 @@ class mlang_component implements IteratorAggregate, Countable {
      * @param int $timemodified use this as a timestamp of string modification instead of the filemtime()
      * @param string $name use this as a component name instead of guessing from the file name
      * @param int $format in what string format the file is written - 1 for 1.x string, 2 for 2.x strings
-     * @throw Exception
+     * @throws Exception
      * @return mlang_component
      */
     public static function from_phpfile($filepath, $lang, mlang_version $version, $timemodified=null, $name=null, $format=null) {
@@ -376,7 +382,7 @@ class mlang_component implements IteratorAggregate, Countable {
      *
      * @param mlang_string $string to add
      * @param bool $force if true, existing string will be replaced
-     * @throw coding_exception when trying to add existing component without $force
+     * @throws coding_exception when trying to add existing component without $force
      * @return void
      */
     public function add_string(mlang_string $string, $force=false) {
@@ -579,7 +585,7 @@ EOF
             }
             if (!$reference->has_string($id)) {
                 // Do not affect strings not present in $reference.
-                // See {@link self::intersect()} if you want to get rid of such strings.
+                // See {@see self::intersect()} if you want to get rid of such strings.
                 continue;
             }
             if (mlang_string::differ($string, $reference->get_string($id))) {
@@ -669,6 +675,8 @@ class mlang_string {
     public $nocleaning = false;
 
     /**
+     * Constructor.
+     *
      * @param string $id string identifier
      * @param string $text string text
      * @param int $timemodified
@@ -676,9 +684,11 @@ class mlang_string {
      * @param stdclass $extra
      */
     public function __construct($id, $text='', $timemodified=null, $deleted=0, stdclass $extra=null) {
+
         if (is_null($timemodified)) {
             $timemodified = time();
         }
+
         $this->id           = $id;
         $this->text         = $text;
         $this->timemodified = $timemodified;
@@ -1158,6 +1168,7 @@ class mlang_stage implements IteratorAggregate, Countable {
      * Languages and components lists are returned as strings, slash is used as a delimiter
      * and there is heading and trailing slash, too.
      *
+     * @param mlang_stage $stage Stage to be analyzed
      * @return array of (int)strings, (string)languages, (string)components
      */
     public static function analyze(mlang_stage $stage) {
@@ -1272,7 +1283,7 @@ class mlang_persistent_stage extends mlang_stage {
     }
 
     /**
-     * Make sure the storage is ready for {@link store()} call
+     * Make sure the storage is ready for {@see store()} call
      *
      * @return string|false full path to file to use or false if fail
      */
@@ -1491,7 +1502,7 @@ class mlang_stash {
     /**
      * Reads the stashed strings from the file, sets $this->stage
      *
-     * This should be called exclusively by {@link self::instance_from_id()}
+     * This should be called exclusively by {@see self::instance_from_id()}
      *
      * @see self::save_into_file()
      */
@@ -1521,8 +1532,11 @@ class mlang_stash {
 
     /**
      * Public construction not allowed, use a factory method.
+     *
+     * @param int $ownerid
      */
     protected function __construct($ownerid) {
+
         $this->ownerid = $ownerid;
         $this->timecreated = time();
     }
@@ -1618,7 +1632,7 @@ class mlang_version {
     /**
      * Get instance by the branch code.
      *
-     * @param int code Branch code of the version: 20, 21, ... 39, 310, 311, 400, ...
+     * @param int $code Branch code of the version: 20, 21, ... 39, 310, 311, 400, ...
      * @return mlang_version
      */
     public static function by_code($code) {
@@ -1696,7 +1710,7 @@ class mlang_version {
      * List of versions starting since the given branch code, optionally up to the given end (inclusive).
      *
      * @param int $start The branch code of the first version in the returned list.
-     * @param ?int $end Optional branch code of the last version in the returned list
+     * @param int $end Optional branch code of the last version in the returned list
      * @return array mlang_version[] indexed by version code
      */
     public static function list_range(int $start, ?int $end = null): array {
@@ -1792,9 +1806,13 @@ class mlang_version {
  */
 class mlang_tools {
 
-    /** return stati of {@see self::execute()} */
+    /** Success return status of {@see self::execute()} */
     const STATUS_OK = 0;
+
+    /** Error return status of {@see self::execute()} */
     const STATUS_SYNTAX_ERROR = -1;
+
+    /** Error return status of {@see self::execute()} */
     const STATUS_UNKNOWN_INSTRUCTION = -2;
 
     /**
@@ -1938,7 +1956,7 @@ class mlang_tools {
     /**
      * Given a text, extracts AMOS script lines from it as array of commands
      *
-     * See {@link http://docs.moodle.org/dev/Languages/AMOS} for the specification
+     * See {@link https://docs.moodle.org/dev/Languages/AMOS} for the specification
      * of the script. Basically it is a block of lines starting with "AMOS BEGIN" line and
      * ending with "AMOS END" line. "AMOS START" is an alias for "AMOS BEGIN". Each instruction
      * in the script must be on a separate line.
@@ -2252,13 +2270,13 @@ class mlang_tools {
      * Copy one string to another at the given version branch for all languages in the repository
      *
      * Deleted strings are not copied. If the target string already exists (and is not deleted), it is
-     * not overwritten - compare with {@link self::forced_copy_string()}
+     * not overwritten - compare with {@see self::forced_copy_string()}
      *
      * @param mlang_version $version to execute copying on
      * @param string $fromstring source string identifier
      * @param string $fromcomponent source component name
      * @param string $tostring target string identifier
-     * @param string $tocomponet target component name
+     * @param string $tocomponent target component name
      * @param int $timestamp effective timestamp of the copy, null for now
      * @return mlang_stage to be committed
      */
@@ -2283,13 +2301,13 @@ class mlang_tools {
      * Copy one string to another at the given version branch for all languages in the repository
      *
      * Deleted strings are not copied. The target string is always overwritten, even if it already exists
-     * or it is deleted - compare with {@link self::copy_string()}
+     * or it is deleted - compare with {@see self::copy_string()}
      *
      * @param mlang_version $version to execute copying on
      * @param string $fromstring source string identifier
      * @param string $fromcomponent source component name
      * @param string $tostring target string identifier
-     * @param string $tocomponet target component name
+     * @param string $tocomponent target component name
      * @param int $timestamp effective timestamp of the copy, null for now
      * @return mlang_stage to be committed
      */
@@ -2320,7 +2338,7 @@ class mlang_tools {
      * @param string $fromstring source string identifier
      * @param string $fromcomponent source component name
      * @param string $tostring target string identifier
-     * @param string $tocomponet target component name
+     * @param string $tocomponent target component name
      * @param int $timestamp effective timestamp of the move, null for now
      * @return mlang_stage to be committed
      */
@@ -2351,10 +2369,11 @@ class mlang_tools {
      * This is a temporary method and will be dropped once we have all English helps migrated. It does not do anything
      * yet. It is intended to be run once upon a checkout of 1.9 language files prepared just for this purpose.
      *
-     * @param mixed         $helpfile
-     * @param mixed         $tostring
-     * @param mixed         $tocomponent
-     * @param mixed         $timestamp
+     * @param mlang_version $version
+     * @param string $helpfile
+     * @param string $tostring
+     * @param string $tocomponent
+     * @param int|null $timestamp
      * @return mlang_stage
      */
     protected static function migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp=null) {
@@ -2395,7 +2414,7 @@ class mlang_tools {
 
         $newstyle = trim($newstyle);
 
-        // See {@link PARAM_COMPONENT}.
+        // See {@see PARAM_COMPONENT}.
         if (!preg_match('/^[a-z]+(_[a-z][a-z0-9_]*)?[a-z0-9]+$/', $newstyle)) {
             return false;
         }

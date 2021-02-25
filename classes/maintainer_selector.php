@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,9 +12,11 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
+ * Provides {@see local_amos_maintainer_selector} class.
+ *
  * @package     local_amos
  * @copyright   2014 David Mudrak <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/user/selector/lib.php');
 
+/**
+ * Allows to select language pack maintainer.
+ *
+ * @package     local_amos
+ * @copyright   2014 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_amos_maintainer_selector extends user_selector_base {
 
     /**
@@ -39,6 +48,12 @@ class local_amos_maintainer_selector extends user_selector_base {
         parent::__construct($name, $options);
     }
 
+    /**
+     * Find users based on search criteria
+     *
+     * @param string $search
+     * @return array
+     */
     public function find_users($search) {
         global $DB;
 

@@ -106,6 +106,8 @@ class mlang_php_parser implements mlang_parser {
     }
 
     /**
+     * Factory method.
+     *
      * @return singleton instance of mlang_php_parser
      */
     public static function get_instance() {

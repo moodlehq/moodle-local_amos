@@ -40,7 +40,7 @@ require_once($CFG->libdir.'/externallib.php');
 class update_strings_file extends \external_api {
 
     /**
-     * Describes parameters of the {@link execute()} method
+     * Describes parameters of the {@see execute()} method
      */
     public static function execute_parameters() {
 
@@ -66,7 +66,9 @@ class update_strings_file extends \external_api {
     /**
      * Imports component strings from a PHP strings file
      *
-     * @param string $components
+     * @param string $userinfo Name and email of the author to record into AMOS commit
+     * @param string $message Message describing the change to be committed into AMOS repository
+     * @param array $components of objects
      */
     public static function execute($userinfo, $message, $components) {
         global $CFG;
@@ -214,7 +216,7 @@ class update_strings_file extends \external_api {
     }
 
     /**
-     * Describes the return value of the {@link execute()} method
+     * Describes the return value of the {@see execute()} method
      *
      * @return external_description
      */

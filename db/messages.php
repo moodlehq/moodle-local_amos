@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Defines messages providers for AMOS
@@ -20,24 +20,24 @@
  * @package     local_amos
  * @category    message
  * @copyright   2014 David Mudrak <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$messageproviders = array(
-    // Results of the {@link amos_checker} checks for the maintainers.
-    'checker' => array(
+$messageproviders = [
+    // Results of the {@see amos_checker} checks for the maintainers.
+    'checker' => [
         'capability' => 'local/amos:commit',
-        'defaults' => array(
+        'defaults' => [
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-        ),
-    ),
+        ],
+    ],
 
     // Activity related to the contributed translations (workflow, comments).
-    'contribution' => array(
-        'defaults' => array(
+    'contribution' => [
+        'defaults' => [
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
-        ),
-    ),
-);
+        ],
+    ],
+];

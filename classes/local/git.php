@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link \local_amos\local\git} class.
+ * Provides the {@see \local_amos\local\git} class.
  *
  * @package     local_amos
  * @copyright   2019 David Mudrák <david@moodle.com>

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link \local_amos\task\import_workplace_plugins} class.
+ * Provides the {@see \local_amos\task\import_workplace_plugins} class.
  *
  * @package     local_amos
  * @category    task

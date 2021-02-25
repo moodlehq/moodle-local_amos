@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  */
 class translator implements \renderable, \templatable {
 
-    /** @const int number of rows per page */
+    /** Number of rows per page. */
     const PERPAGE = 100;
 
     /** @var int total number of found strings matching the filter */
@@ -60,6 +60,8 @@ class translator implements \renderable, \templatable {
     public $filter = null;
 
     /**
+     * Constructor.
+     *
      * @param \local_amos\output\filter $filter
      * @param object $user working with the translator
      */

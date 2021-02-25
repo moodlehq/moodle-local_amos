@@ -59,6 +59,12 @@ class local_amos_newlanguage_form extends moodleform {
         $this->add_action_buttons(false, 'Register new language');
     }
 
+    /**
+     * Validate the submitted form.
+     *
+     * @param array $data
+     * @param array $files
+     */
     public function validation($data, $files) {
         global $CFG, $DB;
 

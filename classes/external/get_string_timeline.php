@@ -50,7 +50,9 @@ class get_string_timeline extends \external_api {
     /**
      * Execute the external function.
      *
-     * @param string $filterquery
+     * @param string $component Component containing the string.
+     * @param string $strname String identifier.
+     * @param string $language Language code.
      * @return array
      */
     public static function execute(string $component, string $strname, string $language): array {

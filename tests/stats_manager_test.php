@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@link local_amos_stats_manager_test} class.
+ * Provides the {@see local_amos_stats_manager_test} class.
  *
  * @package     local_amos
  * @category    test
@@ -30,7 +30,7 @@ global $CFG;
 require_once($CFG->dirroot.'/local/amos/mlanglib.php');
 
 /**
- * Tests for the {@link local_amos_stats_manager} class.
+ * Tests for the {@see local_amos_stats_manager} class.
  */
 class local_amos_stats_manager_test extends advanced_testcase {
 

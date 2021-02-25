@@ -264,8 +264,9 @@ class local_amos_renderer extends plugin_renderer_base {
      *
      * @param string $title
      * @param string $content
-     * @param string $helpcicon
+     * @param string $helpicon
      * @param bool $expanded
+     * @param string $extraclasses
      * @return string
      */
     protected function collapsible_stage_tool($title, $content, $helpicon = '', $expanded = false, $extraclasses = '') {
@@ -362,7 +363,7 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Render single contribution record
      *
-     * @param local_amos_contribution $contribution
+     * @param local_amos_contribution $contrib
      * @return string
      */
     protected function render_local_amos_contribution(local_amos_contribution $contrib) {

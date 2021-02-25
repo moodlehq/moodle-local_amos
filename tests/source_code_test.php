@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@link local_amos_source_code_testcase} class.
+ * Provides {@see local_amos_source_code_testcase} class.
  *
  * @package     local_amos
  * @category    test
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 /**
- * Test the implementation of {@link \local_amos\local\source_code} class.
+ * Test the implementation of {@see \local_amos\local\source_code} class.
  *
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,7 @@ global $CFG;
 class local_amos_source_code_testcase extends advanced_testcase {
 
     /**
-     * Test {@link \local_amos\local\source_code::parse_version_php()}.
+     * Test {@see \local_amos\local\source_code::parse_version_php()}.
      */
     public function test_get_version_php() {
         global $CFG;
@@ -52,7 +52,7 @@ class local_amos_source_code_testcase extends advanced_testcase {
     }
 
     /**
-     * Test {@link \local_amos\local\source_code::get_included_string_files()}.
+     * Test {@see \local_amos\local\source_code::get_included_string_files()}.
      */
     public function test_get_included_string_files() {
 
@@ -68,7 +68,7 @@ class local_amos_source_code_testcase extends advanced_testcase {
         $foonew = new \local_amos\local\source_code(__DIR__.'/fixtures/mod_new');
         $files = $foonew->get_included_string_files();
 
-        $this->assertStringStartsWith('// Just a test file', $files['mod_new']['lang/en/new.php']);
+        $this->assertStringContainsString('// Just a test file', $files['mod_new']['lang/en/new.php']);
         $this->assertStringStartsWith('// Just a test file',
             $files['newsubtype_subplug']['subtype/subplug/lang/en/newsubtype_subplug.php']);
     }

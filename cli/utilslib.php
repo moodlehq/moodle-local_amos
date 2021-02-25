@@ -49,9 +49,16 @@ if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
  */
 class amos_cli_logger {
 
+    /** Error log message level. */
     const LEVEL_ERROR = 100;
+
+    /** Warning log message level. */
     const LEVEL_WARNING = 200;
+
+    /** Informational log message level. */
     const LEVEL_INFO = 300;
+
+    /** Debugging log message level. */
     const LEVEL_DEBUG = 400;
 
     /**
@@ -144,8 +151,10 @@ class amos_export_zip {
     protected $maxver;
 
     /**
-     * Instantinate the exporter job
+     * Instantiate the exporter job
      *
+     * @param amos_cli_logger $logger
+     * @param local_amos_stats_manager $statsman
      */
     public function __construct(amos_cli_logger $logger, local_amos_stats_manager $statsman = null) {
         global $CFG;
@@ -175,6 +184,9 @@ class amos_export_zip {
 
     /**
      * Initialize this exporter job instance
+     *
+     * @param int $minver
+     * @param int $maxver
      */
     public function init(?int $minver = null, ?int $maxver = null) {
 
@@ -230,7 +242,7 @@ class amos_export_zip {
     /**
      * Returns the list of mlang_versions that we should process
      *
-     * @return array {@link mlang_version} objects indexed by the version code
+     * @return array of {@see mlang_version} objects indexed by the version code
      */
     protected function get_versions() {
 
@@ -245,6 +257,9 @@ class amos_export_zip {
 
     /**
      * Set optional limits for processed versions.
+     *
+     * @param int $minver
+     * @param int $maxver
      */
     protected function init_versions_range(?int $minver, ?int $maxver) {
 
@@ -603,7 +618,7 @@ class amos_merge_string_files {
      *
      * @param string $filecontents the file contents to be modified
      * @param array $fromstrings list of strings and their values to be replaced
-     * @param array $tostring list of strings and their new values
+     * @param array $tostrings list of strings and their new values
      * @return int|false number of replaced strings, or false on error
      */
     public function replace_strings_in_file(&$filecontents, array $fromstrings, array $tostrings) {

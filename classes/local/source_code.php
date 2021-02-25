@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@link \local_amos\local\source_code} class.
+ * Provides {@see \local_amos\local\source_code} class.
  *
  * @package     local_amos
  * @copyright   2019 David Mudrák <david@moodle.com>

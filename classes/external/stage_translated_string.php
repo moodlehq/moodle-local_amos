@@ -50,6 +50,14 @@ class stage_translated_string extends \external_api {
 
     /**
      * Execute the external function.
+     *
+     * @param string $stageid Identifier of persistent AMOS stage to add the translation to
+     * @param int $originalid Identifier of English string used as a source for translation
+     * @param string $lang Code of the language
+     * @param string $text Raw text of the translation
+     * @param int|null $translationid Identifier of translation being updated
+     * @param bool $nocleaning Skip implicit cleaning of the input string
+     * @return array
      */
     public static function execute(string $stageid, int $originalid, string $lang, string $text,
             ?int $translationid = null, ?bool $nocleaning = false): array {

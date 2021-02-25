@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@link local_amos_git_testcase} class.
+ * Provides {@see local_amos_git_testcase} class.
  *
  * @package     local_amos
  * @category    test
@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 /**
- * Test the implementation of {@link \local_amos\local\git} class.
+ * Test the implementation of {@see \local_amos\local\git} class.
  *
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,7 @@ global $CFG;
 class local_amos_git_testcase extends basic_testcase {
 
     /**
-     * Test {@link \local_amos\local\git::exec()}.
+     * Test {@see \local_amos\local\git::exec()}.
      */
     public function test_exec() {
 
@@ -58,7 +58,7 @@ class local_amos_git_testcase extends basic_testcase {
     }
 
     /**
-     * Test {@link \local_amos\local\git::is_success()}.
+     * Test {@see \local_amos\local\git::is_success()}.
      */
     public function test_is_success() {
 
@@ -77,7 +77,7 @@ class local_amos_git_testcase extends basic_testcase {
     }
 
     /**
-     * Test {@link \local_amos\local\git::list_local_branches()}.
+     * Test {@see \local_amos\local\git::list_local_branches()}.
      */
     public function test_list_local_branches() {
 
@@ -99,7 +99,7 @@ class local_amos_git_testcase extends basic_testcase {
     }
 
     /**
-     * Test {@link \local_amos\local\git::has_local_branch()}.
+     * Test {@see \local_amos\local\git::has_local_branch()}.
      */
     public function test_has_local_branch() {
 

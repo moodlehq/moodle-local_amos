@@ -18,8 +18,17 @@
  * AMOS upgrade steps.
  *
  * @package     local_amos
- * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @category    upgrade
+ * @copyright   2010 David Mudrák <david@moodle.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Perform upgrade steps.
+ *
+ * @param int $oldversion Old version we are upgrading from.
  */
 function xmldb_local_amos_upgrade($oldversion) {
     global $CFG, $DB, $OUTPUT;

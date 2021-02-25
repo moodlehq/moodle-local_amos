@@ -46,7 +46,7 @@ class stage implements \renderable, \templatable {
     /** @var object holds the info needed to mimic a filter form */
     public $filterfields;
 
-    /** $var local_amos_importfile_form form to import data */
+    /** @var local_amos_importfile_form form to import data */
     public $importform;
 
     /** @var local_amos_execute_form to execute a given AMOScript */
@@ -65,6 +65,8 @@ class stage implements \renderable, \templatable {
     public $canstash = false;
 
     /**
+     * Constructor.
+     *
      * @param object $user the owner of the stage
      */
     public function __construct(object $user) {
