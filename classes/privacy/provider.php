@@ -47,7 +47,8 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  */
 class provider implements
         \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider {
+        \core_privacy\local\request\plugin\provider,
+        \core_privacy\local\request\core_userlist_provider {
 
     /**
      * Describe all the places where the AMOS plugin stores some personal data.
