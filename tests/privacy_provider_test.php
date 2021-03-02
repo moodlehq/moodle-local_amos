@@ -33,7 +33,21 @@ global $CFG;
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_privacy_provider_testcase extends advanced_testcase {
+class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
+
+    /**
+     * Test {@see \local_amos\privacy\provider::get_contexts_for_userid()} implementation.
+     */
+    public function test_get_contexts_for_userid() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $u = $this->getDataGenerator()->create_user();
+
+        $contextlist = \local_amos\privacy\provider::get_contexts_for_userid($u->id);
+        $this->assertInstanceOf(\core_privacy\local\request\contextlist::class, $contextlist);
+        $this->assertEquals([SYSCONTEXTID], $contextlist->get_contextids());
+    }
 
     /**
      * Test {@see \local_amos\privacy\provider::get_users_in_context()} implementation.
@@ -49,6 +63,7 @@ class local_amos_privacy_provider_testcase extends advanced_testcase {
         $u1 = $this->getDataGenerator()->create_user();
         $u2 = $this->getDataGenerator()->create_user();
         $u3 = $this->getDataGenerator()->create_user();
+        $u4 = $this->getDataGenerator()->create_user();
 
         $DB->insert_record('amos_commits', [
             'source' => 'test',
@@ -65,10 +80,47 @@ class local_amos_privacy_provider_testcase extends advanced_testcase {
             'status' => 0,
         ]);
 
+        $DB->insert_record('amos_preferences', [
+            'userid' => $u3->id,
+            'name' => 'test_pref_name',
+            'value' => 'Test preference value',
+        ]);
+
         \local_amos\privacy\provider::get_users_in_context($userlist);
 
-        $expected = [$u1->id, $u2->id];
+        $expected = [$u1->id, $u2->id, $u3->id];
         $actual = $userlist->get_userids();
         $this->assertEqualsCanonicalizing($expected, $actual);
+    }
+
+    /**
+     * Test {@see \local_amos\privacy\provider::export_data()} implementation.
+     */
+    public function test_export_user_data() {
+        global $DB;
+        $this->resetAfterTest();
+
+        $syscontext = \context_system::instance();
+
+        $u1 = $this->getDataGenerator()->create_user();
+
+        $DB->insert_record('amos_preferences', [
+            'userid' => $u1->id,
+            'name' => 'filter_default',
+            'value' => '{}',
+        ]);
+
+        $contextlist = new \core_privacy\local\request\approved_contextlist($u1, 'local_amos', [$syscontext->id]);
+
+        \local_amos\privacy\provider::export_user_data($contextlist);
+
+        $writer = \core_privacy\local\request\writer::with_context($syscontext);
+
+        $data = $writer->get_data([
+            'AMOS',
+            get_string('preferences', 'core'),
+        ]);
+
+        $this->assertEquals('{}', $data->filter_default);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - https://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Defines {@see \local_amos\privacy\provider} class.
@@ -20,7 +20,7 @@
  * @package     local_amos
  * @category    privacy
  * @copyright   2018 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_amos\privacy;
@@ -36,14 +36,14 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-require_once($CFG->dirroot.'/local/amos/locallib.php');
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/locallib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Privacy API implementation for the AMOS plugin.
  *
  * @copyright  2018 David Mudrák <david@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
         \core_privacy\local\metadata\provider,
@@ -88,6 +88,11 @@ class provider implements
            'timecreated' => 'privacy:metadata:db:amoscontributions:timecreated',
            'timemodified' => 'privacy:metadata:db:amoscontributions:timemodified',
         ], 'privacy:metadata:db:amoscontributions');
+
+        $collection->add_database_table('amos_preferences', [
+           'name' => 'privacy:metadata:db:amospreferences:name',
+           'value' => 'privacy:metadata:db:amospreferences:value',
+        ], 'privacy:metadata:db:amospreferences');
 
         $collection->add_subsystem_link('core_comment', [], 'privacy:metadata:subsystem:comment');
 
@@ -134,6 +139,10 @@ class provider implements
         // AMOS contributors.
         $sql = "SELECT userid FROM {amos_translators}";
         $userlist->add_from_sql('userid', $sql, []);
+
+        // Users' preferences.
+        $sql = "SELECT userid FROM {amos_preferences}";
+        $userlist->add_from_sql('userid', $sql, []);
     }
 
     /**
@@ -166,6 +175,7 @@ class provider implements
         static::export_user_data_contributions($user->id);
         static::export_user_data_credits($user->id);
         static::export_user_data_stashes($user->id);
+        static::export_user_data_preferences($user->id);
     }
 
     /**
@@ -377,6 +387,28 @@ class provider implements
                 $writer->export_related_data($subcontext, 'strings', $strings);
             }
         }
+    }
+
+    /**
+     * Export user's preferences.
+     *
+     * @param int $userid
+     */
+    protected static function export_user_data_preferences(int $userid) {
+        global $DB;
+
+        $writer = writer::with_context(\context_system::instance());
+
+        $data = (object) [];
+
+        foreach ($DB->get_records('amos_preferences', ['userid' => $userid], 'name', 'id, name, value') as $preference) {
+            $data->{$preference->name} = $preference->value;
+        }
+
+        $writer->export_data([
+            'AMOS',
+            get_string('preferences', 'core'),
+        ], $data);
     }
 
     /**
