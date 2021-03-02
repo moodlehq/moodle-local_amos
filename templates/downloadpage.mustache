@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template local_plugins/frontpage
+    @template local_amos/downloadpage
 
-    Template purpose and description.
+    Renders the HTML for language packs index at https://download.moodle.org/langpack/x.y/
 
     Classes required for JS:
     * none
@@ -26,10 +26,33 @@
     * none
 
     Context variables required for this template:
-    * attributes Array of name / value pairs.
+    * langpacks
+    * generatedlabel
+    * generateddatetime
 
     Example context (json):
-    {}
+    {
+        "langpacks": [
+            {
+                "haszip": true,
+                "langcode": "cs",
+                "langname": "Czech / Čeština",
+                "totalstrings": 28848,
+                "totalenglish": 28848,
+                "ratio": 100
+            },
+            {
+                "haszip": true,
+                "langcode": "cs_wp",
+                "langname": "Czech for Workplace / Čeština pro Workplace",
+                "parentlanguagecode": "cs",
+                "parentlanguagename": "Czech / Čeština",
+                "totalstrings": 43
+            }
+        ],
+        "generatedlabel": "2021-03-02 15:03 UTC",
+        "generateddatetime": "2021-03-02T15:03:19+00:00"
+    }
 }}
 
 <table class="generaltable" width="100%">

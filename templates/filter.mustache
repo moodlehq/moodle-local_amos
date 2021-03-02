@@ -35,6 +35,81 @@
 
     Context variables required for this template:
     * formaction
+    * lazyformname
+    * filterdata
+    * flng
+    * fcmp
+    * fver
+
+    Example context (json):
+    {
+        "formaction": "view.php",
+        "lazyformname": "amosfilter",
+        "filterdata": {
+            "missing": true
+        },
+        "flng": {
+            "options": [
+                {
+                    "value": "cs",
+                    "text": "Czech / Čeština [cs]",
+                    "selected": true
+                }
+            ]
+        },
+        "fcmp": {
+            "options": {
+                "core": [
+                    {
+                        "name": "core",
+                        "label": "core",
+                        "selected": true,
+                        "type": "core",
+                        "typename": "Core",
+                        "since": "2.0+",
+                        "app": "true"
+                    }
+                ],
+                "standard": [
+                    {
+                        "name": "workshop",
+                        "label": "mod_workshop",
+                        "selected": false,
+                        "type": "standard",
+                        "typename": "Standard",
+                        "since": "2.0+",
+                        "app": "true"
+                    }
+                ],
+                "contrib": [
+                    {
+                        "name": "theme_moove",
+                        "label": "theme_move",
+                        "selected": false,
+                        "type": "contrib",
+                        "typename": "Additional",
+                        "since": "3.1+",
+                        "app": "false"
+                    }
+                ]
+
+            }
+        },
+        "fver": {
+            "options": [
+                {
+                    "value": 39,
+                    "text": "3.9",
+                    "selected": true
+                },
+                {
+                    "value": 310,
+                    "text": "3.10",
+                    "selected": false
+                }
+            ]
+        }
+    }
 }}
 
 <div id="amosfilter" data-region="amosfilter" data-level-showadvanced="0" class="mb-3">
@@ -47,14 +122,14 @@
 
         <div class="form-group row" data-region="amosfilter_fcmp">
             <div class="col-md-2">
-                <label for="amosfilter_fcmp" class="mb-0">{{#str}} filtercmp, local_amos {{/str}}</label>
+                <label class="mb-0">{{#str}} filtercmp, local_amos {{/str}}</label>
                 <span class="badge badge-pill badge-info" id="amosfilter_fcmp_counter">{{fcmp.numselected}}</span>
                 <small id="amosfilter_fcmp_desc" class="form-text text-muted">{{#str}} filtercmp_desc, local_amos {{/str}}</small>
             </div>
 
             <div class="col-md-10">
                 <div class="form-control {{^fcmp.numselected}}is-invalid{{/fcmp.numselected}}" style="height: 7rem; overflow-y: scroll" id="amosfilter_fcmp">
-                    <table id="amosfilter_fcmp_items_table" border="0">
+                    <table id="amosfilter_fcmp_items_table">
                         <tr>
                             <th colspan="2">{{#str}} typecore, local_amos {{/str}}</th>
                         </tr>
@@ -83,16 +158,16 @@
 
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                         <label class="btn btn-light btn-sm">
-                            <input data-action="selectstandard" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsstandard, local_amos {{/str}}
+                            <input data-action="selectstandard" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsstandard, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input data-action="selectapp" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsapp, local_amos {{/str}}
+                            <input data-action="selectapp" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsapp, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input data-action="selectall" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsall, local_amos {{/str}}
+                            <input data-action="selectall" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsall, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
-                            <input data-action="selectnone" type="radio" name="amosfilter_fcmp_actions" autocomplete="off"> {{#str}} componentsnone, local_amos {{/str}}
+                            <input data-action="selectnone" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsnone, local_amos {{/str}}
                         </label>
                     </div>
                 </div>
@@ -134,7 +209,7 @@
         <div class="form-group row">
             <div class="col-md-2">
                 <div data-level="advanced" data-level-control="amosfilter_misc">
-                    <label for="amosfilter_misc">{{#str}} filtermis, local_amos {{/str}}</label>
+                    <label>{{#str}} filtermis, local_amos {{/str}}</label>
                     <small class="form-text text-muted">{{#str}} filtermis_desc, local_amos {{/str}}</small>
                 </div>
             </div>

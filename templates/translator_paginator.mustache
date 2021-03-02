@@ -17,22 +17,27 @@
 {{!
     @template local_amos/translator_paginator
 
-    Template purpose and description.
-
-    Classes required for JS:
-    * none
-
-    Data attributes required for JS:
-    * none
+    Renders the paginator widget.
 
     Context variables required for this template:
-    * attributes Array of name / value pairs.
+    * hasmultiplepages
+    * navigation
 
     Example context (json):
     {
-        "attributes": [
-            { "name": "src", "value": "http://moodle.com/wp-content/themes/moodle/images/logo-hat2.png" },
-            { "name": "class", "value": "iconsmall" }
+        "hasmultiplepages": true,
+        "navigation": [
+            {
+                "iscurrent": true,
+                "islink": false,
+                "label": 1
+            },
+            {
+                "iscurrent": false,
+                "islink": true,
+                "value": 2,
+                "label": 2
+            }
         ]
     }
 }}

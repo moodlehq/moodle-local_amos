@@ -18,6 +18,31 @@
     @template local_amos/filter_fcmp_option
 
     Render filter component selector's component line.
+
+    Selectors required for JS:
+    * amosfilter_fcmp - component selector id
+    * amosfilter_fcmp_counter - indicator of the number of selected components
+    * amosfilter_fcmp_search - searchfilterinput field
+
+    Context variables required for this template:
+    * name
+    * label
+    * selected
+    * type
+    * typename
+    * since
+    * app
+
+    Example context (json):
+    {
+        "name": "core",
+        "label": "core",
+        "selected": true,
+        "type": "core",
+        "typename": "Core",
+        "since": "2.0+",
+        "app": "true"
+    }
 }}
 
 <tr data-region="amosfilter_fcmp_item">

@@ -19,20 +19,40 @@
 
     Render the string translation timeline.
 
-    Classes required for JS:
-    * none
-
-    Data attributes required for JS:
-    * none
-
     Context variables required for this template:
-    * attributes Array of name / value pairs.
+    * changes
 
     Example context (json):
     {
-        "attributes": [
-            { "name": "src", "value": "http://moodle.com/wp-content/themes/moodle/images/logo-hat2.png" },
-            { "name": "class", "value": "iconsmall" }
+        "changes": [
+            {
+                "translation": {
+                    "hascontent": true,
+                    "displaysince": "2.0+",
+                    "langcode": "cs",
+                    "displaydate": "2006-05-03 16:26 UTC",
+                    "userinfo": "David Mudrak <david.mudrak@gmail.com>",
+                    "commitmsg": "David's first translations of 1.6 files.",
+                    "commitsource": "amos",
+                    "hascommithash": false,
+                    "displaytext": "Kurz"
+                }
+            },
+            {
+                "english": {
+                    "hascontent": true,
+                    "displaysince": "2.0+",
+                    "langcode": "en",
+                    "displaydate": "2006-02-06 09:28 UTC",
+                    "userinfo": "Martin Dougiamas <martin@moodle.com>",
+                    "commitmsg": "New base version of English in Unicode format",
+                    "commitsource": "git",
+                    "hascommithash": true,
+                    "commiturl": "https://github.com/moodle/moodle/commit/49aafb90bd6b08e4ad24b7d305c2e07595315d32",
+                    "commithash": "49aafb90bd6b08e4ad24b7d305c2e07595315d32",
+                    "displaytext": "Course"
+                }
+            }
         ]
     }
 }}
