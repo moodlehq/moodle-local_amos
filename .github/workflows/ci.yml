@@ -80,6 +80,8 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: Run mustache
+        # Some validation warnings are unavoidable as individual templates may not be fully valid HTML (e.g. table rows).
+        continue-on-error: true
         if: ${{ always() }}
         run: moodle-plugin-ci mustache
 
