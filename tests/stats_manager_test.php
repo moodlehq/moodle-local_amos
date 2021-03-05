@@ -244,22 +244,29 @@ class local_amos_stats_manager_test extends advanced_testcase {
         $this->helper_add_language('cs', 'Czech', 'Čeština');
         $this->helper_add_language('de_du', 'German (personal)', 'Deutsch (Du)', 'de');
         $this->helper_add_language('de', 'German', 'Deutsch');
+        $this->helper_add_language('en_us', 'English (US)', 'English (US)', 'en');
+        $this->helper_add_language('en_us_k12', 'English (US) K12', 'English (US) K12', 'en_us');
 
         $statsman->update_stats('400', 'en', 'moodle', 10);
         $statsman->update_stats('400', 'de_du', 'moodle', 1);
         $statsman->update_stats('400', 'cs', 'moodle', 9);
         $statsman->update_stats('400', 'de', 'moodle', 10);
+        $statsman->update_stats('400', 'en_us', 'moodle', 2);
+        $statsman->update_stats('400', 'en_us_k12', 'moodle', 3);
 
         $data = $statsman->get_language_pack_download_page_data(400);
 
-        $this->assertEquals(4, count($data));
+        $this->assertEquals(6, count($data));
         $this->assertEquals('cs', $data[0]['langcode']);
         $this->assertEquals('Czech / Čeština', $data[0]['langname']);
         $this->assertEquals('9', $data[0]['totalstrings']);
         $this->assertEquals('en', $data[1]['langcode']);
-        $this->assertEquals('de', $data[2]['langcode']);
-        $this->assertEquals('de_du', $data[3]['langcode']);
-        $this->assertEquals('de', $data[3]['parentlanguagecode']);
+        $this->assertEquals('en_us', $data[2]['langcode']);
+        $this->assertEquals('en_us_k12', $data[3]['langcode']);
+        $this->assertEquals('en_us', $data[3]['parentlanguagecode']);
+        $this->assertEquals('de', $data[4]['langcode']);
+        $this->assertEquals('de_du', $data[5]['langcode']);
+        $this->assertEquals('de', $data[5]['parentlanguagecode']);
     }
 
     /**

@@ -360,8 +360,8 @@ class local_amos_stats_manager {
                 continue;
             }
 
-            if (substr($langpack->langcode, 0, 3) === 'en_') {
-                $parent = 'en';
+            if ($langpack->langcode === 'en') {
+                $parent = '';
 
             } else {
                 $langconfig = mlang_component::from_snapshot('langconfig', $langpack->langcode, $version);
