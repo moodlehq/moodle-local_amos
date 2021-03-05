@@ -1868,7 +1868,10 @@ class mlang_tools {
             $rs->close();
 
             uasort($langs, function($a, $b) {
-                return strcmp($a['thislanguageint'], $b['thislanguageint']);
+                return strcmp(
+                    $a['thislanguageint'] ?? $a['thislanguage'],
+                    $b['thislanguageint'] ?? $b['thislanguage']
+                );
             });
 
             $cache->set('languages', $langs);
