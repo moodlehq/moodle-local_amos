@@ -1866,7 +1866,11 @@ class mlang_tools {
             }
 
             $rs->close();
-            asort($langs);
+
+            uasort($langs, function($a, $b) {
+                return strcmp($a['thislanguageint'], $b['thislanguageint']);
+            });
+
             $cache->set('languages', $langs);
         }
 
