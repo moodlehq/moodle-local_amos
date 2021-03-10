@@ -365,14 +365,21 @@ class local_amos_stats_manager {
 
             } else {
                 $langconfig = mlang_component::from_snapshot('langconfig', $langpack->langcode, $version);
+
                 if ($mlangstringparentlanguage = $langconfig->get_string('parentlanguage')) {
                     $parent = $mlangstringparentlanguage->text;
                 } else {
                     $parent = '';
                 }
+
                 if ($parent === 'en') {
                     $parent = '';
                 }
+            }
+
+            if (substr($langpack->langcode, 0, 3) === 'en_' && $parent === '') {
+                // Language packs with code en_* are implicit child packs of en, unless explicitly set to e.g. en_us.
+                $parent = 'en';
             }
 
             if (empty($parent)) {
@@ -423,11 +430,11 @@ class local_amos_stats_manager {
             return strcmp($a->langname, $b->langname);
         });
 
-        // Flatten the list.
+        // Flatten the list via anonymous recursive function.
         $result = [];
 
-        foreach ($stats as $langpack) {
-            $result[] = [
+        $processlangpack = function ($langpack) use (&$processlangpack, &$result) {
+            $data = [
                 'langcode' => $langpack->langcode,
                 'langname' => $langpack->langname,
                 'totalstrings' => $langpack->totalstrings,
@@ -435,18 +442,25 @@ class local_amos_stats_manager {
                 'ratio' => $langpack->ratio,
             ];
 
+            if (isset($langpack->parentlanguagecode)) {
+                $data['parentlanguagecode'] = $langpack->parentlanguagecode;
+            }
+
+            if (isset($langpack->parentlanguagename)) {
+                $data['parentlanguagename'] = $langpack->parentlanguagename;
+            };
+
+            $result[] = $data;
+
             if (!empty($langpack->childpacks)) {
                 foreach ($langpack->childpacks as $childpack) {
-                    $result[] = [
-                        'parentlanguagecode' => $childpack->parentlanguagecode,
-                        'langcode' => $childpack->langcode,
-                        'langname' => $childpack->langname,
-                        'totalstrings' => $childpack->totalstrings,
-                        'totalenglish' => $childpack->totalenglish,
-                        'ratio' => $childpack->ratio,
-                    ];
+                    $processlangpack($childpack);
                 }
             }
+        };
+
+        foreach ($stats as $langpack) {
+            $processlangpack($langpack);
         }
 
         return $result;
