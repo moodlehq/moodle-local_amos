@@ -1,5 +1,5 @@
 MDTSITE=lang.moodle.org
-MDTVERSION=3.10
+MDTVERSION=3.11
 MDTCOMPONENT=local_amos
 MDTRELPATH=local/amos/
 MDTEXPORT=origin/master
