@@ -529,9 +529,9 @@ if (has_capability('local/amos:commit', context_system::instance())) {
         }
 
         $sql = "SELECT c.id, c.lang, c.subject, c.message, c.stashid, c.status, c.timecreated, c.timemodified,
-                       s.components, s.strings,
-                       ".user_picture::fields('a', null, 'authorid', 'author').",
-                       ".user_picture::fields('m', null, 'assigneeid', 'assignee')."
+                       s.components, s.strings" .
+                       \core_user\fields::for_userpic()->get_sql('a', false, 'author', 'authorid')->selects .
+                       \core_user\fields::for_userpic()->get_sql('m', false, 'assignee', 'assigneeid')->selects . "
                   FROM {amos_contributions} c
                   JOIN {amos_stashes} s ON (c.stashid = s.id)
                   JOIN {user} a ON c.authorid = a.id
@@ -609,8 +609,8 @@ if (has_capability('local/amos:commit', context_system::instance())) {
 
 // Submitted contributions.
 $sql = "SELECT c.id, c.lang, c.subject, c.message, c.stashid, c.status, c.timecreated, c.timemodified,
-               s.components, s.strings,
-               ".user_picture::fields('m', null, 'assigneeid', 'assignee')."
+               s.components, s.strings" .
+               \core_user\fields::for_userpic()->get_sql('m', false, 'assignee', 'assigneeid')->selects . "
           FROM {amos_contributions} c
           JOIN {amos_stashes} s ON (c.stashid = s.id)
      LEFT JOIN {user} m ON c.assignee = m.id

@@ -65,8 +65,8 @@ if (empty($options['author'])) {
 }
 
 $sql = "SELECT c.id, c.lang, c.subject, c.stashid, c.status, c.timecreated,
-               s.components, s.strings, " .
-               user_picture::fields('a', null, 'authorid', 'author') . "
+               s.components, s.strings" .
+               \core_user\fields::for_userpic()->get_sql('a', false, 'author', 'authorid')->selects . "
           FROM {amos_contributions} c
           JOIN {amos_stashes} s ON (c.stashid = s.id)
           JOIN {user} a ON c.authorid = a.id

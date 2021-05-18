@@ -487,12 +487,12 @@ class local_amos_stats_manager {
               JOIN mdl_amos_stashes s ON c.stashid = s.id
              WHERE c.status = 30");
 
-        $namefields = get_all_user_name_fields(true, "u");
+        $namefields = \core_user\fields::for_name()->get_sql('u')->selects;
         $recent = $DB->get_records_sql("
-            SELECT c.authorid AS id, $namefields, MAX(c.timecreated) AS mostrecent
+            SELECT c.authorid AS id $namefields, MAX(c.timecreated) AS mostrecent
               FROM {amos_contributions} c
               JOIN {user} u ON u.id = c.authorid
-          GROUP BY c.authorid, $namefields
+          GROUP BY c.authorid $namefields
           ORDER BY mostrecent DESC", null, 0, 4);
 
         $links = array();
