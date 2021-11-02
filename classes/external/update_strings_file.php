@@ -218,7 +218,7 @@ class update_strings_file extends \external_api {
     /**
      * Describes the return value of the {@see execute()} method
      *
-     * @return external_description
+     * @return \external_multiple_structure
      */
     public static function execute_returns() {
 

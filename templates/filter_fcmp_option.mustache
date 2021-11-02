@@ -41,7 +41,8 @@
         "type": "core",
         "typename": "Core",
         "since": "2.0+",
-        "app": "true"
+        "app": "true",
+        "workplace": "true"
     }
 }}
 
@@ -49,7 +50,7 @@
     <td>
         <div class="form-check">
             <input class="form-check-input" {{#selected}} checked {{/selected}} type="checkbox" name="fcmp[]" id="amosfilter_fcmp_f_{{name}}" value="{{name}}"
-                data-component-type="{{type}}" {{#app}}data-component-app="1"{{/app}}>
+                data-component-type="{{type}}" {{#app}}data-component-app="1"{{/app}} {{#workplace}}data-component-workplace="1"{{/workplace}}>
             <label class="form-check-label" for="amosfilter_fcmp_f_{{name}}">{{label}}</label>
         </div>
     </td>
@@ -62,5 +63,8 @@
         {{#app}}
             <span class="badge badge-light"><i class="fa fa-mobile"></i> {{#str}} componentsapp, local_amos {{/str}}</span>
         {{/app}}
+        {{#workplace}}
+            <span class="badge badge-light"><i class="fa fa-briefcase"></i> {{#str}} componentsworkplace, local_amos {{/str}}</span>
+        {{/workplace}}
     </td>
 </tr>

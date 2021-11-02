@@ -157,22 +157,35 @@ const registerEventListeners = () => {
 const handleComponentSelectorAction = (e, fcmp, action) => {
 
     let selectorComponentItem = `:scope [data-region="amosfilter_fcmp_item"]:not(.hidden) input[name="fcmp[]"]`;
+    document.getElementById('amosfilter_fapp').checked = false;
+    document.getElementById('amosfilter_fworkplace').checked = false;
 
     if (action == 'selectstandard') {
         e.preventDefault();
-        let selectorByType = type => `${selectorComponentItem}[data-component-type="${type}"]`;
-        fcmp.querySelectorAll(`${selectorByType('core')}, ${selectorByType('standard')}`).forEach(item => {
-            item.checked = true;
+        fcmp.querySelectorAll(`${selectorComponentItem}`).forEach(item => {
+            var type = item.getAttribute('data-component-type');
+            item.checked = type == 'core' || type == 'standard';
         });
     }
 
-    if (action == 'selectapp') {
+    if (action == 'selectworkplace' || action == 'selectapp') {
         e.preventDefault();
-        fcmp.querySelectorAll(`${selectorComponentItem}[data-component-app]`).forEach(item => {
-            item.checked = true;
+        let selectedcomponent = '';
+
+        switch (action) {
+            case 'selectworkplace':
+                selectedcomponent = 'workplace';
+                break;
+            case 'selectapp':
+                selectedcomponent = 'app';
+                break;
+        }
+
+        fcmp.querySelectorAll(`${selectorComponentItem}`).forEach(item => {
+            item.checked = item.hasAttribute('data-component-' + selectedcomponent);
         });
 
-        document.getElementById('amosfilter_fapp').checked = true;
+        document.getElementById('amosfilter_f' + selectedcomponent).checked = true;
         showUsedAdvancedOptions();
     }
 

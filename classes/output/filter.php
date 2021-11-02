@@ -79,6 +79,7 @@ class filter implements \renderable, \templatable {
             'stringidpartial',
             'stagedonly',
             'app',
+            'workplace',
             'last',
             'page',
             'substringregex',
@@ -155,6 +156,7 @@ class filter implements \renderable, \templatable {
         $data->stringid = $data->stringid ?? '';
         $data->stagedonly = $data->stagedonly ?? false;
         $data->app = $data->app ?? false;
+        $data->workplace = $data->workplace ?? false;
         $data->last = $data->last ?? true;
         $data->page = $data->page ?? 1;
 
@@ -230,6 +232,7 @@ class filter implements \renderable, \templatable {
 
         $data->stagedonly = optional_param('fstg', false, PARAM_BOOL);
         $data->app = optional_param('fapp', false, PARAM_BOOL);
+        $data->workplace = optional_param('fworkplace', false, PARAM_BOOL);
 
         if ($data->missing and $data->outdated) {
             // It does not make sense to have both.
@@ -304,6 +307,7 @@ class filter implements \renderable, \templatable {
         }
 
         $data->app = false;
+        $data->workplace = false;
 
         $data->component = array();
         $fcmp = optional_param('c', '', PARAM_RAW);
@@ -316,6 +320,12 @@ class filter implements \renderable, \templatable {
             // Mobile App components.
             $data->component = array_keys(local_amos_app_plugins());
             $data->app = true;
+            $data->last = 1;
+
+        } else if ($fcmp == '*workplace') {
+            // Moodle Workplace components.
+            $data->component = local_amos_workplace_plugins();
+            $data->workplace = true;
             $data->last = 1;
 
         } else if ($fcmp == '*') {
@@ -349,6 +359,7 @@ class filter implements \renderable, \templatable {
 
         $data->stagedonly = optional_param('g', false, PARAM_BOOL);
         $data->app = optional_param('a', $data->app, PARAM_BOOL);
+        $data->workplace = optional_param('w', $data->workplace, PARAM_BOOL);
 
         // Reset the paginator to the first page for permalinks.
         $data->page = 1;
@@ -394,9 +405,12 @@ class filter implements \renderable, \templatable {
         $all = \mlang_tools::list_components();
         $app = array_keys(local_amos_app_plugins());
         $app = array_combine($app, $app);
+        $workplace = local_amos_workplace_plugins();
+        $workplace = array_combine($workplace, $workplace);
         foreach ($fdata->component as $selected) {
             unset($all[$selected]);
             unset($app[$selected]);
+            unset($workplace[$selected]);
         }
 
         // The '*std' cannot be preselected because it depends on version.
@@ -405,6 +419,9 @@ class filter implements \renderable, \templatable {
 
         } else if (empty($app)) {
             $permalink->param('c', '*app');
+
+        } else if (empty($workplace)) {
+            $permalink->param('c', '*workplace');
 
         } else {
             $permalink->param('c', implode(',', $fdata->component));
@@ -449,6 +466,10 @@ class filter implements \renderable, \templatable {
 
         if ($fdata->app) {
             $permalink->param('a', 1);
+        }
+
+        if ($fdata->workplace) {
+            $permalink->param('w', 1);
         }
 
         return $permalink;
@@ -562,6 +583,7 @@ class filter implements \renderable, \templatable {
         asort($options['contrib']);
 
         $mobileapp = local_amos_app_plugins();
+        $workplace = local_amos_workplace_plugins();
 
         foreach (['core', 'standard', 'contrib'] as $type) {
             foreach ($options[$type] as $componentname => $componentlabel) {
@@ -573,6 +595,7 @@ class filter implements \renderable, \templatable {
                     'typename' => get_string('type' . $type . 'badge', 'local_amos'),
                     'since' => $sinceversion[$componentname],
                     'app' => isset($mobileapp[$componentname]),
+                    'workplace' => in_array($componentname, $workplace),
                 ];
 
                 if ($type === 'contrib' && isset($stdversions[$componentname])) {

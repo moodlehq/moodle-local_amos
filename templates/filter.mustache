@@ -164,6 +164,9 @@
                             <input data-action="selectapp" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsapp, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
+                            <input data-action="selectworkplace" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsworkplace, local_amos {{/str}}
+                        </label>
+                        <label class="btn btn-light btn-sm">
                             <input data-action="selectall" type="radio" name="amosfilter_fcmp_actions"> {{#str}} componentsall, local_amos {{/str}}
                         </label>
                         <label class="btn btn-light btn-sm">
@@ -244,6 +247,11 @@
                     <div class="form-check" data-level="advanced" data-level-control="amosfilter_fapp">
                         <input class="form-check-input" {{#filterdata.app}} checked {{/filterdata.app}} type="checkbox" name="fapp" id="amosfilter_fapp" value="1">
                         <label class="form-check-label" for="amosfilter_fapp">{{#str}} filtermisfapp, local_amos {{/str}}</label>
+                    </div>
+
+                    <div class="form-check" data-level="advanced" data-level-control="amosfilter_fworkplace">
+                        <input class="form-check-input" {{#filterdata.workplace}} checked {{/filterdata.workplace}} type="checkbox" name="fworkplace" id="amosfilter_fworkplace" value="1">
+                        <label class="form-check-label" for="amosfilter_fworkplace">{{#str}} filtermisfworkplace, local_amos {{/str}}</label>
                     </div>
                 </fieldset>
             </div>

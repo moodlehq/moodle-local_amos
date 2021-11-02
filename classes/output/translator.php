@@ -91,6 +91,7 @@ class translator implements \renderable, \templatable {
         $stringidpartial = $filter->get_data()->stringidpartial;
         $stagedonly = $filter->get_data()->stagedonly;
         $app = $filter->get_data()->app;
+        $workplace = $filter->get_data()->workplace;
 
         // Prepare the SQL queries to load all the filtered strings and their translations.
         $params = [];
@@ -315,15 +316,20 @@ class translator implements \renderable, \templatable {
                         }
 
                         $applist = local_amos_applist_strings();
+                        $workplacelist = local_amos_workplace_plugins();
 
                         if ($component == 'local_moodlemobileapp') {
                             $string->app = $stringid;
-
                         } else if (isset($applist[$component.'/'.$stringid])) {
                             $string->app = $applist[$component.'/'.$stringid];
-
                         } else {
                             $string->app = false;
+                        }
+
+                        if (in_array($component, $workplacelist)) {
+                            $string->workplace = $component.'/'.$stringid;
+                        } else {
+                            $string->workplace = false;
                         }
 
                         unset($s[$lang][$component][$stringid]);
@@ -337,6 +343,10 @@ class translator implements \renderable, \templatable {
                         }
 
                         if ($app && !$string->app) {
+                            continue;
+                        }
+
+                        if ($workplace && !$string->workplace) {
                             continue;
                         }
 
@@ -463,8 +473,6 @@ class translator implements \renderable, \templatable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-        global $PAGE;
-
         $result = [
             'permalink' => $this->filter->get_permalink()->out(false),
             'found' => $this->numofrows,
@@ -490,6 +498,11 @@ class translator implements \renderable, \templatable {
             if ($string->app) {
                 $string->isappstring = true;
                 $string->infoapp = get_string('filtermisfapp_help', 'local_amos', $string->app);
+            }
+
+            if ($string->workplace) {
+                $string->isworkplacestring = true;
+                $string->infoworkplace = get_string('filtermisfworkplace_help', 'local_amos', $string->workplace);
             }
 
             $string->timelineurl = (new \moodle_url('/local/amos/timeline.php', [

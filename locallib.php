@@ -233,6 +233,16 @@ function local_amos_app_plugins() {
 }
 
 /**
+ * Returns the list of workplace components
+ *
+ * @return array (string)componentname
+ */
+function local_amos_workplace_plugins() {
+    $components = get_config('local_amos', 'workplacecomponents');
+    return explode(',', $components);
+}
+
+/**
  * Returns the list of app components
  *
  * @return array (string)component/(string)stringid => (string)appid

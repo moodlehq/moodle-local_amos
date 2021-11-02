@@ -59,6 +59,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
         $key = '/var/www/.ssh/moodle-workplace-pluginstrings.key';
 
         $this->git = new \local_amos\local\git($repo, $key);
+        $componentnames = [];
 
         foreach ($this->get_branches_to_process() as $branchname => $job) {
             $mver = \mlang_version::by_branch('MOODLE_'.$job['version'].'_STABLE');
@@ -101,8 +102,26 @@ class import_workplace_plugins extends \core\task\scheduled_task {
 
             foreach ($results as $result) {
                 mtrace('  '.$result['status'].' '.$result['componentname'].' '.$result['changes'].'/'.$result['found'].' changes');
+                if (!in_array($result['componentname'], $componentnames)) {
+                    $componentnames[] = $result['componentname'];
+                }
             }
         }
+
+        // Save workplace component names.
+        if (count($componentnames) > 0) {
+            self::mark_workplace_components($componentnames);
+        }
+    }
+
+    /**
+     * Marks Workplace components as such
+     *
+     * @param array $workplacecomponents
+     */
+    private static function mark_workplace_components(array $workplacecomponents): void {
+        $componentsstring = implode(',', $workplacecomponents);
+        set_config('workplacecomponents', $componentsstring, 'local_amos');
     }
 
     /**

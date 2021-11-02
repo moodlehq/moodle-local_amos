@@ -77,6 +77,7 @@
         "stringid": "course",
         "displaycomponent": "core",
         "isappstring": true,
+        "isworkplacestring": true,
         "displayoriginal": "Course",
         "hastranslationsincelabel": true,
         "displaytranslationsince": "2.0+",
@@ -111,6 +112,9 @@
                 {{#isappstring}}
                     | <i class="fa fa-mobile" title="{{app}}"></i>
                 {{/isappstring}}
+                {{#isworkplacestring}}
+                    | <i class="fa fa-briefcase" title="{{workplace}}"></i>
+                {{/isworkplacestring}}
             </div>
             <div class="amosoriginal">{{{displayoriginal}}}</div>
         </div>
