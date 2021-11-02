@@ -104,6 +104,20 @@
         <INDEX NAME="uq_appid" UNIQUE="true" FIELDS="appid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="amos_workplace_strings" COMMENT="Defines the strings that are being used in Moodle Workplace.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component name of the string"/>
+        <FIELD NAME="stringid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier"/>
+        <FIELD NAME="workplaceid" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The string identifier in Moodle Workplace"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="uq_workplaceid" UNIQUE="true" FIELDS="workplaceid"/>
+      </INDEXES>
+    </TABLE>
     <TABLE NAME="amos_strings" COMMENT="English strings and their history">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

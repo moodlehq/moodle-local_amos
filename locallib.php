@@ -233,6 +233,24 @@ function local_amos_app_plugins() {
 }
 
 /**
+ * Returns the list of workplace components
+ *
+ * @return array (string)frankenstylename
+ */
+function local_amos_workplace_plugins() {
+    global $DB;
+
+    static $list = null;
+
+    if (is_null($list)) {
+        $components = $DB->get_fieldset_select('amos_workplace_strings', 'DISTINCT component', "");
+        $list = array_combine($components, $components);
+    }
+
+    return $list;
+}
+
+/**
  * Returns the list of app components
  *
  * @return array (string)component/(string)stringid => (string)appid
@@ -252,6 +270,27 @@ function local_amos_applist_strings() {
     }
 
     return $applist;
+}
+/**
+ * Returns the list of workplace components
+ *
+ * @return array (string)component/(string)stringid => (string)workplaceid
+ */
+function local_amos_workplacelist_strings() {
+    global $DB;
+
+    static $workplacelist = null;
+
+    if (is_null($workplacelist)) {
+        // Get the workplace strings.
+        $workplacelist = array();
+        $rs = $DB->get_records('amos_workplace_strings');
+        foreach ($rs as $s) {
+            $workplacelist[$s->component.'/'.$s->stringid] = $s->workplaceid;
+        }
+    }
+
+    return $workplacelist;
 }
 
 /**

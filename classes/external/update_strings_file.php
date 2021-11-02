@@ -56,6 +56,7 @@ class update_strings_file extends \external_api {
                             'language' => new \external_value(PARAM_SAFEDIR, 'The code of the language (eg. en)'),
                             'stringfilename' => new \external_value(PARAM_FILE, 'The name of the strings file (eg. stampcoll.php)'),
                             'stringfilecontent' => new \external_value(PARAM_RAW, 'The content of the strings file.'),
+                            'version' => new \external_value(PARAM_RAW, 'The version of the component.', VALUE_OPTIONAL),
                         ]
                     )
                 )
@@ -116,6 +117,9 @@ class update_strings_file extends \external_api {
 
         // List of processed components for later auto-merge.
         $componentnames = [];
+
+        // List of new and changed workplace translations.
+        $workplacestrings = [];
 
         // Iterate over all passed components and process them.
         foreach ($components as $component) {
@@ -182,6 +186,23 @@ class update_strings_file extends \external_api {
             $tmpstage->rebase(null, true);
             list($numofstrings, $listlanguages, $listcomponents) = \mlang_stage::analyze($tmpstage);
             $result['changes'] = $numofstrings;
+
+            // Save changed or new workplace string keys in a variable.
+            if ($userinfo === 'Moodle Workplace <workplace@moodle.com>') {
+                $message = 'Strings for '.$component->componentname.' '.$component->version;
+                foreach ($tmpstage as $workplacecomponent) {
+                    foreach ($workplacecomponent->get_string_keys() as $stringkey) {
+                        $fullkey = 'addon.' . $workplacecomponent->name . '.' . $stringkey;
+                        $workplacestrings[$fullkey] = (object) [
+                            'component' => $mlangcomponent->name,
+                            'stringid' => $stringkey,
+                            'workplaceid' => $fullkey
+                        ];
+                    }
+                }
+            }
+
+            // Clear $tmpstage.
             $tmpstage->clear();
             unset($tmpstage);
             $result['status'] = 'ok';
@@ -190,8 +211,8 @@ class update_strings_file extends \external_api {
             $stage->add($mlangcomponent);
 
             // Remember the names of components we processed.
-            foreach ($stage as $component) {
-                $componentnames[$component->name] = true;
+            foreach ($stage as $processedcomponent) {
+                $componentnames[$processedcomponent->name] = true;
             }
 
             // Rebase and mark missing strings as deleted.
@@ -211,14 +232,33 @@ class update_strings_file extends \external_api {
             \mlang_tools::backport_translations($componentname);
         }
 
+        // Save workplace translation keys.
+        if (count($workplacestrings) > 0) {
+            self::mark_workplace_strings($workplacestrings);
+        }
+
         // Done! Thank you for calling this web service.
         return $results;
     }
 
     /**
+     * Marks Workplace plugin translations as such
+     *
+     * @param array $workplacestrings
+     */
+    private static function mark_workplace_strings(array $workplacestrings): void {
+        global $DB;
+
+        $DB->delete_records_list('amos_workplace_strings', 'workplaceid', array_keys($workplacestrings));
+        $DB->insert_records('amos_workplace_strings',  $workplacestrings);
+
+        mtrace(count($workplacestrings) .' workplace strings inserted');
+    }
+
+    /**
      * Describes the return value of the {@see execute()} method
      *
-     * @return external_description
+     * @return \external_multiple_structure
      */
     public static function execute_returns() {
 
