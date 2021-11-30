@@ -413,11 +413,11 @@ class translator implements \renderable, \templatable {
             }
         }
 
-        $standard = \local_amos\local\util::standard_components_tree();
+        $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($this->strings as $string) {
             if ($string->language === 'en_fix') {
-                if (!isset($standard[$string->englishsincecode][$string->component])) {
+                if (!isset($standard[$string->component])) {
                     $string->committable = false;
                     $string->translatable = false;
                     $string->translation = get_string('unableenfixaddon', 'local_amos');
