@@ -405,7 +405,7 @@ class filter implements \renderable, \templatable {
         $all = \mlang_tools::list_components();
         $app = array_keys(local_amos_app_plugins());
         $app = array_combine($app, $app);
-        $workplace = array_keys(local_amos_workplace_plugins());
+        $workplace = local_amos_workplace_plugins();
         $workplace = array_combine($workplace, $workplace);
         foreach ($fdata->component as $selected) {
             unset($all[$selected]);
@@ -595,7 +595,7 @@ class filter implements \renderable, \templatable {
                     'typename' => get_string('type' . $type . 'badge', 'local_amos'),
                     'since' => $sinceversion[$componentname],
                     'app' => isset($mobileapp[$componentname]),
-                    'workplace' => isset($workplace[$componentname]),
+                    'workplace' => in_array($componentname, $workplace),
                 ];
 
                 if ($type === 'contrib' && isset($stdversions[$componentname])) {

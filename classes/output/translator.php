@@ -326,8 +326,8 @@ class translator implements \renderable, \templatable {
                             $string->app = false;
                         }
 
-                        if (isset($workplacelist[$component.'/'.$stringid])) {
-                            $string->workplace = $workplacelist[$component.'/'.$stringid];
+                        if (in_array($component, $workplacelist)) {
+                            $string->workplace = $component.'/'.$stringid;
                         } else {
                             $string->workplace = false;
                         }
