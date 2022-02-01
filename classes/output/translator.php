@@ -316,7 +316,7 @@ class translator implements \renderable, \templatable {
                         }
 
                         $applist = local_amos_applist_strings();
-                        $workplacelist = local_amos_workplacelist_strings();
+                        $workplacelist = local_amos_workplace_plugins();
 
                         if ($component == 'local_moodlemobileapp') {
                             $string->app = $stringid;

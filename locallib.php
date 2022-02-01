@@ -238,9 +238,8 @@ function local_amos_app_plugins() {
  * @return array (string)componentname
  */
 function local_amos_workplace_plugins() {
-    //get_config('local_amos', 'workplacecomponents');
-    //set_config('workplacecomponents', 'tool_certification,tool_program', 'local_amos');
-    return ['tool_certification'];
+    $components = get_config('local_amos', 'workplacecomponents');
+    return explode(',', $components);
 }
 
 /**
@@ -263,16 +262,6 @@ function local_amos_applist_strings() {
     }
 
     return $applist;
-}
-/**
- * Returns the list of workplace components
- *
- * @return array (string)componentname
- */
-function local_amos_workplacelist_strings() {
-    //get_config('local_amos', 'workplacecomponents');
-    //set_config('workplacecomponents', 'tool_certification,tool_program', 'local_amos');
-    return ['tool_certification'];
 }
 
 /**

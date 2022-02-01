@@ -190,16 +190,6 @@ class update_strings_file extends \external_api {
             // Save changed or new workplace string keys in a variable.
             if ($userinfo === 'Moodle Workplace <workplace@moodle.com>') {
                 $message = 'Strings for '.$component->componentname.' '.$component->version;
-                foreach ($tmpstage as $workplacecomponent) {
-                    foreach ($workplacecomponent->get_string_keys() as $stringkey) {
-                        $fullkey = 'addon.' . $workplacecomponent->name . '.' . $stringkey;
-                        $workplacestrings[$fullkey] = (object) [
-                            'component' => $mlangcomponent->name,
-                            'stringid' => $stringkey,
-                            'workplaceid' => $fullkey
-                        ];
-                    }
-                }
             }
 
             // Clear $tmpstage.
@@ -232,27 +222,8 @@ class update_strings_file extends \external_api {
             \mlang_tools::backport_translations($componentname);
         }
 
-        // Save workplace translation keys.
-        if (count($workplacestrings) > 0) {
-            self::mark_workplace_strings($workplacestrings);
-        }
-
         // Done! Thank you for calling this web service.
         return $results;
-    }
-
-    /**
-     * Marks Workplace plugin translations as such
-     *
-     * @param array $workplacestrings
-     */
-    private static function mark_workplace_strings(array $workplacestrings): void {
-        global $DB;
-
-        $DB->delete_records_list('amos_workplace_strings', 'workplaceid', array_keys($workplacestrings));
-        $DB->insert_records('amos_workplace_strings',  $workplacestrings);
-
-        mtrace(count($workplacestrings) .' workplace strings inserted');
     }
 
     /**
