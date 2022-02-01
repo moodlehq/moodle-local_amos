@@ -60,7 +60,6 @@ class import_workplace_plugins extends \core\task\scheduled_task {
 
         $this->git = new \local_amos\local\git($repo, $key);
         $components = [];
-        $componentnames = [];
 
         foreach ($this->get_branches_to_process() as $branchname => $job) {
             $mver = \mlang_version::by_branch('MOODLE_'.$job['version'].'_STABLE');
@@ -79,7 +78,6 @@ class import_workplace_plugins extends \core\task\scheduled_task {
             foreach ($code->get_included_string_files() as $componentname => $stringfiles) {
                 $stringfilecontent = reset($stringfiles);
                 $stringfilepath = key($stringfiles);
-                $componentnames[] = $componentname;
 
                 $component = [
                     'componentname' => $componentname,
@@ -100,15 +98,20 @@ class import_workplace_plugins extends \core\task\scheduled_task {
             'Strings for Moodle Workplace',
             $components
         );
-        // Save workplace translation keys.
-        if (count($componentnames) > 0) {
-            self::mark_workplace_components(array_unique($componentnames));
-        }
 
         $results = \external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $results);
+        $componentnames = [];
 
         foreach ($results as $result) {
             mtrace('  '.$result['status'].' '.$result['componentname'].' '.$result['changes'].'/'.$result['found'].' changes');
+            if (!in_array($result['componentname'], $componentnames)) {
+                $componentnames[] = $result['componentname'];
+            }
+        }
+
+        // Save workplace component names.
+        if (count($componentnames) > 0) {
+            self::mark_workplace_components($componentnames);
         }
     }
 
