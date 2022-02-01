@@ -324,7 +324,7 @@ class filter implements \renderable, \templatable {
 
         } else if ($fcmp == '*workplace') {
             // Moodle Workplace components.
-            $data->component = array_keys(local_amos_workplace_plugins());
+            $data->component = local_amos_workplace_plugins();
             $data->workplace = true;
             $data->last = 1;
 

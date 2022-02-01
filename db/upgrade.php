@@ -669,27 +669,5 @@ function xmldb_local_amos_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020111800, 'local', 'amos');
     }
 
-    if ($oldversion < 2021110200) {
-        // Install amos_workplace_strings table from install.xml.
-        if (!$dbman->table_exists(new xmldb_table('amos_workplace_strings'))) {
-            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_workplace_strings');
-        }
-
-        require_once($CFG->dirroot.'/local/amos/db/workplace_string_ids.php');
-
-        foreach ($workplacestrings as $component => $componentstrings) {
-            foreach ($componentstrings as $componentstring) {
-                $string = new stdClass();
-                $string->component = $component;
-                $string->stringid = $componentstring;
-                $string->workplaceid = 'addon.' . $component . '.' . $componentstring;
-                $DB->insert_record('amos_workplace_strings', $string);
-            }
-        }
-
-        // Amos savepoint reached.
-        upgrade_plugin_savepoint(true, 2021110200, 'local', 'amos');
-    }
-
     return $result;
 }

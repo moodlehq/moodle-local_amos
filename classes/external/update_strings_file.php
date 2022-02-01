@@ -118,9 +118,6 @@ class update_strings_file extends \external_api {
         // List of processed components for later auto-merge.
         $componentnames = [];
 
-        // List of new and changed workplace translations.
-        $workplacestrings = [];
-
         // Iterate over all passed components and process them.
         foreach ($components as $component) {
             $stage = new \mlang_stage();
@@ -187,7 +184,7 @@ class update_strings_file extends \external_api {
             list($numofstrings, $listlanguages, $listcomponents) = \mlang_stage::analyze($tmpstage);
             $result['changes'] = $numofstrings;
 
-            // Save changed or new workplace string keys in a variable.
+            // Change message for workplace strings.
             if ($userinfo === 'Moodle Workplace <workplace@moodle.com>') {
                 $message = 'Strings for '.$component->componentname.' '.$component->version;
             }
