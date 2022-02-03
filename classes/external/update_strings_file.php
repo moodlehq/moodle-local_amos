@@ -56,7 +56,6 @@ class update_strings_file extends \external_api {
                             'language' => new \external_value(PARAM_SAFEDIR, 'The code of the language (eg. en)'),
                             'stringfilename' => new \external_value(PARAM_FILE, 'The name of the strings file (eg. stampcoll.php)'),
                             'stringfilecontent' => new \external_value(PARAM_RAW, 'The content of the strings file.'),
-                            'version' => new \external_value(PARAM_RAW, 'The version of the component.', VALUE_OPTIONAL),
                         ]
                     )
                 )
@@ -183,13 +182,6 @@ class update_strings_file extends \external_api {
             $tmpstage->rebase(null, true);
             list($numofstrings, $listlanguages, $listcomponents) = \mlang_stage::analyze($tmpstage);
             $result['changes'] = $numofstrings;
-
-            // Change message for workplace strings.
-            if ($userinfo === 'Moodle Workplace <workplace@moodle.com>') {
-                $message = 'Strings for '.$component->componentname.' '.$component->version;
-            }
-
-            // Clear $tmpstage.
             $tmpstage->clear();
             unset($tmpstage);
             $result['status'] = 'ok';
@@ -198,8 +190,8 @@ class update_strings_file extends \external_api {
             $stage->add($mlangcomponent);
 
             // Remember the names of components we processed.
-            foreach ($stage as $processedcomponent) {
-                $componentnames[$processedcomponent->name] = true;
+            foreach ($stage as $component) {
+                $componentnames[$component->name] = true;
             }
 
             // Rebase and mark missing strings as deleted.

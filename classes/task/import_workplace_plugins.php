@@ -59,7 +59,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
         $key = '/var/www/.ssh/moodle-workplace-pluginstrings.key';
 
         $this->git = new \local_amos\local\git($repo, $key);
-        $components = [];
+        $componentnames = [];
 
         foreach ($this->get_branches_to_process() as $branchname => $job) {
             $mver = \mlang_version::by_branch('MOODLE_'.$job['version'].'_STABLE');
@@ -69,11 +69,13 @@ class import_workplace_plugins extends \core\task\scheduled_task {
                 continue;
             }
 
-            mtrace(' Preparing strings from '.$job['plugin'].' for '.$mver->branch);
+            mtrace(' Importing strings from '.$job['plugin'].' for '.$mver->branch);
 
             $path = $this->export_branch_to_temp($branchname);
             $code = new \local_amos\local\source_code($path);
             $info = $code->get_version_php();
+
+            $components = [];
 
             foreach ($code->get_included_string_files() as $componentname => $stringfiles) {
                 $stringfilecontent = reset($stringfiles);
@@ -85,27 +87,24 @@ class import_workplace_plugins extends \core\task\scheduled_task {
                     'language' => 'en',
                     'stringfilename' => basename($stringfilepath),
                     'stringfilecontent' => $stringfilecontent,
-                    'version' => $info['version'],
                 ];
 
                 $components[] = $component;
             }
-        }
 
-        mtrace(' Importing all strings for Moodle Workplace');
-        $results = \local_amos\external\update_strings_file::execute(
-            'Moodle Workplace <workplace@moodle.com>',
-            'Strings for Moodle Workplace',
-            $components
-        );
+            $results = \local_amos\external\update_strings_file::execute(
+                'Moodle Workplace <workplace@moodle.com>',
+                'Strings for '.$componentname.' '.$info['version'],
+                $components
+            );
 
-        $results = \external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $results);
-        $componentnames = [];
+            $results = \external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $results);
 
-        foreach ($results as $result) {
-            mtrace('  '.$result['status'].' '.$result['componentname'].' '.$result['changes'].'/'.$result['found'].' changes');
-            if (!in_array($result['componentname'], $componentnames)) {
-                $componentnames[] = $result['componentname'];
+            foreach ($results as $result) {
+                mtrace('  '.$result['status'].' '.$result['componentname'].' '.$result['changes'].'/'.$result['found'].' changes');
+                if (!in_array($result['componentname'], $componentnames)) {
+                    $componentnames[] = $result['componentname'];
+                }
             }
         }
 
