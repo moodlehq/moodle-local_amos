@@ -268,7 +268,10 @@ class filter implements \renderable, \templatable {
         $data->version = [];
         $fver = optional_param('v', '', PARAM_RAW);
 
+        $data->last = 1;
+
         if ($fver !== 'l') {
+            $data->last = 0;
             $fver = explode(',', $fver);
             $fver = clean_param_array($fver, PARAM_INT);
             if (!empty($fver) && is_array($fver)) {
@@ -276,12 +279,10 @@ class filter implements \renderable, \templatable {
                 foreach (\mlang_version::list_all() as $version) {
                     if ($version->code == $fver) {
                         $data->version = $version->code;
+                        $data->last = 0;
                     }
                 }
             }
-
-        } else {
-            $data->last = 1;
         }
 
         $data->language = array();
@@ -320,13 +321,11 @@ class filter implements \renderable, \templatable {
             // Mobile App components.
             $data->component = array_keys(local_amos_app_plugins());
             $data->app = true;
-            $data->last = 1;
 
         } else if ($fcmp == '*workplace') {
             // Moodle Workplace components.
             $data->component = local_amos_workplace_plugins();
             $data->workplace = true;
-            $data->last = 1;
 
         } else if ($fcmp == '*') {
             // All components.
