@@ -88,7 +88,7 @@ if ($hassiteconfig) {
             'local_amos/applangindexfile',
             get_string('applangindexfile', 'local_amos'),
             get_string('applangindexfile_desc', 'local_amos'),
-            'https://raw.githubusercontent.com/moodlehq/moodlemobile2/integration/scripts/langindex.json',
+            'https://raw.githubusercontent.com/moodlehq/moodle-local_moodlemobileapp/master/langindex.json',
             PARAM_URL
         ));
     }
