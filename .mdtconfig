@@ -2,4 +2,4 @@ MDTSITE=lang.moodle.org
 MDTVERSION=4.0
 MDTCOMPONENT=local_amos
 MDTRELPATH=local/amos/
-MDTEXPORT=origin/main
+MDTEXPORT=origin/MOODLE_400_STABLE
