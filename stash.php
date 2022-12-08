@@ -42,6 +42,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/stash.php');
 navigation_node::override_active_url(new moodle_url('/local/amos/stash.php'));
 $PAGE->set_title('AMOS ' . get_string('stashes', 'local_amos'));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_heading('AMOS ' . get_string('stashes', 'local_amos'));
 
 if ($new) {

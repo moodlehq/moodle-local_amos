@@ -35,6 +35,7 @@ $cache->delete('languages');
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/admin/newlanguage.php');
 $PAGE->set_title('AMOS ' . get_string('newlanguage', 'local_amos'));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_heading('AMOS ' . get_string('newlanguage', 'local_amos'));
 
 $form = new local_amos_newlanguage_form();

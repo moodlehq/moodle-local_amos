@@ -33,6 +33,7 @@ require_capability('local/amos:stage', context_system::instance());
 $PAGE->set_pagelayout('standard');
 $PAGE->set_url('/local/amos/view.php');
 $PAGE->set_title('AMOS ' . get_string('translatortool', 'local_amos'));
+$PAGE->set_context(context_system::instance());
 $PAGE->set_heading('AMOS ' . get_string('translatortool', 'local_amos'));
 
 $output = $PAGE->get_renderer('local_amos');
