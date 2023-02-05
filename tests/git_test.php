@@ -71,7 +71,7 @@ class local_amos_git_testcase extends basic_testcase {
         $git->exec('commit -m "Initial commit"');
         $git->exec('checkout -b slave 2>/dev/null');
 
-        $this->assertTrue($git->is_success('show-ref --verify --quiet refs/heads/master'));
+        $this->assertTrue($git->is_success('show-ref --verify --quiet refs/heads/main'));
         $this->assertTrue($git->is_success('show-ref --verify --quiet refs/heads/slave'));
         $this->assertFalse($git->is_success('show-ref --verify --quiet refs/heads/justice_exists'));
     }
@@ -90,11 +90,11 @@ class local_amos_git_testcase extends basic_testcase {
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
-        $this->assertEquals(['master'], $git->list_local_branches());
+        $this->assertEquals(['main'], $git->list_local_branches());
 
         $git->exec('checkout -b slave 2>/dev/null');
         $this->assertEquals(2, count($git->list_local_branches()));
-        $this->assertContains('master', $git->list_local_branches());
+        $this->assertContains('main', $git->list_local_branches());
         $this->assertContains('slave', $git->list_local_branches());
     }
 
@@ -112,7 +112,7 @@ class local_amos_git_testcase extends basic_testcase {
         $git->exec('commit -m "Initial commit"');
         $git->exec('checkout -b slave 2>/dev/null');
 
-        $this->assertTrue($git->has_local_branch('master'));
+        $this->assertTrue($git->has_local_branch('main'));
         $this->assertTrue($git->has_local_branch('slave'));
         $this->assertFalse($git->has_local_branch('justice_exists'));
     }
