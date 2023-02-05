@@ -43,7 +43,7 @@ class local_amos_git_testcase extends basic_testcase {
         $repo = make_request_directory();
         $git = new \local_amos\local\git($repo);
 
-        $out = $git->exec('init');
+        $out = $git->exec('init --initial-branch=main');
         $this->assertEquals('Initialized empty Git repository in '.$repo.'/.git/', $out[0]);
 
         file_put_contents($repo.'/README.txt', 'Hello world');
@@ -65,7 +65,7 @@ class local_amos_git_testcase extends basic_testcase {
         $repo = make_request_directory();
         $git = new \local_amos\local\git($repo);
 
-        $git->exec('init');
+        $git->exec('init --initial-branch=main');
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
@@ -84,7 +84,7 @@ class local_amos_git_testcase extends basic_testcase {
         $repo = make_request_directory();
         $git = new \local_amos\local\git($repo);
 
-        $git->exec('init');
+        $git->exec('init --initial-branch=main');
         $this->assertSame([], $git->list_local_branches());
 
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
@@ -106,7 +106,7 @@ class local_amos_git_testcase extends basic_testcase {
         $repo = make_request_directory();
         $git = new \local_amos\local\git($repo);
 
-        $git->exec('init');
+        $git->exec('init --initial-branch=main');
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
