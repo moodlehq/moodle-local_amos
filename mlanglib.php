@@ -2022,7 +2022,9 @@ class mlang_tools {
         switch ($cmd) {
             // phpcs:disable Squiz.PHP.CommentedOutCode
             case 'CPY':
+            case 'MOV':
                 // CPY [sourcestring,sourcecomponent],[targetstring,targetcomponent].
+                // MOV [sourcestring,sourcecomponent],[targetstring,targetcomponent].
                 if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
                     array_map('trim', $matches);
                     $fromcomponent = self::legacy_component_name($matches[2]);
@@ -2045,21 +2047,6 @@ class mlang_tools {
                     if ($fromcomponent and $tocomponent) {
                         return self::forced_copy_string($version, $matches[1], $fromcomponent,
                             $matches[3], $tocomponent, $timestamp);
-                    } else {
-                        return self::STATUS_SYNTAX_ERROR;
-                    }
-                } else {
-                    return self::STATUS_SYNTAX_ERROR;
-                }
-                break;
-            case 'MOV':
-                // MOV [sourcestring,sourcecomponent],[targetstring,targetcomponent].
-                if (preg_match('/\[(.+),(.+)\]\s*,\s*\[(.+),(.+)\]/', $arg, $matches)) {
-                    array_map('trim', $matches);
-                    $fromcomponent = self::legacy_component_name($matches[2]);
-                    $tocomponent = self::legacy_component_name($matches[4]);
-                    if ($fromcomponent and $tocomponent) {
-                        return self::move_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
                     } else {
                         return self::STATUS_SYNTAX_ERROR;
                     }
@@ -2340,6 +2327,9 @@ class mlang_tools {
      *
      * Deleted strings are not moved. If the target string already exists (and is not deleted), it is
      * not overwritten.
+     *
+     * Note: This function is not actually used any more. The MOV command is now an alias of CPY and
+     * strings are kept in the language packs.
      *
      * @param mlang_version $version to execute moving on
      * @param string $fromstring source string identifier

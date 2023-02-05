@@ -1311,7 +1311,8 @@ EOF;
         $component->clear();
 
         $component = mlang_component::from_snapshot('auth', 'cs', $version);
-        $this->assertFalse($component->has_string('ldap'));
+        // The MOV command is an alias for CPY now, it does not actually remove anything.
+        $this->assertTrue($component->has_string('ldap'));
         $component->clear();
 
         $component = mlang_component::from_snapshot('auth', 'en', $version);
@@ -1382,11 +1383,27 @@ AMOS END';
             }
         }
 
-        // Check the results.
-        $component = mlang_component::from_snapshot('admin', 'cs', $version, $now);
-        $this->assertTrue($component->has_string('sitepolicy_help'));
-        $this->assertEquals('OLD in cs', $component->get_string('sitepolicy_help')->text);
-        $this->assertEquals(1, $component->get_number_of_strings());
+        // The moved string is gone from English.
+        $componenten = mlang_component::from_snapshot('admin', 'en', $version, $now);
+        $this->assertFalse($componenten->has_string('configsitepolicy'));
+        $this->assertTrue($componenten->has_string('sitepolicy_help'));
+        $this->assertEquals('NEW', $componenten->get_string('sitepolicy_help')->text);
+        $this->assertEquals(1, $componenten->get_number_of_strings());
+
+        // It is still present in the raw snapshot of the Czech.
+        $componentcs = mlang_component::from_snapshot('admin', 'cs', $version, $now);
+        $this->assertTrue($componentcs->has_string('configsitepolicy'));
+        $this->assertTrue($componentcs->has_string('sitepolicy_help'));
+        $this->assertEquals('OLD in cs', $componentcs->get_string('configsitepolicy')->text);
+        $this->assertEquals('OLD in cs', $componentcs->get_string('sitepolicy_help')->text);
+        $this->assertEquals(2, $componentcs->get_number_of_strings());
+
+        // Prune all strings not present in the English (this is what exporting ZIPs does).
+        $componentcs->intersect($componenten);
+        $this->assertFalse($componentcs->has_string('configsitepolicy'));
+        $this->assertTrue($componentcs->has_string('sitepolicy_help'));
+        $this->assertEquals('OLD in cs', $componentcs->get_string('sitepolicy_help')->text);
+        $this->assertEquals(1, $componentcs->get_number_of_strings());
     }
 
     public function test_legacy_component_name() {

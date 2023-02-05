@@ -1,3 +1,9 @@
+### 2023.02.05 ###
+
+* The MOV command behaviour changed so that it is technically an alias for the CPY
+  now. This is to prevent situations when the MOV was used in the commit message even
+  without the string being actually deleted from the original.
+
 ### 3.6.3 ###
 
 * Currently supported versions are highlighted in green.
