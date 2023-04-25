@@ -1,0 +1,23 @@
+HOW TO UPDATE AMOS AFTER THE NEW MAJOR VERSION IS RELEASED
+==========================================================
+
+1. Add the next branch code to the `branchesall` admin setting.
+
+2. Review the list of supported versions and update the value of
+   `branchsupported` there eventually, too.
+
+3. Copy the most recent folder in <moodledata>/amos/export-zip/ to a new one
+   named after the newly released version.
+
+4. Run the following in the AMOS database:
+
+```
+INSERT INTO mdl_amos_stats (timemodified, branch, lang, component, numofstrings)
+SELECT timemodified, YYY AS branch, lang, component, numofstrings FROM mdl_amos_stats WHERE branch = XXX;
+```
+
+where XXX is the previous most recent version (such as 403) and YYY is the
+newly released version (such as 404).
+
+5. Let Jenkins job rebuild the lang-table.html file and deploy it to the
+   download server.
