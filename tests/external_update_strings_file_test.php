@@ -39,6 +39,8 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
 
     /**
      * Test the permission check for the update_strings_file external function.
+     *
+     * @runInSeparateProcess
      */
     public function test_update_strings_file_without_import_capability() {
         $this->resetAfterTest(true);
@@ -56,6 +58,8 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
 
     /**
      * Test the behaviour of the update_strings_file external function.
+     *
+     * @runInSeparateProcess
      */
     public function test_update_strings_file() {
         $this->resetAfterTest(true);
@@ -86,7 +90,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             ]
         );
 
-        $clean = external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
+        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
 
         $this->assertTrue(is_array($clean));
         $this->assertEquals(2, count($clean));
@@ -128,6 +132,8 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
 
     /**
      * Test that changes are processed from lower to highest moodle branch to avoid unnecessary commits.
+     *
+     * @runInSeparateProcess
      */
     public function test_moodle_version_procesing_order() {
         $this->resetAfterTest(true);
@@ -184,7 +190,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             ]
         );
 
-        $clean = external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
+        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
 
         $this->assertTrue(is_array($clean));
         $this->assertEquals(4, count($clean));

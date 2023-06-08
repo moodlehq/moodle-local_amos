@@ -29,17 +29,17 @@ require_once($CFG->libdir . '/externallib.php');
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_translator_data extends \external_api {
+class get_translator_data extends \core_external\external_api {
 
     /**
      * Describe the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
+    public static function execute_parameters(): \core_external\external_function_parameters {
 
-        return new \external_function_parameters([
-            'filterquery' => new \external_value(PARAM_RAW, 'Query string representing the filter form data.'),
+        return new \core_external\external_function_parameters([
+            'filterquery' => new \core_external\external_value(PARAM_RAW, 'Query string representing the filter form data.'),
         ]);
     }
 
@@ -75,12 +75,12 @@ class get_translator_data extends \external_api {
     /**
      * Describe the external function result value.
      *
-     * @return \external_description
+     * @return \core_external\external_description
      */
-    public static function execute_returns(): \external_description {
+    public static function execute_returns(): \core_external\external_description {
 
-        return new \external_single_structure([
-            'json' => new \external_value(PARAM_RAW, 'JSON encoded template data'),
+        return new \core_external\external_single_structure([
+            'json' => new \core_external\external_value(PARAM_RAW, 'JSON encoded template data'),
         ]);
     }
 }

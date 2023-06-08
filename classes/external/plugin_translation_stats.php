@@ -35,14 +35,14 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright   2019, 2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class plugin_translation_stats extends \external_api {
+class plugin_translation_stats extends \core_external\external_api {
 
     /**
      * Describes parameters of the {@see execute()} method
      */
     public static function execute_parameters() {
-        return new \external_function_parameters([
-            'component' => new \external_value(PARAM_COMPONENT, 'Name of the component to obtain stats for'),
+        return new \core_external\external_function_parameters([
+            'component' => new \core_external\external_value(PARAM_COMPONENT, 'Name of the component to obtain stats for'),
         ]);
     }
 
@@ -79,22 +79,22 @@ class plugin_translation_stats extends \external_api {
      * @return external_description
      */
     public static function execute_returns() {
-        return new \external_single_structure([
-            'lastmodified' => new \external_value(PARAM_INT, 'Timestamp of when the data was last modified'),
-            'langnames' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'lang' => new \external_value(PARAM_SAFEDIR, 'Language code'),
-                    'name' => new \external_value(PARAM_TEXT, 'International name of the language followed by its code')
+        return new \core_external\external_single_structure([
+            'lastmodified' => new \core_external\external_value(PARAM_INT, 'Timestamp of when the data was last modified'),
+            'langnames' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure([
+                    'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code'),
+                    'name' => new \core_external\external_value(PARAM_TEXT, 'International name of the language followed by its code')
                 ])
             ),
-            'branches' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'branch' => new \external_value(PARAM_FILE, 'Moodle branch (eg. 3.6)'),
-                    'languages' => new \external_multiple_structure(
-                        new \external_single_structure([
-                            'lang' => new \external_value(PARAM_SAFEDIR, 'Language code'),
-                            'numofstrings' => new \external_value(PARAM_INT, 'Number of strings in the language pack'),
-                            'ratio' => new \external_value(PARAM_INT, 'Completeness of the translation'),
+            'branches' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure([
+                    'branch' => new \core_external\external_value(PARAM_FILE, 'Moodle branch (eg. 3.6)'),
+                    'languages' => new \core_external\external_multiple_structure(
+                        new \core_external\external_single_structure([
+                            'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code'),
+                            'numofstrings' => new \core_external\external_value(PARAM_INT, 'Number of strings in the language pack'),
+                            'ratio' => new \core_external\external_value(PARAM_INT, 'Completeness of the translation'),
                         ])
                     ),
                 ])

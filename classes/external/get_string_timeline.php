@@ -31,19 +31,19 @@ require_once($CFG->dirroot . '/local/amos/renderer.php');
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_string_timeline extends \external_api {
+class get_string_timeline extends \core_external\external_api {
 
     /**
      * Describe the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
+    public static function execute_parameters(): \core_external\external_function_parameters {
 
-        return new \external_function_parameters([
-            'component' => new \external_value(PARAM_ALPHANUMEXT, 'Component containing the string.'),
-            'strname' => new \external_value(PARAM_STRINGID, 'String identifier'),
-            'language' => new \external_value(PARAM_ALPHANUMEXT, 'Language code.'),
+        return new \core_external\external_function_parameters([
+            'component' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Component containing the string.'),
+            'strname' => new \core_external\external_value(PARAM_STRINGID, 'String identifier'),
+            'language' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Language code.'),
         ]);
     }
 
@@ -198,30 +198,30 @@ class get_string_timeline extends \external_api {
      * Data are returned as list of tuples. Each tuple represents one row in the timeline table.
      * Each row has either left (first) or right (second) item with data.
      *
-     * @return \external_description
+     * @return \core_external\external_description
      */
-    public static function execute_returns(): \external_description {
+    public static function execute_returns(): \core_external\external_description {
 
-        $info = new \external_single_structure([
-            'hascontent' => new \external_value(PARAM_BOOL, 'Does this item have data to display.'),
-            'langcode' => new \external_value(PARAM_ALPHANUMEXT, 'Language code', VALUE_OPTIONAL),
-            'displaysince' => new \external_value(PARAM_RAW, 'Formatted version since this applies', VALUE_OPTIONAL),
-            'displaydate' => new \external_value(PARAM_RAW, 'Formatted date and time of string change', VALUE_OPTIONAL),
-            'userinfo' => new \external_value(PARAM_RAW, 'Author name and email', VALUE_OPTIONAL),
-            'commitmsg' => new \external_value(PARAM_RAW, 'Commit message', VALUE_OPTIONAL),
-            'hascommithash' => new \external_value(PARAM_BOOL, 'Is commit hash info present?', VALUE_OPTIONAL),
-            'commithash' => new \external_value(PARAM_RAW, 'Commit hash', VALUE_OPTIONAL),
-            'commiturl' => new \external_value(PARAM_URL, 'Commit URL', VALUE_OPTIONAL),
-            'commitsource' => new \external_value(PARAM_RAW, 'Commit source', VALUE_OPTIONAL),
-            'displaytext' => new \external_value(PARAM_RAW, 'Formatted string text content', VALUE_OPTIONAL),
+        $info = new \core_external\external_single_structure([
+            'hascontent' => new \core_external\external_value(PARAM_BOOL, 'Does this item have data to display.'),
+            'langcode' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Language code', VALUE_OPTIONAL),
+            'displaysince' => new \core_external\external_value(PARAM_RAW, 'Formatted version since this applies', VALUE_OPTIONAL),
+            'displaydate' => new \core_external\external_value(PARAM_RAW, 'Formatted date and time of string change', VALUE_OPTIONAL),
+            'userinfo' => new \core_external\external_value(PARAM_RAW, 'Author name and email', VALUE_OPTIONAL),
+            'commitmsg' => new \core_external\external_value(PARAM_RAW, 'Commit message', VALUE_OPTIONAL),
+            'hascommithash' => new \core_external\external_value(PARAM_BOOL, 'Is commit hash info present?', VALUE_OPTIONAL),
+            'commithash' => new \core_external\external_value(PARAM_RAW, 'Commit hash', VALUE_OPTIONAL),
+            'commiturl' => new \core_external\external_value(PARAM_URL, 'Commit URL', VALUE_OPTIONAL),
+            'commitsource' => new \core_external\external_value(PARAM_RAW, 'Commit source', VALUE_OPTIONAL),
+            'displaytext' => new \core_external\external_value(PARAM_RAW, 'Formatted string text content', VALUE_OPTIONAL),
         ]);
 
-        return new \external_single_structure([
-            'component' => new \external_value(PARAM_ALPHANUMEXT, 'Component containing the string.'),
-            'strname' => new \external_value(PARAM_STRINGID, 'String identifier'),
-            'language' => new \external_value(PARAM_ALPHANUMEXT, 'Language code.'),
-            'changes' => new \external_multiple_structure(
-                new \external_single_structure([
+        return new \core_external\external_single_structure([
+            'component' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Component containing the string.'),
+            'strname' => new \core_external\external_value(PARAM_STRINGID, 'String identifier'),
+            'language' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Language code.'),
+            'changes' => new \core_external\external_multiple_structure(
+                new \core_external\external_single_structure([
                     'english' => $info,
                     'translation' => $info,
                 ])

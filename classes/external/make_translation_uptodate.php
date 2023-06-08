@@ -30,18 +30,18 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class make_translation_uptodate extends \external_api {
+class make_translation_uptodate extends \core_external\external_api {
 
     /**
      * Describes the external function parameters.
      *
-     * @return \external_function_parameters
+     * @return \core_external\external_function_parameters
      */
-    public static function execute_parameters(): \external_function_parameters {
+    public static function execute_parameters(): \core_external\external_function_parameters {
 
-        return new \external_function_parameters([
-            'originalid' => new \external_value(PARAM_INT, 'ID of the English original used as reference'),
-            'translationid' => new \external_value(PARAM_INT, 'ID of the translation to be re-committed as up-to-date'),
+        return new \core_external\external_function_parameters([
+            'originalid' => new \core_external\external_value(PARAM_INT, 'ID of the English original used as reference'),
+            'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the translation to be re-committed as up-to-date'),
         ]);
     }
 
@@ -119,13 +119,13 @@ class make_translation_uptodate extends \external_api {
     /**
      * Describes the external function result value.
      *
-     * @return \external_description
+     * @return \core_external\external_description
      */
-    public static function execute_returns(): \external_description {
+    public static function execute_returns(): \core_external\external_description {
 
-        return new \external_single_structure([
-            'translationid' => new \external_value(PARAM_INT, 'ID of the new translation'),
-            'displaytranslationsince' => new \external_value(PARAM_RAW, 'Label indicating version since the translation applies'),
+        return new \core_external\external_single_structure([
+            'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the new translation'),
+            'displaytranslationsince' => new \core_external\external_value(PARAM_RAW, 'Label indicating version since the translation applies'),
         ]);
     }
 }

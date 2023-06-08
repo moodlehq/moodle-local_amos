@@ -76,7 +76,7 @@ class local_amos_external_plugin_translation_stats_testcase extends externallib_
         $statsman->update_stats('36', 'en', 'tool_foo', 9);
 
         $raw = \local_amos\external\plugin_translation_stats::execute('tool_foo');
-        $clean = external_api::clean_returnvalue(\local_amos\external\plugin_translation_stats::execute_returns(), $raw);
+        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\plugin_translation_stats::execute_returns(), $raw);
 
         $this->assertEquals(1, count($clean['langnames']));
         $this->assertEquals(1, count($clean['branches']));

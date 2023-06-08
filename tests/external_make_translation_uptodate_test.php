@@ -26,6 +26,8 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
 
     /**
      * Test that permission check is performed.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_without_capability() {
         $this->resetAfterTest(true);
@@ -45,6 +47,8 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
 
     /**
      * Test that only defined language pack maintainers can use the method.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_without_being_maintainer() {
         global $DB, $USER;
@@ -86,6 +90,8 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
 
     /**
      * Test basic behaviour of the method.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_basics() {
         global $DB, $USER;
@@ -126,7 +132,7 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
             'strname' => 'groupmode', 'since' => 20], MUST_EXIST);
 
         $response = \local_amos\external\make_translation_uptodate::execute($originalid, $translationid);
-        $response = external_api::clean_returnvalue(\local_amos\external\make_translation_uptodate::execute_returns(), $response);
+        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\make_translation_uptodate::execute_returns(), $response);
 
         $this->assertTrue(is_array($response));
         $this->assertEquals('Skupinový režim', $DB->get_field('amos_translations', 'strtext', [

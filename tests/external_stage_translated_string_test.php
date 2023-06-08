@@ -26,6 +26,8 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
 
     /**
      * Test that permission check is performed.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_without_capability() {
         $this->resetAfterTest(true);
@@ -45,6 +47,8 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
 
     /**
      * Test basic behaviour of the method.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_basics() {
         global $DB, $USER;
@@ -73,7 +77,7 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
         $text = 'Fů bár';
 
         $response = \local_amos\external\stage_translated_string::execute($stageid, $originalid, $lang, $text);
-        $response = external_api::clean_returnvalue(\local_amos\external\stage_translated_string::execute_returns(), $response);
+        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\stage_translated_string::execute_returns(), $response);
 
         $this->assertTrue(is_array($response));
         $this->assertSame('Fů bár', $response['translation']);

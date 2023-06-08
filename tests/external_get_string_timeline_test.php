@@ -26,6 +26,8 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
 
     /**
      * Test that permission check is performed.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_without_capability() {
         $this->resetAfterTest(true);
@@ -45,6 +47,8 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
 
     /**
      * Test basic behaviour of the method.
+     *
+     * @runInSeparateProcess
      */
     public function test_execute_basics() {
         global $DB, $USER;
@@ -74,7 +78,7 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         $stage->commit('Add exclamation mark in Moodle 3.10', ['source' => 'unittest']);
 
         $response = \local_amos\external\get_string_timeline::execute('foo_bar', 'foobar', 'cs');
-        $response = external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
+        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
 
         $this->assertEquals('foo_bar', $response['component']);
         $this->assertEquals('foobar', $response['strname']);
