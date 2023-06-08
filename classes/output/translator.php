@@ -141,12 +141,6 @@ class translator implements \renderable, \templatable {
             $sql2 .= " AND " . $DB->sql_like("strname", ":helpstrname2", false);
             $params['helpstrname1'] = '%' . $DB->sql_like_escape('_help');
             $params['helpstrname2'] = '%' . $DB->sql_like_escape('_help');
-
-        } else {
-            $sql1 .= " AND " . $DB->sql_like("strname", ":linkstrname1", false, true, true);
-            $sql2 .= " AND " . $DB->sql_like("strname", ":linkstrname2", false, true, true);
-            $params['linkstrname1'] = '%' . $DB->sql_like_escape('_link');
-            $params['linkstrname2'] = '%' . $DB->sql_like_escape('_link');
         }
 
         $sql = "SELECT id, since, lang, component, strname, strtext, timemodified

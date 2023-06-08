@@ -1757,7 +1757,7 @@ AMOS END';
         $this->resetAfterTest();
 
         $this->assertTrue((new mlang_string('one', 'One'))->should_be_included_in_stats());
-        $this->assertFalse((new mlang_string('one_link', 'foo'))->should_be_included_in_stats());
+        $this->assertTrue((new mlang_string('one_link', 'foo'))->should_be_included_in_stats());
         $this->assertFalse((new mlang_string('del', '', null, true))->should_be_included_in_stats());
     }
 
@@ -1784,12 +1784,12 @@ AMOS END';
         $component->add_string(new mlang_string('welcome_link', 'test/welcome'));
 
         $this->assertEquals(3, $component->get_number_of_strings());
-        $this->assertEquals(2, $component->get_number_of_strings(true));
+        $this->assertEquals(3, $component->get_number_of_strings(true));
 
         $component->add_string(new mlang_string('deleted', '', null, true));
 
         $this->assertEquals(4, $component->get_number_of_strings());
-        $this->assertEquals(2, $component->get_number_of_strings(true));
+        $this->assertEquals(3, $component->get_number_of_strings(true));
 
         $component->unlink_string('deleted');
         $component->unlink_string('welcome_link');

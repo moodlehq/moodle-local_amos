@@ -891,10 +891,6 @@ class mlang_string {
             return false;
         }
 
-        if (substr($this->id, -5) === '_link') {
-            return false;
-        }
-
         return true;
     }
 }
