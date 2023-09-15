@@ -29,6 +29,7 @@ $string['about'] = '<p>AMOS is a central repository of Moodle strings and their 
 $string['amos'] = 'AMOS translation toolkit';
 $string['amos:changecontriblang'] = 'Change language of contributed strings';
 $string['amos:commit'] = 'Commit the staged strings into the main repository';
+$string['amos:editlangconfig'] = 'Edit language pack configuration strings';
 $string['amos:execute'] = 'Execute the given AMOScript';
 $string['amos:importfile'] = 'Import translations from uploaded file and stage them';
 $string['amos:importstrings'] = 'Import strings (including the English ones) directly into the main repository';

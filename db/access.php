@@ -55,6 +55,13 @@ $capabilities = [
         'legacy' => [],
     ],
 
+    // Ability to edit strings in the langconfig component.
+    'local/amos:editlangconfig' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => [],
+    ],
+
     // Ability to stash a stage and to contribute.
     'local/amos:stash' => [
         'captype' => 'write',
