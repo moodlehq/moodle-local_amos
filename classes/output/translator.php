@@ -458,6 +458,16 @@ class translator implements \renderable, \templatable {
                 $string->translation = get_string('unableunmaintained', 'local_amos', $langnames[$string->language]);
             }
         }
+
+        if (!has_capability('local/amos:editlangconfig', \context_system::instance())) {
+            foreach ($this->strings as $string) {
+                if ($string->component === 'langconfig') {
+                    $string->committable = false;
+                    $string->translatable = false;
+                    $string->translation .= PHP_EOL . PHP_EOL . get_string('unablelangconfig', 'local_amos');
+                }
+            }
+        }
     }
 
     /**

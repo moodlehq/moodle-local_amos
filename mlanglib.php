@@ -1085,10 +1085,20 @@ class mlang_stage implements IteratorAggregate, Countable {
     /**
      * Remove all components that do not belong to any of the given languages or the branch is not translatable via AMOS
      *
+     * Also removes the langconfig changes if the user does not have permission to edit it.
+     *
      * @param array $keeplangs (string)langcode => (string)langcode - list of languages to keep, 'X' means all languages
      */
     public function prune(array $keeplangs) {
         foreach ($this->components as $cx => $component) {
+            if ($component->name === 'langconfig') {
+                if (!has_capability('local/amos:editlangconfig', \context_system::instance())) {
+                    // The user is unable to edit these strings, unstage them all.
+                    $component->clear();
+                    unset($this->components[$cx]);
+                    continue;
+                }
+            }
             if (empty($component->version->translatable)) {
                 // Commits not allowed into this branch via AMOS web interface.
                 $component->clear();

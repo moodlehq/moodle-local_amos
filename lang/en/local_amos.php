@@ -469,6 +469,7 @@ $string['typestandard'] = 'Standard plugins';
 $string['typestandardbadge'] = 'Standard';
 $string['unableenfixaddon'] = 'English fixes allowed for standard plugins only';
 $string['unableenfixcountries'] = 'Country names are copied from ISO 3166-1';
+$string['unablelangconfig'] = 'No permission to edit language pack configuration';
 $string['unableunmaintained'] = 'The language pack \'{$a}\' has no maintainer at the moment, so translation contributions cannot be accepted. Please consider volunteering to become \'{$a}\' language pack maintainer.';
 $string['unstage'] = 'unstage';
 $string['unstageconfirm'] = 'Confirm unstaging';

@@ -64,6 +64,9 @@ class stage implements \renderable, \templatable {
     /** @var bool */
     public $canstash = false;
 
+    /** @var bool */
+    public $caneditlangconfig = false;
+
     /**
      * Constructor.
      *
@@ -85,6 +88,10 @@ class stage implements \renderable, \templatable {
 
         if (has_capability('local/amos:stash', \context_system::instance(), $user)) {
             $this->canstash = true;
+        }
+
+        if (has_capability('local/amos:editlangconfig', \context_system::instance(), $user)) {
+            $this->caneditlangconfig = true;
         }
 
         if (has_all_capabilities(['local/amos:execute', 'local/amos:stage'], \context_system::instance(), $user)) {
@@ -191,6 +198,10 @@ class stage implements \renderable, \templatable {
             }
 
             if (empty(\mlang_version::by_code($string->sincecode)->translatable)) {
+                $string->committable = false;
+            }
+
+            if ($string->component === 'langconfig' && !$this->caneditlangconfig) {
                 $string->committable = false;
             }
         }
