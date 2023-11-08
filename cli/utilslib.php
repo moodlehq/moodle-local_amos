@@ -380,12 +380,18 @@ class amos_export_zip {
             if ($langcode !== 'en') {
                 $english = mlang_component::from_snapshot($componentname, 'en', $version);
                 $component->intersect($english);
+                $numberofenglishstrings = $english->get_number_of_strings(true);
                 $english->clear();
             }
             $this->dump_component_into_temp($component);
 
             if ($component->has_string()) {
-                $numberofstrings = $component->get_number_of_strings(true);
+                if ($langcode !== 'en' && $component->name === 'langconfig') {
+                    $numberofstrings = $numberofenglishstrings;
+                } else {
+                    $numberofstrings = $component->get_number_of_strings(true);
+                }
+
                 $this->statsman->add_to_buffer($component->version->code, $component->lang, $component->name, $numberofstrings);
             }
 
