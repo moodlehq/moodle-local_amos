@@ -107,7 +107,7 @@ jobs:
       - name: Privacy tests
         if: ${{ always() }}
         run: |
-          cd moodlemoodle-plugin-ci phpunit --fail-on-warning
+          cd moodle
           vendor/bin/phpunit --fail-on-risky --disallow-test-output -v admin/tool/dataprivacy/tests/metadata_registry_test.php
           vendor/bin/phpunit --fail-on-risky --disallow-test-output -v privacy/tests/privacy/provider_test.php
 
