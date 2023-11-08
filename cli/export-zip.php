@@ -32,19 +32,23 @@ require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 $usage = "Generate ZIP language packs for publishing.
 
 Usage:
-    $ php export-zip.php [--minver=<minver>] [--maxver=<maxver>]
+    $ php export-zip.php [--minver=<minver>] [--maxver=<maxver>] [--langs=<code,...>]
 
 Options:
     --minver=<minver>   Generate only versions greater or equal than given code.
     --maxver=<maxver>   Generate only versions lower or equal than given code.
+    --langs=<code,...>  Comma separated list of lang codes to be processed, defaults to auto-detection.
 
-Example:
+Examples:
     $ php export-zip.php --minver=400
+
+    $ php export-zip.php --minver=400 --langs=cs
 ";
 
 [$options, $unrecognised] = cli_get_params([
     'minver' => null,
     'maxver' => null,
+    'langs' => null,
     'help' => false,
 ], [
     'h' => 'help',
@@ -61,7 +65,11 @@ if ($options['help']) {
 
 $logger = new amos_cli_logger();
 
+if ($options['langs'] !== null) {
+    $options['langs'] = array_map('trim', explode(',', $options['langs']));
+}
+
 $exporter = new amos_export_zip($logger);
-$exporter->init($options['minver'], $options['maxver']);
+$exporter->init($options['minver'], $options['maxver'], $options['langs']);
 $exporter->rebuild_zip_packages();
 $exporter->rebuild_output_folders();

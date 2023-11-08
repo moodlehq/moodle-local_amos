@@ -150,6 +150,9 @@ class amos_export_zip {
     /** @var int|null max version code to process */
     protected $maxver;
 
+    /** @var string[]|null explicit list of languages to process */
+    protected $langcodes;
+
     /**
      * Instantiate the exporter job
      *
@@ -187,12 +190,20 @@ class amos_export_zip {
      *
      * @param int $minver
      * @param int $maxver
+     * @param string[] $langcodes
      */
-    public function init(?int $minver = null, ?int $maxver = null) {
+    public function init(?int $minver = null, ?int $maxver = null, ?array $langcodes = null) {
 
         $this->log('== Initializing the ZIP language packs exporter ==');
         $this->init_versions_range($minver, $maxver);
-        $this->init_timestamp_last();
+
+        if (!empty($langcodes)) {
+            if (empty($this->minver)) {
+                $this->job_failure('Missing minver specified for explicitly selected language packs');
+            }
+            $this->langcodes = $langcodes;
+        }
+
         $this->init_temp_folders();
     }
 
@@ -200,9 +211,16 @@ class amos_export_zip {
      * Regenerates ZIP packages in output folders if needed
      */
     public function rebuild_zip_packages() {
-        $this->log('== Rebuilding outdated ZIP language packs ==');
 
-        $langpacks = $this->detect_recently_modified_languages();
+        if (empty($this->langcodes)) {
+            $this->log('== Rebuilding ZIPs of outdated language packs ==');
+            $this->init_timestamp_last();
+            $langpacks = $this->detect_recently_modified_languages();
+
+        } else {
+            $this->log('== Rebuilding ZIPs of specified language packs ==');
+            $langpacks = array_combine($this->langcodes, array_fill(0, count($this->langcodes), $this->minver));
+        }
 
         foreach ($this->get_versions() as $version) {
             foreach ($langpacks as $langcode => $since) {
