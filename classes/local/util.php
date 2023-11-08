@@ -56,7 +56,7 @@ class util {
         $list = get_config('local_amos', 'standardcomponents');
 
         foreach (explode(PHP_EOL, $list) as $line) {
-            $parts = preg_split('/\s+/', $line, null, PREG_SPLIT_NO_EMPTY);
+            $parts = preg_split('/\s+/', $line, -1, PREG_SPLIT_NO_EMPTY);
 
             if (empty($parts)) {
                 continue;

@@ -56,7 +56,7 @@ $cliresult = 0;
 $componentsjson = (array) json_decode(implode(PHP_EOL, $git->exec('show origin/master:lib/components.json')), true);
 $plugintypelocations = $componentsjson['plugintypes'];
 
-foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), null, PREG_SPLIT_NO_EMPTY) as $line) {
+foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), -1, PREG_SPLIT_NO_EMPTY) as $line) {
     if (preg_match('|^\s*([a-z][a-z0-9]*)\s+(.+)$|', $line, $matches)) {
         $plugintypelocations[$matches[1]] = $matches[2];
     }
