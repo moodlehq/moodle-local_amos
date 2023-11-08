@@ -299,7 +299,7 @@ class mlang_component implements IteratorAggregate, Countable {
      *
      * @return ArrayIterator
      */
-    public function getIterator() {
+    public function getIterator(): Traversable {
         return new ArrayIterator($this->strings);
     }
 
@@ -310,7 +310,7 @@ class mlang_component implements IteratorAggregate, Countable {
      *
      * @return int
      */
-    public function count() {
+    public function count(): int {
         return count($this->strings);
     }
 
@@ -1120,7 +1120,7 @@ class mlang_stage implements IteratorAggregate, Countable {
      *
      * @return ArrayIterator
      */
-    public function getIterator() {
+    public function getIterator(): Traversable {
         return new ArrayIterator($this->components);
     }
 
@@ -1131,7 +1131,7 @@ class mlang_stage implements IteratorAggregate, Countable {
      *
      * @return int
      */
-    public function count() {
+    public function count(): int {
         return count($this->components);
     }
 
