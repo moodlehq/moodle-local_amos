@@ -41,11 +41,6 @@ define('AMOS_REPO_MOODLE_ROOT', '2e35f0aa005d07298b575f77f7cde56149103fe0');
 define('AMOS_REPO_LANGS', $CFG->dataroot . '/amos/repos/moodle-lang');
 
 /**
- * Full path to the directory where AMOS will generate language packs
- */
-define('AMOS_EXPORT_DIR', $CFG->dataroot . '/amos/export');
-
-/**
  * Full path to the directory where AMOS will generate installer strings
  */
 define('AMOS_EXPORT_INSTALLER_DIR', $CFG->dataroot . '/amos/export-install');
