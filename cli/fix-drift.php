@@ -53,7 +53,7 @@ $stages = [];
 $cliresult = 0;
 
 // Load the location of standard plugin types and core subsystems.
-$componentsjson = (array) json_decode(implode(PHP_EOL, $git->exec('show origin/master:lib/components.json')), true);
+$componentsjson = (array) json_decode(implode(PHP_EOL, $git->exec('show origin/main:lib/components.json')), true);
 $plugintypelocations = $componentsjson['plugintypes'];
 
 foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), -1, PREG_SPLIT_NO_EMPTY) as $line) {
@@ -71,7 +71,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
         $gitbranch = 'origin/' . $version->branch;
 
     } else if ($versioncode == max(array_keys($plugins))) {
-        $gitbranch = 'origin/master';
+        $gitbranch = 'origin/main';
 
     } else {
         cli_error('Git branch not found', 3);

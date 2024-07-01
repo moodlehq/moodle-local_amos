@@ -542,11 +542,11 @@ EOF
      *
      * This may be used to get rid of strings that are not defined in another component.
      * Typically can be used to clean the translation from strings that are not defined in
-     * the master English pack.
+     * the English pack.
      * Beware - if the string is defined in $mask as deleted, it will be kept in this regardless
      * its state.
      *
-     * @param mlang_component $mask master component to compare strings with
+     * @param mlang_component $mask component to compare strings with
      * @return int number of removed strings
      */
     public function intersect(mlang_component $mask) {
@@ -571,7 +571,7 @@ EOF
      * regardless its state and value. Our strings that are already deleted are not
      * affected.
      *
-     * @param mlang_component $reference master component to compare strings with
+     * @param mlang_component $reference component to compare strings with
      * @return array list of removed string ids
      */
     public function complement(mlang_component $reference) {

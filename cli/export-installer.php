@@ -51,8 +51,8 @@ foreach ($versions as $version) {
         $exportdir = $version->code . '_STABLE';
 
     } else if ($version->code == mlang_version::latest_version()->code) {
-        $gitbranch = 'origin/master';
-        $exportdir = 'master';
+        $gitbranch = 'origin/main';
+        $exportdir = 'main';
 
     } else {
         fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");

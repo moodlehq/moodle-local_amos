@@ -284,7 +284,7 @@ foreach ($versions as $version) {
         $gitbranch = 'origin/' . $version->branch;
 
     } else if ($version->code == mlang_version::latest_version()->code) {
-        $gitbranch = 'origin/master';
+        $gitbranch = 'origin/main';
 
     } else {
         fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");

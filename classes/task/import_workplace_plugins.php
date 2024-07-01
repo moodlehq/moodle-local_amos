@@ -158,7 +158,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
         sort($listbranches, SORT_NATURAL);
 
         foreach ($listbranches as $branchname) {
-            if ($branchname === 'master') {
+            if ($branchname === 'master' || $branchname === 'main') {
                 continue;
             }
 

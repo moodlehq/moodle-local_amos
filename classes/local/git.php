@@ -133,7 +133,7 @@ class git {
      */
     public function list_local_branches() : array {
 
-        // Git returns values like 'refs/heads/master'. We want to strip the first two.
+        // Git returns values like 'refs/heads/main'. We want to strip the first two.
         $list = $this->exec('for-each-ref --format="%(refname:strip=2)" '.escapeshellarg('refs/heads/'));
 
         return $list;
@@ -170,7 +170,7 @@ class git {
      */
     public function list_remote_branches(string $remote='origin') : array {
 
-        // Git returns values like 'refs/remotes/origin/master'. We want to strip the first three.
+        // Git returns values like 'refs/remotes/origin/main'. We want to strip the first three.
         $list = $this->exec('for-each-ref --format="%(refname:strip=3)" '.escapeshellarg('refs/remotes/'.$remote));
 
         // Get rid of the ref HEAD (which shows the default branch in

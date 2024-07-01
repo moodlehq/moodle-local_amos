@@ -1119,21 +1119,21 @@ EOF;
     }
 
     public function test_intersect() {
-        $master = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_18_STABLE'));
-        $master->add_string(new mlang_string('one', 'One'));
-        $master->add_string(new mlang_string('two', 'Two'));
-        $master->add_string(new mlang_string('three', 'Three'));
+        $comp1 = new mlang_component('moodle', 'en', mlang_version::by_branch('MOODLE_18_STABLE'));
+        $comp1->add_string(new mlang_string('one', 'One'));
+        $comp1->add_string(new mlang_string('two', 'Two'));
+        $comp1->add_string(new mlang_string('three', 'Three'));
 
-        $slave = new mlang_component('moodle', 'cs', mlang_version::by_branch('MOODLE_18_STABLE'));
-        $slave->add_string(new mlang_string('one', 'Jedna'));
-        $slave->add_string(new mlang_string('two', 'Dva'));
-        $slave->add_string(new mlang_string('seven', 'Sedm'));
-        $slave->add_string(new mlang_string('eight', 'Osm'));
+        $comp2 = new mlang_component('moodle', 'cs', mlang_version::by_branch('MOODLE_18_STABLE'));
+        $comp2->add_string(new mlang_string('one', 'Jedna'));
+        $comp2->add_string(new mlang_string('two', 'Dva'));
+        $comp2->add_string(new mlang_string('seven', 'Sedm'));
+        $comp2->add_string(new mlang_string('eight', 'Osm'));
 
-        $slave->intersect($master);
-        $this->assertEquals(2, count($slave->get_string_keys()));
-        $this->assertTrue($slave->has_string('one'));
-        $this->assertTrue($slave->has_string('two'));
+        $comp2->intersect($comp1);
+        $this->assertEquals(2, count($comp2->get_string_keys()));
+        $this->assertTrue($comp2->has_string('one'));
+        $this->assertTrue($comp2->has_string('two'));
     }
 
     public function test_extract_script_from_text() {

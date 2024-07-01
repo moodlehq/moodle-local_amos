@@ -30,8 +30,8 @@ on_exit() {
 ##
 # Make sure that all required branches exist and are up to date.
 #
-# param $1 - name of the upstream branch such as master or MOODLE_311_STABLE
-# param $2 - name of the install branch such as install_master or install_311_STABLE
+# param $1 - name of the upstream branch such as main or MOODLE_311_STABLE
+# param $2 - name of the install branch such as install_main or install_311_STABLE
 #
 prepare_branches() {
     local upstreambranch=$1
@@ -59,8 +59,8 @@ prepare_branches() {
 ##
 # Commit new install strings to the install branch.
 #
-# param $1 - name of the directory inside ${SRCROOT} to process such as master or 311_STABLE
-# param $2 - name of the install branch such as install_master or install_311_STABLE
+# param $1 - name of the directory inside ${SRCROOT} to process such as main or 311_STABLE
+# param $2 - name of the install branch such as install_main or install_311_STABLE
 #
 commit_install_strings() {
     local dirname=$1
@@ -80,8 +80,8 @@ commit_install_strings() {
 ##
 # Push branches to remotes
 #
-# param $1 - name of the upstream branch such as master or MOODLE_311_STABLE
-# param $2 - name of the install branch such as install_master or install_311_STABLE
+# param $1 - name of the upstream branch such as main or MOODLE_311_STABLE
+# param $2 - name of the install branch such as install_main or install_311_STABLE
 #
 publish_branches() {
     local upstreambranch=$1
@@ -99,9 +99,9 @@ git remote update --prune
 for DIR in ${SRCROOT}/*; do
     if [[ -d ${DIR} ]]; then
         DIRNAME=$(basename ${DIR})
-        if [[ ${DIRNAME} = "master" ]]; then
-            UPSTREAMBRANCH="master"
-            INSTALLBRANCH="install_master"
+        if [[ ${DIRNAME} = "main" ]]; then
+            UPSTREAMBRANCH="main"
+            INSTALLBRANCH="install_main"
         else
             UPSTREAMBRANCH="MOODLE_${DIRNAME}"
             INSTALLBRANCH="install_${DIRNAME}"
