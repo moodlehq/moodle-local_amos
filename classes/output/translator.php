@@ -349,17 +349,19 @@ class translator implements \renderable, \templatable {
                         if ($substring !== '' && ($substringtra || $substringeng)) {
                             if (empty($substringregex)) {
                                 if (empty($substringcs)) {
-                                    if ($substringtra && !stristr($string->translation, trim($substring))) {
+                                    if ($substringtra && $string->translation !== null
+                                            && !stristr($string->translation, $substring)) {
                                         continue;
                                     }
-                                    if ($substringeng && !stristr($string->original, trim($substring))) {
+                                    if ($substringeng && $string->original !== null && !stristr($string->original, $substring)) {
                                         continue;
                                     }
                                 } else {
-                                    if ($substringtra && !strstr($string->translation, trim($substring))) {
+                                    if ($substringtra && $string->translation !== null
+                                            && !strstr($string->translation, $substring)) {
                                         continue;
                                     }
-                                    if ($substringeng && !strstr($string->original, trim($substring))) {
+                                    if ($substringeng && $string->original !== null && !strstr($string->original, $substring)) {
                                         continue;
                                     }
                                 }
