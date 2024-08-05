@@ -17,7 +17,6 @@
  * JS module for the AMOS translator filter.
  *
  * @module      local_amos/filter
- * @package     local_amos
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -67,7 +66,6 @@ const populateDOMElementCaches = () => {
 
 /**
  * @function registerEventListeners
- * @param {Element} root
  */
 const registerEventListeners = () => {
     let root = document.getElementById('amosfilter');
@@ -209,7 +207,6 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
 /**
  * @function handleComponentSearch
  * @param {Element} inputField
- * @param {Array} fcmpItems
  */
 const handleComponentSearch = (inputField) => {
 

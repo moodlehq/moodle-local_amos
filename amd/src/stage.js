@@ -17,7 +17,6 @@
  * JS module for the AMOS stage.
  *
  * @module      local_amos/stage
- * @package     local_amos
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

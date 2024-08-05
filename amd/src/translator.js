@@ -17,7 +17,6 @@
  * JS module for the AMOS translator.
  *
  * @module      local_amos/translator
- * @package     local_amos
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -200,6 +199,8 @@ const turnAllMissingForEditing = () => {
 
 /**
  * @function showFilteredStrings
+ *
+ * @param {Object} filterQuery
  */
 const showFilteredStrings = (filterQuery) => {
 
