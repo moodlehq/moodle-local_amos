@@ -1,3 +1,8 @@
+### 2024.08.05 ###
+
+* MDLSITE-6660 the "Substring" filter now allows to specify whether it applies to
+  translated strings, the English originals, or both.
+
 ### 2023.02.05 ###
 
 * The MOV command behaviour changed so that it is technically an alias for the CPY
