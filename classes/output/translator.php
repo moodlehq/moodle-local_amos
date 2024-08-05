@@ -87,6 +87,8 @@ class translator implements \renderable, \templatable {
         $substring = $filter->get_data()->substring;
         $substringregex = $filter->get_data()->substringregex;
         $substringcs = $filter->get_data()->substringcs;
+        $substringtra = $filter->get_data()->substringtra;
+        $substringeng = $filter->get_data()->substringeng;
         $stringid = $filter->get_data()->stringid;
         $stringidpartial = $filter->get_data()->stringidpartial;
         $stagedonly = $filter->get_data()->stagedonly;
@@ -344,31 +346,38 @@ class translator implements \renderable, \templatable {
                             continue;
                         }
 
-                        if (!empty($substring)) {
-                            // If defined, then either English or the translation must contain the substring.
+                        if ($substring !== '' && ($substringtra || $substringeng)) {
                             if (empty($substringregex)) {
                                 if (empty($substringcs)) {
-                                    if (!stristr($string->original, trim($substring))
-                                            && !stristr($string->translation, trim($substring))) {
+                                    if ($substringtra && !stristr($string->translation, trim($substring))) {
+                                        continue;
+                                    }
+                                    if ($substringeng && !stristr($string->original, trim($substring))) {
                                         continue;
                                     }
                                 } else {
-                                    if (!strstr($string->original, trim($substring))
-                                            && !strstr($string->translation, trim($substring))) {
+                                    if ($substringtra && !strstr($string->translation, trim($substring))) {
+                                        continue;
+                                    }
+                                    if ($substringeng && !strstr($string->original, trim($substring))) {
                                         continue;
                                     }
                                 }
 
                             } else {
-                                // Considere substring as a regular expression.
                                 if (empty($substringcs)) {
-                                    if (!preg_match("/$substring/i", $string->original)
-                                            && !preg_match("/$substring/i", $string->translation)) {
+                                    if ($substringtra && !preg_match("/$substring/i", $string->translation)) {
                                         continue;
                                     }
+                                    if ($substringeng && !preg_match("/$substring/i", $string->original)) {
+                                        continue;
+                                    }
+
                                 } else {
-                                    if (!preg_match("/$substring/", $string->original)
-                                            && !preg_match("/$substring/", $string->translation)) {
+                                    if ($substringtra && !preg_match("/$substring/", $string->translation)) {
+                                        continue;
+                                    }
+                                    if ($substringeng && !preg_match("/$substring/", $string->original)) {
                                         continue;
                                     }
                                 }

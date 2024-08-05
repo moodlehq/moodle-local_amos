@@ -74,6 +74,8 @@ const registerEventListeners = () => {
     let languageSearch = document.getElementById('amosfilter_flng_search');
     let fver = document.getElementById('amosfilter_fver');
     let flast = document.getElementById('amosfilter_flast');
+    let ftxn = document.getElementById('amosfilter_ftxn');
+    let ftxe = document.getElementById('amosfilter_ftxe');
 
     // Click event delegation.
     root.addEventListener('click', e => {
@@ -115,6 +117,20 @@ const registerEventListeners = () => {
                 fver.setAttribute('disabled', 'disabled');
             } else {
                 fver.removeAttribute('disabled');
+            }
+        }
+
+        if (e.target.id == 'amosfilter_ftxn') {
+            if (!ftxn.checked && !ftxe.checked) {
+                ftxe.checked = true;
+                return;
+            }
+        }
+
+        if (e.target.id == 'amosfilter_ftxe') {
+            if (!ftxn.checked && !ftxe.checked) {
+                ftxn.checked = true;
+                return;
             }
         }
     });

@@ -84,6 +84,8 @@ class filter implements \renderable, \templatable {
             'page',
             'substringregex',
             'substringcs',
+            'substringtra',
+            'substringeng',
         ];
 
         $this->lazyformname = 'amosfilter';
@@ -116,6 +118,11 @@ class filter implements \renderable, \templatable {
             } else {
                 $data->{$field} = $default->{$field};
             }
+        }
+
+        if (!$data->substringtra && !$data->substringeng) {
+            $data->substringtra = 1;
+            $data->substringeng = 1;
         }
 
         return $data;
@@ -153,6 +160,8 @@ class filter implements \renderable, \templatable {
         $data->stringidpartial = $data->stringidpartial ?? false;
         $data->substringregex = $data->substringregex ?? false;
         $data->substringcs = $data->substringcs ?? false;
+        $data->substringtra = $data->substringtra ?? true;
+        $data->substringeng = $data->substringeng ?? true;
         $data->stringid = $data->stringid ?? '';
         $data->stagedonly = $data->stagedonly ?? false;
         $data->app = $data->app ?? false;
@@ -222,6 +231,8 @@ class filter implements \renderable, \templatable {
         $data->substring = optional_param('ftxt', '', PARAM_RAW);
         $data->substringregex = optional_param('ftxr', false, PARAM_BOOL);
         $data->substringcs = optional_param('ftxs', false, PARAM_BOOL);
+        $data->substringtra = optional_param('ftxn', true, PARAM_BOOL);
+        $data->substringeng = optional_param('ftxe', true, PARAM_BOOL);
         $data->stringidpartial = optional_param('fsix', false, PARAM_BOOL);
 
         if ($data->stringidpartial) {
@@ -341,6 +352,21 @@ class filter implements \renderable, \templatable {
             }
         }
 
+        // a - app
+        // d - stringid
+        // e - substringeng
+        // g - stagedonly
+        // h - helps
+        // i - substringcs
+        // m - missing
+        // n - substringtra
+        // p - stringidpartial
+        // r - substringregex
+        // s - substring
+        // u - outdated
+        // w - workplace
+        // x - has
+
         $data->missing = optional_param('m', false, PARAM_BOOL);
         $data->outdated = optional_param('u', false, PARAM_BOOL);
         $data->has = optional_param('x', false, PARAM_BOOL);
@@ -348,6 +374,8 @@ class filter implements \renderable, \templatable {
         $data->substring = optional_param('s', '', PARAM_RAW);
         $data->substringregex = optional_param('r', false, PARAM_BOOL);
         $data->substringcs = optional_param('i', false, PARAM_BOOL);
+        $data->substringtra = optional_param('n', true, PARAM_BOOL);
+        $data->substringeng = optional_param('e', true, PARAM_BOOL);
         $data->stringidpartial = optional_param('p', false, PARAM_BOOL);
 
         if ($data->stringidpartial) {
@@ -429,6 +457,8 @@ class filter implements \renderable, \templatable {
         unset($all);
 
         $permalink->param('s', $fdata->substring);
+        $permalink->param('n', (int) $fdata->substringtra);
+        $permalink->param('e', (int) $fdata->substringeng);
         $permalink->param('d', $fdata->stringid);
 
         if ($fdata->missing) {
