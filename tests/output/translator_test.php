@@ -42,14 +42,16 @@ class translator_test extends \local_amos_testcase {
         $stage = new \mlang_stage();
 
         $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
-        $component->add_string(new \mlang_string('foobaz', 'Foo baz'));
+        $component->add_string(new \mlang_string('s1', 'AAA'));
+        $component->add_string(new \mlang_string('s2', 'BBB'));
+        $component->add_string(new \mlang_string('s3', 'CCC'));
         $stage->add($component);
         $component->clear();
 
         $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Fů bar'));
-        $component->add_string(new \mlang_string('foobaz', 'Foo baz'));
+        $component->add_string(new \mlang_string('s1', 'Ddd'));
+        $component->add_string(new \mlang_string('s2', 'Aaa'));
+        $component->add_string(new \mlang_string('s3', 'aaa'));
         $stage->add($component);
         $component->clear();
 
@@ -59,24 +61,50 @@ class translator_test extends \local_amos_testcase {
         $_POST['flng'] = ['cs'];
         $_POST['fcmp'] = ['foo_bar'];
         $_POST['sesskey'] = sesskey();
-        $_POST['ftxt'] = 'Foo';
+        $_POST['ftxt'] = 'aaa';
 
         $filter = new \local_amos\output\filter(new \moodle_url('/'));
         $translator = new \local_amos\output\translator($filter, $USER);
         $data = $translator->export_for_template($PAGE->get_renderer('core'));
 
-        // By default, both English and Czech are to be filtered so only 'foobaz' string is returned.
-        $this->assertEquals(1, count($data['strings']));
-        $this->assertEquals('foobaz', $data['strings'][0]->stringid);
+        // By default, search in both English and Czech.
+        $this->assertEquals(3, count($data['strings']));
+        $this->assertEquals('s1', $data['strings'][0]->stringid);
+        $this->assertEquals('s2', $data['strings'][1]->stringid);
+        $this->assertEquals('s3', $data['strings'][2]->stringid);
 
-        // Do not apply to translations.
+        // Do not apply to translations, search in English only.
+        $_POST['ftxe'] = 1;
         $_POST['ftxn'] = 0;
 
         $filter = new \local_amos\output\filter(new \moodle_url('/'));
         $translator = new \local_amos\output\translator($filter, $USER);
         $data = $translator->export_for_template($PAGE->get_renderer('core'));
 
-        // Now the filter applies to the English only so both strings should be returned.
-        $this->assertEquals(2, count($data['strings']));
+        $this->assertEquals(1, count($data['strings']));
+        $this->assertEquals('s1', $data['strings'][0]->stringid);
+
+        // Search in Czech only.
+        $_POST['ftxe'] = 0;
+        $_POST['ftxn'] = 1;
+        $_POST['ftxt'] = 'ddd';
+
+        $filter = new \local_amos\output\filter(new \moodle_url('/'));
+        $translator = new \local_amos\output\translator($filter, $USER);
+        $data = $translator->export_for_template($PAGE->get_renderer('core'));
+
+        $this->assertEquals(1, count($data['strings']));
+        $this->assertEquals('s1', $data['strings'][0]->stringid);
+
+        // Same string but in English only.
+        $_POST['ftxe'] = 1;
+        $_POST['ftxn'] = 0;
+        $_POST['ftxt'] = 'ddd';
+
+        $filter = new \local_amos\output\filter(new \moodle_url('/'));
+        $translator = new \local_amos\output\translator($filter, $USER);
+        $data = $translator->export_for_template($PAGE->get_renderer('core'));
+
+        $this->assertEquals(0, count($data['strings']));
     }
 }

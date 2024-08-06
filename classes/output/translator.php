@@ -346,41 +346,81 @@ class translator implements \renderable, \templatable {
                             continue;
                         }
 
-                        if ($substring !== '' && ($substringtra || $substringeng)) {
+                        $searcheng = ($substringeng && $string->original !== null);
+                        $searchtra = ($substringtra && $string->translation !== null);
+
+                        if ($substring !== '' && ($searcheng || $searchtra)) {
                             if (empty($substringregex)) {
                                 if (empty($substringcs)) {
-                                    if ($substringtra && $string->translation !== null
-                                            && !stristr($string->translation, $substring)) {
-                                        continue;
+                                    if ($searcheng && $searchtra) {
+                                        if (!stristr($string->original, $substring) && !stristr($string->translation, $substring)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searcheng) {
+                                        if (!stristr($string->original, $substring)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searchtra) {
+                                        if (!stristr($string->translation, $substring)) {
+                                            continue;
+                                        }
                                     }
-                                    if ($substringeng && $string->original !== null && !stristr($string->original, $substring)) {
-                                        continue;
-                                    }
+
                                 } else {
-                                    if ($substringtra && $string->translation !== null
-                                            && !strstr($string->translation, $substring)) {
-                                        continue;
-                                    }
-                                    if ($substringeng && $string->original !== null && !strstr($string->original, $substring)) {
-                                        continue;
+                                    if ($searcheng && $searchtra) {
+                                        if (!strstr($string->original, $substring) && !stristr($string->translation, $substring)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searcheng) {
+                                        if (!strstr($string->original, $substring)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searchtra) {
+                                        if (!strstr($string->translation, $substring)) {
+                                            continue;
+                                        }
                                     }
                                 }
 
                             } else {
                                 if (empty($substringcs)) {
-                                    if ($substringtra && !preg_match("/$substring/i", $string->translation)) {
-                                        continue;
-                                    }
-                                    if ($substringeng && !preg_match("/$substring/i", $string->original)) {
-                                        continue;
+                                    if ($searcheng && $searchtra) {
+                                        if (!preg_match("/$substring/i", $string->translation)
+                                                && !preg_match("/$substring/i", $string->original)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searcheng) {
+                                        if (!preg_match("/$substring/i", $string->original)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searchtra) {
+                                        if (!preg_match("/$substring/i", $string->translation)) {
+                                            continue;
+                                        }
                                     }
 
                                 } else {
-                                    if ($substringtra && !preg_match("/$substring/", $string->translation)) {
-                                        continue;
-                                    }
-                                    if ($substringeng && !preg_match("/$substring/", $string->original)) {
-                                        continue;
+                                    if ($searcheng && $searchtra) {
+                                        if (!preg_match("/$substring/", $string->translation)
+                                                && !preg_match("/$substring/", $string->original)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searcheng) {
+                                        if (!preg_match("/$substring/", $string->original)) {
+                                            continue;
+                                        }
+
+                                    } else if ($searchtra) {
+                                        if (!preg_match("/$substring/", $string->translation)) {
+                                            continue;
+                                        }
                                     }
                                 }
                             }
