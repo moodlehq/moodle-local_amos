@@ -370,7 +370,7 @@ class translator implements \renderable, \templatable {
 
                                 } else {
                                     if ($searcheng && $searchtra) {
-                                        if (!strstr($string->original, $substring) && !stristr($string->translation, $substring)) {
+                                        if (!strstr($string->original, $substring) && !strstr($string->translation, $substring)) {
                                             continue;
                                         }
 
