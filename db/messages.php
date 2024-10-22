@@ -30,14 +30,14 @@ $messageproviders = [
     'checker' => [
         'capability' => 'local/amos:commit',
         'defaults' => [
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
         ],
     ],
 
     // Activity related to the contributed translations (workflow, comments).
     'contribution' => [
         'defaults' => [
-            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
         ],
     ],
 ];
