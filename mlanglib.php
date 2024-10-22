@@ -520,7 +520,7 @@ EOF
                     'it is unable to differentiate core plugins from activity modules. '.
                     'Using normalize_component() is not reliable much because it depends '.
                     'on the site version and may be wrong for older/newer versions');
-                list($type, $plugin) = normalize_component($this->name);
+                list($type, $plugin) = \core_component::normalize_component($this->name);
                 if ($type === 'core') {
                     return 'lang/' . $this->lang . '/' . $this->name . '.php';
                 } else {

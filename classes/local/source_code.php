@@ -171,7 +171,7 @@ class source_code {
         $files = array();
 
         $component = $this->versionphp['component'];
-        [$plugintype, $pluginname] = normalize_component($component);
+        [$plugintype, $pluginname] = \core_component::normalize_component($component);
 
         $fullnamefile = 'lang/en/'.$component.'.php';
         if (is_readable($this->basepath.'/'.$fullnamefile)) {
