@@ -43,7 +43,7 @@ $confirm = optional_param('confirm', false, PARAM_BOOL);
 $languages = mlang_tools::list_languages(false);
 
 if (!isset($languages[$langcode])) {
-    print_error('error_unknown_language', 'local_amos', '', $langcode);
+    throw new \moodle_exception('error_unknown_language', 'local_amos', '', $langcode);
 }
 
 if ($action === 'add') {
@@ -54,7 +54,7 @@ if ($action === 'add') {
         $actionname = get_string('creditsaddcontributor', 'local_amos');
         $selector = new local_amos_contributor_selector('user', []);
     } else {
-        print_error('error_unknown_status', 'local_amos', '', $status);
+        throw new \moodle_exception('error_unknown_status', 'local_amos', '', $status);
     }
 
 } else if ($action === 'del') {
@@ -64,7 +64,7 @@ if ($action === 'add') {
     } else if ($status == AMOS_USER_CONTRIBUTOR) {
         $actionname = get_string('creditsdelcontributor', 'local_amos');
     } else {
-        print_error('error_unknown_status', 'local_amos', '', $status);
+        throw new \moodle_exception('error_unknown_status', 'local_amos', '', $status);
     }
 }
 
@@ -160,5 +160,5 @@ if ($action === 'add') {
     echo $OUTPUT->footer();
 
 } else {
-    print_error('error_unknown_action', 'local_amos');
+    throw new \moodle_exception('error_unknown_action', 'local_amos');
 }

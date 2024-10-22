@@ -72,7 +72,7 @@ if ($assign) {
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
-            print_error('contributionaccessdenied', 'local_amos');
+            throw new \moodle_exception('contributionaccessdenied', 'local_amos');
         }
     }
 
@@ -143,7 +143,7 @@ if ($review) {
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
-            print_error('contributionaccessdenied', 'local_amos');
+            throw new \moodle_exception('contributionaccessdenied', 'local_amos');
         }
     }
 
@@ -190,7 +190,7 @@ if ($accept) {
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
-            print_error('contributionaccessdenied', 'local_amos');
+            throw new \moodle_exception('contributionaccessdenied', 'local_amos');
         }
     }
 
@@ -241,7 +241,7 @@ if ($reject) {
 
     if ($maintainerof !== 'all') {
         if (!in_array($contribution->lang, $maintainerof)) {
-            print_error('contributionaccessdenied', 'local_amos');
+            throw new \moodle_exception('contributionaccessdenied', 'local_amos');
         }
     }
 
@@ -285,7 +285,7 @@ if ($changelang) {
     $listlanguages = mlang_tools::list_languages();
 
     if (empty($listlanguages[$newlang])) {
-        print_error('err_invalid_target_language', 'local_amos', new moodle_url($PAGE->url, ['id' => $contriborig->id]),
+        throw new \moodle_exception('err_invalid_target_language', 'local_amos', new moodle_url($PAGE->url, ['id' => $contriborig->id]),
             null, $newlang);
     }
 

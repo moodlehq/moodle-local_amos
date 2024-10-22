@@ -59,7 +59,7 @@ if ($apply) {
     require_capability('local/amos:stage', context_system::instance());
     $stash = mlang_stash::instance_from_id($apply);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
@@ -73,7 +73,7 @@ if ($pop) {
     require_capability('local/amos:stage', context_system::instance());
     $stash = mlang_stash::instance_from_id($pop);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
@@ -87,7 +87,7 @@ if ($drop) {
     require_sesskey();
     $stash = mlang_stash::instance_from_id($drop);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     $confirm = optional_param('confirm', false, PARAM_BOOL);
@@ -115,7 +115,7 @@ if ($download) {
     require_sesskey();
     $stash = mlang_stash::instance_from_id($download);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     $stash->send_zip("stash.zip");
@@ -129,7 +129,7 @@ if ($submitform->is_cancelled()) {
 } else if ($submitdata = $submitform->get_data()) {
     $stash = mlang_stash::instance_from_id($submitdata->stashid);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
 
@@ -231,7 +231,7 @@ if ($submit) {
     require_sesskey();
     $stash = mlang_stash::instance_from_id($submit);
     if ($stash->ownerid != $USER->id) {
-        print_error('stashaccessdenied', 'local_amos');
+        throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     echo $output->heading_with_help(get_string('submitting', 'local_amos'), 'submitting', 'local_amos');
