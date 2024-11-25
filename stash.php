@@ -95,8 +95,17 @@ if ($drop) {
     if (!$confirm) {
         $output = $PAGE->get_renderer('local_amos');
         echo $output->header();
+        $name = trim($stash->name);
+        if (empty($name)) {
+            // If name is empty, use the time of creation or modification.
+            $time = $stash->timemodified;
+            if (!$time) {
+                $time = $stash->timecreated;
+            }
+            $name = userdate($time, get_string('strftimedaydatetime', 'langconfig'));
+        }
         echo $output->confirm(
-            get_string('stashdropconfirm', 'local_amos', s($stash->name)),
+            get_string('stashdropconfirm', 'local_amos', s($name)),
             new moodle_url($PAGE->url, [
                 'confirm' => true,
                 'drop' => $drop,
