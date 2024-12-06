@@ -334,8 +334,14 @@ class local_amos_renderer extends plugin_renderer_base {
             'class' => 'my-2 mr-2 d-inline-block',
             'size' => 21,
         ]);
-        $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
-                                    ['class' => 'timecreated']);
+
+        if ($stash->timemodified) {
+            $output .= html_writer::tag('div', userdate($stash->timemodified, get_string('strftimedaydatetime', 'langconfig')),
+            ['class' => 'timemodified']);
+        } else {
+            $output .= html_writer::tag('div', userdate($stash->timecreated, get_string('strftimedaydatetime', 'langconfig')),
+            ['class' => 'timecreated']);
+        }
         $output .= html_writer::tag('div', get_string('stashstrings', 'local_amos', $stash->strings),
                                     ['class' => 'strings']);
         $output .= html_writer::tag('div', get_string('stashlanguages', 'local_amos', s(implode(', ', $stash->languages))),
@@ -372,8 +378,15 @@ class local_amos_renderer extends plugin_renderer_base {
         $output = '';
         $output .= $this->output->heading('#'.$contrib->info->id.' '.s($contrib->info->subject), 3, 'subject');
         $output .= $this->output->container($this->output->user_picture($contrib->author) . fullname($contrib->author), 'author');
-        $output .= $this->output->container(userdate($contrib->info->timecreated,
+
+        if ($contrib->info->timemodified) {
+            $output .= $this->output->container(userdate($contrib->info->timemodified,
+            get_string('strftimedaydatetime', 'langconfig')), 'timemodified');
+        } else {
+            $output .= $this->output->container(userdate($contrib->info->timecreated,
             get_string('strftimedaydatetime', 'langconfig')), 'timecreated');
+        }
+
         $output .= $this->output->container(format_text($contrib->info->message), 'message');
         $output = $this->box($output, 'generalbox source');
 

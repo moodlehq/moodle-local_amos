@@ -40,6 +40,8 @@ class local_amos_stash implements renderable {
     public $name;
     /** @var int timestamp of when the stash was created */
     public $timecreated;
+    /** @var int timestamp of when the stash was modified */
+    public $timemodified;
     /** @var stdClass the owner of the stash */
     public $owner;
     /** @var array of language names */
@@ -71,6 +73,7 @@ class local_amos_stash implements renderable {
         $new->id            = $stash->id;
         $new->name          = $stash->name;
         $new->timecreated   = $stash->timecreated;
+        $new->timemodified  = $stash->timemodified;
 
         $stage = new mlang_stage();
         $stash->apply($stage);
@@ -109,6 +112,7 @@ class local_amos_stash implements renderable {
         $new->id            = $record->id;
         $new->name          = $record->name;
         $new->timecreated   = $record->timecreated;
+        $new->timemodified  = $record->timemodified;
         $new->strings       = $record->strings;
         $new->components    = explode('/', trim($record->components, '/'));
         $new->languages     = explode('/', trim($record->languages, '/'));
