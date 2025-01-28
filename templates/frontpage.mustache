@@ -23,54 +23,18 @@
     {}
 }}
 
-<h1 class="brandheader" style="margin: 1.5rem 0 0">Translation</h1>
-
-<div class="card-deck my-2">
-    <div class="card">
-        <div class="lead card-header">{{#str}} amos, local_amos {{/str}}</div>
-        <div class="card-body">
-            <div>{{#str}} about, local_amos {{/str}}</div>
-        </div>
-    </div>
-    <div class="card">
-        <div class="lead card-header">{{#str}} contribute, local_amos {{/str}}</div>
-        <div class="card-body">
-            <p>{{#str}} contributestats, local_amos, {"count": {{#quote}} {{{contributedstrings}}} {{/quote}} } {{/str}}</p>
-            <p>{{#str}} contributethanks, local_amos, { "listcontributors": {{#quote}} {{{listcontributors}}} {{/quote}} } {{/str}}</p>
-            <p class="text-center">
-                <a class="btn btn-large btn-success" href="/local/amos/">{{#str}} contributenow, local_amos {{/str}}</a>
-                <a class="btn btn-large btn-secondary" href="/local/amos/credits.php">{{#str}} creditstitleshort, local_amos {{/str}}</a>
-            </p>
-        </div>
-    </div>
-    <div class="card">
-        <div class="lead card-header">{{#str}} quicklinks, local_amos {{/str}}</div>
-        <div class="card-body">
-            <ul class="unstyled">
-                <li>
-                    <a href="/local/amos/view.php">
-                        {{#str}} quicklinks_amos, local_amos {{/str}}
-                    </a>
-                </li>
-                <li>
-                    <a href="/course/view.php?id=2">
-                        {{#str}} quicklinks_forum, local_amos {{/str}}
-                    </a>
-                </li>
-                <li>
-                    <a href="/mod/page/view.php?id=9">
-                        {{#str}} quicklinks_newcomers, local_amos {{/str}}
-                    </a>
-                </li>
-                <li>
-                    <a href="https://docs.moodle.org/dev/AMOS_manual">
-                        {{#str}} quicklinks_manual, local_amos {{/str}}
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>
+{{#js}}
+{{#contributedstrings}}
+    require(['local_amos/contributedstrings'], function(contributedstrings) {
+        contributedstrings.init('{{{contributedstrings}}}');
+    });
+{{/contributedstrings}}
+{{#listcontributors}}
+    require(['local_amos/listcontributors'], function(listcontributors) {
+        listcontributors.init('{{#str}} contributethanks, local_amos, { "listcontributors": {{#quote}} {{{listcontributors}}} {{/quote}} } {{/str}}');
+    });
+{{/listcontributors}}
+{{/js}}
 
 <div class="card">
     <div class="lead card-header">{{#str}} availablelangs, core_install {{/str}}</div>
