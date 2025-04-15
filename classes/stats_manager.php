@@ -125,9 +125,9 @@ class local_amos_stats_manager {
 
         $sql = "SELECT id, branch, lang, component, numofstrings
                   FROM {amos_stats}
-                 WHERE branch ${sqlbranches}
-                   AND lang ${sqllangs}
-                   AND component ${sqlcomponents}";
+                 WHERE branch $sqlbranches
+                   AND lang $sqllangs
+                   AND component $sqlcomponents";
 
         $current = [];
         $rs = $DB->get_recordset_sql($sql, array_merge($parambranches, $paramlangs, $paramcomponents));
@@ -324,7 +324,7 @@ class local_amos_stats_manager {
 
         $sql = "SELECT lang, SUM(numofstrings) AS totalnumofstrings
                   FROM {amos_stats}
-                 WHERE component ${standardsql}
+                 WHERE component $standardsql
                    AND branch = :vercode
               GROUP BY lang
               ORDER BY totalnumofstrings DESC, MAX(timemodified), lang";

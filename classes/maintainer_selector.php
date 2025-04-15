@@ -67,9 +67,9 @@ class local_amos_maintainer_selector extends user_selector_base {
         $countfields = "SELECT COUNT(*)";
 
         $sql = " FROM {user} u
-                WHERE u.id ${permsql} AND ${searchsql}";
+                WHERE u.id $permsql AND $searchsql";
 
-        $order = " ORDER BY ${sortsql}";
+        $order = " ORDER BY $sortsql";
 
         if (!$this->is_validating()) {
             $foundcount = $DB->count_records_sql($countfields.$sql, array_merge($permparams, $searchparams));

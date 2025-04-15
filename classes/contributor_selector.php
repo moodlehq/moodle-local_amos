@@ -64,9 +64,9 @@ class local_amos_contributor_selector extends user_selector_base {
         $countfields = "SELECT COUNT(*)";
 
         $sql = " FROM {user} u
-                WHERE ${searchsql}";
+                WHERE $searchsql";
 
-        $order = " ORDER BY ${sortsql}";
+        $order = " ORDER BY $sortsql";
 
         if (!$this->is_validating()) {
             $foundcount = $DB->count_records_sql($countfields.$sql, array_merge($searchparams));
