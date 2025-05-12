@@ -1,3 +1,8 @@
+### 2025.05.12 ###
+
+* MDLSITE-7990 Fixes to make the styling work with Moodle 5.0. Credit goes to Daniel
+  Ureña.
+
 ### 2024.08.05 ###
 
 * MDLSITE-6660 the "Substring" filter now allows to specify whether it applies to
