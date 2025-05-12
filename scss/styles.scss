@@ -127,3 +127,31 @@
 .path-local-amos .commentswrapper .comment-area {
     margin: 0px auto;
 }
+
+#page-local-amos-view {
+    .badge-light {
+        color: #1d2125;
+        background-color: #f8f9fa;
+    }
+    .form-text {
+        display: block;
+    }
+    .btn-group-toggle>.btn input[type="radio"] {
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
+    .btn-light {
+        color: #1d2125;
+        background-color: #f8f9fa;
+        border-color: #f8f9fa;
+    }
+
+    .btn-light:not(:disabled):not(.disabled):active,
+    .btn-light:not(:disabled):not(.disabled).active,
+    .show>.btn-light.dropdown-toggle {
+        color: #1d2125;
+        background-color: #dae0e5;
+        border-color: #d3d9df;
+    }
+}
