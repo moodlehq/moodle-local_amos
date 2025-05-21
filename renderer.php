@@ -283,7 +283,7 @@ class local_amos_renderer extends plugin_renderer_base {
 
         $attr['aria-controls'] = html_writer::random_id('collapse_');
         $attr['data-bs-toggle'] = 'collapse';
-        $attr['data-target'] = '#'.$attr['aria-controls'];
+        $attr['data-bs-target'] = '#'.$attr['aria-controls'];
 
         $output = html_writer::start_div('stagetool '.$extraclasses);
         $output .= html_writer::div(
