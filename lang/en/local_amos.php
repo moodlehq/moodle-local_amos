@@ -246,6 +246,7 @@ $string['languages'] = 'Languages';
 $string['languagesall'] = 'All';
 $string['languagesnone'] = 'None';
 $string['lastavailable'] = 'Latest available version';
+$string['limitreachedmsg'] = 'Too many results. Try changing the filter options to narrow down your search.';
 $string['log'] = 'Log';
 $string['logfilterbranch'] = 'Versions';
 $string['logfiltercommithash'] = 'git hash';

@@ -34,6 +34,13 @@
         "found": 1,
         "missing": 0,
         "missingcurrentpage": 0,
+        "limitreached": false,
+        "limitreachedmsg": {
+            "message": "Too many strings found",
+            "closebutton": 0,
+            "announce": 1,
+            "extraclasses": "limitreached",
+        },
         "strings": [
             {
                 "translatable": true,
@@ -65,13 +72,18 @@
 }}
 
 <div class="mt-4 mb-3">
+    {{#limitreachedmsg}}
+        {{> core/notification_error}}
+    {{/limitreachedmsg}}
     <div class="row">
         <div class="col-md">
             <ul class="list-inline">
+                {{^limitreached}}
                 <li class="list-inline-item">{{#str}} foundtotal, local_amos, <span class="badge badge-info">{{found}}</span> {{/str}}</li>
                 <li class="list-inline-item">{{#str}} foundmissing, local_amos, <span class="badge badge-light">{{missing}}</span> {{/str}}</li>
                 <li class="list-inline-item">{{#str}} foundmissingonthispage, local_amos, <span class="badge badge-light">{{missingcurrentpage}}</span> {{/str}}</li>
                 <li class="list-inline-item"><i class="fa fa-link" aria-hidden="true"></i> <a href="{{permalink}}">{{#str}} permalink, local_amos {{/str}}</a></li>
+                {{/limitreached}}
                 <li class="list-inline-item"><i class="fa fa-arrow-right" aria-hidden="true"></i> <a href="/local/amos/stage.php">{{#str}} stagetoolopen, local_amos{{/str}}</a></li>
             </ul>
         </div>

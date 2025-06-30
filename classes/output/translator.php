@@ -59,6 +59,9 @@ class translator implements \renderable, \templatable {
     /** @var \local_amos\output\filter */
     public $filter = null;
 
+    /** @var bool The filter would return too many strings to fit into memory. */
+    public $limitreached = null;
+
     /**
      * Constructor.
      *
@@ -154,8 +157,22 @@ class translator implements \renderable, \templatable {
         $tree = [];
         $newer = [];
         $compbranch = 0;
+        $numrec = 0;
+        $memlimit = ceil(get_real_size(ini_get('memory_limit')) * 0.9);
+        $this->limitreached = false;
 
         foreach ($recordset as $record) {
+            $numrec++;
+
+            if ($numrec % 1000 === 0) {
+                if (memory_get_usage() > $memlimit) {
+                    $this->limitreached = true;
+                    $tree = [];
+                    $newer = [];
+                    break;
+                }
+            }
+
             if ($last) {
                 $compbranch = $latestcomponentbranch[$record->component];
             } else {
@@ -195,11 +212,23 @@ class translator implements \renderable, \templatable {
 
         // Convert the tree into a new one containing only non-deletions.
         $s = [];
+        $numrec = 0;
 
         foreach ($tree as $xlang => $xcomps) {
             foreach ($xcomps as $xcomp => $xstrnames) {
                 foreach ($xstrnames as $xstrname => $record) {
                     if ($record->strtext !== null) {
+                        $numrec++;
+                        if ($numrec % 1000 === 0) {
+                            if (memory_get_usage() > $memlimit) {
+                                $this->limitreached = true;
+                                $tree = [];
+                                $newer = [];
+                                $s = [];
+                                break 3;
+                            }
+                        }
+
                         $s[$xlang][$xcomp][$xstrname] = (object) [
                             'amosid' => $record->id,
                             'text' => $record->strtext,
@@ -534,8 +563,18 @@ class translator implements \renderable, \templatable {
             'missing' => $this->numofmissing,
             'missingcurrentpage' => $this->numofmissingoncurrentpage,
             'strings' => $this->strings,
+            'limitreached' => $this->limitreached,
             'paginator' => $this->export_for_template_paginator($output),
         ];
+
+        if ($this->limitreached) {
+            $result['limitreachedmsg'] = [
+                'message' => get_string('limitreachedmsg', 'local_amos'),
+                'closebutton' => 0,
+                'announce' => 1,
+                'extraclasses' => 'limitreached',
+            ];
+        }
 
         $listlanguages = \mlang_tools::list_languages();
         $standard = \local_amos\local\util::standard_components_list();
