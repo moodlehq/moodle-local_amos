@@ -1,3 +1,9 @@
+### 2025.07.01 ###
+
+* MDLSITE-8099 Added ability to filter additional (contributed) components only.
+* MDLSITE-8099 Added a message that there is not enough memory to process the current
+  filter setting.
+
 ### 2025.05.12 ###
 
 * MDLSITE-7990 Fixes to make the styling work with Moodle 5.0. Credit goes to Daniel
