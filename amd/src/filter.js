@@ -178,7 +178,15 @@ const handleComponentSelectorAction = (e, fcmp, action) => {
         e.preventDefault();
         fcmp.querySelectorAll(`${selectorComponentItem}`).forEach(item => {
             var type = item.getAttribute('data-component-type');
-            item.checked = type == 'core' || type == 'standard';
+            item.checked = (type == 'core' || type == 'standard');
+        });
+    }
+
+    if (action == 'selectadditional') {
+        e.preventDefault();
+        fcmp.querySelectorAll(`${selectorComponentItem}`).forEach(item => {
+            var type = item.getAttribute('data-component-type');
+            item.checked = (type == 'contrib');
         });
     }
 

@@ -54,6 +54,7 @@ $string['commitstage_help'] = 'Permanently store all staged translations in AMOS
 $string['committable'] = 'You have permission to commit to this language pack';
 $string['committableall'] = 'all languages';
 $string['committablenone'] = 'no languages allowed - please contact AMOS manager';
+$string['componentsadditional'] = 'Additional';
 $string['componentsall'] = 'All';
 $string['componentsapp'] = 'Moodle App';
 $string['componentsnone'] = 'None';
