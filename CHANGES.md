@@ -3,6 +3,7 @@
 * MDLSITE-8099 Added ability to filter additional (contributed) components only.
 * MDLSITE-8099 Added a message that there is not enough memory to process the current
   filter setting.
+* MDLSITE-7228 URLs in generated installer strings updated.
 
 ### 2025.05.12 ###
 
