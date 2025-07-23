@@ -61,8 +61,16 @@ foreach ($versions as $version) {
 
     fputs(STDOUT, "PROCESSING VERSION {$version->code} ({$gitbranch})\n");
 
+    if ($version->code >= 501) {
+        $installroot = 'public/install';
+    } else {
+        $installroot = 'install';
+    }
+
+    $stringnamestxt = $installroot . '/stringnames.txt';
+
     // Read the contents of stringnames.txt on the given branch.
-    $gitout = $git->exec('show ' . escapeshellarg($gitbranch . ':install/stringnames.txt'));
+    $gitout = $git->exec('show ' . escapeshellarg($gitbranch . ':' . $stringnamestxt));
 
     $list = [];
 
@@ -82,7 +90,7 @@ foreach ($versions as $version) {
  * needed during the very first steps of installation. This file was
  * generated automatically by export-installer.php (which is part of AMOS
  * {@link https://moodledev.io/general/projects/api/amos}) using the
- * list of strings defined in /install/stringnames.txt.
+ * list of strings defined in {$stringnamestxt} file.
  *
  * @package   installer
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -99,7 +107,7 @@ EOF;
             $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false,
                 array_keys($stringids));
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/install/lang/' . $lang . '/' . $component->name . '.php';
+                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/' . $installroot . '/lang/' . $lang . '/' . $component->name . '.php';
                 if (!file_exists(dirname($file))) {
                     mkdir(dirname($file), 0755, true);
                 }
