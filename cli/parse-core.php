@@ -263,6 +263,8 @@ $ignoredcommits = array(
     '8118207b6fd8607eeca1aa7bef327e8280e3e5f8',
     // Removal of mod_hotpot from core.
     '91b9560bd63e5582781e910573ee0887b558ca12',
+    // Moving most of the codebase to the public subfolder.
+    'f747c15cbf1c1c963a9592a73b167b969ec33d75',
 );
 
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
