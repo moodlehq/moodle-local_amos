@@ -52,7 +52,7 @@ prepare_branches() {
         git checkout --no-guess -b ${installbranch} --no-track upstream/${upstreambranch}
     fi
 
-	GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" \
+    GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" \
         git merge ${upstreambranch}
 }
 
@@ -65,15 +65,20 @@ prepare_branches() {
 commit_install_strings() {
     local dirname=$1
     local installbranch=$2
+    local installroot="install"
 
-	cd ${REPO}
-	git checkout ${installbranch}
+    cd ${REPO}
+    git checkout ${installbranch}
 
-	cd ${REPO}/install
-	rm -rf lang
-	cp -r ${AMOSDATAROOT}/export-install/${dirname}/install/lang .
-	git add .
-	GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" \
+    if [[ -d ${AMOSDATAROOT}/export-install/${dirname}/public ]]; then
+        installroot="public/install"
+    fi
+
+    cd ${REPO}/${installroot}
+    rm -rf lang
+    cp -r ${AMOSDATAROOT}/export-install/${dirname}/${installroot}/lang .
+    git add .
+    GIT_AUTHOR_NAME="AMOS bot" GIT_AUTHOR_EMAIL="amos@moodle.org" GIT_COMMITTER_NAME="AMOS bot" GIT_COMMITTER_EMAIL="amos@moodle.org" \
         git commit -a -m "Automatically generated installer lang files"
 }
 
