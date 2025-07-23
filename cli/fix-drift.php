@@ -54,7 +54,15 @@ $cliresult = 0;
 
 // Load the location of standard plugin types and core subsystems.
 $componentsjson = (array) json_decode(implode(PHP_EOL, $git->exec('show origin/main:lib/components.json')), true);
-$plugintypelocations = $componentsjson['plugintypes'];
+$plugintypelocations = [];
+
+foreach ($componentsjson['plugintypes'] as $plugtype => $pluglocation) {
+    if (str_starts_with($pluglocation, 'public/')) {
+        $plugintypelocations[$plugtype] = substr($pluglocation, 7);
+    } else {
+        $plugintypelocations[$plugtype] = $pluglocation;
+    }
+}
 
 foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), -1, PREG_SPLIT_NO_EMPTY) as $line) {
     if (preg_match('|^\s*([a-z][a-z0-9]*)\s+(.+)$|', $line, $matches)) {
@@ -117,6 +125,10 @@ foreach ($plugins as $versioncode => $plugintypes) {
 
         } else {
             $filepath = $plugintypelocations[$plugintype] . '/' . $pluginname . '/lang/en/' . $legacyname . '.php';
+        }
+
+        if ($version->code >= 501) {
+            $filepath = 'public/' . $filepath;
         }
 
         // Get the most recent snapshot from the git repository.
