@@ -8,7 +8,7 @@
 # periodically: H/5 * * * *
 # downstream: en-track
 
-cd $AMOSDATAROOT/repos/moodle
+cd $AMOSDATAROOT/repos/moodle/public
 OLDMD5=$(md5sum version.php)
 git pull
 NEWMD5=$(md5sum version.php)
