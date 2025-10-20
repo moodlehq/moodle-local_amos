@@ -7,7 +7,8 @@
 
 NOW=$(date +%s)
 
-php $AMOSCLIROOT/export-zip.php --minver=400 && \
+php $AMOSCLIROOT/export-zip.php --minver=500 && \
+    php $AMOSCLIROOT/export-zip.php --minver=400 --maxver=405 && \
     php $AMOSCLIROOT/export-zip.php --minver=35 --maxver=311 && \
     php $AMOSCLIROOT/export-zip.php --minver=27 --maxver=34 && \
     php $AMOSCLIROOT/export-zip.php --maxver=26 && \
