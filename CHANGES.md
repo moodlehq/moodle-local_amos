@@ -1,3 +1,7 @@
+### 2025.10.20 ###
+
+* MDLSITE-8135 Support the new directory layout introduced in Moodle 5.1
+
 ### 2025.07.01 ###
 
 * MDLSITE-8099 Added ability to filter additional (contributed) components only.
