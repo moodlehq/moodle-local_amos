@@ -1919,14 +1919,22 @@ class mlang_tools {
         $cache = cache::make('local_amos', 'lists');
         $components = $cache->get('components');
 
+        // These components are to be excluded from processing.
+        $excluded = [
+            'local_moodleorg',
+        ];
+
         if ($components === false) {
+
+            [$excludedsql, $excludedparams] = $DB->get_in_or_equal($excluded, SQL_PARAMS_QM, 'param', false);
 
             $sql = "SELECT component, MIN(since) AS since
                       FROM {amos_strings}
+                     WHERE component $excludedsql
                   GROUP BY component
                   ORDER BY component";
 
-            $rs = $DB->get_recordset_sql($sql);
+            $rs = $DB->get_recordset_sql($sql, $excludedparams);
             $components = [];
 
             foreach ($rs as $record) {
