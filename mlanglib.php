@@ -1922,6 +1922,7 @@ class mlang_tools {
         // These components are to be excluded from processing.
         $excluded = [
             'local_moodleorg',
+            'theme_moodleorg',
         ];
 
         if ($components === false) {
