@@ -29,7 +29,7 @@ import FilterEvents from './filter_events';
 import TranslatorEvents from './translator_events';
 import Templates from 'core/templates';
 import ModalEvents from 'core/modal_events';
-import ModalFactory from 'core/modal_factory';
+import Modal from 'core/modal';
 import {get_string as getString} from 'core/str';
 
 /**
@@ -255,7 +255,7 @@ const showTimeline = (item) => {
         return Templates.render('local_amos/timeline', response);
 
     }).then((html) => {
-        return ModalFactory.create({
+        return Modal.create({
             large: true,
             title: modalTitle,
             body: html,
