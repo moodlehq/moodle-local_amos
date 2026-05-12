@@ -1,3 +1,7 @@
+### 2026.05.12 ###
+
+* Fixed deprecated `core/modal_factory` module. Credit goes to Khairu Sudirman.
+
 ### 2025.10.20 ###
 
 * MDLSITE-8135 Support the new directory layout introduced in Moodle 5.1
