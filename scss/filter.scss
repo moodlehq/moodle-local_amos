@@ -18,6 +18,18 @@
         font-weight: bold;
     }
 
+    // Keep the component selector table borderless.
+    #amosfilter_fcmp_items_table {
+        border: none;
+
+        tbody,
+        tr,
+        th,
+        td {
+            border: none;
+        }
+    }
+
     // Hide advanced settings in basic mode, unless they are forced to be shown.
     &[data-level-showadvanced="0"] [data-level="advanced"]:not([data-level-forceshow]) {
         display: none;
