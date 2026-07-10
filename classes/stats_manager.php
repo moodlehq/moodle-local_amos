@@ -469,7 +469,7 @@ class local_amos_stats_manager {
     /**
      * Populates the contribution stats for the front page.
      *
-     * @return string
+     * @return array
      */
     public function frontpage_contribution_stats(): array {
         global $CFG, $DB;
@@ -478,25 +478,36 @@ class local_amos_stats_manager {
         $cachekey = 'contributionstats';
 
         if ($cached = $cache->get($cachekey)) {
-            return $cached;
+            if (($cached['timecached'] ?? 0) > time() - 600) {
+                // The cache is not older than 10 minutes, let's use it.
+                return $cached;
+            }
         }
 
         $total = (int)$DB->get_field_sql("
-            SELECT SUM(strings)
-              FROM {amos_contributions} c
-              JOIN mdl_amos_stashes s ON c.stashid = s.id
-             WHERE c.status = 30");
+            SELECT SUM(numofstrings)
+              FROM {amos_stats}
+             WHERE branch = (SELECT MAX(branch) FROM {amos_stats})
+               AND lang != 'en'");
 
         $namefields = \core_user\fields::for_name()->get_sql('u')->selects;
-        $recent = $DB->get_records_sql("
+
+        $recentcommitters = $DB->get_records_sql("
+            SELECT c.userid AS id $namefields, MAX(c.timecommitted) AS mostrecent
+              FROM {amos_commits} c
+              JOIN {user} u ON u.id = c.userid
+          GROUP BY c.userid $namefields
+          ORDER BY mostrecent DESC", null, 0, 2);
+
+        $recentcontributors = $DB->get_records_sql("
             SELECT c.authorid AS id $namefields, MAX(c.timecreated) AS mostrecent
               FROM {amos_contributions} c
               JOIN {user} u ON u.id = c.authorid
           GROUP BY c.authorid $namefields
-          ORDER BY mostrecent DESC", null, 0, 4);
+          ORDER BY mostrecent DESC", null, 0, 2);
 
         $links = array();
-        foreach ($recent as $contributor) {
+        foreach ($recentcommitters + $recentcontributors as $contributor) {
             $links[] = '<a style="color: #0077b8; text-decoration: underline;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$contributor->id.'">'.s(fullname($contributor)).'</a>';
         }
 
@@ -510,6 +521,7 @@ class local_amos_stats_manager {
         $result = [
             'contributedstrings' => number_format($total, 0, '', get_string('thousandssep', 'core_langconfig')),
             'listcontributors' => $links,
+            'timecached' => time(),
         ];
 
         $cache->set($cachekey, $result);
