@@ -94,42 +94,9 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', con
                         notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
                     }
 
-                    // Load English strings with full info so that $extra->since is populated.
-                    // Strings deleted in current English are excluded by $deleted=false.
-                    $encomponent = mlang_component::from_snapshot($name, 'en', mlang_version::latest_version(),
-                        null, false, true);
-
-                    // Group translated strings by their English source version code.
-                    $byversion = [];
-                    foreach ($tempcomponent->get_string_keys() as $strname) {
-                        $enstr = $encomponent->get_string($strname);
-                        if ($enstr === null) {
-                            // String not present in English; skip it.
-                            continue;
-                        }
-                        $byversion[$enstr->extra->since][] = $strname;
-                    }
-
-                    // Stage one mlang_component per version group.
-                    foreach ($byversion as $vcode => $strnames) {
-                        $mver = mlang_version::by_code($vcode);
-                        if (!$mver->translatable) {
-                            continue;
-                        }
-                        $component = new mlang_component($name, $data->language, $mver);
-                        foreach ($strnames as $strname) {
-                            $str = $tempcomponent->get_string($strname);
-                            $component->add_string(new mlang_string($str->id, $str->text, $str->timemodified,
-                                $str->deleted));
-                        }
-                        if ($component->has_string()) {
-                            $stage->add($component, true);
-                            $component->clear();
-                            $stage->store();
-                        }
-                    }
-
+                    local_amos_importfile_stage_auto($stage, $tempcomponent);
                     $tempcomponent->clear();
+                    $stage->store();
 
                 } else {
                     $version = mlang_version::by_code($data->version);

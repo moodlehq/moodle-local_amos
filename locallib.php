@@ -295,6 +295,54 @@ function local_amos_importfile_options() {
 }
 
 /**
+ * Stage translated strings at the auto-detected version of their English source.
+ *
+ * For each string in $parsed, the most recent non-deleted English version is
+ * looked up via {@see mlang_component::from_snapshot()}. Strings that have no
+ * English counterpart are silently skipped. The translated strings are added to
+ * $stage grouped by their target version.
+ *
+ * @param mlang_stage $stage Stage to add the versioned components into.
+ * @param mlang_component $parsed Component holding the parsed translated strings.
+ *     Its name and lang properties determine which component and language are staged.
+ */
+function local_amos_importfile_stage_auto(mlang_stage $stage, mlang_component $parsed): void {
+
+    // Load English strings with full info so that $extra->since is populated.
+    // $deleted=false ensures strings currently deleted in English are excluded.
+    $encomponent = mlang_component::from_snapshot($parsed->name, 'en', mlang_version::latest_version(),
+        null, false, true);
+
+    // Group translated strings by their English source version code.
+    $byversion = [];
+    foreach ($parsed->get_string_keys() as $strname) {
+        $enstr = $encomponent->get_string($strname);
+        if ($enstr === null) {
+            // Not present in current English; skip.
+            continue;
+        }
+        $byversion[$enstr->extra->since][] = $strname;
+    }
+
+    // Add one mlang_component per version group to the stage.
+    foreach ($byversion as $vcode => $strnames) {
+        $mver = mlang_version::by_code($vcode);
+        if (!$mver->translatable) {
+            continue;
+        }
+        $component = new mlang_component($parsed->name, $parsed->lang, $mver);
+        foreach ($strnames as $strname) {
+            $str = $parsed->get_string($strname);
+            $component->add_string(new mlang_string($str->id, $str->text, $str->timemodified, $str->deleted));
+        }
+        if ($component->has_string()) {
+            $stage->add($component, true);
+            $component->clear();
+        }
+    }
+}
+
+/**
  * Returns the options used for {@see local_amos_execute_form}
  *
  * @return array
