@@ -81,7 +81,7 @@ class local_amos_mlang_version_test extends advanced_testcase {
      *
      * @return array
      */
-    public function mlang_version_properties_provider(): array {
+    public static function mlang_version_properties_provider(): array {
         return [
             'Moodle 1.x - not translatable' => [
                 'code' => 16,
