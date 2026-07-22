@@ -277,14 +277,13 @@ function local_amos_importfile_options() {
 
     $options = array();
 
-    $options['versions'] = array();
-    $options['versioncurrent'] = null;
+    $options['versions'] = ['auto' => get_string('versionauto', 'local_amos')];
+    $options['versioncurrent'] = 'auto';
     foreach (mlang_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
         }
     }
-    $options['versioncurrent'] = mlang_version::latest_version()->code;
     $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
     $currentlanguage = current_language();
     if ($currentlanguage === 'en') {

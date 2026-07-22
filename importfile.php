@@ -78,27 +78,78 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', con
 
         } else {
             $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-            $version = mlang_version::by_code($data->version);
             $parser = mlang_parser_factory::get_parser('php');
 
             foreach ($stringfiles as $filenameorig => $pathname) {
                 $name = mlang_component::name_from_filename($filenameorig);
-                $component = new mlang_component($name, $data->language, $version);
 
-                try {
-                    $parser->parse(file_get_contents($pathname), $component);
+                if ($data->version === 'auto') {
+                    // Auto version: stage each string at the version of its most recent English source.
+                    $tempcomponent = new mlang_component($name, $data->language, mlang_version::latest_version());
 
-                } catch (mlang_parser_exception $e) {
-                    notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
-                }
+                    try {
+                        $parser->parse(file_get_contents($pathname), $tempcomponent);
 
-                $encomponent = mlang_component::from_snapshot($component->name, 'en', $version);
-                $component->intersect($encomponent);
+                    } catch (mlang_parser_exception $e) {
+                        notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
+                    }
 
-                if ($component->has_string()) {
-                    $stage->add($component, true);
-                    $component->clear();
-                    $stage->store();
+                    // Load English strings with full info so that $extra->since is populated.
+                    // Strings deleted in current English are excluded by $deleted=false.
+                    $encomponent = mlang_component::from_snapshot($name, 'en', mlang_version::latest_version(),
+                        null, false, true);
+
+                    // Group translated strings by their English source version code.
+                    $byversion = [];
+                    foreach ($tempcomponent->get_string_keys() as $strname) {
+                        $enstr = $encomponent->get_string($strname);
+                        if ($enstr === null) {
+                            // String not present in English; skip it.
+                            continue;
+                        }
+                        $byversion[$enstr->extra->since][] = $strname;
+                    }
+
+                    // Stage one mlang_component per version group.
+                    foreach ($byversion as $vcode => $strnames) {
+                        $mver = mlang_version::by_code($vcode);
+                        if (!$mver->translatable) {
+                            continue;
+                        }
+                        $component = new mlang_component($name, $data->language, $mver);
+                        foreach ($strnames as $strname) {
+                            $str = $tempcomponent->get_string($strname);
+                            $component->add_string(new mlang_string($str->id, $str->text, $str->timemodified,
+                                $str->deleted));
+                        }
+                        if ($component->has_string()) {
+                            $stage->add($component, true);
+                            $component->clear();
+                            $stage->store();
+                        }
+                    }
+
+                    $tempcomponent->clear();
+
+                } else {
+                    $version = mlang_version::by_code($data->version);
+                    $component = new mlang_component($name, $data->language, $version);
+
+                    try {
+                        $parser->parse(file_get_contents($pathname), $component);
+
+                    } catch (mlang_parser_exception $e) {
+                        notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
+                    }
+
+                    $encomponent = mlang_component::from_snapshot($component->name, 'en', $version);
+                    $component->intersect($encomponent);
+
+                    if ($component->has_string()) {
+                        $stage->add($component, true);
+                        $component->clear();
+                        $stage->store();
+                    }
                 }
             }
             mlang_stash::autosave($stage);

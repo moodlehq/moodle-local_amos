@@ -486,3 +486,4 @@ $string['untranslating'] = 'Untranslating';
 $string['userdefaultsave'] = 'Save as my defaults';
 $string['userdefaultreset'] = 'Reset to my defaults';
 $string['version'] = 'Version';
+$string['versionauto'] = 'Auto';
