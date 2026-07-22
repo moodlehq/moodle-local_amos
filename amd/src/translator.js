@@ -266,11 +266,44 @@ const showTimeline = (item) => {
             modal.destroy();
         });
 
+        modal.getRoot().on('click', '[data-region="deletetranslationlink"]', (e) => {
+            e.preventDefault();
+            deleteTranslation(e.currentTarget);
+        });
+
         modal.show();
 
         return modal;
 
     }).catch(Notification.exception);
+};
+
+/**
+ * @function deleteTranslation
+ * @param {Element} link
+ */
+const deleteTranslation = (link) => {
+    Notification.confirm(
+        getString('deletetranslationtitle', 'local_amos'),
+        getString('deletetranslationconfirm', 'local_amos'),
+        getString('delete', 'core'),
+        getString('cancel', 'core'),
+        () => {
+            fetchMany([{
+                methodname: 'local_amos_delete_translation',
+                args: {
+                    translationid: link.getAttribute('data-translationid'),
+                },
+
+            }])[0].then(() => {
+                let row = link.closest('[data-region="timelinerow"]');
+                row?.remove();
+
+                return true;
+
+            }).catch(Notification.exception);
+        }
+    );
 };
 
 /**

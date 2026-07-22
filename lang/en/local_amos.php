@@ -191,6 +191,9 @@ $string['creditsnomaintainer'] = 'No maintainer at the moment. <a href="{$a->url
 $string['creditsthanks'] = 'On this page, we wish to thank everyone who has contributed to Moodle translations. Their work has made the spread of Moodle across the world  possible.';
 $string['creditstitlelong'] = 'Language pack maintainers and contributors';
 $string['creditstitleshort'] = 'Credits';
+$string['deletetranslation'] = 'Delete this record';
+$string['deletetranslationconfirm'] = 'Are you sure you want to permanently delete this translation record? This cannot be undone.';
+$string['deletetranslationtitle'] = 'Deleting translation record';
 $string['diff'] = 'Compare';
 $string['diffstringmode'] = 'Switch diff mode';
 $string['err_exception'] = 'Error: {$a}';

@@ -2,6 +2,7 @@
 *.swp
 /.patches/
 /phpunit.xml
+/tests/phpunit.xml
 /cli/config.php
 .DS_Store
 /node_modules/

@@ -2,6 +2,8 @@
 
 * MDLSITE-6394 Allow the version to be automatically detected when importing strings
   from a file.
+* Added ability for AMOS admins to permanently delete a bad translation record
+  directly from the string history timeline.
 
 ### 2026.05.12 ###
 

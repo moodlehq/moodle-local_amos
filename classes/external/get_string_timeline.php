@@ -58,7 +58,8 @@ class get_string_timeline extends \core_external\external_api {
     public static function execute(string $component, string $strname, string $language): array {
         global $DB;
 
-        $context = \context_system::instance();
+        /** @var \context $context */
+        $context = \core\context\system::instance();
         self::validate_context($context);
         require_capability('local/amos:stage', $context);
 
@@ -71,6 +72,8 @@ class get_string_timeline extends \core_external\external_api {
             'strname',
             'language'
         ));
+
+        $candelete = has_capability('local/amos:manage', $context);
 
         $sql = "SELECT s.id, 'en' AS lang, s.strtext, s.since, s.timemodified,
                        c.userinfo, c.commitmsg, c.commithash, c.source
@@ -152,6 +155,11 @@ class get_string_timeline extends \core_external\external_api {
 
             $cell['displaytext'] = \local_amos\local\util::add_breaks($displaytext);
 
+            if ($record->lang !== 'en') {
+                $cell['translationid'] = $record->id;
+                $cell['candelete'] = $candelete;
+            }
+
             if ($record->commithash) {
                 if ($record->lang === 'en' && $record->source === 'git') {
                     $cell['hascommithash'] = true;
@@ -214,6 +222,9 @@ class get_string_timeline extends \core_external\external_api {
             'commiturl' => new \core_external\external_value(PARAM_URL, 'Commit URL', VALUE_OPTIONAL),
             'commitsource' => new \core_external\external_value(PARAM_RAW, 'Commit source', VALUE_OPTIONAL),
             'displaytext' => new \core_external\external_value(PARAM_RAW, 'Formatted string text content', VALUE_OPTIONAL),
+            'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the amos_translations record', VALUE_OPTIONAL),
+            'candelete' => new \core_external\external_value(PARAM_BOOL, 'Can the current user delete this translation record',
+                VALUE_OPTIONAL),
         ]);
 
         return new \core_external\external_single_structure([

@@ -70,6 +70,14 @@ $functions = [
         'type' => 'write',
         'ajax' => true,
     ],
+    'local_amos_delete_translation' => [
+        'classname' => '\local_amos\external\delete_translation',
+        'methodname' => 'execute',
+        'description' => 'Permanently delete a single translation record from the AMOS history.',
+        'capabilities' => 'local/amos:manage',
+        'type' => 'write',
+        'ajax' => true,
+    ],
 ];
 
 $services = [

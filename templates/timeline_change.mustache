@@ -47,6 +47,18 @@
                     <a href="{{commiturl}}" target="_blank">{{commithash}}</a>
                 </div>
             {{/hascommithash}}
+            {{#candelete}}
+                <div>
+                    <a class="my-1 btn btn-outline-danger btn-sm"
+                        role="button"
+                        href="#"
+                        data-region="deletetranslationlink"
+                        data-translationid="{{translationid}}"
+                    >
+                        {{#str}} deletetranslation, local_amos {{/str}}
+                    </a>
+                </div>
+            {{/candelete}}
         </div>
         <div class="bg-white mt-1 p-2">
             {{{displaytext}}}

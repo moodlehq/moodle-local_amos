@@ -91,5 +91,46 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         $this->assertFalse($response['changes'][1]['english']['hascontent']);
         $this->assertEquals('3.9+', $response['changes'][1]['translation']['displaysince']);
         $this->assertEquals('Fů bár', $response['changes'][1]['translation']['displaytext']);
+
+        // Admin has the local/amos:manage capability so the translation record is deletable.
+        $translationid = $DB->get_field('amos_translations', 'id', ['lang' => 'cs', 'component' => 'foo_bar',
+            'strname' => 'foobar'], MUST_EXIST);
+        $this->assertTrue($response['changes'][1]['translation']['candelete']);
+        $this->assertEquals($translationid, $response['changes'][1]['translation']['translationid']);
+    }
+
+    /**
+     * Test that a user without the manage capability can not delete translation records.
+     *
+     * @runInSeparateProcess
+     */
+    public function test_execute_candelete_without_manage_capability() {
+        global $DB;
+        $this->resetAfterTest(true);
+
+        self::setAdminUser();
+
+        $this->register_language('en', 20);
+        $this->register_language('cs', 20);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(39));
+        $component->add_string(new mlang_string('foobar', 'Foo bar'));
+        $stage->add($component);
+        $stage->commit('First string', ['source' => 'unittest']);
+
+        $stage = new mlang_stage();
+        $component = new mlang_component('foo_bar', 'cs', mlang_version::by_code(39));
+        $component->add_string(new mlang_string('foobar', 'Fů bár'));
+        $stage->add($component);
+        $stage->commit('První překlad', ['source' => 'unittest']);
+
+        $user = self::getDataGenerator()->create_user();
+        self::setUser($user);
+
+        $response = \local_amos\external\get_string_timeline::execute('foo_bar', 'foobar', 'cs');
+        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
+
+        $this->assertFalse($response['changes'][0]['translation']['candelete']);
     }
 }
