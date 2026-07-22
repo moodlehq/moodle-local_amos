@@ -354,8 +354,19 @@ class amos_export_zip {
 
         $result = $DB->get_records_sql_menu($sql, $params);
 
+        foreach ($this->consume_pending_zip_rebuilds() as $lang => $since) {
+            $this->log(sprintf('Pending forced rebuild detected for language %s affecting branches since %d', $lang, $since),
+                amos_cli_logger::LEVEL_DEBUG);
+
+            if (!isset($result[$lang]) || $since < $result[$lang]) {
+                $result[$lang] = $since;
+            }
+        }
+
+        ksort($result);
+
         foreach ($result as $lang => $since) {
-            $this->log(sprintf('Recent commit detected in language %s affecting branches since %d', $lang, $since),
+            $this->log(sprintf('Recent change detected in language %s affecting branches since %d', $lang, $since),
                 amos_cli_logger::LEVEL_DEBUG);
         }
 
@@ -364,6 +375,34 @@ class amos_export_zip {
         }
 
         return $result;
+    }
+
+    /**
+     * Reads and clears the list of languages that need a forced ZIP rebuild
+     *
+     * This covers cases such as a translation record being permanently deleted directly from the
+     * database, bypassing the normal commit mechanism that {@see detect_recently_modified_languages()}
+     * relies on.
+     *
+     * @return array of (string) lang => (int) since version code
+     */
+    protected function consume_pending_zip_rebuilds() {
+
+        $raw = get_config('local_amos', 'pendingzipsrebuild');
+
+        if (empty($raw)) {
+            return [];
+        }
+
+        unset_config('pendingzipsrebuild', 'local_amos');
+
+        $pending = json_decode($raw, true);
+
+        if (!is_array($pending)) {
+            return [];
+        }
+
+        return $pending;
     }
 
     /**

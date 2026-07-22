@@ -64,8 +64,10 @@ class delete_translation extends \core_external\external_api {
             'translationid'
         ));
 
-        $DB->get_record('amos_translations', ['id' => $translationid], '*', MUST_EXIST);
+        $record = $DB->get_record('amos_translations', ['id' => $translationid], '*', MUST_EXIST);
         $DB->delete_records('amos_translations', ['id' => $translationid]);
+
+        self::schedule_zip_rebuild($record->lang, $record->since);
 
         return [
             'translationid' => $translationid,
@@ -82,5 +84,36 @@ class delete_translation extends \core_external\external_api {
         return new \core_external\external_single_structure([
             'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the deleted amos_translations record'),
         ]);
+    }
+
+    /**
+     * Remembers that the given language pack needs its ZIP rebuilt on the next export run
+     *
+     * Permanently deleting a translation record bypasses the normal commit mechanism that the
+     * export-zip CLI job relies on to detect recently modified languages. This records the
+     * affected language and version in the plugin config so that the next run of the export-zip
+     * job can pick it up and rebuild the affected ZIP package.
+     *
+     * @param string $lang the language code affected by the deletion
+     * @param int $since the STABLE branch code the deleted record was valid since
+     */
+    protected static function schedule_zip_rebuild(string $lang, int $since) {
+
+        if ($lang === 'en_fix') {
+            // Local English fixes never trigger a language pack rebuild.
+            return;
+        }
+
+        $pending = json_decode((string) get_config('local_amos', 'pendingzipsrebuild'), true);
+
+        if (!is_array($pending)) {
+            $pending = [];
+        }
+
+        if (!isset($pending[$lang]) || $since < $pending[$lang]) {
+            $pending[$lang] = $since;
+        }
+
+        set_config('pendingzipsrebuild', json_encode($pending), 'local_amos');
     }
 }
