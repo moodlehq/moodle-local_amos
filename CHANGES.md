@@ -1,3 +1,8 @@
+## 2026.07.22 ##
+
+* MDLSITE-6394 Allow the version to be automatically detected when importing strings
+  from a file.
+
 ### 2026.05.12 ###
 
 * Fixed deprecated `core/modal_factory` module. Credit goes to Khairu Sudirman.
