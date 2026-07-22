@@ -279,7 +279,7 @@ function local_amos_importfile_options() {
 
     $options['versions'] = ['auto' => get_string('versionauto', 'local_amos')];
     $options['versioncurrent'] = 'auto';
-    foreach (mlang_version::list_all() as $version) {
+    foreach (array_reverse(mlang_version::list_all(), true) as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
         }
