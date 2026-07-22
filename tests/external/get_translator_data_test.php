@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_amos\external;
+
 /**
  * Unit tests for external function {@see \local_amos\external\get_translator_data}.
  *
@@ -22,7 +24,7 @@
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_get_translator_data_testcase extends local_amos_testcase {
+class get_translator_data_test extends \local_amos_testcase {
 
     /**
      * Test that permission check is performed.
@@ -41,8 +43,8 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
         role_assign($spammer, $user->id, SYSCONTEXTID);
         accesslib_clear_all_caches_for_unit_testing();
 
-        $this->expectException(required_capability_exception::class);
-        \local_amos\external\get_translator_data::execute('');
+        $this->expectException(\required_capability_exception::class);
+        get_translator_data::execute('');
     }
 
     /**
@@ -59,10 +61,10 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
+        $stage = new \mlang_stage();
 
-        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Foo bar'));
+        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
         $stage->add($component);
         $component->clear();
 
@@ -78,8 +80,8 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
             'ftxt' => 'Foo bar',
         ], '', '&');
 
-        $response = \local_amos\external\get_translator_data::execute($filterquery);
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_translator_data::execute_returns(), $response);
+        $response = get_translator_data::execute($filterquery);
+        $response = \core_external\external_api::clean_returnvalue(get_translator_data::execute_returns(), $response);
 
         $this->assertTrue(isset($response['json']));
 
@@ -105,8 +107,8 @@ class local_amos_external_get_translator_data_testcase extends local_amos_testca
             'fpg' => 3,
         ], '', '&');
 
-        $response = \local_amos\external\get_translator_data::execute($filterquery);
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_translator_data::execute_returns(), $response);
+        $response = get_translator_data::execute($filterquery);
+        $response = \core_external\external_api::clean_returnvalue(get_translator_data::execute_returns(), $response);
 
         $this->assertTrue(isset($response['json']));
 

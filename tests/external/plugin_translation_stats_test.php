@@ -15,13 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides class {@see local_amos_external_plugin_translation_stats_testcase}.
+ * Provides class {@see \local_amos\external\plugin_translation_stats_test}.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2019 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos\external;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +37,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_plugin_translation_stats_testcase extends externallib_advanced_testcase {
+class plugin_translation_stats_test extends \externallib_advanced_testcase {
 
     /**
      * Test the behaviour of the plugin_translation_stats external function when unknown component is requested.
@@ -47,9 +49,9 @@ class local_amos_external_plugin_translation_stats_testcase extends externallib_
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $this->expectException(invalid_parameter_exception::class);
+        $this->expectException(\invalid_parameter_exception::class);
 
-        \local_amos\external\plugin_translation_stats::execute('muhehe');
+        plugin_translation_stats::execute('muhehe');
     }
 
     /**
@@ -65,18 +67,18 @@ class local_amos_external_plugin_translation_stats_testcase extends externallib_
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_36_STABLE'));
-        $component->add_string(new mlang_string('thislanguageint', 'English'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('langconfig', 'en', \mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new \mlang_string('thislanguageint', 'English'));
         $stage->add($component);
         $component->clear();
         $stage->commit('Registering English language', ['source' => 'unittest']);
 
-        $statsman = new local_amos_stats_manager();
+        $statsman = new \local_amos_stats_manager();
         $statsman->update_stats('36', 'en', 'tool_foo', 9);
 
-        $raw = \local_amos\external\plugin_translation_stats::execute('tool_foo');
-        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\plugin_translation_stats::execute_returns(), $raw);
+        $raw = plugin_translation_stats::execute('tool_foo');
+        $clean = \core_external\external_api::clean_returnvalue(plugin_translation_stats::execute_returns(), $raw);
 
         $this->assertEquals(1, count($clean['langnames']));
         $this->assertEquals(1, count($clean['branches']));

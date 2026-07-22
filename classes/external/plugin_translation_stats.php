@@ -76,7 +76,7 @@ class plugin_translation_stats extends \core_external\external_api {
     /**
      * Describes the return value of the {@see execute()} method.
      *
-     * @return external_description
+     * @return \core_external\external_description
      */
     public static function execute_returns() {
         return new \core_external\external_single_structure([

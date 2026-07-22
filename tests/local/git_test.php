@@ -15,13 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@see local_amos_git_testcase} class.
+ * Provides {@see \local_amos\local\git_test} class.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2019 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos\local;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,7 +35,7 @@ global $CFG;
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_git_testcase extends basic_testcase {
+class git_test extends \basic_testcase {
 
     /**
      * Test {@see \local_amos\local\git::exec()}.
@@ -41,7 +43,7 @@ class local_amos_git_testcase extends basic_testcase {
     public function test_exec() {
 
         $repo = make_request_directory();
-        $git = new \local_amos\local\git($repo);
+        $git = new git($repo);
 
         $out = $git->exec('init --initial-branch=main');
         $this->assertEquals('Initialized empty Git repository in '.$repo.'/.git/', $out[0]);
@@ -53,7 +55,7 @@ class local_amos_git_testcase extends basic_testcase {
         $out = $git->exec('log -n 1 --oneline');
         $this->assertTrue(strpos($out[0], 'Adding a first file') > 0);
 
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $git->exec('add FOO.exe 2>/dev/null');
     }
 
@@ -63,7 +65,7 @@ class local_amos_git_testcase extends basic_testcase {
     public function test_is_success() {
 
         $repo = make_request_directory();
-        $git = new \local_amos\local\git($repo);
+        $git = new git($repo);
 
         $git->exec('init --initial-branch=main');
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
@@ -82,7 +84,7 @@ class local_amos_git_testcase extends basic_testcase {
     public function test_list_local_branches() {
 
         $repo = make_request_directory();
-        $git = new \local_amos\local\git($repo);
+        $git = new git($repo);
 
         $git->exec('init --initial-branch=main');
         $this->assertSame([], $git->list_local_branches());
@@ -104,7 +106,7 @@ class local_amos_git_testcase extends basic_testcase {
     public function test_has_local_branch() {
 
         $repo = make_request_directory();
-        $git = new \local_amos\local\git($repo);
+        $git = new git($repo);
 
         $git->exec('init --initial-branch=main');
         file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');

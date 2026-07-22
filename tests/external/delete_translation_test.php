@@ -24,7 +24,7 @@ namespace local_amos\external;
  * @copyright   2026 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class external_delete_translation_test extends \local_amos_testcase {
+class delete_translation_test extends \local_amos_testcase {
 
     /**
      * Test that permission check is performed.

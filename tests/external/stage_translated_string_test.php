@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_amos\external;
+
 /**
  * Unit tests for external function {@see \local_amos\external\stage_translated_string}.
  *
@@ -22,7 +24,7 @@
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_stage_translated_string_testcase extends local_amos_testcase {
+class stage_translated_string_test extends \local_amos_testcase {
 
     /**
      * Test that permission check is performed.
@@ -41,8 +43,8 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
         role_assign($spammer, $user->id, SYSCONTEXTID);
         accesslib_clear_all_caches_for_unit_testing();
 
-        $this->expectException(required_capability_exception::class);
-        \local_amos\external\stage_translated_string::execute(sesskey(), 123, 'en_fix', 'Foo');
+        $this->expectException(\required_capability_exception::class);
+        stage_translated_string::execute(sesskey(), 123, 'en_fix', 'Foo');
     }
 
     /**
@@ -59,16 +61,16 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
+        $stage = new \mlang_stage();
 
-        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Foo bar'));
+        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
         $stage->add($component);
         $component->clear();
 
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $foobarcomponent = mlang_component::from_snapshot('foo_bar', 'en',  mlang_version::by_code(310), null, false, true);
+        $foobarcomponent = \mlang_component::from_snapshot('foo_bar', 'en',  \mlang_version::by_code(310), null, false, true);
         $foobarstring = $foobarcomponent->get_string('foobar');
 
         $stageid = sesskey();
@@ -76,8 +78,8 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
         $lang = 'cs';
         $text = 'Fů bár';
 
-        $response = \local_amos\external\stage_translated_string::execute($stageid, $originalid, $lang, $text);
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\stage_translated_string::execute_returns(), $response);
+        $response = stage_translated_string::execute($stageid, $originalid, $lang, $text);
+        $response = \core_external\external_api::clean_returnvalue(stage_translated_string::execute_returns(), $response);
 
         $this->assertTrue(is_array($response));
         $this->assertSame('Fů bár', $response['translation']);
@@ -86,8 +88,8 @@ class local_amos_external_stage_translated_string_testcase extends local_amos_te
         $this->assertFalse($response['nocleaning']);
         $this->assertSame([], $response['warnings']);
 
-        $stage = mlang_persistent_stage::instance_for_user($USER->id, $USER->sesskey);
+        $stage = \mlang_persistent_stage::instance_for_user($USER->id, $USER->sesskey);
 
-        $this->assertSame('Fů bár', $stage->get_component('foo_bar', 'cs', mlang_version::by_code(39))->get_string('foobar')->text);
+        $this->assertSame('Fů bár', $stage->get_component('foo_bar', 'cs', \mlang_version::by_code(39))->get_string('foobar')->text);
     }
 }

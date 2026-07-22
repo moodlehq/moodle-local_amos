@@ -15,13 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@see local_amos_external_update_strings_file_testcase} class.
+ * Provides the {@see \local_amos\external\update_strings_file_test} class.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos\external;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +37,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_update_strings_file_testcase extends externallib_advanced_testcase {
+class update_strings_file_test extends \externallib_advanced_testcase {
 
     /**
      * Test the permission check for the update_strings_file external function.
@@ -51,9 +53,9 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
         $roleid = $this->assignUserCapability('local/amos:importstrings', SYSCONTEXTID);
         $this->unassignUserCapability('local/amos:importstrings', SYSCONTEXTID, $roleid);
 
-        $this->expectException(required_capability_exception::class);
+        $this->expectException(\required_capability_exception::class);
 
-        \local_amos\external\update_strings_file::execute('Test User <test@example.com>', 'Just a test update', []);
+        update_strings_file::execute('Test User <test@example.com>', 'Just a test update', []);
     }
 
     /**
@@ -69,7 +71,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
 
         $this->assignUserCapability('local/amos:importstrings', SYSCONTEXTID);
 
-        $raw = \local_amos\external\update_strings_file::execute(
+        $raw = update_strings_file::execute(
             'Johny Developer <developer@example.com>',
             'First version of the tool_foobar',
             [
@@ -90,7 +92,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             ]
         );
 
-        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
+        $clean = \core_external\external_api::clean_returnvalue(update_strings_file::execute_returns(), $raw);
 
         $this->assertTrue(is_array($clean));
         $this->assertEquals(2, count($clean));
@@ -113,19 +115,19 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             'changes' => 1,
         ], $clean);
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_36_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
         $component->clear();
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_35_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_35_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.5');
         $component->clear();
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_37_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_37_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
         $component->clear();
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_34_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_34_STABLE'));
         $this->assertFalse($component->has_string());
         $component->clear();
     }
@@ -143,7 +145,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
 
         $this->assignUserCapability('local/amos:importstrings', SYSCONTEXTID);
 
-        $raw = \local_amos\external\update_strings_file::execute(
+        $raw = update_strings_file::execute(
             'Johny Developer <developer@example.com>',
             'Foo bar strings',
             [
@@ -190,7 +192,7 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             ]
         );
 
-        $clean = \core_external\external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $raw);
+        $clean = \core_external\external_api::clean_returnvalue(update_strings_file::execute_returns(), $raw);
 
         $this->assertTrue(is_array($clean));
         $this->assertEquals(4, count($clean));
@@ -231,20 +233,20 @@ class local_amos_external_update_strings_file_testcase extends externallib_advan
             'changes' => 0,
         ], $clean);
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_39_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_39_STABLE'));
         $this->assertEquals(3, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');
         $this->assertEquals($component->get_string('in39only')->text, '3.9 only');
         $component->clear();
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_310_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_310_STABLE'));
         $this->assertEquals(2, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');
         $component->clear();
 
-        $component = mlang_component::from_snapshot('tool_foobar', 'en', mlang_version::by_branch('MOODLE_311_STABLE'));
+        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_311_STABLE'));
         $this->assertEquals(2, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');

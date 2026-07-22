@@ -15,13 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@see local_amos_privacy_provider_testcase} class.
+ * Provides the {@see \local_amos\privacy\provider_test} class.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2018 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,7 +35,7 @@ global $CFG;
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_testcase {
+class provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Test {@see \local_amos\privacy\provider::get_contexts_for_userid()} implementation.
@@ -44,7 +46,7 @@ class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_
 
         $u = $this->getDataGenerator()->create_user();
 
-        $contextlist = \local_amos\privacy\provider::get_contexts_for_userid($u->id);
+        $contextlist = provider::get_contexts_for_userid($u->id);
         $this->assertInstanceOf(\core_privacy\local\request\contextlist::class, $contextlist);
         $this->assertEquals([SYSCONTEXTID], $contextlist->get_contextids());
     }
@@ -56,7 +58,7 @@ class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_
         global $DB;
         $this->resetAfterTest();
 
-        $context = context_system::instance();
+        $context = \context_system::instance();
 
         $userlist = new \core_privacy\local\request\userlist($context, 'local_amos');
 
@@ -86,7 +88,7 @@ class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_
             'value' => 'Test preference value',
         ]);
 
-        \local_amos\privacy\provider::get_users_in_context($userlist);
+        provider::get_users_in_context($userlist);
 
         $expected = [$u1->id, $u2->id, $u3->id];
         $actual = $userlist->get_userids();
@@ -112,7 +114,7 @@ class local_amos_privacy_provider_testcase extends \core_privacy\tests\provider_
 
         $contextlist = new \core_privacy\local\request\approved_contextlist($u1, 'local_amos', [$syscontext->id]);
 
-        \local_amos\privacy\provider::export_user_data($contextlist);
+        provider::export_user_data($contextlist);
 
         $writer = \core_privacy\local\request\writer::with_context($syscontext);
 

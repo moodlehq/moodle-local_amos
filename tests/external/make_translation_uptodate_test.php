@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_amos\external;
+
 /**
  * Unit tests for external function {@see \local_amos\external\make_translation_uptodate}.
  *
@@ -22,7 +24,7 @@
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_make_translation_uptodate_testcase extends local_amos_testcase {
+class make_translation_uptodate_test extends \local_amos_testcase {
 
     /**
      * Test that permission check is performed.
@@ -41,8 +43,8 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         role_assign($spammer, $user->id, SYSCONTEXTID);
         accesslib_clear_all_caches_for_unit_testing();
 
-        $this->expectException(required_capability_exception::class);
-        \local_amos\external\make_translation_uptodate::execute(0, 0);
+        $this->expectException(\required_capability_exception::class);
+        make_translation_uptodate::execute(0, 0);
     }
 
     /**
@@ -60,20 +62,20 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
+        $stage = new \mlang_stage();
 
-        $component = new mlang_component('moodle', 'en', mlang_version::by_code(20));
-        $component->add_string(new mlang_string('groupmode', 'Group Mode', $now - 100));
+        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(20));
+        $component->add_string(new \mlang_string('groupmode', 'Group Mode', $now - 100));
         $stage->add($component);
         $stage->commit('Introducing "Group Mode" string', ['source' => 'unittest']);
 
-        $component = new mlang_component('moodle', 'cs', mlang_version::by_code(20));
-        $component->add_string(new mlang_string('groupmode', 'Skupinový režim', $now - 90));
+        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(20));
+        $component->add_string(new \mlang_string('groupmode', 'Skupinový režim', $now - 90));
         $stage->add($component);
         $stage->commit('Translating "Group Mode" string into Czech', ['source' => 'unittest']);
 
-        $component = new mlang_component('moodle', 'en', mlang_version::by_code(21));
-        $component->add_string(new mlang_string('groupmode', 'Group mode', $now - 80));
+        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(21));
+        $component->add_string(new \mlang_string('groupmode', 'Group mode', $now - 80));
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 
@@ -82,10 +84,10 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         $translationid = $DB->get_field('amos_translations', 'id', ['lang' => 'cs', 'component' => 'moodle',
             'strname' => 'groupmode', 'since' => 20], MUST_EXIST);
 
-        $this->expectException(invalid_parameter_exception::class);
+        $this->expectException(\invalid_parameter_exception::class);
         $this->expectExceptionMessage('Invalid parameters: not a maintainer of cs');
 
-        \local_amos\external\make_translation_uptodate::execute($originalid, $translationid);
+        make_translation_uptodate::execute($originalid, $translationid);
     }
 
     /**
@@ -109,20 +111,20 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
+        $stage = new \mlang_stage();
 
-        $component = new mlang_component('moodle', 'en', mlang_version::by_code(20));
-        $component->add_string(new mlang_string('groupmode', 'Group Mode', $now - 100));
+        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(20));
+        $component->add_string(new \mlang_string('groupmode', 'Group Mode', $now - 100));
         $stage->add($component);
         $stage->commit('Introducing "Group Mode" string', ['source' => 'unittest']);
 
-        $component = new mlang_component('moodle', 'cs', mlang_version::by_code(20));
-        $component->add_string(new mlang_string('groupmode', 'Skupinový režim', $now - 90));
+        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(20));
+        $component->add_string(new \mlang_string('groupmode', 'Skupinový režim', $now - 90));
         $stage->add($component);
         $stage->commit('Translating "Group Mode" string into Czech', ['source' => 'unittest']);
 
-        $component = new mlang_component('moodle', 'en', mlang_version::by_code(21));
-        $component->add_string(new mlang_string('groupmode', 'Group mode', $now - 80));
+        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(21));
+        $component->add_string(new \mlang_string('groupmode', 'Group mode', $now - 80));
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 
@@ -131,8 +133,8 @@ class local_amos_external_make_translation_uptodate_testcase extends local_amos_
         $translationid = $DB->get_field('amos_translations', 'id', ['lang' => 'cs', 'component' => 'moodle',
             'strname' => 'groupmode', 'since' => 20], MUST_EXIST);
 
-        $response = \local_amos\external\make_translation_uptodate::execute($originalid, $translationid);
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\make_translation_uptodate::execute_returns(), $response);
+        $response = make_translation_uptodate::execute($originalid, $translationid);
+        $response = \core_external\external_api::clean_returnvalue(make_translation_uptodate::execute_returns(), $response);
 
         $this->assertTrue(is_array($response));
         $this->assertEquals('Skupinový režim', $DB->get_field('amos_translations', 'strtext', [

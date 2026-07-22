@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_amos\external;
+
 /**
  * Unit tests for external function {@see \local_amos\external\get_string_timeline}.
  *
@@ -22,7 +24,7 @@
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_external_get_string_timeline_testcase extends local_amos_testcase {
+class get_string_timeline_test extends \local_amos_testcase {
 
     /**
      * Test that permission check is performed.
@@ -41,8 +43,8 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         role_assign($spammer, $user->id, SYSCONTEXTID);
         accesslib_clear_all_caches_for_unit_testing();
 
-        $this->expectException(required_capability_exception::class);
-        \local_amos\external\get_string_timeline::execute('', '', '');
+        $this->expectException(\required_capability_exception::class);
+        get_string_timeline::execute('', '', '');
     }
 
     /**
@@ -59,26 +61,26 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Foo bar'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
         $stage->add($component);
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('foo_bar', 'cs', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Fů bár'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Fů bár'));
         $stage->add($component);
         $stage->commit('První překlad', ['source' => 'unittest']);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(310));
-        $component->add_string(new mlang_string('foobar', 'Foo bar!'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(310));
+        $component->add_string(new \mlang_string('foobar', 'Foo bar!'));
         $stage->add($component);
         $stage->commit('Add exclamation mark in Moodle 3.10', ['source' => 'unittest']);
 
-        $response = \local_amos\external\get_string_timeline::execute('foo_bar', 'foobar', 'cs');
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
+        $response = get_string_timeline::execute('foo_bar', 'foobar', 'cs');
+        $response = \core_external\external_api::clean_returnvalue(get_string_timeline::execute_returns(), $response);
 
         $this->assertEquals('foo_bar', $response['component']);
         $this->assertEquals('foobar', $response['strname']);
@@ -113,23 +115,23 @@ class local_amos_external_get_string_timeline_testcase extends local_amos_testca
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('foo_bar', 'en', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Foo bar'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
         $stage->add($component);
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('foo_bar', 'cs', mlang_version::by_code(39));
-        $component->add_string(new mlang_string('foobar', 'Fů bár'));
+        $stage = new \mlang_stage();
+        $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
+        $component->add_string(new \mlang_string('foobar', 'Fů bár'));
         $stage->add($component);
         $stage->commit('První překlad', ['source' => 'unittest']);
 
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $response = \local_amos\external\get_string_timeline::execute('foo_bar', 'foobar', 'cs');
-        $response = \core_external\external_api::clean_returnvalue(\local_amos\external\get_string_timeline::execute_returns(), $response);
+        $response = get_string_timeline::execute('foo_bar', 'foobar', 'cs');
+        $response = \core_external\external_api::clean_returnvalue(get_string_timeline::execute_returns(), $response);
 
         $this->assertFalse($response['changes'][0]['translation']['candelete']);
     }
