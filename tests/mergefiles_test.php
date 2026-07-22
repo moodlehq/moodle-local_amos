@@ -23,6 +23,12 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_amos;
+
+use amos_cli_logger;
+use amos_merge_string_files;
+use basic_testcase;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;

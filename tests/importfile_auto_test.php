@@ -15,13 +15,21 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for {@see local_amos_importfile_stage_auto()}.
+ * Unit tests for {@see \local_amos_importfile_stage_auto()}.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2026 David Mudrak <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos;
+
+use local_amos_testcase;
+use mlang_component;
+use mlang_stage;
+use mlang_string;
+use mlang_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,7 +40,7 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 /**
  * Tests for the auto-version import staging function.
  */
-class local_amos_importfile_auto_testcase extends local_amos_testcase {
+class importfile_auto_test extends local_amos_testcase {
 
     /**
      * Set up English strings used across all test methods.

@@ -15,13 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides the {@see local_amos_stats_manager_test} class.
+ * Provides the {@see \local_amos\stats_manager_test} class.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2019 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos;
+
+use advanced_testcase;
+use local_amos_stats_manager;
+use mlang_component;
+use mlang_stage;
+use mlang_string;
+use mlang_tools;
+use mlang_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -30,9 +40,9 @@ global $CFG;
 require_once($CFG->dirroot.'/local/amos/mlanglib.php');
 
 /**
- * Tests for the {@see local_amos_stats_manager} class.
+ * Tests for the {@see \local_amos_stats_manager} class.
  */
-class local_amos_stats_manager_test extends advanced_testcase {
+class stats_manager_test extends advanced_testcase {
 
     /**
      * Test the workflow for updating the stats.

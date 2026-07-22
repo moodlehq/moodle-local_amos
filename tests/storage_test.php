@@ -15,13 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@see local_amos_storage_test} class.
+ * Provides {@see \local_amos\storage_test} class.
  *
  * @package     local_amos
  * @category    test
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace local_amos;
+
+use advanced_testcase;
+use mlang_component;
+use mlang_stage;
+use mlang_string;
+use mlang_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,7 +42,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_amos_storage_test extends advanced_testcase {
+class storage_test extends advanced_testcase {
 
     /**
      * Test essential operations with the strings storage.

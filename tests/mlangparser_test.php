@@ -23,6 +23,14 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_amos;
+
+use basic_testcase;
+use mlang_component;
+use mlang_parser_factory;
+use mlang_php_parser;
+use mlang_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;

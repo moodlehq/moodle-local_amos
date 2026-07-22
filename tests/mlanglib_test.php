@@ -23,6 +23,15 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_amos;
+
+use local_amos_testcase;
+use mlang_component;
+use mlang_stage;
+use mlang_string;
+use mlang_tools;
+use mlang_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -46,7 +55,7 @@ class testable_mlang_tools extends mlang_tools {
 /**
  * Test cases for the internal AMOS API
  */
-class mlang_test extends local_amos_testcase {
+class mlanglib_test extends local_amos_testcase {
 
     /**
      * Excercise various helper methods
