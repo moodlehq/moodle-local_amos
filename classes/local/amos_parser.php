@@ -14,25 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace local_amos\local;
+
 /**
- * Legacy compatibility shim for the classes previously defined in this file.
- *
- * The classes formerly named mlang_* have been moved into the local_amos\local namespace
- * and renamed to amos_* (see classes/local/). This file only keeps backward-compatible
- * class_alias() mappings so that any external code still referring to the old global class
- * names keeps working.
- *
- * Do not add any new code here - this file must only register these aliases.
+ * Every parser must implement this interface
  *
  * @package     local_amos
  * @subpackage  amos
  * @copyright   2010 David Mudrak <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+interface amos_parser {
+    /**
+     * Returns singleton instance of the parser
+     *
+     * Direct contruction and cloning of instances should not be allowed
+     */
+    public static function get_instance();
 
-defined('MOODLE_INTERNAL') || die();
-
-class_alias(\local_amos\local\amos_parser::class, 'mlang_parser');
-class_alias(\local_amos\local\amos_parser_factory::class, 'mlang_parser_factory');
-class_alias(\local_amos\local\amos_parser_exception::class, 'mlang_parser_exception');
-class_alias(\local_amos\local\amos_php_parser::class, 'mlang_php_parser');
+    /**
+     * Parses data and adds strings into given component
+     *
+     * @param mixed $data data to parse, typically a file content
+     * @param amos_component $component component to add strings to
+     * @param int $format the data format on the input, defaults to the one used since 2.0
+     */
+    public function parse($data, amos_component $component, $format = 2);
+}
