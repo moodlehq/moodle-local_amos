@@ -326,10 +326,10 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Render stash information
      *
-     * @param local_amos_stash $stash
+     * @param local_amos\output\stash $stash
      * @return string to be echo'ed
      */
-    protected function render_local_amos_stash(local_amos_stash $stash) {
+    protected function render_stash(local_amos\output\stash $stash) {
 
         $output  = html_writer::start_tag('div', ['class' => 'stash']);
         if ($stash->isautosave) {
@@ -394,10 +394,10 @@ class local_amos_renderer extends plugin_renderer_base {
     /**
      * Render single contribution record
      *
-     * @param local_amos_contribution $contrib
+     * @param local_amos\output\contribution $contrib
      * @return string
      */
-    protected function render_local_amos_contribution(local_amos_contribution $contrib) {
+    protected function render_contribution(local_amos\output\contribution $contrib) {
         global $USER;
 
         $output = '';

@@ -25,6 +25,7 @@
 use local_amos\local\amos_persistent_stage;
 use local_amos\local\amos_stage;
 use local_amos\local\amos_stash;
+use local_amos\output\stash;
 
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -250,7 +251,7 @@ if ($submit) {
         die();
     }
     echo $output->heading_with_help(get_string('submitting', 'local_amos'), 'submitting', 'local_amos');
-    $stashinfo = local_amos_stash::instance_from_amos_stash($stash, $USER);
+    $stashinfo = stash::instance_from_amos_stash($stash, $USER);
     if (empty($stashinfo->strings)) {
         echo $output->heading(get_string('stagestringsnone', 'local_amos'));
         echo $output->footer();
@@ -276,7 +277,7 @@ if (!$stashes = $DB->get_records('amos_stashes', ['ownerid' => $USER->id], 'time
     $ownstashes = '';
 
     foreach ($stashes as $stashdata) {
-        $stash = local_amos_stash::instance_from_record($stashdata, $USER);
+        $stash = stash::instance_from_record($stashdata, $USER);
         if (has_capability('local/amos:stage', context_system::instance())) {
             $stash->add_action(
                 'apply',

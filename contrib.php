@@ -26,6 +26,7 @@ use local_amos\local\amos_persistent_stage;
 use local_amos\local\amos_stage;
 use local_amos\local\amos_stash;
 use local_amos\local\amos_tools;
+use local_amos\output\contribution;
 
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -154,7 +155,7 @@ if ($review) {
 
     $contribution->assignee = $USER->id;
     $contribution->timemodified = time();
-    $contribution->status = local_amos_contribution::STATE_REVIEW;
+    $contribution->status = contribution::STATE_REVIEW;
     $DB->update_record('amos_contributions', $contribution);
 
     $stash = amos_stash::instance_from_id($contribution->stashid);
@@ -200,7 +201,7 @@ if ($accept) {
     }
 
     $contribution->timemodified = time();
-    $contribution->status = local_amos_contribution::STATE_ACCEPTED;
+    $contribution->status = contribution::STATE_ACCEPTED;
     $DB->update_record('amos_contributions', $contribution);
 
     // Notify the contributor.
@@ -251,7 +252,7 @@ if ($reject) {
     }
 
     $contribution->timemodified = time();
-    $contribution->status = local_amos_contribution::STATE_REJECTED;
+    $contribution->status = contribution::STATE_REJECTED;
     $DB->update_record('amos_contributions', $contribution);
 
     // Notify the contributor.
@@ -330,7 +331,7 @@ if ($changelang) {
         $contriborig->id . " on " . date('Y-m-d', $contriborig->timecreated) . " to the " .
         $languagenameorig . " language pack by mistake.";
     $contribnew->stashid = $stashnew->id;
-    $contribnew->status = local_amos_contribution::STATE_NEW;
+    $contribnew->status = contribution::STATE_NEW;
     $contribnew->timecreated = $stashnew->timecreated;
     $contribnew->timemodified = null;
 
@@ -339,7 +340,7 @@ if ($changelang) {
     // Automatically reject the original contribution and add a note to it.
     $contriborig->timemodified = time();
     $contriborig->assignee = $USER->id;
-    $contriborig->status = local_amos_contribution::STATE_REJECTED;
+    $contriborig->status = contribution::STATE_REJECTED;
     $contriborig->message .= "\n\nNote: This contribution was submitted to the " . $languagenameorig .
         " language pack by mistake and has been moved to the " . $listlanguages[$newlang] .
         " language pack as #" . $contribnew->id . ".";
@@ -411,7 +412,7 @@ if ($id) {
     $stage->rebase();
     [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = amos_stage::analyze($stage);
 
-    $contribinfo = new local_amos_contribution($contribution, $author);
+    $contribinfo = new contribution($contribution, $author);
     $contribinfo->language = implode(', ', array_filter(array_map('trim', explode('/', $origlanguages))));
     $contribinfo->components = implode(', ', array_filter(array_map('trim', explode('/', $origcomponents))));
     $contribinfo->strings = $origstrings;
@@ -421,7 +422,7 @@ if ($id) {
         $contribution->assignee == $USER->id
             && $maintainerof
             && ($maintainerof === 'all' || in_array($contribution->lang, $maintainerof))
-            && $contribution->status == local_amos_contribution::STATE_REVIEW
+            && $contribution->status == contribution::STATE_REVIEW
             && $contribinfo->stringsreb == 0
     ) {
         // Maintainers tend to leave the contribution in the "In review" state.
@@ -436,7 +437,7 @@ if ($id) {
 
     echo html_writer::start_tag('div', ['class' => 'contribactions']);
     if ($maintainerof && ($maintainerof === 'all' || in_array($contribution->lang, $maintainerof))) {
-        if ($contribution->status == local_amos_contribution::STATE_NEW) {
+        if ($contribution->status == contribution::STATE_NEW) {
             echo $output->single_button(
                 new moodle_url($PAGE->url, ['review' => $id]),
                 get_string('contribstartreview', 'local_amos'),
@@ -469,8 +470,8 @@ if ($id) {
             ['class' => 'singlebutton apply']
         );
     }
-    if ($contribution->assignee == $USER->id && $contribution->status > local_amos_contribution::STATE_NEW) {
-        if ($contribution->status != local_amos_contribution::STATE_ACCEPTED) {
+    if ($contribution->assignee == $USER->id && $contribution->status > contribution::STATE_NEW) {
+        if ($contribution->status != contribution::STATE_ACCEPTED) {
             echo $output->single_button(
                 new moodle_url($PAGE->url, ['accept' => $id]),
                 get_string('contribaccept', 'local_amos'),
@@ -478,7 +479,7 @@ if ($id) {
                 ['class' => 'singlebutton accept']
             );
         }
-        if ($contribution->status != local_amos_contribution::STATE_REJECTED) {
+        if ($contribution->status != contribution::STATE_REJECTED) {
             echo $output->single_button(
                 new moodle_url($PAGE->url, ['reject' => $id]),
                 get_string('contribreject', 'local_amos'),

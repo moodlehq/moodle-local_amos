@@ -31,6 +31,7 @@ use local_amos\local\amos_stage;
 use local_amos\local\amos_stash;
 use local_amos\local\amos_tools;
 use local_amos\local\amos_version;
+use local_amos\output\contribution;
 
 define('CLI_SCRIPT', true);
 
@@ -167,8 +168,8 @@ class amos_checker {
             "amos_contributions",
             "(status = :statusnew AND timecreated <= :timecreated) OR (status = :statusreview AND timemodified <= :timemodified)",
             [
-                'statusnew' => local_amos_contribution::STATE_NEW,
-                'statusreview' => local_amos_contribution::STATE_REVIEW,
+                'statusnew' => contribution::STATE_NEW,
+                'statusreview' => contribution::STATE_REVIEW,
                 'timecreated' => time() - 7 * DAYSECS,
                 'timemodified' => time() - 3 * DAYSECS,
             ]
@@ -192,7 +193,7 @@ class amos_checker {
                 $DB->set_field(
                     'amos_contributions',
                     'status',
-                    local_amos_contribution::STATE_ACCEPTED,
+                    contribution::STATE_ACCEPTED,
                     ['id' => $contribution->id]
                 );
             } else {

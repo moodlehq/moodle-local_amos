@@ -24,6 +24,7 @@
 
 use local_amos\local\amos_stage;
 use local_amos\local\amos_stash;
+use local_amos\output\contribution;
 
 define('CLI_SCRIPT', true);
 
@@ -78,7 +79,7 @@ $sql = "SELECT c.id, c.lang, c.subject, c.stashid, c.status, c.timecreated,
       ORDER BY c.timemodified";
 
 $contributions = $DB->get_records_sql($sql, [
-    'rejected' => local_amos_contribution::STATE_REJECTED,
+    'rejected' => contribution::STATE_REJECTED,
     'authorid' => $options['author'],
 ]);
 
@@ -100,7 +101,7 @@ foreach ($contributions as $contribution) {
             'id' => $contribution->id,
             'timemodified' => time(),
             'assignee' => AMOS_BOT_USERID,
-            'status' => local_amos_contribution::STATE_ACCEPTED,
+            'status' => contribution::STATE_ACCEPTED,
         ];
 
         $DB->update_record('amos_contributions', $update);

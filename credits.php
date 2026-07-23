@@ -23,6 +23,7 @@
  */
 
 use local_amos\local\amos_tools;
+use local_amos\output\contribution;
 
 // phpcs:ignore moodle.Files.RequireLogin
 require(__DIR__ . '/../../config.php');
@@ -84,7 +85,7 @@ $sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable {$
 
       ORDER BY amoslang, contribstatus, {$sortsql}, iseditable";
 
-$rs = $DB->get_recordset_sql($sql, array_merge($sortparams, ['status' => local_amos_contribution::STATE_ACCEPTED]));
+$rs = $DB->get_recordset_sql($sql, array_merge($sortparams, ['status' => contribution::STATE_ACCEPTED]));
 
 // Track credits with unexpected data.
 $issues = [];
