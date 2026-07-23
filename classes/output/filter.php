@@ -392,7 +392,7 @@ class filter implements \renderable, \templatable {
     /**
      * Return a permanent link for the current filter data.
      *
-     * @param \moodle_url $baseurl
+     * @param \moodle_url|null $baseurl
      * @return \moodle_url $permalink
      */
     public function get_permalink(?\moodle_url $baseurl = null): \moodle_url {

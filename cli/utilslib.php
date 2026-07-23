@@ -189,9 +189,9 @@ class amos_export_zip {
     /**
      * Initialize this exporter job instance
      *
-     * @param int $minver
-     * @param int $maxver
-     * @param string[] $langcodes
+     * @param int|null $minver
+     * @param int|null $maxver
+     * @param string[]|null $langcodes
      */
     public function init(?int $minver = null, ?int $maxver = null, ?array $langcodes = null) {
 
@@ -276,8 +276,8 @@ class amos_export_zip {
     /**
      * Set optional limits for processed versions.
      *
-     * @param int $minver
-     * @param int $maxver
+     * @param int|null $minver
+     * @param int|null $maxver
      */
     protected function init_versions_range(?int $minver, ?int $maxver) {
 

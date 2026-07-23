@@ -61,7 +61,7 @@ class stage_translated_string extends \core_external\external_api {
      * @param string $lang Code of the language
      * @param string $text Raw text of the translation
      * @param int|null $translationid Identifier of translation being updated
-     * @param bool $nocleaning Skip implicit cleaning of the input string
+     * @param bool|null $nocleaning Skip implicit cleaning of the input string
      * @return array
      */
     public static function execute(

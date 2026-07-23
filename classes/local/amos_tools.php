@@ -165,7 +165,7 @@ class amos_tools {
      *
      * Language code 'X' has a special meaning - the user is allowed to edit all languages.
      *
-     * @param int $userid User id, defaults to the current user
+     * @param int|null $userid User id, defaults to the current user
      * @return array List of (string)langcode => (string)langcode
      */
     public static function list_allowed_languages(?int $userid = null): array {

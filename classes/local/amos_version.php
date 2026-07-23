@@ -120,7 +120,7 @@ class amos_version {
      * List of versions starting since the given branch code, optionally up to the given end (inclusive).
      *
      * @param int $start The branch code of the first version in the returned list.
-     * @param int $end Optional branch code of the last version in the returned list
+     * @param int|null $end Optional branch code of the last version in the returned list
      * @return array amos_version[] indexed by version code
      */
     public static function list_range(int $start, ?int $end = null): array {

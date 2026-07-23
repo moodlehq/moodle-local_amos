@@ -61,8 +61,8 @@ final class source_code_test extends \advanced_testcase {
         $toolold = new source_code(__DIR__ . '/../fixtures/tool_old');
         $files = $toolold->get_included_string_files();
 
-        $this->assertStringStartsWith('// Just a test file', $files['tool_old']['lang/en/tool_old.php']);
-        $this->assertStringStartsWith(
+        $this->assertStringContainsString('// Just a test file', $files['tool_old']['lang/en/tool_old.php']);
+        $this->assertStringContainsString(
             '// Just a test file',
             $files['oldsubtype_subplug']['subtype/subplug/lang/en/oldsubtype_subplug.php']
         );
@@ -72,7 +72,7 @@ final class source_code_test extends \advanced_testcase {
         $files = $foonew->get_included_string_files();
 
         $this->assertStringContainsString('// Just a test file', $files['mod_new']['lang/en/new.php']);
-        $this->assertStringStartsWith(
+        $this->assertStringContainsString(
             '// Just a test file',
             $files['newsubtype_subplug']['subtype/subplug/lang/en/newsubtype_subplug.php']
         );

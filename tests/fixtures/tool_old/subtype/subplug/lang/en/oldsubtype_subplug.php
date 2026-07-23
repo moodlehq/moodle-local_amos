@@ -1,2 +1,3 @@
-// Just a test file
+<?php
 // phpcs:ignoreFile
+// Just a test file

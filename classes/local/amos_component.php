@@ -127,10 +127,10 @@ class amos_component implements \Countable, \IteratorAggregate {
      * @param string $name The component name.
      * @param string $lang The language code.
      * @param amos_version $version Version of the component.
-     * @param int $timestamp Time of the snapshot, defaults to the most recent one.
+     * @param int|null $timestamp Time of the snapshot, defaults to the most recent one.
      * @param bool $deleted Shall deleted strings be included?
      * @param bool $fullinfo Shall full information about the string (commit messages, source etc.) be returned?
-     * @param array $strnames Limit the list of loaded strings to ones in this list only.
+     * @param array|null $strnames Limit the list of loaded strings to ones in this list only.
      * @return amos_component Component with the strings from the snapshot.
      */
     public static function from_snapshot(
