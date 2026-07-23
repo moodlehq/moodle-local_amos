@@ -51,7 +51,7 @@ Example:
     'h' => 'help',
 ]);
 
-if ($options['help'] or empty($options['symlinksdir']) or empty($options['enfixdir'])) {
+if ($options['help'] || empty($options['symlinksdir']) || empty($options['enfixdir'])) {
     cli_error($help, 2);
 }
 
