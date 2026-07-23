@@ -66,7 +66,7 @@ if ($data = $executeform->get_data()) {
     $SESSION->local_amos->presetcommitmessage = $data->script;
 }
 
-if (!isset($stage) or !$stage->has_component()) {
+if (!isset($stage) || !$stage->has_component()) {
     notice(get_string('nothingtostage', 'local_amos'), new moodle_url('/local/amos/stage.php'));
 }
 

@@ -207,7 +207,7 @@ class local_amos_contribution implements renderable {
             $this->author = $author;
         }
 
-        if (empty($assignee) and !empty($info->assignee)) {
+        if (empty($assignee) && !empty($info->assignee)) {
             $this->assignee = $DB->get_record('user', ['id' => $info->assignee]);
         } else {
             $this->assignee = $assignee;

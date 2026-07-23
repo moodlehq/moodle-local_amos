@@ -186,7 +186,7 @@ class stage implements \renderable, \templatable {
         $allowedlangs = \mlang_tools::list_allowed_languages($user->id);
 
         foreach ($this->strings as $string) {
-            if (!empty($allowedlangs['X']) or !empty($allowedlangs[$string->language])) {
+            if (!empty($allowedlangs['X']) || !empty($allowedlangs[$string->language])) {
                 $string->committable = true;
             }
 

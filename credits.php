@@ -45,10 +45,10 @@ $PAGE->set_url('/local/amos/credits.php');
 $PAGE->set_title(get_string('creditstitleshort', 'local_amos'));
 $PAGE->set_heading(get_string('creditstitlelong', 'local_amos'));
 
-if ($canedit and $editmode) {
+if ($canedit && $editmode) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, ['editmode' => 0]), get_string('turneditingoff'), 'get'));
     $PAGE->set_url(new moodle_url($PAGE->url, ['editmode' => 1]));
-} else if ($canedit and !$editmode) {
+} else if ($canedit && !$editmode) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, ['editmode' => 1]), get_string('turneditingon'), 'get'));
 }
 
@@ -114,7 +114,7 @@ foreach ($rs as $user) {
             $list[$lang]->maintainers[$user->id] = $user;
         }
     } else if ($status == AMOS_USER_CONTRIBUTOR) {
-        if (!isset($list[$lang]->maintainers[$user->id]) and !isset($list[$lang]->contributors[$user->id])) {
+        if (!isset($list[$lang]->maintainers[$user->id]) && !isset($list[$lang]->contributors[$user->id])) {
             $list[$lang]->contributors[$user->id] = $user;
         }
     } else {
@@ -133,7 +133,7 @@ echo $OUTPUT->header();
 $output = $PAGE->get_renderer('local_amos');
 echo $output->page_credits($list, current_language(), $editmode);
 
-if (!empty($issues) and has_capability('local/amos:manage', $PAGE->context)) {
+if (!empty($issues) && has_capability('local/amos:manage', $PAGE->context)) {
     echo $output->page_credits_issues($issues);
 }
 

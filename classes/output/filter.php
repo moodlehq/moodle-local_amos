@@ -242,7 +242,7 @@ class filter implements \renderable, \templatable {
         $data->app = optional_param('fapp', false, PARAM_BOOL);
         $data->workplace = optional_param('fworkplace', false, PARAM_BOOL);
 
-        if ($data->missing and $data->outdated) {
+        if ($data->missing && $data->outdated) {
             // It does not make sense to have both.
             $data->missing = false;
         }
@@ -305,7 +305,7 @@ class filter implements \renderable, \templatable {
             $flng = explode(',', $flng);
             $flng = clean_param_array($flng, PARAM_SAFEDIR);
 
-            if (!empty($flng) and is_array($flng)) {
+            if (!empty($flng) && is_array($flng)) {
                 foreach ($flng as $language) {
                     if (!empty($language)) {
                         $data->language[] = $language;
@@ -337,7 +337,7 @@ class filter implements \renderable, \templatable {
         } else {
             $fcmp = explode(',', $fcmp);
             $fcmp = clean_param_array($fcmp, PARAM_FILE);
-            if (!empty($fcmp) and is_array($fcmp)) {
+            if (!empty($fcmp) && is_array($fcmp)) {
                 foreach ($fcmp as $component) {
                     $data->component[] = $component;
                 }

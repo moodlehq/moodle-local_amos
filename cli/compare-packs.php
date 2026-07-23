@@ -105,7 +105,7 @@ function load_language_pack(string $path): array {
     $pack = [];
 
     foreach (new DirectoryIterator($path) as $file) {
-        if ($file->isDot() or $file->isDir()) {
+        if ($file->isDot() || $file->isDir()) {
             continue;
         }
         if (substr($file->getFilename(), -4) !== '.php') {

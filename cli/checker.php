@@ -101,9 +101,9 @@ class amos_checker {
                     $listsep = $listsep->text;
                 }
                 $details[$language][$version->label] = [];
-                if (empty($decsep) and empty($thousandssep)) {
+                if (empty($decsep) && empty($thousandssep)) {
                     $details[$language][$version->label][] = '! empty decsep and thousandssep';
-                } else if (empty($decsep) or empty($thousandssep)) {
+                } else if (empty($decsep) || empty($thousandssep)) {
                     $details[$language][$version->label][] = '!! empty descsep or thousandssep';
                 } else if ($decsep === $thousandssep) {
                     $details[$language][$version->label][] = '!!! decsep === thousandssep';

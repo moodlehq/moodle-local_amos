@@ -53,7 +53,7 @@ if ($whoami !== 'apache') {
 $dbman = $DB->get_manager();
 
 $amosxmldbfile = new xmldb_file($CFG->dirroot . '/local/amos/db/install.xml');
-if (!$amosxmldbfile->fileExists() or !$amosxmldbfile->loadXMLStructure()) {
+if (!$amosxmldbfile->fileExists() || !$amosxmldbfile->loadXMLStructure()) {
     cli_error('Error: unable to read AMOS install.xml');
 }
 $structure = $amosxmldbfile->getStructure();

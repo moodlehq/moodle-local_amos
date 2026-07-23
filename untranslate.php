@@ -36,7 +36,7 @@ require_capability('local/amos:commit', context_system::instance());
 
 $allowedlangs = mlang_tools::list_allowed_languages();
 
-if (empty($allowedlangs['X']) and empty($allowedlangs[$language])) {
+if (empty($allowedlangs['X']) && empty($allowedlangs[$language])) {
     throw new moodle_exception('err_unexpected_language', 'local_amos');
 }
 

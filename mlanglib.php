@@ -709,11 +709,11 @@ class mlang_string {
      * @return bool
      */
     public static function differ(mlang_string $a, mlang_string $b) {
-        if ($a->deleted and $b->deleted) {
+        if ($a->deleted && $b->deleted) {
             return false;
         }
-        if (is_null($a->text) or is_null($b->text)) {
-            if (is_null($a->text) and is_null($b->text)) {
+        if (is_null($a->text) || is_null($b->text)) {
+            if (is_null($a->text) && is_null($b->text)) {
                 return false;
             } else {
                 return true;
@@ -1102,7 +1102,7 @@ class mlang_stage implements Countable, IteratorAggregate {
                 unset($this->components[$cx]);
                 continue;
             }
-            if (empty($keeplangs['X']) and empty($keeplangs[$component->lang])) {
+            if (empty($keeplangs['X']) && empty($keeplangs[$component->lang])) {
                 $component->clear();
                 unset($this->components[$cx]);
                 continue;
@@ -1157,7 +1157,7 @@ class mlang_stage implements Countable, IteratorAggregate {
      * @return bool
      */
     public function has_component($name = null, $lang = null, mlang_version $version = null) {
-        if (is_null($name) and is_null($lang) and is_null($version)) {
+        if (is_null($name) && is_null($lang) && is_null($version)) {
             return (!empty($this->components));
         } else {
             $cid = mlang_component::calculate_identifier($name, $lang, $version);
@@ -1277,7 +1277,7 @@ class mlang_persistent_stage extends mlang_stage {
      * @param string $stageid stage name
      */
     protected function __construct($userid, $stageid) {
-        if (empty($userid) or empty($stageid)) {
+        if (empty($userid) || empty($stageid)) {
             throw new coding_exception('Persistance stage identification failed');
         }
         $this->userid = $userid;
@@ -1508,7 +1508,7 @@ class mlang_stash {
      */
     public function load_from_file() {
 
-        if (!is_null($this->stageserialized) or !is_null($this->stage)) {
+        if (!is_null($this->stageserialized) || !is_null($this->stage)) {
             throw new coding_exception('Already loaded stash can not be overwritten');
         }
 
@@ -1559,7 +1559,7 @@ class mlang_stash {
      * of the stash storage.
      */
     protected function set_hash() {
-        if (is_null($this->ownerid) or is_null($this->stageserialized) or is_null($this->timecreated)) {
+        if (is_null($this->ownerid) || is_null($this->stageserialized) || is_null($this->timecreated)) {
             throw new coding_exception('Unable to calculate stash identifier');
         }
         $this->hash = md5($this->ownerid . '@' . $this->timecreated . '#' . $this->stageserialized . '%' . rand());
@@ -1593,7 +1593,7 @@ class mlang_stash {
     protected function get_storage_filename() {
         global $CFG;
 
-        if (empty($this->hash) or strlen($this->hash) < 4) {
+        if (empty($this->hash) || strlen($this->hash) < 4) {
             throw new coding_exception('Invalid stash hash');
         }
 
@@ -2030,7 +2030,7 @@ class mlang_tools {
                     array_map('trim', $matches);
                     $fromcomponent = self::legacy_component_name($matches[2]);
                     $tocomponent = self::legacy_component_name($matches[4]);
-                    if ($fromcomponent and $tocomponent) {
+                    if ($fromcomponent && $tocomponent) {
                         return self::copy_string($version, $matches[1], $fromcomponent, $matches[3], $tocomponent, $timestamp);
                     } else {
                         return self::STATUS_SYNTAX_ERROR;
@@ -2045,7 +2045,7 @@ class mlang_tools {
                     array_map('trim', $matches);
                     $fromcomponent = self::legacy_component_name($matches[2]);
                     $tocomponent = self::legacy_component_name($matches[4]);
-                    if ($fromcomponent and $tocomponent) {
+                    if ($fromcomponent && $tocomponent) {
                         return self::forced_copy_string(
                             $version,
                             $matches[1],
@@ -2071,7 +2071,7 @@ class mlang_tools {
                     if ($tostring !== clean_param($tostring, PARAM_STRINGID)) {
                         return self::STATUS_SYNTAX_ERROR;
                     }
-                    if ($helpfile and $tocomponent and $tostring) {
+                    if ($helpfile && $tocomponent && $tostring) {
                         return self::migrate_helpfile($version, $helpfile, $tostring, $tocomponent, $timestamp);
                     } else {
                         return self::STATUS_SYNTAX_ERROR;
@@ -2336,7 +2336,7 @@ class mlang_tools {
         foreach (array_keys(self::list_languages(false)) as $lang) {
             $from = mlang_component::from_snapshot($fromcomponent, $lang, $version, $timestamp, false, false, [$fromstring]);
             $to = mlang_component::from_snapshot($tocomponent, $lang, $version, $timestamp, false, false, [$tostring]);
-            if ($from->has_string($fromstring) and !$to->has_string($tostring)) {
+            if ($from->has_string($fromstring) && !$to->has_string($tostring)) {
                 $to->add_string(new mlang_string($tostring, $from->get_string($fromstring)->text, $timestamp));
                 $stage->add($to);
             }

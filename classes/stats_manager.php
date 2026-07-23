@@ -502,7 +502,8 @@ class local_amos_stats_manager {
 
         $links = [];
         foreach ($recentcommitters + $recentcontributors as $contributor) {
-            $links[] = '<a style="color: #0077b8; text-decoration: underline;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $contributor->id . '">' . s(fullname($contributor)) . '</a>';
+            $links[] = '<a style="color: #0077b8; text-decoration: underline;" href="' . $CFG->wwwroot .
+                '/user/profile.php?id=' . $contributor->id . '">' . s(fullname($contributor)) . '</a>';
         }
 
         $links = get_string('contributethankslist', 'local_amos', [

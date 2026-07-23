@@ -39,7 +39,7 @@ $PAGE->set_heading('AMOS ' . get_string('importfile', 'local_amos'));
 
 $importform = new local_amos_importfile_form(null, local_amos_importfile_options());
 
-if (($data = $importform->get_data()) and has_capability('local/amos:stage', context_system::instance())) {
+if (($data = $importform->get_data()) && has_capability('local/amos:stage', context_system::instance())) {
     $tmpdir = $CFG->dataroot . '/amos/temp/import-uploads/' . $USER->id;
     check_dir_exists($tmpdir);
     $filenameorig = basename($importform->get_new_filename('importfile'));
@@ -62,7 +62,7 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', con
                 foreach ($zipcontents as $zipfilename => $zipfilestatus) {
                     // We want PHP files in the root of the ZIP only.
                     if (
-                        $zipfilestatus === true and basename($zipfilename) === $zipfilename &&
+                        $zipfilestatus === true && basename($zipfilename) === $zipfilename &&
                             strtolower(substr($zipfilename, -4)) === '.php'
                     ) {
                         $stringfiles[$zipfilename] = $tmpzipdir . '/' . $zipfilename;
@@ -126,7 +126,7 @@ if (($data = $importform->get_data()) and has_capability('local/amos:stage', con
     }
 }
 
-if (!isset($stage) or !$stage->has_component()) {
+if (!isset($stage) || !$stage->has_component()) {
     notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
 }
 

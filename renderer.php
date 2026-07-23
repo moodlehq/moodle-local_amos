@@ -107,7 +107,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
             unset($a);
 
-            if ($committable and $stage->cancommit) {
+            if ($committable && $stage->cancommit) {
                 $commitform = html_writer::div(
                     html_writer::tag('textarea', s($stage->presetmessage), [
                         'placeholder' => get_string('commitmessage', 'local_amos'),
@@ -152,7 +152,7 @@ class local_amos_renderer extends plugin_renderer_base {
             }
 
             // Submit strings to language pack maintainers.
-            if ($stage->canstash and $committable == 0) {
+            if ($stage->canstash && $committable == 0) {
                 $output .= html_writer::div(
                     html_writer::link(
                         new moodle_url('/local/amos/stage.php', ['submit' => 1, 'sesskey' => sesskey()]),
@@ -599,7 +599,7 @@ class local_amos_renderer extends plugin_renderer_base {
                     $out .= $this->output->container_start('contributor d-inline-block border m-1 p-1 bg-light');
                     $out .= $this->output->user_picture($contributor, ['size' => 16, 'class' => 'd-inline-block m-1']);
                     $out .= $this->output->container(fullname($contributor), 'fullname d-inline-block');
-                    if ($editmode and $contributor->iseditable) {
+                    if ($editmode && $contributor->iseditable) {
                         $out .= $this->output->action_icon(
                             new moodle_url('/local/amos/admin/translators.php', [
                                 'action' => 'del',

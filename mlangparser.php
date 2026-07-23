@@ -187,7 +187,7 @@ class mlang_php_parser implements mlang_parser {
             }
 
             if ($expect == 'STRING_VAR') {
-                if ($foundtype === T_VARIABLE and $founddata === '$string') {
+                if ($foundtype === T_VARIABLE && $founddata === '$string') {
                     $expect = 'LEFT_BRACKET';
                     continue;
                 } else {
@@ -197,7 +197,7 @@ class mlang_php_parser implements mlang_parser {
             }
 
             if ($expect == 'LEFT_BRACKET') {
-                if ($foundtype === 'char' and $founddata === '[') {
+                if ($foundtype === 'char' && $founddata === '[') {
                     $expect = 'STRING_ID';
                     continue;
                 } else {
@@ -216,7 +216,7 @@ class mlang_php_parser implements mlang_parser {
             }
 
             if ($expect == 'RIGHT_BRACKET') {
-                if ($foundtype === 'char' and $founddata === ']') {
+                if ($foundtype === 'char' && $founddata === ']') {
                     $expect = 'ASSIGNMENT';
                     continue;
                 } else {
@@ -225,7 +225,7 @@ class mlang_php_parser implements mlang_parser {
             }
 
             if ($expect == 'ASSIGNMENT') {
-                if ($foundtype === 'char' and $founddata === '=') {
+                if ($foundtype === 'char' && $founddata === '=') {
                     $expect = 'STRING_TEXT';
                     continue;
                 } else {
@@ -244,10 +244,10 @@ class mlang_php_parser implements mlang_parser {
             }
 
             if ($expect == 'SEMICOLON') {
-                if (is_null($id) or is_null($text)) {
+                if (is_null($id) || is_null($text)) {
                     throw new mlang_parser_exception('NULL string id or value at line ' . $line);
                 }
-                if ($foundtype === 'char' and $founddata === ';') {
+                if ($foundtype === 'char' && $founddata === ';') {
                     if (!empty($id)) {
                         $strings[$id] = $text;
                     }
@@ -278,13 +278,13 @@ class mlang_php_parser implements mlang_parser {
             throw new mlang_parser_exception('Expected T_CONSTANT_ENCAPSED_STRING in decapsulate()');
         }
 
-        if (substr($text, 0, 1) == "'" and substr($text, -1) == "'") {
+        if (substr($text, 0, 1) == "'" && substr($text, -1) == "'") {
             // Single quoted string.
             $text = substr($text, 1, strlen($text) - 2);
             $text = str_replace("\'", "'", $text);
             $text = str_replace('\\\\', '\\', $text);
             return $text;
-        } else if (substr($text, 0, 1) == '"' and substr($text, -1) == '"') {
+        } else if (substr($text, 0, 1) == '"' && substr($text, -1) == '"') {
             // Double quoted string.
             $text = trim($text, '"');
             $text = str_replace('\"', '"', $text);

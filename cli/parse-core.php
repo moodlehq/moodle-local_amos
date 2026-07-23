@@ -373,7 +373,7 @@ foreach ($versions as $version) {
 
         // Series of checks that the file is proper language pack.
 
-        if (($version->code >= 20) and ($committime >= 1270884296)) {
+        if (($version->code >= 20) && ($committime >= 1270884296)) {
             // Since Petr's commit 3a915b06676 on 10th April 2010, strings are in 'en' folder again.
             $enfolder = 'en';
         } else {
@@ -385,7 +385,7 @@ foreach ($versions as $version) {
             continue;
         }
 
-        if (strpos($file, "lang/$enfolder/docs/") !== false or strpos($file, "lang/$enfolder/help/") !== false) {
+        if (strpos($file, "lang/$enfolder/docs/") !== false || strpos($file, "lang/$enfolder/help/") !== false) {
             // Ignore.
             continue;
         }

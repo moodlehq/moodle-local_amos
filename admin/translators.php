@@ -97,7 +97,7 @@ if (data_submitted()) {
                 ]);
             }
         }
-    } else if ($action === 'del' and $confirm) {
+    } else if ($action === 'del' && $confirm) {
         if ($status === AMOS_USER_MAINTAINER) {
             // Degrade the maintainer to the contributor only.
             $DB->set_field('amos_translators', 'status', AMOS_USER_CONTRIBUTOR, ['userid' => $deluser->id, 'lang' => $langcode]);

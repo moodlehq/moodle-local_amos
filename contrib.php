@@ -430,7 +430,7 @@ if ($id) {
     echo $output->render($contribinfo);
 
     echo html_writer::start_tag('div', ['class' => 'contribactions']);
-    if ($maintainerof && ($maintainerof === 'all' or in_array($contribution->lang, $maintainerof))) {
+    if ($maintainerof && ($maintainerof === 'all' || in_array($contribution->lang, $maintainerof))) {
         if ($contribution->status == local_amos_contribution::STATE_NEW) {
             echo $output->single_button(
                 new moodle_url($PAGE->url, ['review' => $id]),
@@ -487,7 +487,7 @@ if ($id) {
 
     if (has_capability('local/amos:changecontriblang', context_system::instance())) {
         $listlanguages = mlang_tools::list_languages(false);
-        if (empty($contribution->lang) or isset($listlanguages[$contribution->lang])) {
+        if (empty($contribution->lang) || isset($listlanguages[$contribution->lang])) {
             echo html_writer::start_tag('div', ['class' => 'contribactions']);
             unset($listlanguages[$contribution->lang]);
             echo html_writer::start_tag('form', ['action' => $PAGE->url, 'method' => 'post']);
