@@ -216,13 +216,8 @@ const showFilteredStrings = (filterQuery) => {
         },
 
     }])[0].then(response => {
-        try {
-            let data = JSON.parse(response.json);
-            return Templates.render('local_amos/translator_root', data);
-
-        } catch (error) {
-            return Promise.reject(error);
-        }
+        let data = JSON.parse(response.json);
+        return Templates.render('local_amos/translator_root', data);
 
     }).then((html, js = '') => {
         return Templates.replaceNodeContents(root, html, js);
