@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->libdir . '/clilib.php');
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'lang' => 'en',
     'versioncode' => null,
     'timemodified' => null,
@@ -42,7 +42,7 @@ list($options, $unrecognised) = cli_get_params([
     'userinfo' => 'David Mudrak <david@moodle.com>',
     'commithash' => null,
     'yes' => false,
-    'help' => false
+    'help' => false,
 ], [
     'h' => 'help',
     'y' => 'yes',
@@ -77,7 +77,7 @@ if ($options['help'] || empty($options['message']) || empty($unrecognised)) {
 
 $filepath = $unrecognised[0];
 if (!is_readable($filepath)) {
-    echo 'File "'.$filepath.'" not readable' . PHP_EOL;
+    echo 'File "' . $filepath . '" not readable' . PHP_EOL;
     echo $usage . PHP_EOL;
     exit(2);
 }
@@ -88,8 +88,14 @@ if ($options['versioncode']) {
     $version = mlang_version::latest_version();
 }
 
-$component = mlang_component::from_phpfile($filepath, $options['lang'], $version,
-    $options['timemodified'], $options['name'], (int)$options['format']);
+$component = mlang_component::from_phpfile(
+    $filepath,
+    $options['lang'],
+    $version,
+    $options['timemodified'],
+    $options['name'],
+    (int)$options['format']
+);
 
 fputs(STDOUT, "{$component->name} {$component->version->label} {$component->lang}" . PHP_EOL);
 
@@ -115,14 +121,14 @@ foreach ($stage as $component) {
 
 echo PHP_EOL;
 if (!$options['yes']) {
-    $continue = cli_input('Continue? [y/n]', 'n', array('y', 'n'));
+    $continue = cli_input('Continue? [y/n]', 'n', ['y', 'n']);
     if ($continue !== 'y') {
         echo 'Import aborted' . PHP_EOL;
         exit(5);
     }
 }
 
-$meta = array('source' => 'import', 'userinfo' => $options['userinfo']);
+$meta = ['source' => 'import', 'userinfo' => $options['userinfo']];
 if ($options['commithash']) {
     $meta['commithash'] = $commithash;
 }

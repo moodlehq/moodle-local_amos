@@ -37,14 +37,13 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class update_strings_file_test extends \externallib_advanced_testcase {
-
+final class update_strings_file_test extends \externallib_advanced_testcase {
     /**
      * Test the permission check for the update_strings_file external function.
      *
      * @runInSeparateProcess
      */
-    public function test_update_strings_file_without_import_capability() {
+    public function test_update_strings_file_without_import_capability(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -63,7 +62,7 @@ class update_strings_file_test extends \externallib_advanced_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_update_strings_file() {
+    public function test_update_strings_file(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -137,7 +136,7 @@ class update_strings_file_test extends \externallib_advanced_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_moodle_version_procesing_order() {
+    public function test_moodle_version_procesing_order(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();

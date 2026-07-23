@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class translator implements \renderable, \templatable {
-
     /** Number of rows per page. */
     const PERPAGE = 100;
 
@@ -101,9 +100,9 @@ class translator implements \renderable, \templatable {
         // Prepare the SQL queries to load all the filtered strings and their translations.
         $params = [];
 
-        list($sqllanguages, $paramlanguages) = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
-        list($sqlcomponents1, $paramcomponents1) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
-        list($sqlcomponents2, $paramcomponents2) = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+        [$sqllanguages, $paramlanguages] = $DB->get_in_or_equal($languages, SQL_PARAMS_NAMED);
+        [$sqlcomponents1, $paramcomponents1] = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
+        [$sqlcomponents2, $paramcomponents2] = $DB->get_in_or_equal($components, SQL_PARAMS_NAMED);
 
         $params += $paramlanguages;
         $params += $paramcomponents1;
@@ -111,8 +110,13 @@ class translator implements \renderable, \templatable {
 
         if ($last) {
             // Get know the most recent branch for every component.
-            $latestcomponentbranch = $DB->get_records_select_menu('amos_strings',  "component $sqlcomponents1 GROUP BY component",
-                $paramcomponents1,  '', "component, MAX(since) as branch");
+            $latestcomponentbranch = $DB->get_records_select_menu(
+                'amos_strings',
+                "component $sqlcomponents1 GROUP BY component",
+                $paramcomponents1,
+                '',
+                "component, MAX(since) as branch"
+            );
         }
 
         // Get all the English strings and translations for the translator.
@@ -132,7 +136,6 @@ class translator implements \renderable, \templatable {
                 $sql2 .= " AND " . $DB->sql_like("strname", ":strname2", false);
                 $params['strname1'] = '%' . $DB->sql_like_escape($stringid) . '%';
                 $params['strname2'] = '%' . $DB->sql_like_escape($stringid) . '%';
-
             } else {
                 $sql1 .= " AND strname = :strname1";
                 $sql2 .= " AND strname = :strname2";
@@ -187,7 +190,6 @@ class translator implements \renderable, \templatable {
 
             if (!isset($tree[$record->lang][$record->component][$record->strname])) {
                 $tree[$record->lang][$record->component][$record->strname] = $record;
-
             } else {
                 $current = $tree[$record->lang][$record->component][$record->strname];
 
@@ -199,8 +201,10 @@ class translator implements \renderable, \templatable {
                     continue;
                 }
 
-                if (($record->since == $current->since) && ($record->timemodified == $current->timemodified)
-                        && ($record->id < $current->id)) {
+                if (
+                    ($record->since == $current->since) && ($record->timemodified == $current->timemodified)
+                        && ($record->id < $current->id)
+                ) {
                     continue;
                 }
 
@@ -308,26 +312,24 @@ class translator implements \renderable, \templatable {
 
                             if (isset($s[$lang][$component][$stringid]->statusclass)) {
                                 $string->statusclass = $s[$lang][$component][$stringid]->statusclass;
-
                             } else {
                                 $string->statusclass = 'translated';
                             }
 
-                            if ($string->englishsincecode >= $string->translationsincecode &&
-                                    $string->originalmodified > $string->timemodified) {
+                            if (
+                                $string->englishsincecode >= $string->translationsincecode &&
+                                    $string->originalmodified > $string->timemodified
+                            ) {
                                 $string->outdated = true;
-
                             } else {
                                 $string->outdated = false;
                             }
 
                             if (isset($s[$lang][$component][$stringid]->nocleaning)) {
                                 $string->nocleaning = $s[$lang][$component][$stringid]->nocleaning;
-
                             } else {
                                 $string->nocleaning = false;
                             }
-
                         } else {
                             $string->translation = null;
                             $string->translationid = null;
@@ -345,14 +347,14 @@ class translator implements \renderable, \templatable {
 
                         if ($component == 'local_moodlemobileapp') {
                             $string->app = $stringid;
-                        } else if (isset($applist[$component.'/'.$stringid])) {
-                            $string->app = $applist[$component.'/'.$stringid];
+                        } else if (isset($applist[$component . '/' . $stringid])) {
+                            $string->app = $applist[$component . '/' . $stringid];
                         } else {
                             $string->app = false;
                         }
 
                         if (in_array($component, $workplacelist)) {
-                            $string->workplace = $component.'/'.$stringid;
+                            $string->workplace = $component . '/' . $stringid;
                         } else {
                             $string->workplace = false;
                         }
@@ -385,67 +387,60 @@ class translator implements \renderable, \templatable {
                                         if (!stristr($string->original, $substring) && !stristr($string->translation, $substring)) {
                                             continue;
                                         }
-
                                     } else if ($searcheng) {
                                         if (!stristr($string->original, $substring)) {
                                             continue;
                                         }
-
                                     } else if ($searchtra) {
                                         if (!stristr($string->translation, $substring)) {
                                             continue;
                                         }
                                     }
-
                                 } else {
                                     if ($searcheng && $searchtra) {
                                         if (!strstr($string->original, $substring) && !strstr($string->translation, $substring)) {
                                             continue;
                                         }
-
                                     } else if ($searcheng) {
                                         if (!strstr($string->original, $substring)) {
                                             continue;
                                         }
-
                                     } else if ($searchtra) {
                                         if (!strstr($string->translation, $substring)) {
                                             continue;
                                         }
                                     }
                                 }
-
                             } else {
                                 if (empty($substringcs)) {
                                     if ($searcheng && $searchtra) {
-                                        if (!preg_match("/$substring/i", $string->translation)
-                                                && !preg_match("/$substring/i", $string->original)) {
+                                        if (
+                                            !preg_match("/$substring/i", $string->translation)
+                                                && !preg_match("/$substring/i", $string->original)
+                                        ) {
                                             continue;
                                         }
-
                                     } else if ($searcheng) {
                                         if (!preg_match("/$substring/i", $string->original)) {
                                             continue;
                                         }
-
                                     } else if ($searchtra) {
                                         if (!preg_match("/$substring/i", $string->translation)) {
                                             continue;
                                         }
                                     }
-
                                 } else {
                                     if ($searcheng && $searchtra) {
-                                        if (!preg_match("/$substring/", $string->translation)
-                                                && !preg_match("/$substring/", $string->original)) {
+                                        if (
+                                            !preg_match("/$substring/", $string->translation)
+                                                && !preg_match("/$substring/", $string->original)
+                                        ) {
                                             continue;
                                         }
-
                                     } else if ($searcheng) {
                                         if (!preg_match("/$substring/", $string->original)) {
                                             continue;
                                         }
-
                                     } else if ($searchtra) {
                                         if (!preg_match("/$substring/", $string->translation)) {
                                             continue;
@@ -618,7 +613,7 @@ class translator implements \renderable, \templatable {
             $string->displayoriginal = \local_amos\local\util::add_breaks(s($string->original));
             // Workaround for <https://bugzilla.mozilla.org/show_bug.cgi?id=116083>.
             $string->displayoriginal = nl2br($string->displayoriginal);
-            $string->displayoriginal = str_replace(array("\n", "\r"), '', $string->displayoriginal);
+            $string->displayoriginal = str_replace(["\n", "\r"], '', $string->displayoriginal);
 
             $string->displaytranslation = \local_amos\local\util::add_breaks(s($string->translation));
         }

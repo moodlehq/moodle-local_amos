@@ -33,25 +33,56 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_amos_extend_navigation(global_navigation $navigation) {
 
-    $amos = $navigation->add('AMOS', new moodle_url('/local/amos/'), navigation_node::TYPE_CUSTOM,
-        null, 'amos_root', new pix_icon('t/editstring', ''));
+    $amos = $navigation->add(
+        'AMOS',
+        new moodle_url('/local/amos/'),
+        navigation_node::TYPE_CUSTOM,
+        null,
+        'amos_root',
+        new pix_icon('t/editstring', '')
+    );
     $amos->showinflatnavigation = true;
 
     if (has_capability('local/amos:stage', context_system::instance())) {
-        $amos->add(get_string('translatortool', 'local_amos'), new moodle_url('/local/amos/view.php'),
-            navigation_node::TYPE_CUSTOM, null, 'translator');
-        $amos->add(get_string('stage', 'local_amos'), new moodle_url('/local/amos/stage.php'),
-            navigation_node::TYPE_CUSTOM, null, 'stage');
+        $amos->add(
+            get_string('translatortool', 'local_amos'),
+            new moodle_url('/local/amos/view.php'),
+            navigation_node::TYPE_CUSTOM,
+            null,
+            'translator'
+        );
+        $amos->add(
+            get_string('stage', 'local_amos'),
+            new moodle_url('/local/amos/stage.php'),
+            navigation_node::TYPE_CUSTOM,
+            null,
+            'stage'
+        );
     }
 
     if (has_capability('local/amos:stash', context_system::instance())) {
-        $amos->add(get_string('stashes', 'local_amos'), new moodle_url('/local/amos/stash.php'),
-            navigation_node::TYPE_CUSTOM, null, 'stashes');
-        $amos->add(get_string('contributions', 'local_amos'), new moodle_url('/local/amos/contrib.php'),
-            navigation_node::TYPE_CUSTOM, null, 'contributions');
+        $amos->add(
+            get_string('stashes', 'local_amos'),
+            new moodle_url('/local/amos/stash.php'),
+            navigation_node::TYPE_CUSTOM,
+            null,
+            'stashes'
+        );
+        $amos->add(
+            get_string('contributions', 'local_amos'),
+            new moodle_url('/local/amos/contrib.php'),
+            navigation_node::TYPE_CUSTOM,
+            null,
+            'contributions'
+        );
     }
-    $amos->add(get_string('creditstitleshort', 'local_amos'), new moodle_url('/local/amos/credits.php'),
-        navigation_node::TYPE_CUSTOM, null, 'credits');
+    $amos->add(
+        get_string('creditstitleshort', 'local_amos'),
+        new moodle_url('/local/amos/credits.php'),
+        navigation_node::TYPE_CUSTOM,
+        null,
+        'credits'
+    );
 
     if (has_capability('local/amos:manage', context_system::instance())) {
         $admin = $amos->add(get_string('administration'));
@@ -155,8 +186,12 @@ function local_amos_comment_add($comment, $meta) {
             $data->name = 'contribution';
             $data->userfrom = $amosbot;
             $data->userto = $user;
-            $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos',
-                ['id' => $contribution->id], $user->lang);
+            $data->subject = get_string_manager()->get_string(
+                'contribnotif',
+                'local_amos',
+                ['id' => $contribution->id],
+                $user->lang
+            );
             $data->fullmessage = get_string_manager()->get_string('contribnotifcommented', 'local_amos', [
                 'id' => $contribution->id,
                 'subject' => $contribution->subject,

@@ -24,14 +24,13 @@ namespace local_amos\external;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class get_translator_data_test extends \local_amos_testcase {
-
+final class get_translator_data_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_capability() {
+    public function test_execute_without_capability(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -52,7 +51,7 @@ class get_translator_data_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_basics() {
+    public function test_execute_basics(): void {
         global $DB, $USER;
         $this->resetAfterTest(true);
 

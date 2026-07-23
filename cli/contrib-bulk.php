@@ -90,7 +90,7 @@ foreach ($contributions as $contribution) {
 
         $stage->commit('Bulk approval - contribution #' . $contribution->id, [
             'source' => 'bot',
-            'userinfo' => 'AMOS-bot <amos@moodle.org>'
+            'userinfo' => 'AMOS-bot <amos@moodle.org>',
         ]);
 
         $update = [

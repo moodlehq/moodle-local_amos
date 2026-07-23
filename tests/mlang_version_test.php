@@ -39,8 +39,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mlang_version_test extends advanced_testcase {
-
+final class mlang_version_test extends advanced_testcase {
     /**
      * Test mlang_version factory methods.
      *
@@ -51,7 +50,7 @@ class mlang_version_test extends advanced_testcase {
      * @param string $dir
      * @param bool $translatable
      */
-    public function test_factory_methods(int $code, string $label, string $dir, bool $translatable) {
+    public function test_factory_methods(int $code, string $label, string $dir, bool $translatable): void {
 
         $v = mlang_version::by_code($code);
         $this->assert_mlang_version_properties_match($v, $code, $label, $dir, $translatable);
@@ -72,8 +71,13 @@ class mlang_version_test extends advanced_testcase {
      * @param string $dir
      * @param bool $translatable
      */
-    protected function assert_mlang_version_properties_match(mlang_version $v, int $code, string $label,
-            string $dir, bool $translatable) {
+    protected function assert_mlang_version_properties_match(
+        mlang_version $v,
+        int $code,
+        string $label,
+        string $dir,
+        bool $translatable
+    ) {
 
         $this->assertSame($v->label, $label);
         $this->assertSame($v->dir, $dir);
@@ -172,7 +176,7 @@ class mlang_version_test extends advanced_testcase {
     /**
      * Test obtaining the list of versions.
      */
-    public function test_list_all() {
+    public function test_list_all(): void {
 
         $this->resetAfterTest();
 
@@ -188,7 +192,7 @@ class mlang_version_test extends advanced_testcase {
     /**
      * Test obtaining the most recent version
      */
-    public function test_latest_version() {
+    public function test_latest_version(): void {
 
         $this->resetAfterTest();
 
@@ -202,7 +206,7 @@ class mlang_version_test extends advanced_testcase {
     /**
      * Test obtaining the first known version
      */
-    public function test_oldest_version() {
+    public function test_oldest_version(): void {
 
         $this->resetAfterTest();
 
@@ -216,7 +220,7 @@ class mlang_version_test extends advanced_testcase {
     /**
      * Test obtaining a range of versions.
      */
-    public function test_list_range() {
+    public function test_list_range(): void {
 
         $this->resetAfterTest();
 
@@ -247,7 +251,7 @@ class mlang_version_test extends advanced_testcase {
     /**
      * Test obtaining list of supported versions.
      */
-    public function test_list_supported() {
+    public function test_list_supported(): void {
 
         $this->resetAfterTest();
 

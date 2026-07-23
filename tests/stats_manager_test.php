@@ -37,17 +37,16 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Tests for the {@see \local_amos_stats_manager} class.
  */
-class stats_manager_test extends advanced_testcase {
-
+final class stats_manager_test extends advanced_testcase {
     /**
      * Test the workflow for updating the stats.
      */
-    public function test_update_stats() {
+    public function test_update_stats(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -57,39 +56,60 @@ class stats_manager_test extends advanced_testcase {
         $statsman->update_stats('37', 'cs', 'tool_foo', 78);
         $statsman->update_stats('37', 'en', 'tool_foo', 81);
 
-        $this->assertEquals(78, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
-        $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertEquals(78, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']
+        ));
+        $this->assertEquals(81, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
 
         // Data from another branch do not affect data on other branches.
         $statsman->update_stats('36', 'en', 'tool_foo', 72);
 
-        $this->assertEquals(72, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 36, 'lang' => 'en', 'component' => 'tool_foo']));
-        $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertEquals(72, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 36, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
+        $this->assertEquals(81, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
 
         // Data can be updated.
         $statsman->update_stats('37', 'en', 'tool_foo', 85);
 
-        $this->assertEquals(85, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertEquals(85, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
 
         // Data can be NULL and NULL'ed.
         $statsman->update_stats('38', 'cs', 'tool_foo', null);
         $statsman->update_stats('37', 'en', 'tool_foo', null);
 
-        $this->assertSame(null, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 38, 'lang' => 'cs', 'component' => 'tool_foo']));
-        $this->assertSame(null, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertSame(null, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 38, 'lang' => 'cs', 'component' => 'tool_foo']
+        ));
+        $this->assertSame(null, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
     }
 
     /**
      * Test updating stats when using the write buffer.
      */
-    public function test_buffered_workflow() {
+    public function test_buffered_workflow(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -102,25 +122,37 @@ class stats_manager_test extends advanced_testcase {
         $statsman->add_to_buffer('37', 'en', 'tool_bar', 42);
         $statsman->add_to_buffer('37', 'cs', 'tool_foo', 78);
 
-        $this->assertEquals(80, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
+        $this->assertEquals(80, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
         $this->assertFalse($DB->record_exists('amos_stats', ['branch' => 37, 'lang' => 'en', 'component' => 'tool_bar']));
         $this->assertFalse($DB->record_exists('amos_stats', ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
 
         $statsman->write_buffer();
 
-        $this->assertEquals(81, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']));
-        $this->assertEquals(42, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_bar']));
-        $this->assertEquals(78, $DB->get_field('amos_stats', 'numofstrings',
-            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']));
+        $this->assertEquals(81, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_foo']
+        ));
+        $this->assertEquals(42, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'en', 'component' => 'tool_bar']
+        ));
+        $this->assertEquals(78, $DB->get_field(
+            'amos_stats',
+            'numofstrings',
+            ['branch' => 37, 'lang' => 'cs', 'component' => 'tool_foo']
+        ));
     }
 
     /**
      * Test obtaining stats for the given plugin.
      */
-    public function test_get_component_stats() {
+    public function test_get_component_stats(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '35,36,37', 'local_amos');
@@ -185,7 +217,7 @@ class stats_manager_test extends advanced_testcase {
     /**
      * Test obtaining stats showing the translation completeness.
      */
-    public function test_get_language_pack_ratio_stats() {
+    public function test_get_language_pack_ratio_stats(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '35,36,37', 'local_amos');
@@ -243,7 +275,7 @@ class stats_manager_test extends advanced_testcase {
     /**
      * Test obtaining data for the download page.
      */
-    public function test_get_language_pack_download_page_data() {
+    public function test_get_language_pack_download_page_data(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '400', 'local_amos');
@@ -296,7 +328,8 @@ class stats_manager_test extends advanced_testcase {
         $component->add_string(new mlang_string('thislanguage', $thislanguage ?? $thislanguageint));
         $component->add_string(new mlang_string('parentlanguage', $parent));
         $stage->add($component);
-        $stage->commit('Registering language ' . $code, ['source' => 'unittest']);;
+        $stage->commit('Registering language ' . $code, ['source' => 'unittest']);
+        ;
 
         // Rebuild the cache.
         mlang_tools::list_languages(true, false);

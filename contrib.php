@@ -285,8 +285,13 @@ if ($changelang) {
     $listlanguages = mlang_tools::list_languages();
 
     if (empty($listlanguages[$newlang])) {
-        throw new \moodle_exception('err_invalid_target_language', 'local_amos', new moodle_url($PAGE->url, ['id' => $contriborig->id]),
-            null, $newlang);
+        throw new \moodle_exception(
+            'err_invalid_target_language',
+            'local_amos',
+            new moodle_url($PAGE->url, ['id' => $contriborig->id]),
+            null,
+            $newlang
+        );
     }
 
     // Load the stash associated with the originial contribution.
@@ -308,7 +313,7 @@ if ($changelang) {
     } else if ($contriborig->lang === '') {
         $languagenameorig = "undefined";
     } else {
-        $languagenameorig = "wrong (".$contriborig->lang.")";
+        $languagenameorig = "wrong (" . $contriborig->lang . ")";
     }
 
     $contribnew = new stdClass();
@@ -370,7 +375,6 @@ if (!empty($CFG->usecomments)) {
 
 // Particular contribution record.
 if ($id) {
-
     if (has_capability('local/amos:commit', context_system::instance())) {
         $maintenances = $DB->get_records('amos_translators', ['status' => AMOS_USER_MAINTAINER, 'userid' => $USER->id]);
         // List of languages the USER is maintainer of, or 'all'.
@@ -398,9 +402,9 @@ if ($id) {
     $stash = mlang_stash::instance_from_id($contribution->stashid);
     $stage = new mlang_stage();
     $stash->apply($stage);
-    list($origstrings, $origlanguages, $origcomponents) = mlang_stage::analyze($stage);
+    [$origstrings, $origlanguages, $origcomponents] = mlang_stage::analyze($stage);
     $stage->rebase();
-    list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
+    [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = mlang_stage::analyze($stage);
 
     $contribinfo = new local_amos_contribution($contribution, $author);
     $contribinfo->language = implode(', ', array_filter(array_map('trim', explode('/', $origlanguages))));
@@ -408,11 +412,13 @@ if ($id) {
     $contribinfo->strings = $origstrings;
     $contribinfo->stringsreb = $rebasedstrings;
 
-    if ($contribution->assignee == $USER->id
+    if (
+        $contribution->assignee == $USER->id
             && $maintainerof
             && ($maintainerof === 'all' || in_array($contribution->lang, $maintainerof))
             && $contribution->status == local_amos_contribution::STATE_REVIEW
-            && $contribinfo->stringsreb == 0) {
+            && $contribinfo->stringsreb == 0
+    ) {
         // Maintainers tend to leave the contribution in the "In review" state.
         // So let us automatically accept it if all strings are already translated.
         // This may lead to unexpected acceptance in certain situations but of the
@@ -441,7 +447,6 @@ if ($id) {
                 'post',
                 ['class' => 'singlebutton resign']
             );
-
         } else {
             echo $output->single_button(
                 new moodle_url($PAGE->url, ['assign' => $id]),
@@ -453,17 +458,28 @@ if ($id) {
     }
     if (has_capability('local/amos:stage', context_system::instance())) {
         echo $output->single_button(
-            new moodle_url($PAGE->url, ['apply' => $id]), get_string('contribapply', 'local_amos'),
-                'post', ['class' => 'singlebutton apply']);
+            new moodle_url($PAGE->url, ['apply' => $id]),
+            get_string('contribapply', 'local_amos'),
+            'post',
+            ['class' => 'singlebutton apply']
+        );
     }
     if ($contribution->assignee == $USER->id && $contribution->status > local_amos_contribution::STATE_NEW) {
         if ($contribution->status != local_amos_contribution::STATE_ACCEPTED) {
-            echo $output->single_button(new moodle_url($PAGE->url, ['accept' => $id]), get_string('contribaccept', 'local_amos'),
-                    'post', ['class' => 'singlebutton accept']);
+            echo $output->single_button(
+                new moodle_url($PAGE->url, ['accept' => $id]),
+                get_string('contribaccept', 'local_amos'),
+                'post',
+                ['class' => 'singlebutton accept']
+            );
         }
         if ($contribution->status != local_amos_contribution::STATE_REJECTED) {
-            echo $output->single_button(new moodle_url($PAGE->url, ['reject' => $id]), get_string('contribreject', 'local_amos'),
-                    'post', ['class' => 'singlebutton reject']);
+            echo $output->single_button(
+                new moodle_url($PAGE->url, ['reject' => $id]),
+                get_string('contribreject', 'local_amos'),
+                'post',
+                ['class' => 'singlebutton reject']
+            );
         }
     }
     echo $output->help_icon('contribactions', 'local_amos');
@@ -518,12 +534,11 @@ if (has_capability('local/amos:commit', context_system::instance())) {
 
     if (empty($maintainerof)) {
         $contributions = [];
-
     } else {
         $params = [];
 
         if (is_array($maintainerof)) {
-            list($langsql, $langparams) = $DB->get_in_or_equal($maintainerof);
+            [$langsql, $langparams] = $DB->get_in_or_equal($maintainerof);
             $params = array_merge($params, $langparams);
         } else {
             $langsql = "";
@@ -560,7 +575,6 @@ if (has_capability('local/amos:commit', context_system::instance())) {
 
     if (empty($contributions)) {
         echo $output->heading(get_string('contribincomingnone', 'local_amos'));
-
     } else {
         $table = new html_table();
         $table->attributes['class'] = 'generaltable contributionlist incoming';
@@ -572,15 +586,15 @@ if (has_capability('local/amos:commit', context_system::instance())) {
             get_string('contribtimemodified', 'local_amos'),
             get_string('contribassignee', 'local_amos'),
             get_string('language', 'local_amos'),
-            get_string('strings', 'local_amos')
+            get_string('strings', 'local_amos'),
         ];
         $table->colclasses = ['id', 'status', 'author', 'subject', 'timemodified', 'assignee', 'language', 'strings'];
 
         foreach ($contributions as $contribution) {
             $url = new moodle_url($PAGE->url, ['id' => $contribution->id]);
             $cells   = [];
-            $cells[] = new html_table_cell(html_writer::link($url, '#'.$contribution->id));
-            $status  = get_string('contribstatus'.$contribution->status, 'local_amos');
+            $cells[] = new html_table_cell(html_writer::link($url, '#' . $contribution->id));
+            $status  = get_string('contribstatus' . $contribution->status, 'local_amos');
             $cells[] = new html_table_cell(html_writer::link($url, $status));
             $author  = new user_picture(user_picture::unalias($contribution, null, 'authorid', 'author'));
             $author->size = 16;
@@ -599,7 +613,7 @@ if (has_capability('local/amos:commit', context_system::instance())) {
             $cells[] = new html_table_cell(s($contribution->lang));
             $cells[] = new html_table_cell(s($contribution->strings));
             $row = new html_table_row($cells);
-            $row->attributes['class'] = 'status'.$contribution->status;
+            $row->attributes['class'] = 'status' . $contribution->status;
             $table->data[] = $row;
         }
 
@@ -632,7 +646,6 @@ $contributions = $DB->get_records_sql($sql, [$USER->id]);
 
 if (empty($contributions)) {
     echo $output->heading(get_string('contribsubmittednone', 'local_amos'));
-
 } else {
     $table = new html_table();
     $table->attributes['class'] = 'generaltable contributionlist submitted';
@@ -643,15 +656,15 @@ if (empty($contributions)) {
         get_string('contribtimemodified', 'local_amos'),
         get_string('contribassignee', 'local_amos'),
         get_string('language', 'local_amos'),
-        get_string('strings', 'local_amos')
+        get_string('strings', 'local_amos'),
     ];
     $table->colclasses = ['id', 'status', 'subject', 'timemodified', 'assignee', 'language', 'strings'];
 
     foreach ($contributions as $contribution) {
         $url = new moodle_url($PAGE->url, ['id' => $contribution->id]);
         $cells   = [];
-        $cells[] = new html_table_cell(html_writer::link($url, '#'.$contribution->id));
-        $status  = get_string('contribstatus'.$contribution->status, 'local_amos');
+        $cells[] = new html_table_cell(html_writer::link($url, '#' . $contribution->id));
+        $status  = get_string('contribstatus' . $contribution->status, 'local_amos');
         $cells[] = new html_table_cell(html_writer::link($url, $status));
         $cells[] = new html_table_cell(html_writer::link($url, s($contribution->subject)));
         $time    = is_null($contribution->timemodified) ? $contribution->timecreated : $contribution->timemodified;
@@ -667,21 +680,28 @@ if (empty($contributions)) {
         $cells[] = new html_table_cell(s($contribution->lang));
         $cells[] = new html_table_cell(s($contribution->strings));
         $row = new html_table_row($cells);
-        $row->attributes['class'] = 'status'.$contribution->status;
+        $row->attributes['class'] = 'status' . $contribution->status;
         $table->data[] = $row;
     }
 
     echo $output->heading(get_string('contribsubmittedsome', 'local_amos', count($contributions)));
     echo html_writer::table($table);
-
 }
 
 if ($closed) {
-    echo $output->single_button(new moodle_url($PAGE->url, ['closed' => false]),
-        get_string('contribclosedno', 'local_amos'), 'get', ['class' => 'singlebutton showclosed']);
+    echo $output->single_button(
+        new moodle_url($PAGE->url, ['closed' => false]),
+        get_string('contribclosedno', 'local_amos'),
+        'get',
+        ['class' => 'singlebutton showclosed']
+    );
 } else {
-    echo $output->single_button(new moodle_url($PAGE->url, ['closed' => true]),
-        get_string('contribclosedyes', 'local_amos'), 'get', ['class' => 'singlebutton showclosed']);
+    echo $output->single_button(
+        new moodle_url($PAGE->url, ['closed' => true]),
+        get_string('contribclosedyes', 'local_amos'),
+        'get',
+        ['class' => 'singlebutton showclosed']
+    );
 }
 
 echo $output->footer();

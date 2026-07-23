@@ -35,15 +35,14 @@ global $CFG;
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class source_code_test extends \advanced_testcase {
-
+final class source_code_test extends \advanced_testcase {
     /**
      * Test {@see \local_amos\local\source_code::parse_version_php()}.
      */
-    public function test_get_version_php() {
+    public function test_get_version_php(): void {
         global $CFG;
 
-        $amos = new source_code($CFG->dirroot.'/local/amos');
+        $amos = new source_code($CFG->dirroot . '/local/amos');
         $info = $amos->get_version_php();
 
         $this->assertEquals('local_amos', $info['component']);
@@ -56,22 +55,26 @@ class source_code_test extends \advanced_testcase {
     /**
      * Test {@see \local_amos\local\source_code::get_included_string_files()}.
      */
-    public function test_get_included_string_files() {
+    public function test_get_included_string_files(): void {
 
         // Admin tool with the old subplugins.php file.
-        $toolold = new source_code(__DIR__.'/../fixtures/tool_old');
+        $toolold = new source_code(__DIR__ . '/../fixtures/tool_old');
         $files = $toolold->get_included_string_files();
 
         $this->assertStringStartsWith('// Just a test file', $files['tool_old']['lang/en/tool_old.php']);
-        $this->assertStringStartsWith('// Just a test file',
-            $files['oldsubtype_subplug']['subtype/subplug/lang/en/oldsubtype_subplug.php']);
+        $this->assertStringStartsWith(
+            '// Just a test file',
+            $files['oldsubtype_subplug']['subtype/subplug/lang/en/oldsubtype_subplug.php']
+        );
 
         // Activity module with the new subplugins.json file.
-        $foonew = new source_code(__DIR__.'/../fixtures/mod_new');
+        $foonew = new source_code(__DIR__ . '/../fixtures/mod_new');
         $files = $foonew->get_included_string_files();
 
         $this->assertStringContainsString('// Just a test file', $files['mod_new']['lang/en/new.php']);
-        $this->assertStringStartsWith('// Just a test file',
-            $files['newsubtype_subplug']['subtype/subplug/lang/en/newsubtype_subplug.php']);
+        $this->assertStringStartsWith(
+            '// Just a test file',
+            $files['newsubtype_subplug']['subtype/subplug/lang/en/newsubtype_subplug.php']
+        );
     }
 }

@@ -29,7 +29,6 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class local_amos_testcase extends advanced_testcase {
-
     /**
      * Register a language on the given branch.
      *
@@ -46,6 +45,6 @@ abstract class local_amos_testcase extends advanced_testcase {
         $stage->add($component);
         $component->clear();
 
-        $stage->commit('Register language ' . $langcode, array('source' => 'unittest'));
+        $stage->commit('Register language ' . $langcode, ['source' => 'unittest']);
     }
 }

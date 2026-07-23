@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plugin_translation_stats extends \core_external\external_api {
-
     /**
      * Describes parameters of the {@see execute()} method
      */
@@ -84,7 +83,7 @@ class plugin_translation_stats extends \core_external\external_api {
             'langnames' => new \core_external\external_multiple_structure(
                 new \core_external\external_single_structure([
                     'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code'),
-                    'name' => new \core_external\external_value(PARAM_TEXT, 'International name of the language followed by its code')
+                    'name' => new \core_external\external_value(PARAM_TEXT, 'International name of the language followed by its code'),
                 ])
             ),
             'branches' => new \core_external\external_multiple_structure(
@@ -98,7 +97,7 @@ class plugin_translation_stats extends \core_external\external_api {
                         ])
                     ),
                 ])
-            )
+            ),
         ]);
     }
 }

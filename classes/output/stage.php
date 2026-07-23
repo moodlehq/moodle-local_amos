@@ -39,7 +39,6 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stage implements \renderable, \templatable {
-
     /** @var array of objects to be rendered */
     public $strings;
 
@@ -97,7 +96,8 @@ class stage implements \renderable, \templatable {
         if (has_all_capabilities(['local/amos:execute', 'local/amos:stage'], \context_system::instance(), $user)) {
             $this->executeform = new \local_amos_execute_form(
                 new \moodle_url('/local/amos/execute.php'),
-                local_amos_execute_options());
+                local_amos_execute_options()
+            );
         }
 
         // Tree of strings to simulate ORDER BY component, stringid, lang, sincecode.
@@ -166,8 +166,15 @@ class stage implements \renderable, \templatable {
                 $flng[$language] = true;
                 foreach ($components as $component => $stringnames) {
                     $fcmp[$component] = true;
-                    $needed[$branch][$language][$component] = \mlang_component::from_snapshot($component,
-                        $language, \mlang_version::by_code($branch), null, false, false, $stringnames);
+                    $needed[$branch][$language][$component] = \mlang_component::from_snapshot(
+                        $component,
+                        $language,
+                        \mlang_version::by_code($branch),
+                        null,
+                        false,
+                        false,
+                        $stringnames
+                    );
                 }
             }
         }
@@ -257,18 +264,17 @@ class stage implements \renderable, \templatable {
                 $string->statusclass = 'removal';
                 $string->displaytranslationcurrent = \local_amos\local\util::add_breaks(s($string->current));
                 $string->hastranslationcurrent = true;
-
             } else if ($string->current === null) {
                 $string->statusclass = 'new';
                 $string->displaytranslationnew = \local_amos\local\util::add_breaks(s($string->new));
                 $string->hastranslationnew = true;
-
-            } else if (($string->nocleaning && $string->current === $string->new) ||
-                    (!$string->nocleaning && trim($string->current) === trim($string->new))) {
+            } else if (
+                ($string->nocleaning && $string->current === $string->new) ||
+                    (!$string->nocleaning && trim($string->current) === trim($string->new))
+            ) {
                 $string->statusclass = 'nodiff';
                 $string->displaytranslationcurrent = \local_amos\local\util::add_breaks(s($string->current));
                 $string->hastranslationcurrent = true;
-
             } else {
                 $string->statusclass = 'diff';
                 $c = s($string->current);
@@ -285,14 +291,14 @@ class stage implements \renderable, \templatable {
                         if (!empty($k['d'])) {
                             $kd = implode(' ', $k['d']);
                             if (!empty($kd)) {
-                                $t .= '<del>'.$kd.'</del> ';
+                                $t .= '<del>' . $kd . '</del> ';
                                 $numd += count($k['d']);
                             }
                         }
                         if (!empty($k['i'])) {
                             $ki = implode(' ', $k['i']);
                             if (!empty($ki)) {
-                                $t .= '<ins>'.$ki.'</ins> ';
+                                $t .= '<ins>' . $ki . '</ins> ';
                                 $numi += count($k['i']);
                             }
                         }

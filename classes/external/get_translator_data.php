@@ -30,7 +30,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_translator_data extends \core_external\external_api {
-
     /**
      * Describe the external function parameters.
      *

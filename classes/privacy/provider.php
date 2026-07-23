@@ -45,18 +45,14 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright  2018 David Mudrák <david@moodle.com>
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider,
-        \core_privacy\local\request\core_userlist_provider {
-
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider {
     /**
      * Describe all the places where the AMOS plugin stores some personal data.
      *
      * @param collection $collection Collection of items to add metadata to.
      * @return collection Collection with our added items.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
 
         $collection->add_database_table('amos_commits', [
            'commitmsg' => 'privacy:metadata:db:amoscommits:commitmsg',
@@ -112,7 +108,7 @@ class provider implements
      * @param int $userid ID of the user.
      * @return contextlist List of contexts containing the user's personal data.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
 
         $contextlist = new contextlist();
         $contextlist->add_system_context();
@@ -208,8 +204,11 @@ class provider implements
             if ($prevcommitid != $r->commitid) {
                 // Write what we have.
                 if (!empty($data->strings)) {
-                    $writer->export_data(array_merge($subcontext, [get_string('privacy:commitnumber', 'local_amos',
-                        $prevcommitid)]), $data);
+                    $writer->export_data(array_merge($subcontext, [get_string(
+                        'privacy:commitnumber',
+                        'local_amos',
+                        $prevcommitid
+                    )]), $data);
                 }
 
                 // Start gathering new data.
@@ -270,7 +269,7 @@ class provider implements
 
             $contrib->timecreated = transform::datetime($contrib->timecreated);
             $contrib->timemodified = transform::datetime($contrib->timemodified);
-            $contrib->status = get_string('contribstatus'.$contrib->status, 'local_amos');
+            $contrib->status = get_string('contribstatus' . $contrib->status, 'local_amos');
 
             $writer->export_data($subcontext, $contrib);
 
@@ -297,8 +296,13 @@ class provider implements
                 $writer->export_related_data($subcontext, 'strings', $strings);
             }
 
-            \core_comment\privacy\provider::export_comments(\context_system::instance(), 'local_amos', 'amos_contribution',
-                $contrib->id, $subcontext);
+            \core_comment\privacy\provider::export_comments(
+                \context_system::instance(),
+                'local_amos',
+                'amos_contribution',
+                $contrib->id,
+                $subcontext
+            );
         }
     }
 
@@ -318,15 +322,13 @@ class provider implements
             ];
 
             if ($add->lang === 'X') {
-                $add->lang = '* ('.get_string('any').')';
+                $add->lang = '* (' . get_string('any') . ')';
             }
 
             if ($credit->status == AMOS_USER_MAINTAINER) {
                 $add->is_maintainer = transform::yesno(true);
-
             } else if ($credit->status == AMOS_USER_CONTRIBUTOR) {
                 $add->is_contributor = transform::yesno(true);
-
             } else {
                 // This should not happen but who knows what the future brings us.
                 $add->status = $credit->status;
@@ -350,8 +352,12 @@ class provider implements
 
         $writer = writer::with_context(\context_system::instance());
 
-        $stashes = $DB->get_records('amos_stashes', ['ownerid' => $userid], 'timecreated',
-            'id, languages, components, strings, timecreated, timemodified, name, message');
+        $stashes = $DB->get_records(
+            'amos_stashes',
+            ['ownerid' => $userid],
+            'timecreated',
+            'id, languages, components, strings, timecreated, timemodified, name, message'
+        );
 
         foreach ($stashes as $stashdata) {
             $subcontext = [

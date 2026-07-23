@@ -27,7 +27,7 @@ define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
-require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir . '/clilib.php');
 
 $usage = "Automatically backport translations to lower versions if they apply.
 
@@ -48,7 +48,7 @@ Options:
     --languages     Backport translations for the given languages only. Defaults to all languages.
 ";
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'component' => '',
     'languages' => '',
     'help' => false,
@@ -80,8 +80,13 @@ $count = count($components);
 $i = 1;
 
 foreach ($components as $component) {
-    $logger->log('backport', sprintf('%d%% %d/%d backporting %s translations ...',
-        floor($i / $count * 100), $i, $count, $component));
+    $logger->log('backport', sprintf(
+        '%d%% %d/%d backporting %s translations ...',
+        floor($i / $count * 100),
+        $i,
+        $count,
+        $component
+    ));
     mlang_tools::backport_translations($component, $languages);
     $i++;
 }

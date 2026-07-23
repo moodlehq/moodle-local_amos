@@ -40,8 +40,7 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 /**
  * Tests for the auto-version import staging function.
  */
-class importfile_auto_test extends local_amos_testcase {
-
+final class importfile_auto_test extends local_amos_testcase {
     /**
      * Set up English strings used across all test methods.
      *
@@ -72,7 +71,7 @@ class importfile_auto_test extends local_amos_testcase {
      * Each string in the import file is staged at the version where its English
      * source was most recently introduced.
      */
-    public function test_strings_staged_at_correct_individual_versions() {
+    public function test_strings_staged_at_correct_individual_versions(): void {
         $this->resetAfterTest();
         $this->set_up_english_strings();
 
@@ -102,7 +101,7 @@ class importfile_auto_test extends local_amos_testcase {
      * A translated string that has no corresponding English string is silently
      * skipped and must not appear in the stage at any version.
      */
-    public function test_string_absent_from_english_is_skipped() {
+    public function test_string_absent_from_english_is_skipped(): void {
         $this->resetAfterTest();
         $this->set_up_english_strings();
 
@@ -123,8 +122,10 @@ class importfile_auto_test extends local_amos_testcase {
         foreach (['39', '310', '400'] as $code) {
             $comp = $stage->get_component('foo_test', 'cs', mlang_version::by_code((int) $code));
             if ($comp !== null) {
-                $this->assertNull($comp->get_string('nonexistent'),
-                    "nonexistent must not be staged at version {$code}");
+                $this->assertNull(
+                    $comp->get_string('nonexistent'),
+                    "nonexistent must not be staged at version {$code}"
+                );
             }
         }
     }
@@ -132,7 +133,7 @@ class importfile_auto_test extends local_amos_testcase {
     /**
      * A string that has been deleted in the current English must not be staged.
      */
-    public function test_string_deleted_in_english_is_skipped() {
+    public function test_string_deleted_in_english_is_skipped(): void {
         $this->resetAfterTest();
         set_config('branchesall', '39,310,400', 'local_amos');
 
@@ -161,15 +162,17 @@ class importfile_auto_test extends local_amos_testcase {
         $parsed->clear();
 
         // Nothing should be staged because 'gamma' is currently deleted in English.
-        $this->assertFalse($stage->has_component(),
-            'Stage must be empty when the English string is deleted');
+        $this->assertFalse(
+            $stage->has_component(),
+            'Stage must be empty when the English string is deleted'
+        );
     }
 
     /**
      * When an English string is updated in a newer version, the imported
      * translation must be staged at that newer version.
      */
-    public function test_updated_english_string_staged_at_new_version() {
+    public function test_updated_english_string_staged_at_new_version(): void {
         $this->resetAfterTest();
         set_config('branchesall', '39,310,400', 'local_amos');
 

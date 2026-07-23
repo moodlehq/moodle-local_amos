@@ -47,7 +47,7 @@ $PAGE->set_url(new moodle_url('/local/amos/untranslate.php', [
     'stringid' => $stringid,
     'since' => $since,
 ]));
-$PAGE->set_title('AMOS '.get_string('untranslating', 'local_amos'));
+$PAGE->set_title('AMOS ' . get_string('untranslating', 'local_amos'));
 $PAGE->navbar->add(get_string('untranslating', 'local_amos'));
 
 navigation_node::override_active_url(new moodle_url('/local/amos/view.php'));
@@ -70,7 +70,7 @@ if ($confirm) {
         $mcomponent->add_string($mstring, true);
         $mstage->add($mcomponent);
 
-        $message = 'Untranslate the string '.$stringid;
+        $message = 'Untranslate the string ' . $stringid;
         $meta = [
             'source' => 'amos',
             'userid' => $USER->id,

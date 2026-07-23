@@ -43,7 +43,7 @@ Example:
 \$ php enfix-merge.php --symlinksdir=/path/to/moodle --enfixdir=/tmp/export-enfix
 ";
 
-list($options, $unrecognized) = cli_get_params([
+[$options, $unrecognized] = cli_get_params([
     'symlinksdir' => '',
     'enfixdir' => '',
     'help' => false,
@@ -63,12 +63,12 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     }
     $filename = $enfixfileinfo->getFilename();
 
-    if (!is_link($options['symlinksdir'].'/'.$filename)) {
-        cli_error('File not symlink: '.$options['symlinksdir'].'/'.$filename);
+    if (!is_link($options['symlinksdir'] . '/' . $filename)) {
+        cli_error('File not symlink: ' . $options['symlinksdir'] . '/' . $filename);
     }
 
-    if (!is_writable($options['symlinksdir'].'/'.$filename)) {
-        cli_error('File not writable: '.$options['symlinksdir'].'/'.$filename);
+    if (!is_writable($options['symlinksdir'] . '/' . $filename)) {
+        cli_error('File not writable: ' . $options['symlinksdir'] . '/' . $filename);
     }
 }
 
@@ -84,33 +84,39 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     }
     $filename = $enfixfileinfo->getFilename();
 
-    $logger->log('enfix-merge', 'Processing file '.$filename.' ...');
+    $logger->log('enfix-merge', 'Processing file ' . $filename . ' ...');
 
     if ($filename === 'langconfig.php') {
-        $logger->log('enfix-merge', 'Skipping file '.$filename, amos_cli_logger::LEVEL_DEBUG);
+        $logger->log('enfix-merge', 'Skipping file ' . $filename, amos_cli_logger::LEVEL_DEBUG);
         continue;
     }
 
-    $filecontents = file_get_contents($options['symlinksdir'].'/'.$filename);
+    $filecontents = file_get_contents($options['symlinksdir'] . '/' . $filename);
 
-    $fromstrings = $helper->load_strings_from_file($options['symlinksdir'].'/'.$filename);
-    $logger->log('enfix-merge', count($fromstrings) . ' string(s) found in ' . $options['symlinksdir'] . '/' . $filename,
-        amos_cli_logger::LEVEL_DEBUG);
+    $fromstrings = $helper->load_strings_from_file($options['symlinksdir'] . '/' . $filename);
+    $logger->log(
+        'enfix-merge',
+        count($fromstrings) . ' string(s) found in ' . $options['symlinksdir'] . '/' . $filename,
+        amos_cli_logger::LEVEL_DEBUG
+    );
 
     $tostrings = $helper->load_strings_from_file($options['enfixdir'] . '/' . $filename);
-    $logger->log('enfix-merge', count($tostrings) . ' string(s) found in ' . $options['enfixdir'] . '/' . $filename,
-        amos_cli_logger::LEVEL_DEBUG);
+    $logger->log(
+        'enfix-merge',
+        count($tostrings) . ' string(s) found in ' . $options['enfixdir'] . '/' . $filename,
+        amos_cli_logger::LEVEL_DEBUG
+    );
 
     $changes = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
 
     if ($changes) {
         $total += $changes;
-        file_put_contents($options['symlinksdir'].'/'.$filename, $filecontents);
-        $logger->log('enfix-merge', $changes.' string(s) fixed in '.$filename);
+        file_put_contents($options['symlinksdir'] . '/' . $filename, $filecontents);
+        $logger->log('enfix-merge', $changes . ' string(s) fixed in ' . $filename);
     } else if ($changes === 0) {
-        $logger->log('enfix-merge', 'No changes in '.$filename);
+        $logger->log('enfix-merge', 'No changes in ' . $filename);
     } else {
-        $logger->log('enfix-merge', 'Error while processing file '.$filename, amos_cli_logger::LEVEL_ERROR);
+        $logger->log('enfix-merge', 'Error while processing file ' . $filename, amos_cli_logger::LEVEL_ERROR);
     }
 }
 

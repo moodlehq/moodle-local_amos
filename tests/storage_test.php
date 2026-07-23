@@ -42,12 +42,11 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class storage_test extends advanced_testcase {
-
+final class storage_test extends advanced_testcase {
     /**
      * Test essential operations with the strings storage.
      */
-    public function test_storage_essentials() {
+    public function test_storage_essentials(): void {
         global $DB, $CFG, $USER;
 
         $this->resetAfterTest();

@@ -67,13 +67,17 @@ foreach ($supportedversions as $version) {
             foreach ($enfix as $enfixstring) {
                 $enstring = $en->get_string($enfixstring->id);
                 if ($enstring === null) {
-                    fputs(STDERR,
-                        'orphaned string ' . $enfixstring->id . ' in ' . $componentname . ' ' . $version->label . PHP_EOL);
+                    fputs(
+                        STDERR,
+                        'orphaned string ' . $enfixstring->id . ' in ' . $componentname . ' ' . $version->label . PHP_EOL
+                    );
                     continue;
                 }
                 if ($enstring->timemodified > $enfixstring->timemodified) {
-                    fputs(STDERR,
-                        'string ' . $enfixstring->id . ' outdated in ' . $componentname . ' ' . $version->label . PHP_EOL);
+                    fputs(
+                        STDERR,
+                        'string ' . $enfixstring->id . ' outdated in ' . $componentname . ' ' . $version->label . PHP_EOL
+                    );
                     $enfix->unlink_string($enfixstring->id);
                     $removed[] = $enfixstring->id;
                 }
@@ -94,7 +98,7 @@ foreach ($supportedversions as $version) {
                 $stage->add($enfix);
                 $stage->rebase(null, true);
                 $msg = 'Clean-up strings that were merged into the English pack';
-                $stage->commit($msg, array('source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'), true);
+                $stage->commit($msg, ['source' => 'bot', 'userinfo' => 'AMOS-bot <amos@moodle.org>'], true);
             } else {
                 $stage->clear();
             }

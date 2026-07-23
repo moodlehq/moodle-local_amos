@@ -38,7 +38,6 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  * Provides all the checks to execute and some helper methods
  */
 class amos_checker {
-
     /** Successful check result code. */
     const RESULT_SUCCESS = 0;
 
@@ -64,8 +63,8 @@ class amos_checker {
      */
     public function __construct(string $taskname) {
 
-        if (!method_exists($this, 'check_'.$taskname)) {
-            fputs(STDERR, "Error: Unknown checker task: ".$taskname."\n");
+        if (!method_exists($this, 'check_' . $taskname)) {
+            fputs(STDERR, "Error: Unknown checker task: " . $taskname . "\n");
             exit(self::RESULT_PARAMS);
         }
 
@@ -82,7 +81,7 @@ class amos_checker {
      */
     protected function check_separators() {
 
-        $details = array();
+        $details = [];
         $langnames = mlang_tools::list_languages();
         $versions = mlang_version::list_all();
         foreach ($versions as $version) {
@@ -101,7 +100,7 @@ class amos_checker {
                 if ($listsep = $langconfig->get_string('listsep')) {
                     $listsep = $listsep->text;
                 }
-                $details[$language][$version->label] = array();
+                $details[$language][$version->label] = [];
                 if (empty($decsep) and empty($thousandssep)) {
                     $details[$language][$version->label][] = '! empty decsep and thousandssep';
                 } else if (empty($decsep) or empty($thousandssep)) {
@@ -122,8 +121,13 @@ class amos_checker {
         foreach ($details as $language => $branches) {
             foreach ($branches as $branch => $msgs) {
                 foreach ($msgs as $msg) {
-                    $this->output(sprintf('  Misconfigured separators: %s {%s} %s %s',
-                        $langnames[$language], $language, $branch, $msg), true);
+                    $this->output(sprintf(
+                        '  Misconfigured separators: %s {%s} %s %s',
+                        $langnames[$language],
+                        $language,
+                        $branch,
+                        $msg
+                    ), true);
                     $status = self::RESULT_FAILURE;
                 }
             }
@@ -153,14 +157,15 @@ class amos_checker {
 
         // Search for contributions in "In review" state not modified for
         // a week.
-        $rs = $DB->get_recordset_select("amos_contributions",
+        $rs = $DB->get_recordset_select(
+            "amos_contributions",
             "(status = :statusnew AND timecreated <= :timecreated) OR (status = :statusreview AND timemodified <= :timemodified)",
-            array(
+            [
                 'statusnew' => local_amos_contribution::STATE_NEW,
                 'statusreview' => local_amos_contribution::STATE_REVIEW,
                 'timecreated' => time() - 7 * DAYSECS,
                 'timemodified' => time() - 3 * DAYSECS,
-            )
+            ]
         );
 
         foreach ($rs as $contribution) {
@@ -169,26 +174,35 @@ class amos_checker {
             $stage = new mlang_stage();
             $stash->apply($stage);
             $stage->rebase();
-            list($rebasedstrings, $rebasedlanguages, $rebasedcomponents) = mlang_stage::analyze($stage);
+            [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = mlang_stage::analyze($stage);
 
             if ($rebasedstrings == 0) {
-                $msg = sprintf('  Pending contribution #%d with no new strings to be committed - marking as accepted',
-                    $contribution->id);
+                $msg = sprintf(
+                    '  Pending contribution #%d with no new strings to be committed - marking as accepted',
+                    $contribution->id
+                );
                 $this->output($msg, true);
                 $status = self::RESULT_FAILURE;
-                $DB->set_field('amos_contributions', 'status', local_amos_contribution::STATE_ACCEPTED,
-                    array('id' => $contribution->id));
-
+                $DB->set_field(
+                    'amos_contributions',
+                    'status',
+                    local_amos_contribution::STATE_ACCEPTED,
+                    ['id' => $contribution->id]
+                );
             } else {
                 $maintainers = $this->get_maintainers($contribution->lang);
                 if (empty($maintainers)) {
                     $msg = sprintf('  Pending contribution #%d - no active maintainers to notify!!', $contribution->id);
                 } else {
-                    $msg = sprintf('  Pending contribution #%d - notifying maintainers %s', $contribution->id,
-                        implode(',', array_keys($maintainers)));
+                    $msg = sprintf(
+                        '  Pending contribution #%d - notifying maintainers %s',
+                        $contribution->id,
+                        implode(',', array_keys($maintainers))
+                    );
 
                     foreach ($maintainers as $maintainer) {
-                        $this->notify($maintainer,
+                        $this->notify(
+                            $maintainer,
                             get_string_manager()->get_string('contribnotif', 'local_amos', [
                                 'id' => $contribution->id,
                             ], $maintainer->lang),
@@ -197,7 +211,7 @@ class amos_checker {
                                 'subject' => $contribution->subject,
                                 'contriburl' => (new moodle_url('/local/amos/contrib.php', ['id' => $contribution->id]))
                                     ->out(false),
-                                'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack'
+                                'docsurl' => 'https://docs.moodle.org/dev/Maintaining_a_language_pack',
                             ], $maintainer->lang)
                         );
                     }
@@ -238,7 +252,7 @@ class amos_checker {
         global $DB;
 
         if ($this->amosbot === null) {
-            $this->amosbot = $DB->get_record('user', array('id' => 2)); // XXX mind the hardcoded value here!
+            $this->amosbot = $DB->get_record('user', ['id' => 2]); // XXX mind the hardcoded value here!
         }
 
         $data = new \core\message\message();
@@ -266,8 +280,8 @@ class amos_checker {
         global $DB;
 
         if ($this->maintainers === null) {
-            $this->maintainers = array();
-            $records = $DB->get_records('amos_translators', array('status' => AMOS_USER_MAINTAINER));
+            $this->maintainers = [];
+            $records = $DB->get_records('amos_translators', ['status' => AMOS_USER_MAINTAINER]);
             foreach ($records as $record) {
                 if ($record->lang === 'X') {
                     // We do not want these "universal" maintainers here.
@@ -278,12 +292,12 @@ class amos_checker {
         }
 
         if (empty($this->maintainers[$langcode])) {
-            return array();
+            return [];
         }
 
         foreach ($this->maintainers[$langcode] as $userid => $userinfo) {
             if ($userinfo === true) {
-                $this->maintainers[$langcode][$userid] = $DB->get_record('user', array('id' => $userid));
+                $this->maintainers[$langcode][$userid] = $DB->get_record('user', ['id' => $userid]);
             }
         }
 
@@ -297,29 +311,26 @@ class amos_checker {
      */
     public function execute() {
 
-        $this->output('START AMOS checker task '.$this->task);
-        $method = 'check_'.$this->task;
+        $this->output('START AMOS checker task ' . $this->task);
+        $method = 'check_' . $this->task;
         $this->output(' RUNNING ' . $method);
         $status = $this->$method();
 
         if ($status === self::RESULT_FAILURE) {
             $this->output(' FAILED ' . $method, true);
-
         } else if ($status === self::RESULT_SUCCESS) {
             $this->output(' OK ' . $method);
-
         } else {
             $this->output(' ERROR ' . $method . ' returned unexpected value', true);
         }
 
-        $this->output('END AMOS checker task '.$this->task);
+        $this->output('END AMOS checker task ' . $this->task);
 
         return $status;
     }
-
 }
 
-list($options, $unrecognized) = cli_get_params(array('task' => ''));
+[$options, $unrecognized] = cli_get_params(['task' => '']);
 
 if (empty($options['task']) || is_numeric((string)$options['task'])) {
     fputs(STDERR, "Error: Please run with the --task=name parameter to specify the checker task to perform.\n");
@@ -327,7 +338,7 @@ if (empty($options['task']) || is_numeric((string)$options['task'])) {
 }
 
 if (!empty($unrecognized)) {
-    fputs(STDERR, "Error: Unrecognized parameter detected: ".implode($unrecognized)."\n");
+    fputs(STDERR, "Error: Unrecognized parameter detected: " . implode($unrecognized) . "\n");
     exit(amos_checker::RESULT_PARAMS);
 }
 

@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/local/amos/renderer.php');
 if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
     // phpcs:ignore moodle.Files.RequireLogin
     require_once($CFG->dirroot . '/local/amos/cli/config.php');
-
 } else {
     require_once($CFG->dirroot . '/local/amos/cli/config-dist.php');
 }
@@ -48,7 +47,6 @@ if (is_readable($CFG->dirroot . '/local/amos/cli/config.php')) {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class amos_cli_logger {
-
     /** Error log message level. */
     const LEVEL_ERROR = 100;
 
@@ -128,7 +126,6 @@ class amos_cli_logger {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class amos_export_zip {
-
     /** @var amos_cli_logger */
     protected $logger;
 
@@ -163,8 +160,8 @@ class amos_export_zip {
         global $CFG;
 
         $this->logger = $logger;
-        $this->outputdirroot = $CFG->dataroot.'/amos/export-zip';
-        $this->tempdirroot = $CFG->dataroot.'/amos/temp/export-zip';
+        $this->outputdirroot = $CFG->dataroot . '/amos/export-zip';
+        $this->tempdirroot = $CFG->dataroot . '/amos/temp/export-zip';
 
         if (!$statsman) {
             $this->statsman = new local_amos_stats_manager();
@@ -216,7 +213,6 @@ class amos_export_zip {
             $this->log('== Rebuilding ZIPs of outdated language packs ==');
             $this->init_timestamp_last();
             $langpacks = $this->detect_recently_modified_languages();
-
         } else {
             $this->log('== Rebuilding ZIPs of specified language packs ==');
             $langpacks = array_combine($this->langcodes, array_fill(0, count($this->langcodes), $this->minver));
@@ -282,13 +278,17 @@ class amos_export_zip {
     protected function init_versions_range(?int $minver, ?int $maxver) {
 
         if ($this->minver = $minver) {
-            $this->log('Processing only versions starting from ' . mlang_version::by_code($minver)->label,
-                amos_cli_logger::LEVEL_DEBUG);
+            $this->log(
+                'Processing only versions starting from ' . mlang_version::by_code($minver)->label,
+                amos_cli_logger::LEVEL_DEBUG
+            );
         }
 
         if ($this->maxver = $maxver) {
-            $this->log('Processing only versions up to ' . mlang_version::by_code($maxver)->label,
-                amos_cli_logger::LEVEL_DEBUG);
+            $this->log(
+                'Processing only versions up to ' . mlang_version::by_code($maxver)->label,
+                amos_cli_logger::LEVEL_DEBUG
+            );
         }
     }
 
@@ -301,8 +301,10 @@ class amos_export_zip {
             $lastexportzip = 0;
             $this->log('Previous execution timestamp (lastexportzip) not configured.', amos_cli_logger::LEVEL_DEBUG);
         } else {
-            $this->log(sprintf('Previous execution timestamp found: %d (%s).', $lastexportzip, date('Y-m-d H:i:s', $lastexportzip)),
-                amos_cli_logger::LEVEL_DEBUG);
+            $this->log(
+                sprintf('Previous execution timestamp found: %d (%s).', $lastexportzip, date('Y-m-d H:i:s', $lastexportzip)),
+                amos_cli_logger::LEVEL_DEBUG
+            );
         }
         $this->last = $lastexportzip;
     }
@@ -314,7 +316,7 @@ class amos_export_zip {
         $this->log('Preparing temporary folders', amos_cli_logger::LEVEL_DEBUG);
         fulldelete($this->tempdirroot);
         foreach ($this->get_versions() as $version) {
-            make_writable_directory($this->tempdirroot.'/'.$version->dir);
+            make_writable_directory($this->tempdirroot . '/' . $version->dir);
         }
     }
 
@@ -355,8 +357,10 @@ class amos_export_zip {
         $result = $DB->get_records_sql_menu($sql, $params);
 
         foreach ($this->consume_pending_zip_rebuilds() as $lang => $since) {
-            $this->log(sprintf('Pending forced rebuild detected for language %s affecting branches since %d', $lang, $since),
-                amos_cli_logger::LEVEL_DEBUG);
+            $this->log(
+                sprintf('Pending forced rebuild detected for language %s affecting branches since %d', $lang, $since),
+                amos_cli_logger::LEVEL_DEBUG
+            );
 
             if (!isset($result[$lang]) || $since < $result[$lang]) {
                 $result[$lang] = $since;
@@ -366,8 +370,10 @@ class amos_export_zip {
         ksort($result);
 
         foreach ($result as $lang => $since) {
-            $this->log(sprintf('Recent change detected in language %s affecting branches since %d', $lang, $since),
-                amos_cli_logger::LEVEL_DEBUG);
+            $this->log(
+                sprintf('Recent change detected in language %s affecting branches since %d', $lang, $since),
+                amos_cli_logger::LEVEL_DEBUG
+            );
         }
 
         if (empty($result)) {
@@ -412,7 +418,7 @@ class amos_export_zip {
      * @param string $langcode
      */
     protected function rebuild_zip_package(mlang_version $version, $langcode) {
-        $this->log('Rebuilding temp/'.$version->dir.'/'.$langcode.'.zip', amos_cli_logger::LEVEL_DEBUG);
+        $this->log('Rebuilding temp/' . $version->dir . '/' . $langcode . '.zip', amos_cli_logger::LEVEL_DEBUG);
 
         foreach (mlang_tools::list_components() as $componentname => $ignored) {
             $component = mlang_component::from_snapshot($componentname, $langcode, $version);
@@ -450,8 +456,8 @@ class amos_export_zip {
      */
     protected function push_zip_package(mlang_version $version, $langcode) {
 
-        $source = $this->tempdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
-        $target = $this->outputdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
+        $source = $this->tempdirroot . '/' . $version->dir . '/' . $langcode . '.zip';
+        $target = $this->outputdirroot . '/' . $version->dir . '/' . $langcode . '.zip';
 
         if (!file_exists($source)) {
             // Nothing to do, there was nothing generated for this branch.
@@ -518,7 +524,7 @@ class amos_export_zip {
 
         if (!empty($files)) {
             $packer = get_file_packer('application/zip');
-            $zipfile = $this->tempdirroot.'/'.$version->dir.'/'.$langcode.'.zip';
+            $zipfile = $this->tempdirroot . '/' . $version->dir . '/' . $langcode . '.zip';
             $packer->archive_to_pathname($files, $zipfile);
         }
     }
@@ -532,13 +538,13 @@ class amos_export_zip {
      */
     protected function list_string_files(mlang_version $version, $langcode) {
 
-        $dirpath = $this->tempdirroot.'/'.$version->dir.'/'.$langcode;
+        $dirpath = $this->tempdirroot . '/' . $version->dir . '/' . $langcode;
 
         if (!is_dir($dirpath)) {
-            return array();
+            return [];
         }
 
-        $files = array();
+        $files = [];
 
         foreach (scandir($dirpath) as $filename) {
             if (substr($filename, 0, 1) === '.') {
@@ -547,7 +553,7 @@ class amos_export_zip {
             if (substr($filename, -4) !== '.php') {
                 continue;
             }
-            $files[$langcode.'/'.$filename] = $dirpath.'/'.$filename;
+            $files[$langcode . '/' . $filename] = $dirpath . '/' . $filename;
         }
 
         return $files;
@@ -585,10 +591,10 @@ class amos_export_zip {
 
         $languagesmd5 = '';
         foreach ($languagesmd5lines as $line) {
-            $languagesmd5 .= $line['code'] . ',' . $line['md5'] . ',' . $line['name']."\n";
+            $languagesmd5 .= $line['code'] . ',' . $line['md5'] . ',' . $line['name'] . "\n";
         }
         file_put_contents($this->outputdirroot . '/' . $version->dir . '/languages.md5', $languagesmd5);
-        $this->log($version->dir.'/languages.md5', amos_cli_logger::LEVEL_DEBUG);
+        $this->log($version->dir . '/languages.md5', amos_cli_logger::LEVEL_DEBUG);
     }
 
     /**
@@ -636,7 +642,6 @@ class amos_export_zip {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class amos_merge_string_files {
-
     /** @var amos_cli_logger */
     protected $logger;
 
@@ -668,7 +673,7 @@ class amos_merge_string_files {
      * @return array
      */
     public function load_strings_from_file($filename) {
-        $string = array();
+        $string = [];
         require($filename);
         return $string;
     }
@@ -691,7 +696,7 @@ class amos_merge_string_files {
 
         foreach ($tostrings as $changeid => $changetext) {
             if (!isset($fromstrings[$changeid])) {
-                $this->log('Attempting to merge an orphaned change: "'.$changeid.'"', amos_cli_logger::LEVEL_WARNING);
+                $this->log('Attempting to merge an orphaned change: "' . $changeid . '"', amos_cli_logger::LEVEL_WARNING);
                 continue;
             }
             if ($fromstrings[$changeid] !== $changetext) {
@@ -700,10 +705,10 @@ class amos_merge_string_files {
                 $pattern = '/(^\s*\$string\s*\[\s*\'' . preg_quote($changeid, '/') . '\'\s*\]\s*=\s*)(\'|")' .
                     preg_quote(str_replace("'", "\\'", $fromstrings[$changeid]), '/') . '(\\2\s*)(;[^;]*\s*$)/m';
                 if (!preg_match($pattern, $filecontents)) {
-                    $this->log('String "'.$changeid.'" not found', amos_cli_logger::LEVEL_DEBUG);
+                    $this->log('String "' . $changeid . '" not found', amos_cli_logger::LEVEL_DEBUG);
                     continue;
                 }
-                $replacement = '$1'.var_export($changetext, true).'$4';
+                $replacement = '$1' . var_export($changetext, true) . '$4';
                 $count = 0;
                 $filecontents = preg_replace($pattern, $replacement, $filecontents, -1, $count);
                 if (!$count) {
@@ -715,12 +720,12 @@ class amos_merge_string_files {
                 }
                 $realchanges += $count;
             } else {
-                $this->log('String "'.$changeid.'" identical, no update needed', amos_cli_logger::LEVEL_DEBUG);
+                $this->log('String "' . $changeid . '" identical, no update needed', amos_cli_logger::LEVEL_DEBUG);
             }
         }
 
         if ($changes <> $realchanges) {
-            $this->log('Expected changes: '.$changes.', real changes: '.$realchanges, amos_cli_logger::LEVEL_WARNING);
+            $this->log('Expected changes: ' . $changes . ', real changes: ' . $realchanges, amos_cli_logger::LEVEL_WARNING);
         }
 
         return $realchanges;

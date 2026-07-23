@@ -24,14 +24,13 @@ namespace local_amos\external;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class make_translation_uptodate_test extends \local_amos_testcase {
-
+final class make_translation_uptodate_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_capability() {
+    public function test_execute_without_capability(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -52,7 +51,7 @@ class make_translation_uptodate_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_being_maintainer() {
+    public function test_execute_without_being_maintainer(): void {
         global $DB, $USER;
         $this->resetAfterTest(true);
 
@@ -79,8 +78,12 @@ class make_translation_uptodate_test extends \local_amos_testcase {
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 
-        $originalid = $DB->get_field('amos_strings', 'id', ['component' => 'moodle', 'strname' => 'groupmode', 'since' => 21],
-            MUST_EXIST);
+        $originalid = $DB->get_field(
+            'amos_strings',
+            'id',
+            ['component' => 'moodle', 'strname' => 'groupmode', 'since' => 21],
+            MUST_EXIST
+        );
         $translationid = $DB->get_field('amos_translations', 'id', ['lang' => 'cs', 'component' => 'moodle',
             'strname' => 'groupmode', 'since' => 20], MUST_EXIST);
 
@@ -95,7 +98,7 @@ class make_translation_uptodate_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_basics() {
+    public function test_execute_basics(): void {
         global $DB, $USER;
         $this->resetAfterTest(true);
 
@@ -128,8 +131,12 @@ class make_translation_uptodate_test extends \local_amos_testcase {
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 
-        $originalid = $DB->get_field('amos_strings', 'id', ['component' => 'moodle', 'strname' => 'groupmode', 'since' => 21],
-            MUST_EXIST);
+        $originalid = $DB->get_field(
+            'amos_strings',
+            'id',
+            ['component' => 'moodle', 'strname' => 'groupmode', 'since' => 21],
+            MUST_EXIST
+        );
         $translationid = $DB->get_field('amos_translations', 'id', ['lang' => 'cs', 'component' => 'moodle',
             'strname' => 'groupmode', 'since' => 20], MUST_EXIST);
 

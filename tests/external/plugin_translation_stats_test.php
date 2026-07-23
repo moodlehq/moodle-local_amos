@@ -37,12 +37,11 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class plugin_translation_stats_test extends \externallib_advanced_testcase {
-
+final class plugin_translation_stats_test extends \externallib_advanced_testcase {
     /**
      * Test the behaviour of the plugin_translation_stats external function when unknown component is requested.
      */
-    public function test_plugin_translation_stats_unknown_component() {
+    public function test_plugin_translation_stats_unknown_component(): void {
         $this->resetAfterTest(true);
 
         // No special capability needed.
@@ -57,9 +56,9 @@ class plugin_translation_stats_test extends \externallib_advanced_testcase {
     /**
      * Test the behaviour of the plugin_translation_stats external function.
      */
-    public function test_plugin_translation_stats() {
+    public function test_plugin_translation_stats(): void {
         global $CFG;
-        require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+        require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
         $this->resetAfterTest(true);
 

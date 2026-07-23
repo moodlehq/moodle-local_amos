@@ -26,14 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-define('AMOS_USER_MAINTAINER',  0);
+define('AMOS_USER_MAINTAINER', 0);
 define('AMOS_USER_CONTRIBUTOR', 1);
 
 /**
  * Renderable stash
  */
 class local_amos_stash implements renderable {
-
     /** @var int identifier in the table of stashes */
     public $id;
     /** @var string title of the stash */
@@ -45,16 +44,16 @@ class local_amos_stash implements renderable {
     /** @var stdClass the owner of the stash */
     public $owner;
     /** @var array of language names */
-    public $languages = array();
+    public $languages = [];
     /** @var array of component names */
-    public $components = array();
+    public $components = [];
     /** @var int number of stashed strings */
     public $strings = 0;
     /** @var bool is autosave stash */
     public $isautosave;
 
     /** @var array of stdClasses representing stash actions */
-    protected $actions = array();
+    protected $actions = [];
 
     /**
      * Factory method using an instance if {@see mlang_stash} as a data source
@@ -77,7 +76,7 @@ class local_amos_stash implements renderable {
 
         $stage = new mlang_stage();
         $stash->apply($stage);
-        list($new->strings, $new->languages, $new->components) = mlang_stage::analyze($stage);
+        [$new->strings, $new->languages, $new->components] = mlang_stage::analyze($stage);
         $stage->clear();
         unset($stage);
 
@@ -86,7 +85,7 @@ class local_amos_stash implements renderable {
 
         $new->owner         = $owner;
 
-        if ($stash->hash === 'xxxxautosaveuser'.$new->owner->id) {
+        if ($stash->hash === 'xxxxautosaveuser' . $new->owner->id) {
             $new->isautosave = true;
         } else {
             $new->isautosave = false;
@@ -118,7 +117,7 @@ class local_amos_stash implements renderable {
         $new->languages     = explode('/', trim($record->languages, '/'));
         $new->owner         = $owner;
 
-        if ($record->hash === 'xxxxautosaveuser'.$new->owner->id) {
+        if ($record->hash === 'xxxxautosaveuser' . $new->owner->id) {
             $new->isautosave = true;
         } else {
             $new->isautosave = false;
@@ -163,7 +162,6 @@ class local_amos_stash implements renderable {
  * Represents renderable contribution infor
  */
 class local_amos_contribution implements renderable {
-
     /** Newly submitted contribution. */
     const STATE_NEW = 0;
 
@@ -198,19 +196,19 @@ class local_amos_contribution implements renderable {
      * @param stdClass $author Contributor user record, if known.
      * @param stdClass $assignee Assignee user record, if known.
      */
-    public function __construct(stdClass $info, stdClass $author=null, stdClass $assignee=null) {
+    public function __construct(stdClass $info, stdClass $author = null, stdClass $assignee = null) {
         global $DB;
 
         $this->info = $info;
 
         if (empty($author)) {
-            $this->author = $DB->get_record('user', array('id' => $info->authorid));
+            $this->author = $DB->get_record('user', ['id' => $info->authorid]);
         } else {
             $this->author = $author;
         }
 
         if (empty($assignee) and !empty($info->assignee)) {
-            $this->assignee = $DB->get_record('user', array('id' => $info->assignee));
+            $this->assignee = $DB->get_record('user', ['id' => $info->assignee]);
         } else {
             $this->assignee = $assignee;
         }
@@ -258,10 +256,10 @@ function local_amos_applist_strings() {
 
     if (is_null($applist)) {
         // Get the app strings.
-        $applist = array();
+        $applist = [];
         $rs = $DB->get_records('amos_app_strings');
         foreach ($rs as $s) {
-            $applist[$s->component.'/'.$s->stringid] = $s->appid;
+            $applist[$s->component . '/' . $s->stringid] = $s->appid;
         }
     }
 
@@ -275,7 +273,7 @@ function local_amos_applist_strings() {
  */
 function local_amos_importfile_options() {
 
-    $options = array();
+    $options = [];
 
     $options['versions'] = ['auto' => get_string('versionauto', 'local_amos')];
     $options['versioncurrent'] = 'auto';
@@ -284,7 +282,7 @@ function local_amos_importfile_options() {
             $options['versions'][$version->code] = $version->label;
         }
     }
-    $options['languages'] = array_merge(array('' => get_string('choosedots')), mlang_tools::list_languages(false));
+    $options['languages'] = array_merge(['' => get_string('choosedots')], mlang_tools::list_languages(false));
     $currentlanguage = current_language();
     if ($currentlanguage === 'en') {
         $currentlanguage = 'en_fix';
@@ -310,8 +308,14 @@ function local_amos_importfile_stage_auto(mlang_stage $stage, mlang_component $p
 
     // Load English strings with full info so that $extra->since is populated.
     // $deleted=false ensures strings currently deleted in English are excluded.
-    $encomponent = mlang_component::from_snapshot($parsed->name, 'en', mlang_version::latest_version(),
-        null, false, true);
+    $encomponent = mlang_component::from_snapshot(
+        $parsed->name,
+        'en',
+        mlang_version::latest_version(),
+        null,
+        false,
+        true
+    );
 
     // Group translated strings by their English source version code.
     $byversion = [];
@@ -349,9 +353,9 @@ function local_amos_importfile_stage_auto(mlang_stage $stage, mlang_component $p
  */
 function local_amos_execute_options() {
 
-    $options = array();
+    $options = [];
 
-    $options['versions'] = array();
+    $options['versions'] = [];
     $options['versioncurrent'] = null;
     $latestversioncode = mlang_version::latest_version()->code;
     foreach (mlang_version::list_all() as $version) {
@@ -398,10 +402,11 @@ function local_amos_simplediff(array $old, array $new) {
         }
     }
     if ($maxlen == 0) {
-        return array(array('d' => $old, 'i' => $new));
+        return [['d' => $old, 'i' => $new]];
     }
     return array_merge(
         local_amos_simplediff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
         array_slice($new, $nmax, $maxlen),
-        local_amos_simplediff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
+        local_amos_simplediff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen))
+    );
 }

@@ -24,12 +24,11 @@ namespace local_amos\local;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class util_test extends \advanced_testcase {
-
+final class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::add_breaks()}.
      */
-    public function test_add_breaks() {
+    public function test_add_breaks(): void {
 
         $input = 'a,b,c';
         $output = util::add_breaks($input);
@@ -40,11 +39,13 @@ class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::standard_components_tree()}.
      */
-    public function test_standard_components_tree() {
+    public function test_standard_components_tree(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
-        set_config('standardcomponents', " mod_foobar\t\n  foobar_one  39  \n  foobar_two 37 -38\n\n\n_test\nfoobar_three 39 -39",
+        set_config(
+            'standardcomponents',
+            " mod_foobar\t\n  foobar_one  39  \n  foobar_two 37 -38\n\n\n_test\nfoobar_three 39 -39",
             'local_amos'
         );
 
@@ -81,7 +82,7 @@ class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::standard_components_list()}.
      */
-    public function test_standard_components_list() {
+    public function test_standard_components_list(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
@@ -100,7 +101,7 @@ class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::standard_components_in_version()}.
      */
-    public function test_standard_components_in_version() {
+    public function test_standard_components_in_version(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
@@ -143,7 +144,7 @@ class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::standard_components_in_latest_version()}.
      */
-    public function test_standard_components_in_latest_version() {
+    public function test_standard_components_in_latest_version(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
@@ -168,12 +169,15 @@ class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::standard_components_range_versions()}.
      */
-    public function test_standard_components_range_versions() {
+    public function test_standard_components_range_versions(): void {
         $this->resetAfterTest();
 
         set_config('branchesall', '38,39,310', 'local_amos');
-        set_config('standardcomponents', "mod_foobar\nfoobar_one 39\nfoobar_two 37 -38\nfoobar_three -310\ncore_barbar 310 -310",
-            'local_amos');
+        set_config(
+            'standardcomponents',
+            "mod_foobar\nfoobar_one 39\nfoobar_two 37 -38\nfoobar_three -310\ncore_barbar 310 -310",
+            'local_amos'
+        );
 
         $list = util::standard_components_range_versions();
 

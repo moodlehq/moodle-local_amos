@@ -32,7 +32,7 @@ if (!defined('T_ML_COMMENT')) {
     define('T_DOC_COMMENT', T_ML_COMMENT);
 }
 
-require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 /**
  * Provides access to the contents of a ZIP package with a plugin's source code.
@@ -43,7 +43,6 @@ require_once($CFG->libdir.'/filelib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class source_code {
-
     /** @var string full path to the directory with the contents of the package */
     protected $basepath;
 
@@ -62,7 +61,7 @@ class source_code {
         }
 
         $this->basepath = $path;
-        $this->versionphp = static::parse_version_php($path.'/version.php');
+        $this->versionphp = static::parse_version_php($path . '/version.php');
     }
 
     /**
@@ -85,9 +84,8 @@ class source_code {
                 array_merge($matches1[3], $matches2[3], $matches3[3], $matches4[3]),
                 array_merge($matches1[5], $matches2[5], $matches3[5], $matches4[5])
             );
-
         } else {
-            $info = array();
+            $info = [];
         }
 
         return $info;
@@ -114,7 +112,7 @@ class source_code {
                 $text = $token;
             } else {
                 // Token array.
-                list($id, $text) = $token;
+                [$id, $text] = $token;
             }
             switch ($id) {
                 case T_WHITESPACE:
@@ -168,28 +166,27 @@ class source_code {
     public function get_included_string_files() {
         global $CFG;
 
-        $files = array();
+        $files = [];
 
         $component = $this->versionphp['component'];
         [$plugintype, $pluginname] = \core_component::normalize_component($component);
 
-        $fullnamefile = 'lang/en/'.$component.'.php';
-        if (is_readable($this->basepath.'/'.$fullnamefile)) {
-            $files[$component][$fullnamefile] = file_get_contents($this->basepath.'/'.$fullnamefile);
-
+        $fullnamefile = 'lang/en/' . $component . '.php';
+        if (is_readable($this->basepath . '/' . $fullnamefile)) {
+            $files[$component][$fullnamefile] = file_get_contents($this->basepath . '/' . $fullnamefile);
         } else {
-            $modnamefile = 'lang/en/'.$pluginname.'.php';
-            if (is_readable($this->basepath.'/'.$modnamefile)) {
-                $files[$component][$modnamefile] = file_get_contents($this->basepath.'/'.$modnamefile);
+            $modnamefile = 'lang/en/' . $pluginname . '.php';
+            if (is_readable($this->basepath . '/' . $modnamefile)) {
+                $files[$component][$modnamefile] = file_get_contents($this->basepath . '/' . $modnamefile);
             }
         }
 
         $subplugins = [];
-        $subpluginsfilejson = $this->basepath.'/db/subplugins.json';
+        $subpluginsfilejson = $this->basepath . '/db/subplugins.json';
         if (is_readable($subpluginsfilejson)) {
             $subplugins = (array) json_decode(file_get_contents($subpluginsfilejson))->plugintypes;
         } else {
-            $subpluginsfile = $this->basepath.'/db/subplugins.php';
+            $subpluginsfile = $this->basepath . '/db/subplugins.php';
             if (is_readable($subpluginsfile)) {
                 $subplugins = static::get_subplugins_from_file($subpluginsfile);
             }
@@ -201,22 +198,22 @@ class source_code {
                 if ($subpluginpath !== clean_param($subpluginpath, PARAM_SAFEPATH)) {
                     continue;
                 }
-                if (strpos($subpluginpath, $parentpath.$pluginname) !== 0) {
+                if (strpos($subpluginpath, $parentpath . $pluginname) !== 0) {
                     // Subplugin not within the parent plugin.
                     continue;
                 }
-                $subpluginpath = substr($subpluginpath, 1 + strlen($parentpath.$pluginname));
+                $subpluginpath = substr($subpluginpath, 1 + strlen($parentpath . $pluginname));
 
-                if (is_dir($this->basepath.'/'.$subpluginpath)) {
+                if (is_dir($this->basepath . '/' . $subpluginpath)) {
                     $list = get_list_of_plugins($subpluginpath, '', $this->basepath);
                     foreach ($list as $subpluginname) {
-                        $subplugincomponent = $subplugintype.'_'.$subpluginname;
+                        $subplugincomponent = $subplugintype . '_' . $subpluginname;
                         if ($subplugincomponent !== clean_param($subplugincomponent, PARAM_COMPONENT)) {
                             continue;
                         }
-                        $subfile = $subpluginpath.'/'.$subpluginname.'/lang/en/'.$subplugincomponent.'.php';
-                        if (is_readable($this->basepath.'/'.$subfile)) {
-                            $files[$subplugincomponent][$subfile] = file_get_contents($this->basepath.'/'.$subfile);
+                        $subfile = $subpluginpath . '/' . $subpluginname . '/lang/en/' . $subplugincomponent . '.php';
+                        if (is_readable($this->basepath . '/' . $subfile)) {
+                            $files[$subplugincomponent][$subfile] = file_get_contents($this->basepath . '/' . $subfile);
                         }
                     }
                 }
@@ -232,7 +229,7 @@ class source_code {
      * @param string $plugintype
      * @return string without the leading slash and with the trailing slash, e.g. 'admin/tool/'
      */
-    protected static function plugin_type_relative_path($plugintype) : string {
+    protected static function plugin_type_relative_path($plugintype): string {
         global $CFG;
 
         static $plugintyperoots = [];
@@ -270,7 +267,7 @@ class source_code {
             throw new \coding_exception('No such file', $path);
         }
 
-        $subplugins = array();
+        $subplugins = [];
         $text = file_get_contents($path);
 
         preg_match_all("/('|\")([a-z][a-z0-9_]*[a-z0-9])\\1\s*=>\s*('|\")([a-z][a-zA-Z0-9\/_-]*)\\3/", $text, $matches);
@@ -282,8 +279,11 @@ class source_code {
         }
 
         if (empty($subplugins)) {
-            preg_match_all("/\\\$subplugins\s*\[\s*('|\")([a-z][a-z0-9_]*[a-z0-9])\\1\s*\]\s*=\s*('|\")([a-z][a-zA-Z0-9\/_-]*)\\3/",
-                $text, $matches);
+            preg_match_all(
+                "/\\\$subplugins\s*\[\s*('|\")([a-z][a-z0-9_]*[a-z0-9])\\1\s*\]\s*=\s*('|\")([a-z][a-zA-Z0-9\/_-]*)\\3/",
+                $text,
+                $matches
+            );
 
             if (!empty($matches[2]) && !empty($matches[4])) {
                 foreach ($matches[2] as $ix => $subplugintype) {

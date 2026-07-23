@@ -134,7 +134,6 @@ $submitform = new local_amos_submit_form();
 
 if ($submitform->is_cancelled()) {
     redirect($PAGE->url);
-
 } else if ($submitdata = $submitform->get_data()) {
     $stash = mlang_stash::instance_from_id($submitdata->stashid);
     if ($stash->ownerid != $USER->id) {
@@ -164,8 +163,7 @@ if ($submitform->is_cancelled()) {
 
     // Create new contribution record for every language and attach a new stash to it.
     foreach ($langstages as $lang => $stage) {
-
-        list($origstrings, $origlanguages, $origcomponents) = mlang_stage::analyze($stage);
+        [$origstrings, $origlanguages, $origcomponents] = mlang_stage::analyze($stage);
 
         $langstash = mlang_stash::instance_from_stage($stage, 0, $submitdata->name);
         $langstash->message = $submitdata->message;
@@ -197,8 +195,12 @@ if ($submitform->is_cancelled()) {
             $data->name = 'contribution';
             $data->userfrom = $amosbot;
             $data->userto = $maintainer;
-            $data->subject = get_string_manager()->get_string('contribnotif', 'local_amos',
-                ['id' => $contribution->id], $maintainer->lang);
+            $data->subject = get_string_manager()->get_string(
+                'contribnotif',
+                'local_amos',
+                ['id' => $contribution->id],
+                $maintainer->lang
+            );
             $data->fullmessage = get_string_manager()->get_string('contribnotifsubmitted', 'local_amos', [
                 'id' => $contribution->id,
                 'subject' => $contribution->subject,
@@ -264,7 +266,6 @@ if ($submit) {
 // Own stashes.
 if (!$stashes = $DB->get_records('amos_stashes', ['ownerid' => $USER->id], 'timecreated DESC')) {
     echo $output->heading(get_string('ownstashesnone', 'local_amos'));
-
 } else {
     // Catch output into these two variables.
     $autosavestash = '';
@@ -273,22 +274,37 @@ if (!$stashes = $DB->get_records('amos_stashes', ['ownerid' => $USER->id], 'time
     foreach ($stashes as $stashdata) {
         $stash = local_amos_stash::instance_from_record($stashdata, $USER);
         if (has_capability('local/amos:stage', context_system::instance())) {
-            $stash->add_action('apply', new moodle_url($PAGE->url, ['apply' => $stash->id]),
-                get_string('stashapply', 'local_amos'));
+            $stash->add_action(
+                'apply',
+                new moodle_url($PAGE->url, ['apply' => $stash->id]),
+                get_string('stashapply', 'local_amos')
+            );
             if (!$stash->isautosave) {
-                $stash->add_action('pop', new moodle_url($PAGE->url, ['pop' => $stash->id]),
-                    get_string('stashpop', 'local_amos'));
+                $stash->add_action(
+                    'pop',
+                    new moodle_url($PAGE->url, ['pop' => $stash->id]),
+                    get_string('stashpop', 'local_amos')
+                );
             }
         }
         if (!$stash->isautosave) {
-            $stash->add_action('drop', new moodle_url($PAGE->url, ['drop' => $stash->id]),
-                get_string('stashdrop', 'local_amos'));
+            $stash->add_action(
+                'drop',
+                new moodle_url($PAGE->url, ['drop' => $stash->id]),
+                get_string('stashdrop', 'local_amos')
+            );
         }
-        $stash->add_action('download', new moodle_url($PAGE->url, ['download' => $stash->id]),
-            get_string('stashdownload', 'local_amos'));
+        $stash->add_action(
+            'download',
+            new moodle_url($PAGE->url, ['download' => $stash->id]),
+            get_string('stashdownload', 'local_amos')
+        );
         if (!$stash->isautosave) {
-            $stash->add_action('submit', new moodle_url($PAGE->url, ['submit' => $stash->id]),
-                get_string('stashsubmit', 'local_amos'));
+            $stash->add_action(
+                'submit',
+                new moodle_url($PAGE->url, ['submit' => $stash->id]),
+                get_string('stashsubmit', 'local_amos')
+            );
         }
 
         if ($stash->isautosave) {

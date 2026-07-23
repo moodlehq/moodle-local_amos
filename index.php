@@ -53,7 +53,7 @@ foreach ($amosroot->get_children_key_list() as $childkey) {
             $child->text,
             ['class' => 'btn btn-primary btn-large']
         ),
-        'well amostool amostool-'.$child->key
+        'well amostool amostool-' . $child->key
     );
 }
 
@@ -75,10 +75,8 @@ if (has_capability('local/amos:commit', context_system::instance())) {
 
     if (empty($allowed)) {
         $allowed = get_string('committablenone', 'local_amos');
-
     } else if (!empty($allowed['X'])) {
         $allowed = get_string('committableall', 'local_amos');
-
     } else {
         $allowed = implode(', ', $allowed);
     }
@@ -88,7 +86,6 @@ if (has_capability('local/amos:commit', context_system::instance())) {
 
 if (empty($caps)) {
     get_string('privilegesnone', 'local_amos');
-
 } else {
     $caps = '<li>' . implode("</li>\n<li>", $caps) . '</li>';
     echo html_writer::tag('ul', $caps);

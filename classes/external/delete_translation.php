@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delete_translation extends \core_external\external_api {
-
     /**
      * Describes the external function parameters.
      *

@@ -37,28 +37,27 @@ require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 /**
  * Test cases for the merge strings file helper class
  */
-class mergefiles_test extends basic_testcase {
-
-    public function test_load_strings_from_file() {
+final class mergefiles_test extends basic_testcase {
+    public function test_load_strings_from_file(): void {
         $logger = new testable_amos_cli_logger();
         $helper = new testable_amos_merge_string_files($logger);
 
-        $found = $helper->load_strings_from_file(dirname(__FILE__).'/fixtures/merge001.php');
+        $found = $helper->load_strings_from_file(dirname(__FILE__) . '/fixtures/merge001.php');
         $this->assertTrue(is_array($found));
         $this->assertEquals(3, count($found));
-        $this->assertEquals(array('foo', 'amos', 'abc'), array_keys($found));
+        $this->assertEquals(['foo', 'amos', 'abc'], array_keys($found));
         $this->assertEquals('Rock\'s!', $found['amos']);
     }
 
-    public function test_replace_strings_in_file() {
+    public function test_replace_strings_in_file(): void {
         global $CFG;
 
         $logger = new testable_amos_cli_logger();
         $helper = new testable_amos_merge_string_files($logger);
 
         $filecontents = "\$string['foo'] = 'Foo';";
-        $fromstrings = array('foo' => 'Foo');
-        $tostrings = array('foo' => 'Bar');
+        $fromstrings = ['foo' => 'Foo'];
+        $tostrings = ['foo' => 'Bar'];
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
         $this->assertEquals(1, $count);
         $expected = "\$string['foo'] = 'Bar';";
@@ -79,15 +78,15 @@ $string[\'baz\'] = \'Baz\';
 ';
         //phpcs:enable
 
-        $fromstrings = array(
+        $fromstrings = [
             'foo' => "Foo 'man' oh\n {\$a->f} matic ",
             'bar' => "Rock'n'roll! dude ",
-        );
-        $tostrings = array(
+        ];
+        $tostrings = [
             'foo' => "Foo\n{\$a}\nBar",
-            'bar' => 'Hell"yeah!'."\n",
+            'bar' => 'Hell"yeah!' . "\n",
             'baz' => 'Should not be changed',
-        );
+        ];
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
         $this->assertEquals(1, $count);
         // phpcs:disable moodle.WhiteSpace.WhiteSpaceInStrings
@@ -107,21 +106,21 @@ $string[\'baz\'] = \'Baz\';
         //phpcs:enable
         $this->assertEquals($expected, $filecontents);
 
-        $filecontents = file_get_contents(dirname(__FILE__).'/fixtures/merge003.php');
-        $fromstrings = $helper->load_strings_from_file(dirname(__FILE__).'/fixtures/merge003.php');
-        $tostrings = $helper->load_strings_from_file(dirname(__FILE__).'/fixtures/merge004.php');
+        $filecontents = file_get_contents(dirname(__FILE__) . '/fixtures/merge003.php');
+        $fromstrings = $helper->load_strings_from_file(dirname(__FILE__) . '/fixtures/merge003.php');
+        $tostrings = $helper->load_strings_from_file(dirname(__FILE__) . '/fixtures/merge004.php');
         $this->assertEquals(1, count($tostrings));
         $count = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
         $this->assertEquals(1, $count);
-        $tmpfile = $CFG->phpunit_dataroot.'/amos_test_replace_strings_in_file.php';
+        $tmpfile = $CFG->phpunit_dataroot . '/amos_test_replace_strings_in_file.php';
         file_put_contents($tmpfile, $filecontents);
-        $string = array();
+        $string = [];
         require($tmpfile);
         $this->assertEquals(7, count($string));
-        $this->assertEquals(array(
+        $this->assertEquals([
             'error_authmnetneeded', 'error_localusersonly', 'error_roamcapabilityneeded',
-            'mnet_hosts:addinstance', 'mnet_hosts:myaddinstance', 'pluginname', 'server'
-        ), array_keys($string));
+            'mnet_hosts:addinstance', 'mnet_hosts:myaddinstance', 'pluginname', 'server',
+        ], array_keys($string));
         $this->assertEquals('Add a new network servers block to My home', $string['mnet_hosts:myaddinstance']);
     }
 }
@@ -134,7 +133,6 @@ $string[\'baz\'] = \'Baz\';
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testable_amos_merge_string_files extends amos_merge_string_files {
-
 }
 
 /**
@@ -144,7 +142,6 @@ class testable_amos_merge_string_files extends amos_merge_string_files {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class testable_amos_cli_logger extends amos_cli_logger {
-
     /**
      * Logs a message
      *

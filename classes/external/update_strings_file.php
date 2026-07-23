@@ -27,7 +27,7 @@ namespace local_amos\external;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/externallib.php');
+require_once($CFG->libdir . '/externallib.php');
 
 /**
  * Implements external function update_strings_file used e.g. by plugins directory to update plugin strings.
@@ -38,7 +38,6 @@ require_once($CFG->libdir.'/externallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class update_strings_file extends \core_external\external_api {
-
     /**
      * Describes parameters of the {@see execute()} method
      */
@@ -58,7 +57,7 @@ class update_strings_file extends \core_external\external_api {
                             'stringfilecontent' => new \core_external\external_value(PARAM_RAW, 'The content of the strings file.'),
                         ]
                     )
-                )
+                ),
             ]
         );
     }
@@ -73,13 +72,15 @@ class update_strings_file extends \core_external\external_api {
     public static function execute($userinfo, $message, $components) {
         global $CFG;
 
-        require_once($CFG->dirroot.'/local/amos/locallib.php');
-        require_once($CFG->dirroot.'/local/amos/mlanglib.php');
-        require_once($CFG->dirroot.'/local/amos/mlangparser.php');
+        require_once($CFG->dirroot . '/local/amos/locallib.php');
+        require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+        require_once($CFG->dirroot . '/local/amos/mlangparser.php');
 
         // Validate parameters.
-        $params = self::validate_parameters(self::execute_parameters(),
-                ['userinfo' => $userinfo, 'message' => $message, 'components' => $components]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['userinfo' => $userinfo, 'message' => $message, 'components' => $components]
+        );
 
         $userinfo = $params['userinfo'];
         $message = $params['message'];
@@ -96,16 +97,14 @@ class update_strings_file extends \core_external\external_api {
         $standardplugins = \local_amos\local\util::standard_components_tree();
 
         // Reorder components to process low versions first.
-        usort($components, function($a, $b) {
+        usort($components, function ($a, $b) {
             $aver = \mlang_version::by_dir($a['moodlebranch']);
             $bver = \mlang_version::by_dir($b['moodlebranch']);
 
             if ($aver->code == $bver->code) {
                 return 0;
-
             } else if ($aver->code < $bver->code) {
                 return -1;
-
             } else {
                 return 1;
             }
@@ -140,8 +139,10 @@ class update_strings_file extends \core_external\external_api {
             // If it is an activity module, make sure the name does not collide with a core subsystem.
             if (strpos($component['componentname'], 'mod_') === 0) {
                 foreach ($standardplugins as $frankenstylenames) {
-                    if (isset($frankenstylenames[$componentname])
-                            && $frankenstylenames[$componentname] === 'core_'.$componentname) {
+                    if (
+                        isset($frankenstylenames[$componentname])
+                            && $frankenstylenames[$componentname] === 'core_' . $componentname
+                    ) {
                         $exceptionmsg = 'The name of your activity module collides with a name of a core subsystem in Moodle';
                         throw new \invalid_parameter_exception($exceptionmsg);
                     }
@@ -153,7 +154,7 @@ class update_strings_file extends \core_external\external_api {
             $result = [
                 'componentname' => $componentname,
                 'moodlebranch' => $componentversion->dir,
-                'language' => $componentlanguage
+                'language' => $componentlanguage,
             ];
 
             // Make sure we do not try to import English strings for a standard plugin.
@@ -177,10 +178,10 @@ class update_strings_file extends \core_external\external_api {
             // Gather some statistics about found strings.
             $tmpstage = new \mlang_stage();
             $tmpstage->add($mlangcomponent);
-            list($numofstrings, $listlanguages, $listcomponents) = \mlang_stage::analyze($tmpstage);
+            [$numofstrings, $listlanguages, $listcomponents] = \mlang_stage::analyze($tmpstage);
             $result['found'] = $numofstrings;
             $tmpstage->rebase(null, true);
-            list($numofstrings, $listlanguages, $listcomponents) = \mlang_stage::analyze($tmpstage);
+            [$numofstrings, $listlanguages, $listcomponents] = \mlang_stage::analyze($tmpstage);
             $result['changes'] = $numofstrings;
             $tmpstage->clear();
             unset($tmpstage);

@@ -24,14 +24,13 @@ namespace local_amos\external;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class stage_translated_string_test extends \local_amos_testcase {
-
+final class stage_translated_string_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_capability() {
+    public function test_execute_without_capability(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -52,7 +51,7 @@ class stage_translated_string_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_basics() {
+    public function test_execute_basics(): void {
         global $DB, $USER;
         $this->resetAfterTest(true);
 
@@ -70,7 +69,7 @@ class stage_translated_string_test extends \local_amos_testcase {
 
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $foobarcomponent = \mlang_component::from_snapshot('foo_bar', 'en',  \mlang_version::by_code(310), null, false, true);
+        $foobarcomponent = \mlang_component::from_snapshot('foo_bar', 'en', \mlang_version::by_code(310), null, false, true);
         $foobarstring = $foobarcomponent->get_string('foobar');
 
         $stageid = sesskey();

@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_amos_stats_manager {
-
     /** @var array */
     protected $buffer;
 
@@ -74,7 +73,6 @@ class local_amos_stats_manager {
                 $record->id = $current->id;
                 $DB->update_record('amos_stats', $record, true);
             }
-
         } else {
             $DB->insert_record('amos_stats', $record, false);
         }
@@ -157,7 +155,6 @@ class local_amos_stats_manager {
                                 'timemodified' => $now,
                             ], true);
                         }
-
                     } else {
                         $DB->insert_record('amos_stats', [
                             'branch' => $branch,
@@ -184,7 +181,7 @@ class local_amos_stats_manager {
      */
     public function get_component_stats(string $component) {
         global $CFG, $DB;
-        require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+        require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
         $cache = cache::make('local_amos', 'stats');
         $cachekey = 'component_' . $component;
@@ -224,7 +221,7 @@ class local_amos_stats_manager {
             $mlangversion = mlang_version::by_code($branch);
 
             if (empty($mlangversion)) {
-                debugging('Unknown branch code: '.$branch);
+                debugging('Unknown branch code: ' . $branch);
                 continue;
             }
 
@@ -235,7 +232,7 @@ class local_amos_stats_manager {
 
             foreach ($langs as $lang => $numofstrings) {
                 if (!isset($langnames[$lang])) {
-                    debugging('Unknown language code: '.$lang);
+                    debugging('Unknown language code: ' . $lang);
                     continue;
                 }
 
@@ -362,7 +359,6 @@ class local_amos_stats_manager {
 
             if ($langpack->langcode === 'en') {
                 $parent = '';
-
             } else {
                 $langconfig = mlang_component::from_snapshot('langconfig', $langpack->langcode, $version);
 
@@ -384,13 +380,11 @@ class local_amos_stats_manager {
 
             if (empty($parent)) {
                 $primary[] = $langpack;
-
             } else if (isset($langpacks[$parent])) {
                 $langpack->parentlanguagecode = $parent;
                 $langpack->parentlanguagename = $langpacks[$parent]->langname;
                 $langpacks[$parent]->childpacks = $langpacks[$parent]->childpacks ?? [];
                 $langpacks[$parent]->childpacks[] = $langpack;
-
             } else {
                 // Orphaned language pack.
                 continue;
@@ -426,7 +420,7 @@ class local_amos_stats_manager {
         $stats = static::get_language_pack_ratio_stats($vercode);
 
         // Sort packs by name.
-        usort($stats, function($a, $b) {
+        usort($stats, function ($a, $b) {
             return strcmp($a->langname, $b->langname);
         });
 
@@ -506,9 +500,9 @@ class local_amos_stats_manager {
           GROUP BY c.authorid $namefields
           ORDER BY mostrecent DESC", null, 0, 2);
 
-        $links = array();
+        $links = [];
         foreach ($recentcommitters + $recentcontributors as $contributor) {
-            $links[] = '<a style="color: #0077b8; text-decoration: underline;" href="'.$CFG->wwwroot.'/user/profile.php?id='.$contributor->id.'">'.s(fullname($contributor)).'</a>';
+            $links[] = '<a style="color: #0077b8; text-decoration: underline;" href="' . $CFG->wwwroot . '/user/profile.php?id=' . $contributor->id . '">' . s(fullname($contributor)) . '</a>';
         }
 
         $links = get_string('contributethankslist', 'local_amos', [

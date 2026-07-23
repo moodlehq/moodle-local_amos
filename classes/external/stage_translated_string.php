@@ -30,7 +30,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class stage_translated_string extends \core_external\external_api {
-
     /**
      * Describe the external function parameters.
      *
@@ -59,14 +58,26 @@ class stage_translated_string extends \core_external\external_api {
      * @param bool $nocleaning Skip implicit cleaning of the input string
      * @return array
      */
-    public static function execute(string $stageid, int $originalid, string $lang, string $text,
-            ?int $translationid = null, ?bool $nocleaning = false): array {
+    public static function execute(
+        string $stageid,
+        int $originalid,
+        string $lang,
+        string $text,
+        ?int $translationid = null,
+        ?bool $nocleaning = false
+    ): array {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
         ['stageid' => $stageid, 'originalid' => $originalid, 'lang' => $lang, 'text' => $text, 'translationid' => $translationid,
-            'nocleaning' => $nocleaning ] = self::validate_parameters(self::execute_parameters(), compact('stageid', 'originalid',
-            'lang', 'text', 'translationid', 'nocleaning'));
+            'nocleaning' => $nocleaning ] = self::validate_parameters(self::execute_parameters(), compact(
+                'stageid',
+                'originalid',
+                'lang',
+                'text',
+                'translationid',
+                'nocleaning'
+            ));
 
         $context = \context_system::instance();
         self::validate_context($context);
@@ -76,7 +87,6 @@ class stage_translated_string extends \core_external\external_api {
 
         if (empty($translationid)) {
             $since = $english->since;
-
         } else {
             $current = $DB->get_record('amos_translations', [
                 'id' => $translationid,
@@ -86,7 +96,6 @@ class stage_translated_string extends \core_external\external_api {
 
             if ($english->since > $current->since) {
                 $since = $english->since;
-
             } else {
                 $since = $current->since;
             }

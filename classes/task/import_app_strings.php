@@ -27,7 +27,7 @@ namespace local_amos\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Imports the strings used in the Moodle apps.
@@ -36,7 +36,6 @@ require_once($CFG->dirroot.'/local/amos/mlanglib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_app_strings extends \core\task\scheduled_task {
-
     /** @var \local_amos\local\git client to use */
     protected $git;
 
@@ -56,11 +55,11 @@ class import_app_strings extends \core\task\scheduled_task {
         global $DB;
 
         $langindexfile = get_config('local_amos', 'applangindexfile');
-        mtrace('Loading langindex from '.$langindexfile);
+        mtrace('Loading langindex from ' . $langindexfile);
         $file = file_get_contents($langindexfile);
         $strings = json_decode($file, true);
 
-        $records = array();
+        $records = [];
         foreach ($strings as $key => $value) {
             if ($value != 'local_moodlemobileapp') {
                 $record = new \StdClass();
@@ -84,10 +83,9 @@ class import_app_strings extends \core\task\scheduled_task {
 
         if (count($records) > 0) {
             $DB->delete_records('amos_app_strings');
-            $DB->insert_records('amos_app_strings',  $records);
+            $DB->insert_records('amos_app_strings', $records);
 
-            mtrace(count($records) .' app strings inserted');
+            mtrace(count($records) . ' app strings inserted');
         }
     }
-
 }

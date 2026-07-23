@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_amos_submit_form extends moodleform {
-
     /**
      * Defines form fields.
      */

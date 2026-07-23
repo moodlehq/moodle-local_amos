@@ -24,14 +24,13 @@ namespace local_amos\external;
  * @copyright   2026 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class delete_translation_test extends \local_amos_testcase {
-
+final class delete_translation_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_capability() {
+    public function test_execute_without_capability(): void {
         $this->resetAfterTest(true);
 
         $user = self::getDataGenerator()->create_user();
@@ -46,7 +45,7 @@ class delete_translation_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_without_manage_capability() {
+    public function test_execute_without_manage_capability(): void {
         global $DB, $USER;
         $this->resetAfterTest(true);
 
@@ -73,7 +72,7 @@ class delete_translation_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_basics() {
+    public function test_execute_basics(): void {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -118,7 +117,7 @@ class delete_translation_test extends \local_amos_testcase {
      *
      * @runInSeparateProcess
      */
-    public function test_execute_invalid_id() {
+    public function test_execute_invalid_id(): void {
         $this->resetAfterTest(true);
 
         self::setAdminUser();

@@ -28,7 +28,6 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class util {
-
     /**
      * Makes sure there is a zero-width space after non-word characters in the given string
      *
@@ -41,7 +40,7 @@ class util {
      * @return string
      */
     public static function add_breaks($text) {
-        return preg_replace('/([,])(\S)/', '$1'."\xe2\x80\x8b".'$2', $text);
+        return preg_replace('/([,])(\S)/', '$1' . "\xe2\x80\x8b" . '$2', $text);
     }
 
     /**
@@ -69,27 +68,21 @@ class util {
 
             if (count($parts) == 1) {
                 $minmax[$parts[0]] = [PHP_INT_MIN, PHP_INT_MAX];
-
             } else if (count($parts) == 2) {
                 if ($parts[1] > 0) {
                     $minmax[$parts[0]] = [$parts[1], PHP_INT_MAX];
-
                 } else {
                      $minmax[$parts[0]] = [PHP_INT_MIN, -$parts[1]];
                 }
-
             } else if (count($parts) == 3) {
                 if ($parts[1] > 0 && $parts[2] < 0) {
                     $minmax[$parts[0]] = [$parts[1], -$parts[2]];
-
                 } else if ($parts[1] < 0 && $parts[2] > 0) {
                     $minmax[$parts[0]] = [$parts[2], -$parts[1]];
-
                 } else {
                     debugging('Unexpected standardcomponents line versions range: ' . $line, DEBUG_DEVELOPER);
                     continue;
                 }
-
             } else {
                 debugging('Unexpected standardcomponents line syntax: ' . $line, DEBUG_DEVELOPER);
             }
@@ -121,7 +114,6 @@ class util {
 
                     if ($type === 'core' || $type === 'mod') {
                         $filename = $name;
-
                     } else {
                         $filename = $type . '_' . $name;
                     }

@@ -25,7 +25,7 @@
 define('CLI_SCRIPT', true);
 
 require_once('../../../config.php');
-require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir . '/clilib.php');
 
 $chunk = 0;
 $size = 10000;
@@ -55,7 +55,8 @@ while (!$done) {
         if ($r->commitid == $maxid) {
             $done = true;
         }
-        printf("%d %% / commitid %d / lang %s / string id %d [%s, %s] / branch %s / timemodified %d\n",
+        printf(
+            "%d %% / commitid %d / lang %s / string id %d [%s, %s] / branch %s / timemodified %d\n",
             floor(100 * $r->commitid / $maxid),
             $r->commitid,
             $r->lang,
@@ -82,7 +83,7 @@ while (!$done) {
 
         // Check if the string matches the latest one in the new storage.
         $timeline = "SELECT id, strtext, since, timemodified, commitid
-                       FROM {".$table."}
+                       FROM {" . $table . "}
                       WHERE component = :component AND strname = :strname $wherelang
                    ORDER BY since DESC, timemodified DESC";
 
@@ -105,7 +106,6 @@ while (!$done) {
         if (empty($revs)) {
             // If it's a new string, register it.
             printf(" - registering a new string ... id %d\n", amos_convert_repository_insert($table, $r));
-
         } else {
             // Check if we already have the record registered.
             foreach ($revs as $rev) {
@@ -132,43 +132,40 @@ while (!$done) {
                 // keep just real changes.
                 printf(" - same value as previously registered string id %d\n", $latest->id);
                 continue;
-
             } else if ($timesameorlater && $commitmatch && $valuematch && $branchsameorlater) {
                 // E.g. commit 28626, string curltimeoutkbitrate - has different time in 2.0 from later. Weird, but no need
                 // to register an update.
                 printf(" - same value as string id %d\n", $latest->id);
                 continue;
-
             } else if ($timesameorlater && !$commitmatch && !$valuematch && $branchsameorlater) {
                 printf(" - registering an update ... id %d\n", amos_convert_repository_insert($table, $r));
-
             } else if ($timesameorlater && $commitmatch && !$valuematch && $branchsameorlater) {
                 // E.g. commit 28626, string validnumberformats_help has value change between 20 and 21 - whitespace
                 // removed, but still the same commit.
                 printf(" - registering an update ... id %d\n", amos_convert_repository_insert($table, $r));
-
             } else if ($timesameorlater && !$commitmatch && !$branchsameorlater) {
                 // The string was backported into an older stable branch.
                 printf(" - registering a backport ... id %d\n", amos_convert_repository_insert($table, $r));
-
             } else if (!$timesameorlater && !$valuematch && $branchsameorlater) {
                 // Later commit introduces earlier change. We do not need it, but let's keep it to see the evolution of the string.
                 printf(" - registering an earlier version ... id %d\n", amos_convert_repository_insert($table, $r));
-
             } else if (!$timesameorlater && $valuematch && $branchsameorlater) {
                 // Later commit has the current string, too. We do not need it and often this is a result of a AMOS hacking.
                 // Ignore it.
                 printf(" - same value as string id %d\n", $latest->id);
                 continue;
-
             } else if (!$timesameorlater && !$branchsameorlater) {
                 // Later commit introduces an earlier version on an earlier branch - record it.
                 printf(" - registering an earlier version ... id %d\n", amos_convert_repository_insert($table, $r));
-
             } else {
                 // Ooops, no handling code for this type of commits.
-                printf(" timesameorlater %d, valuematch %d, commitmatch %d, branchsameorlater %d\n",
-                    $timesameorlater, $valuematch, $commitmatch, $branchsameorlater);
+                printf(
+                    " timesameorlater %d, valuematch %d, commitmatch %d, branchsameorlater %d\n",
+                    $timesameorlater,
+                    $valuematch,
+                    $commitmatch,
+                    $branchsameorlater
+                );
 
                 // phpcs:disable moodle.PHP.ForbiddenFunctions
                 print_object($latest);

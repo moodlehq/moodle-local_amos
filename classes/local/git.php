@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class git {
-
     /** @var string Full path to our repository */
     protected $repodir;
 
@@ -46,7 +45,7 @@ class git {
      * @param string $repodir Full path to the repository to work on
      * @param string $sshprivate SSH private key to use when accessing remote repositories
      */
-    public function __construct(string $repodir, string $sshprivate='') {
+    public function __construct(string $repodir, string $sshprivate = '') {
 
         if (!is_dir($repodir)) {
             throw new \Exception('Repository directory does not exist');
@@ -64,7 +63,7 @@ class git {
      * @param int $status Return status via this reference.
      * @return array output
      */
-    public function exec($args, bool $throw=true, &$status=null) {
+    public function exec($args, bool $throw = true, &$status = null) {
 
         chdir($this->repodir);
         $out = [];
@@ -86,7 +85,7 @@ class git {
      *
      * @return string
      */
-    public function get_repodir() : string {
+    public function get_repodir(): string {
         return $this->repodir;
     }
 
@@ -96,13 +95,12 @@ class git {
      * @param string $args
      * @return string
      */
-    protected function git_shell_cmd(string $args) : string {
+    protected function git_shell_cmd(string $args): string {
 
         if ($this->sshprivate) {
-            $cmd = 'GIT_SSH_COMMAND=\'ssh -i '.$this->sshprivate.'\' git '.$args;
-
+            $cmd = 'GIT_SSH_COMMAND=\'ssh -i ' . $this->sshprivate . '\' git ' . $args;
         } else {
-            $cmd = 'git '.$args;
+            $cmd = 'git ' . $args;
         }
 
         return $cmd;
@@ -114,11 +112,10 @@ class git {
      * @param string $args
      * @return boolean
      */
-    public function is_success(string $args) : bool {
+    public function is_success(string $args): bool {
 
         try {
             $this->exec($args);
-
         } catch (\Exception $e) {
             return false;
         }
@@ -131,10 +128,10 @@ class git {
      *
      * @return array
      */
-    public function list_local_branches() : array {
+    public function list_local_branches(): array {
 
         // Git returns values like 'refs/heads/main'. We want to strip the first two.
-        $list = $this->exec('for-each-ref --format="%(refname:strip=2)" '.escapeshellarg('refs/heads/'));
+        $list = $this->exec('for-each-ref --format="%(refname:strip=2)" ' . escapeshellarg('refs/heads/'));
 
         return $list;
     }
@@ -145,8 +142,8 @@ class git {
      * @param string $name branch name
      * @return bool
      */
-    public function has_local_branch(string $name) : bool {
-        return $this->is_success('show-ref --verify --quiet refs/heads/'.$name);
+    public function has_local_branch(string $name): bool {
+        return $this->is_success('show-ref --verify --quiet refs/heads/' . $name);
     }
 
     /**
@@ -158,8 +155,8 @@ class git {
      * @param string $remote remote name
      * @return bool
      */
-    public function has_remote_branch(string $name, string $remote='origin') : bool {
-        return $this->is_success('show-ref --verify --quiet refs/remotes/'.$remote.'/'.$name);
+    public function has_remote_branch(string $name, string $remote = 'origin'): bool {
+        return $this->is_success('show-ref --verify --quiet refs/remotes/' . $remote . '/' . $name);
     }
 
     /**
@@ -168,10 +165,10 @@ class git {
      * @param string $remote
      * @return array
      */
-    public function list_remote_branches(string $remote='origin') : array {
+    public function list_remote_branches(string $remote = 'origin'): array {
 
         // Git returns values like 'refs/remotes/origin/main'. We want to strip the first three.
-        $list = $this->exec('for-each-ref --format="%(refname:strip=3)" '.escapeshellarg('refs/remotes/'.$remote));
+        $list = $this->exec('for-each-ref --format="%(refname:strip=3)" ' . escapeshellarg('refs/remotes/' . $remote));
 
         // Get rid of the ref HEAD (which shows the default branch in
         // the remote repository and is one of the existing branches).

@@ -36,13 +36,13 @@ Usage:
     # php export-php.php [--help|-h]
 ";
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'help' => false,
     'component' => null,
     'language' => null,
     'version' => null,
 ], [
-    'h' => 'help'
+    'h' => 'help',
 ]);
 
 if ($unrecognised) {

@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/user/selector/lib.php');
+require_once($CFG->dirroot . '/user/selector/lib.php');
 
 /**
  * Allows to select language pack maintainer.
@@ -34,17 +34,16 @@ require_once($CFG->dirroot.'/user/selector/lib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_amos_maintainer_selector extends user_selector_base {
-
     /**
      * Constructor.
      *
      * @param string $name
      * @param array $options
      */
-    public function __construct($name, $options = array()) {
+    public function __construct($name, $options = []) {
         $options['accesscontext'] = context_system::instance();
         $options['multiselect'] = false;
-        $options['extrafields'] = array('email');
+        $options['extrafields'] = ['email'];
         parent::__construct($name, $options);
     }
 
@@ -59,11 +58,11 @@ class local_amos_maintainer_selector extends user_selector_base {
 
         $available = get_users_by_capability(context_system::instance(), 'local/amos:commit', 'u.id');
 
-        list($permsql, $permparams) = $DB->get_in_or_equal(array_keys($available), SQL_PARAMS_NAMED, 'permparam');
-        list($searchsql, $searchparams) = $this->search_sql($search, 'u');
-        list($sortsql, $sortparams) = users_order_by_sql('u', $search, context_system::instance());
+        [$permsql, $permparams] = $DB->get_in_or_equal(array_keys($available), SQL_PARAMS_NAMED, 'permparam');
+        [$searchsql, $searchparams] = $this->search_sql($search, 'u');
+        [$sortsql, $sortparams] = users_order_by_sql('u', $search, context_system::instance());
 
-        $fields = "SELECT ".$this->required_fields_sql('u');
+        $fields = "SELECT " . $this->required_fields_sql('u');
         $countfields = "SELECT COUNT(*)";
 
         $sql = " FROM {user} u
@@ -72,16 +71,16 @@ class local_amos_maintainer_selector extends user_selector_base {
         $order = " ORDER BY $sortsql";
 
         if (!$this->is_validating()) {
-            $foundcount = $DB->count_records_sql($countfields.$sql, array_merge($permparams, $searchparams));
+            $foundcount = $DB->count_records_sql($countfields . $sql, array_merge($permparams, $searchparams));
             if ($foundcount > $this->maxusersperpage) {
                 return $this->too_many_results($search, $foundcount);
             }
         }
 
-        $found = $DB->get_records_sql($fields.$sql.$order, array_merge($permparams, $searchparams, $sortparams));
+        $found = $DB->get_records_sql($fields . $sql . $order, array_merge($permparams, $searchparams, $sortparams));
 
         if (empty($found)) {
-            return array();
+            return [];
         }
 
         if ($search) {
@@ -90,6 +89,6 @@ class local_amos_maintainer_selector extends user_selector_base {
             $groupname = get_string('potusers', 'core_role');
         }
 
-        return array($groupname => $found);
+        return [$groupname => $found];
     }
 }

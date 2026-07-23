@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_amos_importfile_form extends moodleform {
-
     /**
      * Defines the form fields.
      */
@@ -49,8 +48,8 @@ class local_amos_importfile_form extends moodleform {
         $mform->setDefault('language', $this->_customdata['languagecurrent']);
         $mform->addRule('language', null, 'required', null, 'client');
 
-        $fpoptions = array('accepted_types' => ['.php', '.zip'], 'maxbytes' => 2 * 1024 * 1024);
-        $mform->addElement('filepicker', 'importfile', get_string('file'), null,  $fpoptions);
+        $fpoptions = ['accepted_types' => ['.php', '.zip'], 'maxbytes' => 2 * 1024 * 1024];
+        $mform->addElement('filepicker', 'importfile', get_string('file'), null, $fpoptions);
         $mform->addRule('importfile', null, 'required', null, 'client');
 
         $this->add_action_buttons(false, get_string('import'));

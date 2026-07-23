@@ -34,7 +34,7 @@ $usage = "Use this script to compare the contents of two unzipped language packs
     $ php compare-packs.php --old=/tmp/old/cs --new=/tmp/new/cs
 ";
 
-list($options, $unrecognised) = cli_get_params([
+[$options, $unrecognised] = cli_get_params([
     'help' => false,
     'old' => '',
     'new' => '',

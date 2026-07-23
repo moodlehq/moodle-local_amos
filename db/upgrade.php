@@ -77,7 +77,7 @@ function xmldb_local_amos_upgrade($oldversion) {
     }
 
     if ($oldversion < 2019040901) {
-        $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_app_strings');
+        $dbman->install_one_table_from_xmldb_file($CFG->dirroot . '/local/amos/db/install.xml', 'amos_app_strings');
         upgrade_plugin_savepoint(true, 2019040901, 'local', 'amos');
     }
 
@@ -85,11 +85,11 @@ function xmldb_local_amos_upgrade($oldversion) {
         // Create the new tables to store the English strings and their translations.
 
         if (!$dbman->table_exists(new xmldb_table('amos_strings'))) {
-            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_strings');
+            $dbman->install_one_table_from_xmldb_file($CFG->dirroot . '/local/amos/db/install.xml', 'amos_strings');
         }
 
         if (!$dbman->table_exists(new xmldb_table('amos_translations'))) {
-            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_translations');
+            $dbman->install_one_table_from_xmldb_file($CFG->dirroot . '/local/amos/db/install.xml', 'amos_translations');
         }
 
         upgrade_plugin_savepoint(true, 2019040902, 'local', 'amos');
@@ -97,7 +97,7 @@ function xmldb_local_amos_upgrade($oldversion) {
 
     if ($oldversion < 2020111300) {
         if (!$dbman->table_exists(new xmldb_table('amos_preferences'))) {
-            $dbman->install_one_table_from_xmldb_file($CFG->dirroot.'/local/amos/db/install.xml', 'amos_preferences');
+            $dbman->install_one_table_from_xmldb_file($CFG->dirroot . '/local/amos/db/install.xml', 'amos_preferences');
         }
 
         upgrade_plugin_savepoint(true, 2020111300, 'local', 'amos');

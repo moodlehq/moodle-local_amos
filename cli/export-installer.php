@@ -49,11 +49,9 @@ foreach ($versions as $version) {
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
         $exportdir = $version->code . '_STABLE';
-
     } else if ($version->code == mlang_version::latest_version()->code) {
         $gitbranch = 'origin/main';
         $exportdir = 'main';
-
     } else {
         fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
         exit(3);
@@ -104,8 +102,15 @@ EOF;
             if ($lang === 'en_fix') {
                 continue;
             }
-            $component = mlang_component::from_snapshot($componentname, $lang, $version, null, false, false,
-                array_keys($stringids));
+            $component = mlang_component::from_snapshot(
+                $componentname,
+                $lang,
+                $version,
+                null,
+                false,
+                false,
+                array_keys($stringids)
+            );
             if ($component->has_string()) {
                 $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/' . $installroot . '/lang/' . $lang . '/' . $component->name . '.php';
                 if (!file_exists(dirname($file))) {

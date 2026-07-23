@@ -57,9 +57,14 @@ if (!empty($message)) {
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $allowed = mlang_tools::list_allowed_languages();
     $stage->prune($allowed);
-    list($numstrings, $listlanguages, $listcomponents) = mlang_stage::analyze($stage);
-    $stage->commit($message, ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
-        false, null, $clear);
+    [$numstrings, $listlanguages, $listcomponents] = mlang_stage::analyze($stage);
+    $stage->commit(
+        $message,
+        ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
+        false,
+        null,
+        $clear
+    );
 
     // Invalidate the cache of all known languages.
     cache::make('local_amos', 'lists')->delete('languages');
@@ -75,7 +80,7 @@ if (!empty($message)) {
         if (empty($SESSION->local_amos->stagedcontribution)) {
             $nexturl = $PAGE->url;
         } else {
-            $nexturl = new moodle_url('/local/amos/contrib.php', array('id' => $SESSION->local_amos->stagedcontribution->id));
+            $nexturl = new moodle_url('/local/amos/contrib.php', ['id' => $SESSION->local_amos->stagedcontribution->id]);
         }
         unset($SESSION->local_amos->presetcommitmessage);
         unset($SESSION->local_amos->stagedcontribution);
@@ -161,7 +166,7 @@ if (!empty($submit)) {
     $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash = mlang_stash::instance_from_stage($stage, $stage->userid);
     $stash->push();
-    redirect(new moodle_url('/local/amos/stash.php', array('sesskey' => sesskey(), 'submit' => $stash->id)));
+    redirect(new moodle_url('/local/amos/stash.php', ['sesskey' => sesskey(), 'submit' => $stash->id]));
 }
 
 $output = $PAGE->get_renderer('local_amos');
@@ -175,7 +180,6 @@ $stageui = new \local_amos\output\stage($USER);
 if (empty($stageui->strings)) {
     unset($SESSION->local_amos->presetcommitmessage);
     unset($SESSION->local_amos->stagedcontribution);
-
 } else {
     if (!empty($SESSION->local_amos->presetcommitmessage)) {
         $stageui->presetmessage = $SESSION->local_amos->presetcommitmessage;

@@ -35,20 +35,19 @@ global $CFG;
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class git_test extends \basic_testcase {
-
+final class git_test extends \basic_testcase {
     /**
      * Test {@see \local_amos\local\git::exec()}.
      */
-    public function test_exec() {
+    public function test_exec(): void {
 
         $repo = make_request_directory();
         $git = new git($repo);
 
         $out = $git->exec('init --initial-branch=main');
-        $this->assertEquals('Initialized empty Git repository in '.$repo.'/.git/', $out[0]);
+        $this->assertEquals('Initialized empty Git repository in ' . $repo . '/.git/', $out[0]);
 
-        file_put_contents($repo.'/README.txt', 'Hello world');
+        file_put_contents($repo . '/README.txt', 'Hello world');
         $git->exec('add README.txt');
         $git->exec('commit -m "Adding a first file"');
 
@@ -62,13 +61,13 @@ class git_test extends \basic_testcase {
     /**
      * Test {@see \local_amos\local\git::is_success()}.
      */
-    public function test_is_success() {
+    public function test_is_success(): void {
 
         $repo = make_request_directory();
         $git = new git($repo);
 
         $git->exec('init --initial-branch=main');
-        file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
+        file_put_contents($repo . '/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
         $git->exec('checkout -b slave 2>/dev/null');
@@ -81,7 +80,7 @@ class git_test extends \basic_testcase {
     /**
      * Test {@see \local_amos\local\git::list_local_branches()}.
      */
-    public function test_list_local_branches() {
+    public function test_list_local_branches(): void {
 
         $repo = make_request_directory();
         $git = new git($repo);
@@ -89,7 +88,7 @@ class git_test extends \basic_testcase {
         $git->exec('init --initial-branch=main');
         $this->assertSame([], $git->list_local_branches());
 
-        file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
+        file_put_contents($repo . '/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
         $this->assertEquals(['main'], $git->list_local_branches());
@@ -103,13 +102,13 @@ class git_test extends \basic_testcase {
     /**
      * Test {@see \local_amos\local\git::has_local_branch()}.
      */
-    public function test_has_local_branch() {
+    public function test_has_local_branch(): void {
 
         $repo = make_request_directory();
         $git = new git($repo);
 
         $git->exec('init --initial-branch=main');
-        file_put_contents($repo.'/index.php', '<?php // Hello world! ?>');
+        file_put_contents($repo . '/index.php', '<?php // Hello world! ?>');
         $git->exec('add .');
         $git->exec('commit -m "Initial commit"');
         $git->exec('checkout -b slave 2>/dev/null');

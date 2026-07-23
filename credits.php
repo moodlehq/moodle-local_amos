@@ -64,7 +64,7 @@ foreach ($languages as $langcode => $langname) {
 // other contributors based on submitted contributions.
 
 $userfields = \core_user\fields::for_userpic()->get_sql('u')->selects;
-list($sortsql, $sortparams) = users_order_by_sql();
+[$sortsql, $sortparams] = users_order_by_sql();
 
 $sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable {$userfields}
           FROM {amos_translators} t
@@ -73,7 +73,7 @@ $sql = "SELECT t.lang AS amoslang, t.status AS contribstatus, 1 AS iseditable {$
 
          UNION
 
-        SELECT c.lang AS amoslang, ".AMOS_USER_CONTRIBUTOR." AS contribstatus, 0 AS iseditable {$userfields}
+        SELECT c.lang AS amoslang, " . AMOS_USER_CONTRIBUTOR . " AS contribstatus, 0 AS iseditable {$userfields}
           FROM {amos_contributions} c
           JOIN {user} u ON c.authorid = u.id
          WHERE c.status = :status
@@ -88,7 +88,6 @@ $rs = $DB->get_recordset_sql($sql, array_merge($sortparams, ['status' => local_a
 $issues = [];
 
 foreach ($rs as $user) {
-
     $lang = $user->amoslang;
     if (empty($lang)) {
         $issues[] = (object)[
@@ -114,12 +113,10 @@ foreach ($rs as $user) {
         if (!isset($list[$lang]->maintainers[$user->id])) {
             $list[$lang]->maintainers[$user->id] = $user;
         }
-
     } else if ($status == AMOS_USER_CONTRIBUTOR) {
         if (!isset($list[$lang]->maintainers[$user->id]) and !isset($list[$lang]->contributors[$user->id])) {
             $list[$lang]->contributors[$user->id] = $user;
         }
-
     } else {
         $issues[] = (object)[
             'problem' => 'Unknown credit status',

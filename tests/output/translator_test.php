@@ -24,12 +24,11 @@ namespace local_amos\output;
  * @copyright   2024 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class translator_test extends \local_amos_testcase {
-
+final class translator_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.
      */
-    public function test_filter_by_substring() {
+    public function test_filter_by_substring(): void {
         global $PAGE, $USER;
 
         $this->resetAfterTest(true);

@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter implements \renderable, \templatable {
-
     /** @var array list of setting names */
     public $fields = [];
 
@@ -111,10 +110,8 @@ class filter implements \renderable, \templatable {
         foreach ($this->fields as $field) {
             if (isset($submitted->{$field})) {
                 $data->{$field} = $submitted->{$field};
-
             } else if (isset($permalink->{$field})) {
                 $data->{$field} = $permalink->{$field};
-
             } else {
                 $data->{$field} = $default->{$field};
             }
@@ -208,7 +205,7 @@ class filter implements \renderable, \templatable {
             }
         }
 
-        $data->language = array();
+        $data->language = [];
         $flng = optional_param_array('flng', null, PARAM_SAFEDIR);
         if (is_array($flng)) {
             foreach ($flng as $language) {
@@ -216,7 +213,7 @@ class filter implements \renderable, \templatable {
             }
         }
 
-        $data->component = array();
+        $data->component = [];
         $fcmp = optional_param_array('fcmp', null, PARAM_FILE);
         if (is_array($fcmp)) {
             foreach ($fcmp as $component) {
@@ -296,7 +293,7 @@ class filter implements \renderable, \templatable {
             }
         }
 
-        $data->language = array();
+        $data->language = [];
         $flng = optional_param('l', '', PARAM_RAW);
 
         if ($flng == '*') {
@@ -304,7 +301,6 @@ class filter implements \renderable, \templatable {
             foreach (\mlang_tools::list_languages(false) as $langcode => $langname) {
                 $data->language[] = $langcode;
             }
-
         } else {
             $flng = explode(',', $flng);
             $flng = clean_param_array($flng, PARAM_SAFEDIR);
@@ -321,27 +317,23 @@ class filter implements \renderable, \templatable {
         $data->app = false;
         $data->workplace = false;
 
-        $data->component = array();
+        $data->component = [];
         $fcmp = optional_param('c', '', PARAM_RAW);
 
         if ($fcmp == '*std') {
             // Standard components.
             $data->component = array_keys(\local_amos\local\util::standard_components_list());
-
         } else if ($fcmp == '*app') {
             // Mobile App components.
             $data->component = array_keys(local_amos_app_plugins());
             $data->app = true;
-
         } else if ($fcmp == '*workplace') {
             // Moodle Workplace components.
             $data->component = local_amos_workplace_plugins();
             $data->workplace = true;
-
         } else if ($fcmp == '*') {
             // All components.
             $data->component = array_keys(\mlang_tools::list_components());
-
         } else {
             $fcmp = explode(',', $fcmp);
             $fcmp = clean_param_array($fcmp, PARAM_FILE);
@@ -443,13 +435,10 @@ class filter implements \renderable, \templatable {
         // The '*std' cannot be preselected because it depends on version.
         if (empty($all)) {
             $permalink->param('c', '*');
-
         } else if (empty($app)) {
             $permalink->param('c', '*app');
-
         } else if (empty($workplace)) {
             $permalink->param('c', '*workplace');
-
         } else {
             $permalink->param('c', implode(',', $fdata->component));
         }
@@ -595,11 +584,9 @@ class filter implements \renderable, \templatable {
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' || substr($standard[$componentname], 0, 5) === 'core_') {
                     $options['core'][$componentname] = $standard[$componentname];
-
                 } else {
                     $options['standard'][$componentname] = $standard[$componentname];
                 }
-
             } else {
                 $options['contrib'][$componentname] = $componentname;
             }
@@ -700,7 +687,6 @@ class filter implements \renderable, \templatable {
             if (!is_object($data)) {
                 $data = (object) [];
             }
-
         } else {
             $data = (object) [];
         }
@@ -733,7 +719,6 @@ class filter implements \renderable, \templatable {
                 'name' => 'filter_default',
                 'value' => $data,
             ]);
-
         } else {
             $DB->update_record('amos_preferences', [
                 'id' => $current->id,
@@ -815,13 +800,10 @@ class filter implements \renderable, \templatable {
 
         if ($min > PHP_INT_MIN && $max == PHP_INT_MAX) {
             return get_string('stdvernotefrom', 'local_amos', $a);
-
         } else if ($min == PHP_INT_MIN && $max < PHP_INT_MAX) {
             return get_string('stdvernoteto', 'local_amos', $a);
-
         } else if ($min > PHP_INT_MIN && $max < PHP_INT_MAX) {
             return get_string('stdvernotebetween', 'local_amos', $a);
-
         } else {
             return '';
         }

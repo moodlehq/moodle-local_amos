@@ -32,7 +32,6 @@ require_once($CFG->dirroot . '/local/amos/renderer.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class get_string_timeline extends \core_external\external_api {
-
     /**
      * Describe the external function parameters.
      *
@@ -127,7 +126,6 @@ class get_string_timeline extends \core_external\external_api {
                 $cell = &$encell;
                 $blank = &$langcell;
                 $prev = $preven;
-
             } else {
                 $cell = &$langcell;
                 $blank = &$encell;
@@ -165,12 +163,10 @@ class get_string_timeline extends \core_external\external_api {
                     $cell['hascommithash'] = true;
                     $cell['commithash'] = $record->commithash;
                     $cell['commiturl'] = 'https://github.com/moodle/moodle/commit/' . $record->commithash;
-
                 } else if ($record->lang !== 'en' && $record->source === 'commitscript') {
                     $cell['hascommithash'] = true;
                     $cell['commithash'] = $record->commithash;
                     $cell['commiturl'] = 'https://github.com/moodle/moodle/commit/' . $record->commithash;
-
                 } else if ($record->lang !== 'en' && $record->source === 'git') {
                     $cell['hascommithash'] = true;
                     $cell['commithash'] = $record->commithash;
@@ -223,8 +219,11 @@ class get_string_timeline extends \core_external\external_api {
             'commitsource' => new \core_external\external_value(PARAM_RAW, 'Commit source', VALUE_OPTIONAL),
             'displaytext' => new \core_external\external_value(PARAM_RAW, 'Formatted string text content', VALUE_OPTIONAL),
             'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the amos_translations record', VALUE_OPTIONAL),
-            'candelete' => new \core_external\external_value(PARAM_BOOL, 'Can the current user delete this translation record',
-                VALUE_OPTIONAL),
+            'candelete' => new \core_external\external_value(
+                PARAM_BOOL,
+                'Can the current user delete this translation record',
+                VALUE_OPTIONAL
+            ),
         ]);
 
         return new \core_external\external_single_structure([
@@ -236,7 +235,7 @@ class get_string_timeline extends \core_external\external_api {
                     'english' => $info,
                     'translation' => $info,
                 ])
-            )
+            ),
         ]);
     }
 }

@@ -31,7 +31,7 @@ require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
-require_once($CFG->libdir.'/clilib.php');
+require_once($CFG->libdir . '/clilib.php');
 
 [$options, $unrecognised] = cli_get_params([
     'execute' => false,
@@ -77,10 +77,8 @@ foreach ($plugins as $versioncode => $plugintypes) {
 
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
-
     } else if ($versioncode == max(array_keys($plugins))) {
         $gitbranch = 'origin/main';
-
     } else {
         cli_error('Git branch not found', 3);
     }
@@ -117,12 +115,10 @@ foreach ($plugins as $versioncode => $plugintypes) {
 
         if ($plugintype == 'core') {
             $filepath = 'lang/en/' . $legacyname . '.php';
-
         } else if (!isset($plugintypelocations[$plugintype])) {
             cli_writeln("!! Unknown plugin type '{$plugintype}'", STDERR);
             $cliresult = 1;
             continue;
-
         } else {
             $filepath = $plugintypelocations[$plugintype] . '/' . $pluginname . '/lang/en/' . $legacyname . '.php';
         }
@@ -151,8 +147,8 @@ foreach ($plugins as $versioncode => $plugintypes) {
             exit($gitstatus);
         }
 
-        $tmp = make_upload_directory('amos/temp/fix-drift/'.$version->dir);
-        $dumpfile = $tmp.'/'.$legacyname.'.php';
+        $tmp = make_upload_directory('amos/temp/fix-drift/' . $version->dir);
+        $dumpfile = $tmp . '/' . $legacyname . '.php';
         file_put_contents($dumpfile, implode("\n", $gitout));
 
         $gitcomponent = mlang_component::from_phpfile($dumpfile, 'en', $version, time());

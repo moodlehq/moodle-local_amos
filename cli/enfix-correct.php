@@ -76,11 +76,10 @@ foreach ($rs as $record) {
                     'component' => $record->component,
                     'strname' => $record->strname,
                     'since' => $english[$record->component][$record->strname],
-                ]
-            );
-
+                ]);
         } else {
-            printf("to be deleted: [%s, %s] > %d\n",
+            printf(
+                "to be deleted: [%s, %s] > %d\n",
                 $record->strname,
                 $record->component,
                 $english[$record->component][$record->strname]

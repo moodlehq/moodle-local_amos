@@ -46,8 +46,9 @@ $starttime = microtime();
  * @return void
  */
 function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg) {
-    global $CFG; $DB;
-    require_once($CFG->dirroot.'/mod/forum/lib.php');
+    global $CFG;
+    $DB;
+    require_once($CFG->dirroot . '/mod/forum/lib.php');
 
     if ($CFG->wwwroot !== 'https://lang.moodle.org' && $CFG->wwwroot !== 'https://lang.next.moodle.org') {
         return;
@@ -70,8 +71,8 @@ function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $co
     $discussion->name = substr(s('[AMOS commit] ' . $commitmsg), 0, 255);
     $discussion->message = 'Author: ' . $committer . "\n";
     $discussion->message .= $fullcommitmsg . "\n\n";
-    $discussion->message .= 'http://git.moodle.org/gw?p=moodle.git;a=commit;h='.$commithash . "\n";
-    $discussion->message .= 'http://github.com/moodle/moodle/commit/'.$commithash . "\n\n";
+    $discussion->message .= 'http://git.moodle.org/gw?p=moodle.git;a=commit;h=' . $commithash . "\n";
+    $discussion->message .= 'http://github.com/moodle/moodle/commit/' . $commithash . "\n\n";
 
     $standardplugins = \local_amos\local\util::standard_components_tree();
 
@@ -163,7 +164,7 @@ function amos_parse_core_commit() {
     $stage->commit($commitmsg, [
         'source' => 'git',
         'userinfo' => $committer . ' <' . $committeremail . '>',
-        'commithash' => $commithash
+        'commithash' => $commithash,
     ], true, $timemodified);
 
     // Execute AMOS script if the commit message contains some.
@@ -178,7 +179,7 @@ function amos_parse_core_commit() {
                     $changes->commit($commitmsg, [
                         'source' => 'commitscript',
                         'userinfo' => $committer . ' <' . $committeremail . '>',
-                        'commithash' => $commithash
+                        'commithash' => $commithash,
                     ], true, $timemodified);
                 } else if ($changes < 0) {
                     fputs(STDERR, "EXEC STATUS $changes\n");
@@ -197,7 +198,7 @@ $var = make_upload_directory('amos/var');
 $mem = memory_get_usage();
 
 // Following commits contains a syntax typo and they can't be included for processing.
-$brokencheckouts = array(
+$brokencheckouts = [
     '52425959755ff22c733bc39b7580166f848e2e2a_lang_en_utf8_enrol_authorize.php',
     '46702071623f161c4e06ee9bbed7fbbd48356267_lang_en_utf8_enrol_authorize.php',
     '1ec0ef254c869f6bd020edafdb78a80d4126ba79_lang_en_utf8_role.php',
@@ -216,9 +217,9 @@ $brokencheckouts = array(
     '759b81f3dc4c2ce2b0579f8764aabf9e3fa9d0cc_theme_nonzero_lang_en_theme_nonzero.php',
     '5de15b83cc41c1f03415db00088b0c0d294556a9_mod_lti_lang_en_lti.php',
     '0d112864825a316a9bc0a17909bd0ea5342e4be4_question_type_ordering_lang_en_qtype_ordering.php',
-);
+];
 
-$ignoredcommits = array(
+$ignoredcommits = [
     // Following are MDL-21694 commits that just move the lang files. Such a move is registered
     // as a deletion and re-addition of every string which is usually useless.
     '9d68aee7860398345b3921b552ccaefe094d438a',
@@ -265,7 +266,7 @@ $ignoredcommits = array(
     '91b9560bd63e5582781e910573ee0887b558ca12',
     // Moving most of the codebase to the public subfolder.
     'f747c15cbf1c1c963a9592a73b167b969ec33d75',
-);
+];
 
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');
@@ -284,10 +285,8 @@ foreach ($versions as $version) {
 
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
-
     } else if ($version->code == mlang_version::latest_version()->code) {
         $gitbranch = 'origin/main';
-
     } else {
         fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
         exit(3);
@@ -305,11 +304,9 @@ foreach ($versions as $version) {
             $startat = '^' . $startat . '^';
             $prevstartat = '^' . $gitbranch . '^';
         }
-
     } else if (!empty($prevstartat)) {
         // This is the first time we process the new version. Start where the previous version was.
         $startat = $prevstartat;
-
     } else {
         fputs(STDERR, "Missing {$branch} branch startat point\n");
         exit(4);
@@ -361,15 +358,12 @@ foreach ($versions as $version) {
         if ($status === 'D') {
             // The file is being removed - do not do anything.
             continue;
-
         } else if ($status === 'C' || $status === 'R') {
             // Copy of a file into a new one or renaming of a file - read the name of the destination file.
             $file = $parts[2];
-
         } else if ($status === 'A' || $status === 'M') {
             // Addition of a new file or modification of the contents or mode of a file.
             $file = $parts[1];
-
         } else {
             // Some unsupported change, ignore it.
             continue;
@@ -432,7 +426,7 @@ foreach ($versions as $version) {
         fputs(STDOUT, "FOUND {$commithash} {$status} {$file} [{$mem} {$memdiff}]\n");
 
         // Get some additional information from the commit - name, email, timestamp, subject, body.
-        $format = implode('%n', array('%an', '%ae', '%at', '%s', '%b'));
+        $format = implode('%n', ['%an', '%ae', '%at', '%s', '%b']);
         $commitinfo = $git->exec("log --format={$format} {$commithash} ^{$commithash}~");
         $committer = $commitinfo[0];
         $committeremail = $commitinfo[1];

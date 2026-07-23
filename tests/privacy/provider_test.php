@@ -35,12 +35,11 @@ global $CFG;
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider_test extends \core_privacy\tests\provider_testcase {
-
+final class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Test {@see \local_amos\privacy\provider::get_contexts_for_userid()} implementation.
      */
-    public function test_get_contexts_for_userid() {
+    public function test_get_contexts_for_userid(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -54,7 +53,7 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Test {@see \local_amos\privacy\provider::get_users_in_context()} implementation.
      */
-    public function test_get_users_in_context() {
+    public function test_get_users_in_context(): void {
         global $DB;
         $this->resetAfterTest();
 
@@ -98,7 +97,7 @@ class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Test {@see \local_amos\privacy\provider::export_data()} implementation.
      */
-    public function test_export_user_data() {
+    public function test_export_user_data(): void {
         global $DB;
         $this->resetAfterTest();
 

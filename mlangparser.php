@@ -31,7 +31,6 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
  * Every parser must implement this interface
  */
 interface mlang_parser {
-
     /**
      * Returns singleton instance of the parser
      *
@@ -46,14 +45,13 @@ interface mlang_parser {
      * @param mlang_component $component component to add strings to
      * @param int $format the data format on the input, defaults to the one used since 2.0
      */
-    public function parse($data, mlang_component $component, $format=2);
+    public function parse($data, mlang_component $component, $format = 2);
 }
 
 /**
  * Factory class for obtaining a parser
  */
 class mlang_parser_factory {
-
     /**
      * Returns an instance of parser for the given format of data
      *
@@ -63,10 +61,9 @@ class mlang_parser_factory {
     public static function get_parser($format) {
 
         $format = clean_param($format, PARAM_ALPHANUM);
-        $classname = 'mlang_'.$format.'_parser';
+        $classname = 'mlang_' . $format . '_parser';
         if (class_exists($classname)) {
             return call_user_func("$classname::get_instance");
-
         } else {
             throw new coding_error('No such parser implemented');
         }
@@ -88,7 +85,6 @@ class mlang_parser_exception extends mlang_exception {
  * the file.
  */
 class mlang_php_parser implements mlang_parser {
-
     /** @var holds the singleton instance of self */
     private static $instance = null;
 
@@ -125,7 +121,7 @@ class mlang_php_parser implements mlang_parser {
      * @param int $format the data format on the input, defaults to the one used since 2.0
      * @return void
      */
-    public function parse($data, mlang_component $component, $format=2) {
+    public function parse($data, mlang_component $component, $format = 2) {
 
         $strings = $this->extract_strings($data);
         foreach ($strings as $id => $text) {
@@ -146,7 +142,7 @@ class mlang_php_parser implements mlang_parser {
      */
     protected function extract_strings($data) {
 
-        $strings = array();
+        $strings = [];
 
         if (empty($data)) {
             return $strings;
@@ -160,7 +156,7 @@ class mlang_php_parser implements mlang_parser {
         $tokens = token_get_all($data);
 
         // Get rid of all non-relevant tokens.
-        $rubbish = array(T_WHITESPACE, T_INLINE_HTML, T_COMMENT, T_DOC_COMMENT, T_OPEN_TAG, T_CLOSE_TAG);
+        $rubbish = [T_WHITESPACE, T_INLINE_HTML, T_COMMENT, T_DOC_COMMENT, T_OPEN_TAG, T_CLOSE_TAG];
         foreach ($tokens as $i => $token) {
             if (is_array($token)) {
                 if (in_array($token[0], $rubbish)) {
@@ -185,7 +181,6 @@ class mlang_php_parser implements mlang_parser {
                 if (!empty($token[2])) {
                     $line = $token[2];
                 }
-
             } else {
                 $foundtype = 'char';
                 $founddata = $token;
@@ -206,7 +201,7 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'STRING_ID';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected character [ at line '.$line);
+                    throw new mlang_parser_exception('Expected character [ at line ' . $line);
                 }
             }
 
@@ -216,7 +211,7 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'RIGHT_BRACKET';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected T_CONSTANT_ENCAPSED_STRING array key at line '.$line);
+                    throw new mlang_parser_exception('Expected T_CONSTANT_ENCAPSED_STRING array key at line ' . $line);
                 }
             }
 
@@ -225,7 +220,7 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'ASSIGNMENT';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected character ] at line '.$line);
+                    throw new mlang_parser_exception('Expected character ] at line ' . $line);
                 }
             }
 
@@ -234,7 +229,7 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'STRING_TEXT';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected character = at line '.$line);
+                    throw new mlang_parser_exception('Expected character = at line ' . $line);
                 }
             }
 
@@ -244,13 +239,13 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'SEMICOLON';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected T_CONSTANT_ENCAPSED_STRING array item value at line '.$line);
+                    throw new mlang_parser_exception('Expected T_CONSTANT_ENCAPSED_STRING array item value at line ' . $line);
                 }
             }
 
             if ($expect == 'SEMICOLON') {
                 if (is_null($id) or is_null($text)) {
-                    throw new mlang_parser_exception('NULL string id or value at line '.$line);
+                    throw new mlang_parser_exception('NULL string id or value at line ' . $line);
                 }
                 if ($foundtype === 'char' and $founddata === ';') {
                     if (!empty($id)) {
@@ -261,10 +256,9 @@ class mlang_php_parser implements mlang_parser {
                     $expect = 'STRING_VAR';
                     continue;
                 } else {
-                    throw new mlang_parser_exception('Expected character ; at line '.$line);
+                    throw new mlang_parser_exception('Expected character ; at line ' . $line);
                 }
             }
-
         }
 
         return $strings;
@@ -290,16 +284,14 @@ class mlang_php_parser implements mlang_parser {
             $text = str_replace("\'", "'", $text);
             $text = str_replace('\\\\', '\\', $text);
             return $text;
-
         } else if (substr($text, 0, 1) == '"' and substr($text, -1) == '"') {
             // Double quoted string.
             $text = trim($text, '"');
             $text = str_replace('\"', '"', $text);
             $text = str_replace('\\\\', '\\', $text);
             return $text;
-
         } else {
-            throw new mlang_parser_exception('Unexpected quotation in T_CONSTANT_ENCAPSED_STRING in decapsulate(): '.$text);
+            throw new mlang_parser_exception('Unexpected quotation in T_CONSTANT_ENCAPSED_STRING in decapsulate(): ' . $text);
         }
     }
 }

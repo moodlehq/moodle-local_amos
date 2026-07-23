@@ -56,7 +56,6 @@ if ($action === 'add') {
     } else {
         throw new \moodle_exception('error_unknown_status', 'local_amos', '', $status);
     }
-
 } else if ($action === 'del') {
     $deluser = $DB->get_record('user', ['id' => required_param('user', PARAM_INT)], '*', MUST_EXIST);
     if ($status == AMOS_USER_MAINTAINER) {
@@ -81,7 +80,6 @@ if (data_submitted()) {
             if ($DB->record_exists('amos_translators', ['userid' => $adduser->id, 'lang' => $langcode])) {
                 // Promote an existing contributor to a maintainer.
                 $DB->set_field('amos_translators', 'status', AMOS_USER_MAINTAINER, ['userid' => $adduser->id, 'lang' => $langcode]);
-
             } else {
                 // New maintainer.
                 $DB->insert_record('amos_translators', [
@@ -90,7 +88,6 @@ if (data_submitted()) {
                     'status' => AMOS_USER_MAINTAINER,
                 ]);
             }
-
         } else if ($status === AMOS_USER_CONTRIBUTOR) {
             if (!$DB->record_exists('amos_translators', ['userid' => $adduser->id, 'lang' => $langcode])) {
                 $DB->insert_record('amos_translators', [
@@ -100,29 +97,26 @@ if (data_submitted()) {
                 ]);
             }
         }
-
     } else if ($action === 'del' and $confirm) {
         if ($status === AMOS_USER_MAINTAINER) {
             // Degrade the maintainer to the contributor only.
             $DB->set_field('amos_translators', 'status', AMOS_USER_CONTRIBUTOR, ['userid' => $deluser->id, 'lang' => $langcode]);
-
         } else if ($status === AMOS_USER_CONTRIBUTOR) {
             $DB->delete_records('amos_translators', ['userid' => $deluser->id, 'lang' => $langcode]);
         }
-
     }
 
     $maintainedlangscache = cache::make_from_params(cache_store::MODE_APPLICATION, 'local_amos', 'maintainedlangs');
     $maintainedlangscache->purge();
 
-    redirect(new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-'.$langcode));
+    redirect(new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-' . $langcode));
 }
 
 if ($action === 'add') {
     // Display a form to add a maintainer or a contributor.
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('language', 'local_amos').': '.$languages[$langcode]);
-    echo $OUTPUT->heading(get_string('action').': '.$actionname);
+    echo $OUTPUT->heading(get_string('language', 'local_amos') . ': ' . $languages[$langcode]);
+    echo $OUTPUT->heading(get_string('action') . ': ' . $actionname);
     echo html_writer::start_tag('form', ['method' => 'post', 'action' => $PAGE->url]);
     echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
     echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'langcode', 'value' => $langcode]);
@@ -132,18 +126,20 @@ if ($action === 'add') {
     echo html_writer::start_div('buttons');
     echo html_writer::tag('button', $actionname, ['type' => 'submit', 'class' => 'btn btn-primary']);
     echo ' ';
-    echo html_writer::link(new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-'.$langcode),
-        get_string('cancel'), ['class' => 'btn']);
+    echo html_writer::link(
+        new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-' . $langcode),
+        get_string('cancel'),
+        ['class' => 'btn']
+    );
     echo html_writer::end_div();
     echo html_writer::end_tag('form');
     echo $OUTPUT->footer();
-
 } else if ($action === 'del') {
     // Display a confirmation box.
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('language', 'local_amos').': '.$languages[$langcode]);
-    echo $OUTPUT->heading(get_string('user').': '.$OUTPUT->user_picture($deluser).' '.fullname($deluser));
-    echo $OUTPUT->heading(get_string('action').': '.$actionname);
+    echo $OUTPUT->heading(get_string('language', 'local_amos') . ': ' . $languages[$langcode]);
+    echo $OUTPUT->heading(get_string('user') . ': ' . $OUTPUT->user_picture($deluser) . ' ' . fullname($deluser));
+    echo $OUTPUT->heading(get_string('action') . ': ' . $actionname);
     echo html_writer::start_div('', ['style' => 'text-align: center']);
     echo $OUTPUT->confirm(
         get_string('areyousure'),
@@ -154,11 +150,10 @@ if ($action === 'add') {
             'user' => $deluser->id,
             'confirm' => 1,
         ]),
-        new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-'.$langcode)
+        new moodle_url('/local/amos/credits.php', ['editmode' => 1], 'credits-language-' . $langcode)
     );
     echo html_writer::end_div();
     echo $OUTPUT->footer();
-
 } else {
     throw new \moodle_exception('error_unknown_action', 'local_amos');
 }

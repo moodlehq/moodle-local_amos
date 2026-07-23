@@ -92,33 +92,6 @@ $string['contriblanguagechange_help'] = 'If the contribution has been submitted 
 $string['contriblanguagereport'] = 'Reporting wrong contribution language';
 $string['contriblanguagereport_help'] = 'If this contribution has been submitted to the wrong language pack by mistake, please copy and paste the contribution URL into an email to `translation@moodle.org`. The contribution will then be moved to the correct language.';
 $string['contriblanguagewrong'] = 'Wrong language?';
-$string['contribreject'] = 'Reject';
-$string['contribresign'] = 'Unassign';
-$string['contribstaged'] = 'Staged contribution <a href="contrib.php?id={$a->id}">#{$a->id}</a> by {$a->author}';
-$string['contribstagedinfo'] = 'Staged contribution';
-$string['contribstagedinfo_help'] = 'The stage contains strings that were contributed by a community member. The language pack maintainers are supposed to review them and then set their status to either Accepted (if there were committed) or Rejected (if they can\'t be included in the official language pack for some reason).';
-$string['contribstagedinfo_link'] = 'AMOS#Contributing_to_a_language_pack';
-$string['contribstartreview'] = 'Start review';
-$string['contribstatus'] = 'Status';
-$string['contribstatus_help'] = 'Workflow of a contributed translation consists of following states:
-
-* New - the contribution has been submitted but it was not reviewed yet
-* In review - the contribution has been assigned to a language pack maintainer and was staged for review
-* Rejected - the language pack maintainer has rejected the contribution and probably left an explanation in a comment
-* Accepted - the contribution has been accepted by the language pack maintainer';
-$string['contribstatus_link'] = 'AMOS#Contributing_to_a_language_pack';
-$string['contribstatus0'] = 'New';
-$string['contribstatus10'] = 'In review';
-$string['contribstatus20'] = 'Rejected';
-$string['contribstatus30'] = 'Accepted';
-$string['contribstrings'] = 'Strings';
-$string['contribstringseq'] = '{$a->orig} new';
-$string['contribstringsnone'] = '{$a->orig} (all of them are already translated in the lang pack)';
-$string['contribstringssome'] = '{$a->orig} ({$a->same} of them already have more recent translation)';
-$string['contribsubject'] = 'Subject';
-$string['contribsubmittednone'] = 'No submitted contributions';
-$string['contribsubmittedsome'] = 'Your contributions ({$a})';
-$string['contribtimemodified'] = 'Modified';
 $string['contribnotif'] = '[AMOS] Contribution notification (#{$a->id})';
 $string['contribnotifaccepted'] = '{$a->fullname} has accepted your contributed translation
 #{$a->id} {$a->subject}
@@ -147,6 +120,16 @@ you start translating strings.
 ---------------------------------------------------------------------
 Original contribution page: {$a->contriborigurl}
 New contribution page: {$a->contribnewurl}';
+$string['contribnotifpending'] = 'There is a pending contributed translation requiring your action
+#{$a->id} {$a->subject}
+
+As the language pack maintainer, you are supposed to review and eventually
+commit all submitted contributions. When done, please mark them as accepted or
+rejected.
+
+See {$a->docsurl} for more details.
+---------------------------------------------------------------------
+Contribution page: {$a->contriburl}';
 $string['contribnotifrejected'] = '{$a->fullname} has rejected your contributed translation
 #{$a->id} {$a->subject}
 
@@ -164,28 +147,45 @@ $string['contribnotifsubmitted'] = '{$a->fullname} has submitted a new contribut
 
 ---------------------------------------------------------------------
 Contribution page: {$a->contriburl}';
-$string['contribnotifpending'] = 'There is a pending contributed translation requiring your action
-#{$a->id} {$a->subject}
+$string['contribreject'] = 'Reject';
+$string['contribresign'] = 'Unassign';
+$string['contribstaged'] = 'Staged contribution <a href="contrib.php?id={$a->id}">#{$a->id}</a> by {$a->author}';
+$string['contribstagedinfo'] = 'Staged contribution';
+$string['contribstagedinfo_help'] = 'The stage contains strings that were contributed by a community member. The language pack maintainers are supposed to review them and then set their status to either Accepted (if there were committed) or Rejected (if they can\'t be included in the official language pack for some reason).';
+$string['contribstagedinfo_link'] = 'AMOS#Contributing_to_a_language_pack';
+$string['contribstartreview'] = 'Start review';
+$string['contribstatus'] = 'Status';
+$string['contribstatus0'] = 'New';
+$string['contribstatus10'] = 'In review';
+$string['contribstatus20'] = 'Rejected';
+$string['contribstatus30'] = 'Accepted';
+$string['contribstatus_help'] = 'Workflow of a contributed translation consists of following states:
 
-As the language pack maintainer, you are supposed to review and eventually
-commit all submitted contributions. When done, please mark them as accepted or
-rejected.
-
-See {$a->docsurl} for more details.
----------------------------------------------------------------------
-Contribution page: {$a->contriburl}';
+* New - the contribution has been submitted but it was not reviewed yet
+* In review - the contribution has been assigned to a language pack maintainer and was staged for review
+* Rejected - the language pack maintainer has rejected the contribution and probably left an explanation in a comment
+* Accepted - the contribution has been accepted by the language pack maintainer';
+$string['contribstatus_link'] = 'AMOS#Contributing_to_a_language_pack';
+$string['contribstrings'] = 'Strings';
+$string['contribstringseq'] = '{$a->orig} new';
+$string['contribstringsnone'] = '{$a->orig} (all of them are already translated in the lang pack)';
+$string['contribstringssome'] = '{$a->orig} ({$a->same} of them already have more recent translation)';
+$string['contribsubject'] = 'Subject';
+$string['contribsubmittednone'] = 'No submitted contributions';
+$string['contribsubmittedsome'] = 'Your contributions ({$a})';
+$string['contribtimemodified'] = 'Modified';
 $string['contribute'] = 'Contribute';
 $string['contributenow'] = 'Contribute now!';
 $string['contributestats'] = 'To date, our community has submitted <strong>{$a->count}</strong> translated strings into AMOS.';
 $string['contributethanks'] = 'Many thanks to {$a->listcontributors} for your recent contributions.';
 $string['contributethankslist'] = '{$a->contributor1}, {$a->contributor2}, {$a->contributor3} and {$a->contributor4}';
 $string['contributions'] = 'Contributions';
-$string['creditsaddmaintainer'] = 'Add maintainer';
 $string['creditsaddcontributor'] = 'Add contributor';
-$string['creditsdelmaintainer'] = 'Remove maintainer';
-$string['creditsdelcontributor'] = 'Remove contributor';
+$string['creditsaddmaintainer'] = 'Add maintainer';
 $string['creditscontact'] = 'Send message';
 $string['creditscontributors'] = 'Other contributors';
+$string['creditsdelcontributor'] = 'Remove contributor';
+$string['creditsdelmaintainer'] = 'Remove maintainer';
 $string['creditsmaintainedby'] = 'Maintained by';
 $string['creditsnomaintainer'] = 'No maintainer at the moment. <a href="{$a->url}">Become one!</a>';
 $string['creditsthanks'] = 'On this page, we wish to thank everyone who has contributed to Moodle translations. Their work has made the spread of Moodle across the world  possible.';
@@ -200,22 +200,22 @@ $string['err_exception'] = 'Error: {$a}';
 $string['err_invalidlangcode'] = 'Invalid language code';
 $string['err_parser'] = 'Parsing error: {$a}';
 $string['filtercmp'] = 'Components';
-$string['filtercmpnothingselected'] = 'Please select some component';
 $string['filtercmp_desc'] = 'Show strings of these components';
+$string['filtercmpnothingselected'] = 'Please select some component';
 $string['filterlng'] = 'Languages';
-$string['filterlngnothingselected'] = 'Please select some language';
 $string['filterlng_desc'] = 'Display translations in these languages';
+$string['filterlngnothingselected'] = 'Please select some language';
 $string['filtermis'] = 'Miscellaneous';
 $string['filtermis_desc'] = 'Additional conditions on strings to display';
+$string['filtermisfapp'] = 'only strings used in the Moodle App';
+$string['filtermisfapp_help'] = 'This string is used in Moodle Apps as {$a}';
 $string['filtermisfhas'] = 'translated strings only';
 $string['filtermisfhlp'] = 'help strings only';
 $string['filtermisfmis'] = 'missing and outdated strings only';
-$string['filtermisfapp'] = 'only strings used in the Moodle App';
-$string['filtermisfapp_help'] = 'This string is used in Moodle Apps as {$a}';
-$string['filtermisfworkplace'] = 'only strings used in the Moodle Workplace';
-$string['filtermisfworkplace_help'] = 'This string is used in Moodle Workplace as {$a}';
 $string['filtermisfout'] = 'outdated strings only';
 $string['filtermisfstg'] = 'staged strings only';
+$string['filtermisfworkplace'] = 'only strings used in the Moodle Workplace';
+$string['filtermisfworkplace_help'] = 'This string is used in Moodle Workplace as {$a}';
 $string['filtersid'] = 'String identifier';
 $string['filtersid_desc'] = 'The key in the array of strings';
 $string['filtersidpartial'] = 'partial match';
@@ -226,11 +226,11 @@ $string['filtertxteng'] = 'in English strings';
 $string['filtertxtregex'] = 'regex';
 $string['filtertxttra'] = 'in translated strings';
 $string['filterver'] = 'Version';
-$string['filtervernothingselected'] = 'Please select some version';
 $string['filterver_desc'] = 'Show strings for this Moodle version';
-$string['foundtotal'] = '{$a} found';
+$string['filtervernothingselected'] = 'Please select some version';
 $string['foundmissing'] = '{$a} missing';
 $string['foundmissingonthispage'] = '{$a} on this page';
+$string['foundtotal'] = '{$a} found';
 $string['googletranslate'] = 'ask google';
 $string['importfile'] = 'Import translated strings from file';
 // phpcs:disable moodle.Strings.ForbiddenStrings
@@ -250,6 +250,7 @@ $string['languages'] = 'Languages';
 $string['languagesall'] = 'All';
 $string['languagesnone'] = 'None';
 $string['lastavailable'] = 'Latest available version';
+$string['lessfilteringoptions'] = 'Less options';
 $string['limitreachedmsg'] = 'Too many results. Try changing the filter options to narrow down your search.';
 $string['log'] = 'Log';
 $string['logfilterbranch'] = 'Versions';
@@ -281,7 +282,6 @@ $string['markuptodatelabel'] = 'mark as up-to-date';
 $string['messageprovider:checker'] = 'Language pack checker results';
 $string['messageprovider:contribution'] = 'Contributed translations';
 $string['morefilteringoptions'] = 'More options';
-$string['lessfilteringoptions'] = 'Less options';
 $string['newlanguage'] = 'New language';
 $string['nodiffs'] = 'No differences found';
 $string['nofiletoimport'] = 'Please provide a file to import from.';
@@ -322,7 +322,6 @@ $string['presetcommitmessage3'] = 'Fixing differences between {$a->versiona} and
 $string['privacy:commitnumber'] = 'Commit {$a}';
 $string['privacy:contribnumber'] = 'Contribution {$a}';
 $string['privacy:filterusage'] = 'Filter usage';
-$string['privacy:stashnumber'] = 'Stash {$a}';
 $string['privacy:metadata:db:amoscommits'] = 'Keeps all commit related meta-data.';
 $string['privacy:metadata:db:amoscommits:commitmsg'] = 'Commit message provided by the user.';
 $string['privacy:metadata:db:amoscommits:timecommitted'] = 'Timestamp of the commit.';
@@ -378,6 +377,7 @@ $string['privacy:metadata:external:languagepacks:email'] = 'Contributor email ad
 $string['privacy:metadata:external:languagepacks:firstname'] = 'Contributor first name may be included in the language pack files.';
 $string['privacy:metadata:external:languagepacks:lastname'] = 'Contributor last name may be included in the language pack files.';
 $string['privacy:metadata:subsystem:comment'] = 'Describe how the comment subsystem is used by the plugin.';
+$string['privacy:stashnumber'] = 'Stash {$a}';
 $string['privileges'] = 'Your privileges';
 $string['privilegesnone'] = 'You have read-only access to public information.';
 $string['processing'] = 'Processing ...';
@@ -402,13 +402,13 @@ $string['stageactions_help'] = '* Edit staged strings - modifies the translator 
 * Unstage all - clears the stage, all staged translations are lost.';
 $string['stagedownload'] = 'Download';
 $string['stageedit'] = 'Edit staged strings';
-$string['stagetoolopen'] = 'Go to the stage';
 $string['stageprune'] = 'Prune non-committable';
 $string['stagerebase'] = 'Rebase';
 $string['stagestringsnocommit'] = 'There are {$a->staged} staged strings';
 $string['stagestringsnone'] = 'There are no staged strings';
 $string['stagestringssome'] = 'There are {$a->staged} staged strings, {$a->committable} of them can be committed';
 $string['stagesubmit'] = 'Send strings to language pack maintainers';
+$string['stagetoolopen'] = 'Go to the stage';
 $string['stagetranslation'] = 'Translation';
 $string['stagetranslation_help'] = 'Displays the staged translation to be committed. The background color of the cell means:
 
@@ -445,9 +445,9 @@ $string['stashsubmitmessage'] = 'Message';
 $string['stashsubmitsubject'] = 'Subject';
 $string['stashtitle'] = 'Stash title';
 $string['stashtitledefault'] = 'Work in progress - {$a->time}';
+$string['stdvernotebetween'] = 'Standard from {$a->from} up to {$a->to}';
 $string['stdvernotefrom'] = 'Standard from {$a->from}';
 $string['stdvernoteto'] = 'Standard up to {$a->to}';
-$string['stdvernotebetween'] = 'Standard from {$a->from} up to {$a->to}';
 $string['stringhistory'] = 'history';
 $string['strings'] = 'Strings';
 $string['stringversionnotlatest'] = 'more recent version exists';
@@ -486,7 +486,7 @@ $string['untranslate'] = 'untranslate';
 $string['untranslateconfirm'] = '<p>You are going to remove existing translation of the string <code>{$a->stringid}</code>, component <code>{$a->component}</code>, from <code>{$a->since}</code> and higher versions of the language pack <code>{$a->language}</code>.</p><p>Are you sure?</p>';
 $string['untranslatetitle'] = 'Removing translation from the language pack';
 $string['untranslating'] = 'Untranslating';
-$string['userdefaultsave'] = 'Save as my defaults';
 $string['userdefaultreset'] = 'Reset to my defaults';
+$string['userdefaultsave'] = 'Save as my defaults';
 $string['version'] = 'Version';
 $string['versionauto'] = 'Auto';

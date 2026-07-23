@@ -39,9 +39,8 @@ require_once($CFG->dirroot . '/local/amos/mlangparser.php');
 /**
  * Test cases for the parsers api
  */
-class mlangparser_test extends basic_testcase {
-
-    public function test_singleton_instances() {
+final class mlangparser_test extends basic_testcase {
+    public function test_singleton_instances(): void {
         $parser = mlang_parser_factory::get_parser('php');
         $this->assertTrue(in_array('mlang_parser', class_implements($parser)));
         $this->assertTrue($parser instanceof mlang_php_parser);
@@ -51,7 +50,7 @@ class mlangparser_test extends basic_testcase {
         $clone = clone($parser);
     }
 
-    public function test_php_parser() {
+    public function test_php_parser(): void {
         $parser = mlang_parser_factory::get_parser('php');
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
 
@@ -73,7 +72,7 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals('One', $component->get_string('one')->text);
 
         // More complex example.
-        $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata001.txt');
+        $data = file_get_contents(dirname(__FILE__) . '/fixtures/parserdata001.txt');
         $component->clear();
         $parser->parse($data, $component);
         $this->assertFalse($component->has_string('notincodeblock'));
@@ -90,7 +89,7 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals($component->get_string('valid7')->text, 'Course \'{$a}\'');
 
         // More complex example (format 1.x).
-        $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata003.txt');
+        $data = file_get_contents(dirname(__FILE__) . '/fixtures/parserdata003.txt');
         $component->clear();
         $parser->parse($data, $component, 1);
         $this->assertEquals($component->get_number_of_strings(), 3);
@@ -105,13 +104,13 @@ class mlangparser_test extends basic_testcase {
         $this->assertEquals($component->get_string('id')->text, 'No dollar here');
 
         // Only strings conforming to PARAM_STRINGID are accepted.
-        $data = file_get_contents(dirname(__FILE__).'/fixtures/parserdata004.txt');
+        $data = file_get_contents(dirname(__FILE__) . '/fixtures/parserdata004.txt');
         $component->clear();
         $parser->parse($data, $component);
         $this->assertEquals($component->get_number_of_strings(), 2);
     }
 
-    public function test_php_parser_failure_double_quotes() {
+    public function test_php_parser_failure_double_quotes(): void {
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string["id"] = "This {$a} fails";';
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -119,7 +118,7 @@ class mlangparser_test extends basic_testcase {
         $parser->parse($data, $component);
     }
 
-    public function test_php_parser_usupported_string_concatenate() {
+    public function test_php_parser_usupported_string_concatenate(): void {
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string[\'invalid\'] = \'Hello \' . \' world\';';
         $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
@@ -127,7 +126,7 @@ class mlangparser_test extends basic_testcase {
         $parser->parse($data, $component);
     }
 
-    public function test_php_parser_security_variable_expansion() {
+    public function test_php_parser_security_variable_expansion(): void {
         // Security issues.
         $parser = mlang_parser_factory::get_parser('php');
         $data = '<?php $string[\'dbpass\'] = $CFG->dbpass;';

@@ -40,20 +40,22 @@ if ($unrecognised) {
 
 $sql = "SELECT component, strname, MAX(since) AS maxsince
           FROM {amos_strings}
-         WHERE " . $DB->sql_like('strname' , ':pattern') . "
+         WHERE " . $DB->sql_like('strname', ':pattern') . "
       GROUP BY component,strname";
 
 $rs = $DB->get_recordset_sql($sql, [
-    'pattern' => '%' . $DB->sql_like_escape('_link')
+    'pattern' => '%' . $DB->sql_like_escape('_link'),
 ]);
 
 $english = [];
 
 foreach ($rs as $record) {
-    if ($DB->record_exists('amos_strings', [
+    if (
+        $DB->record_exists('amos_strings', [
         'component' => $record->component,
         'strname' => substr($record->strname, 0, -5) . '_help',
-    ])) {
+        ])
+    ) {
         // This seems to be a valid _link string. Let's copy it to all language packs.
         $english[$record->component][$record->maxsince][$record->strname] = true;
     }
@@ -86,8 +88,10 @@ foreach ($english as $componentname => $vercodes) {
         foreach ($stringnames as $stringname => $notused) {
             printf("%s\t%d\t%s\n", $componentname, $vercode, $stringname);
             foreach ($langs as $langcode) {
-                if ($DB->record_exists('amos_translations', ['lang' => $langcode, 'strname' => $stringname,
-                        'component' => $componentname])) {
+                if (
+                    $DB->record_exists('amos_translations', ['lang' => $langcode, 'strname' => $stringname,
+                        'component' => $componentname])
+                ) {
                     continue;
                 }
 
@@ -98,7 +102,10 @@ foreach ($english as $componentname => $vercodes) {
                         AND component = :component
                         AND since = :since
                    ORDER BY timemodified DESC",
-                    ['strname' => $stringname, 'component' => $componentname, 'since' => $vercode], 0, 1);
+                    ['strname' => $stringname, 'component' => $componentname, 'since' => $vercode],
+                    0,
+                    1
+                );
 
                 $origstring = reset($origstring);
 

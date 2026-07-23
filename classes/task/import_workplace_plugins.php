@@ -27,7 +27,7 @@ namespace local_amos\task;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/local/amos/mlanglib.php');
+require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
  * Imports the strings used in the Moodle for Workplace plugins.
@@ -36,7 +36,6 @@ require_once($CFG->dirroot.'/local/amos/mlanglib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_workplace_plugins extends \core\task\scheduled_task {
-
     /** @var \local_amos\local\git client to use */
     protected $git;
 
@@ -55,21 +54,21 @@ class import_workplace_plugins extends \core\task\scheduled_task {
     public function execute() {
         global $CFG;
 
-        $repo = $CFG->dataroot.'/amos/repos/moodle-workplace-pluginstrings';
+        $repo = $CFG->dataroot . '/amos/repos/moodle-workplace-pluginstrings';
         $key = '/var/www/.ssh/moodle-workplace-pluginstrings.key';
 
         $this->git = new \local_amos\local\git($repo, $key);
         $componentnames = [];
 
         foreach ($this->get_branches_to_process() as $branchname => $job) {
-            $mver = \mlang_version::by_branch('MOODLE_'.$job['version'].'_STABLE');
+            $mver = \mlang_version::by_branch('MOODLE_' . $job['version'] . '_STABLE');
 
             if ($mver === null) {
-                mtrace(' unknown moodle version MOODLE_'.$job['version'].'_STABLE');
+                mtrace(' unknown moodle version MOODLE_' . $job['version'] . '_STABLE');
                 continue;
             }
 
-            mtrace(' Importing strings from '.$job['plugin'].' for '.$mver->branch);
+            mtrace(' Importing strings from ' . $job['plugin'] . ' for ' . $mver->branch);
 
             $path = $this->export_branch_to_temp($branchname);
             $code = new \local_amos\local\source_code($path);
@@ -94,14 +93,14 @@ class import_workplace_plugins extends \core\task\scheduled_task {
 
             $results = \local_amos\external\update_strings_file::execute(
                 'Moodle Workplace <workplace@moodle.com>',
-                'Strings for '.$componentname.' '.$info['version'],
+                'Strings for ' . $componentname . ' ' . $info['version'],
                 $components
             );
 
             $results = \external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $results);
 
             foreach ($results as $result) {
-                mtrace('  '.$result['status'].' '.$result['componentname'].' '.$result['changes'].'/'.$result['found'].' changes');
+                mtrace('  ' . $result['status'] . ' ' . $result['componentname'] . ' ' . $result['changes'] . '/' . $result['found'] . ' changes');
                 if (!in_array($result['componentname'], $componentnames)) {
                     $componentnames[] = $result['componentname'];
                 }
@@ -130,12 +129,12 @@ class import_workplace_plugins extends \core\task\scheduled_task {
      * @param string $branchname
      * @return string full path to the temporary location with the exported files
      */
-    protected function export_branch_to_temp(string $branchname) : string {
+    protected function export_branch_to_temp(string $branchname): string {
 
         $target = make_request_directory();
 
-        $this->git->exec('archive --format=tar --prefix=/ '.escapeshellarg($branchname).
-            ' | (cd '.escapeshellarg($target).' && tar xf -) 2>/dev/null');
+        $this->git->exec('archive --format=tar --prefix=/ ' . escapeshellarg($branchname) .
+            ' | (cd ' . escapeshellarg($target) . ' && tar xf -) 2>/dev/null');
 
         return $target;
     }
@@ -147,7 +146,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
      *
      * @return array (string)branchname => ['plugin' => (string)component_name, 'version' => (int)version_code]
      */
-    protected function get_branches_to_process() : array {
+    protected function get_branches_to_process(): array {
 
         // We use a mirror clone, so updating the remote origin updates the local branches.
         $this->git->exec('remote update --prune');
@@ -163,24 +162,24 @@ class import_workplace_plugins extends \core\task\scheduled_task {
             }
 
             if (strpos($branchname, '--') === false) {
-                mtrace(' unexpected branch name: '.$branchname);
+                mtrace(' unexpected branch name: ' . $branchname);
                 continue;
             }
 
             [$plugin, $version] = explode('--', $branchname);
 
             if (empty($plugin) || empty($version)) {
-                mtrace(' unable to parse branch name: '.$branchname);
+                mtrace(' unable to parse branch name: ' . $branchname);
                 continue;
             }
 
             if (clean_param($plugin, PARAM_COMPONENT) !== $plugin) {
-                mtrace(' invalid plugin name: '.$plugin);
+                mtrace(' invalid plugin name: ' . $plugin);
                 continue;
             }
 
             if ((string)clean_param($version, PARAM_INT) !== $version) {
-                mtrace(' invalid version: '.$version);
+                mtrace(' invalid version: ' . $version);
                 continue;
             }
 

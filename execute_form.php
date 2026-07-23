@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_amos_execute_form extends moodleform {
-
     /**
      * Define form fields.
      */
@@ -46,7 +45,7 @@ class local_amos_execute_form extends moodleform {
         $mform->setDefault('version', $this->_customdata['versioncurrent']);
         $mform->addRule('version', null, 'required', null, 'client');
 
-        $mform->addElement('textarea', 'script', get_string('script', 'local_amos'), array('cols' => 60, 'rows' => 10));
+        $mform->addElement('textarea', 'script', get_string('script', 'local_amos'), ['cols' => 60, 'rows' => 10]);
         $mform->setDefault('script', "AMOS BEGIN\n \nAMOS END");
         $mform->setType('script', PARAM_RAW);
         $this->add_action_buttons(false, get_string('scriptexecute', 'local_amos'));
