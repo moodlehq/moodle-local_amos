@@ -27,19 +27,7 @@ namespace local_amos\local;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Makes protected method accessible for testing purposes
- */
-class testable_amos_tools extends amos_tools {
-    /**
-     * Turn protected method to public to be able to test it directly.
-     *
-     * @param string $newstyle
-     */
-    public static function legacy_component_name($newstyle) { // phpcs:ignore Generic.CodeAnalysis.UselessOverridingMethod
-        return parent::legacy_component_name($newstyle);
-    }
-}
+require_once(__DIR__ . '/../classes/local/testable_amos_tools.php');
 
 /**
  * Unit tests for the {@see \local_amos\local\amos_tools} class.

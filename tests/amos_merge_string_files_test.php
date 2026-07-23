@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for {@see amos_merge_string_files} class
+ * Provides {@see \local_amos\amos_merge_string_files_test} class.
  *
  * @package     local_amos
  * @category    test
@@ -25,8 +25,6 @@
 
 namespace local_amos;
 
-use amos_cli_logger;
-use amos_merge_string_files;
 use basic_testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -34,10 +32,16 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/local/amos/cli/utilslib.php');
 
+require_once(__DIR__ . '/classes/cli/testable_amos_cli_logger.php');
+require_once(__DIR__ . '/classes/cli/testable_amos_merge_string_files.php');
+
 /**
- * Test cases for the merge strings file helper class
+ * Unit tests for the {@see \amos_merge_string_files} class
+ *
+ * @copyright 2013 David Mudrak <david.mudrak@gmail.com>
+ * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class mergefiles_test extends basic_testcase {
+final class amos_merge_string_files_test extends basic_testcase {
     public function test_load_strings_from_file(): void {
         $logger = new testable_amos_cli_logger();
         $helper = new testable_amos_merge_string_files($logger);
@@ -122,33 +126,5 @@ $string[\'baz\'] = \'Baz\';
             'mnet_hosts:addinstance', 'mnet_hosts:myaddinstance', 'pluginname', 'server',
         ], array_keys($string));
         $this->assertEquals('Add a new network servers block to My home', $string['mnet_hosts:myaddinstance']);
-    }
-}
-
-
-/**
- * Provides access to protected methods we want to explicitly test
- *
- * @copyright 2013 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class testable_amos_merge_string_files extends amos_merge_string_files {
-}
-
-/**
- * Dummy implementation of the AMOS logger suitable for unit testing
- *
- * @copyright 2013 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class testable_amos_cli_logger extends amos_cli_logger {
-    /**
-     * Logs a message
-     *
-     * @param string $job the AMOS CLI job providing the message
-     * @param string $message the message to log
-     * @param string $level error, warning or info level
-     */
-    public function log($job, $message, $level = self::LEVEL_INFO) {
     }
 }
