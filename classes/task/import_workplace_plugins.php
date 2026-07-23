@@ -25,6 +25,8 @@
 
 namespace local_amos\task;
 
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -61,7 +63,7 @@ class import_workplace_plugins extends \core\task\scheduled_task {
         $componentnames = [];
 
         foreach ($this->get_branches_to_process() as $branchname => $job) {
-            $mver = \mlang_version::by_branch('MOODLE_' . $job['version'] . '_STABLE');
+            $mver = amos_version::by_branch('MOODLE_' . $job['version'] . '_STABLE');
 
             if ($mver === null) {
                 mtrace(' unknown moodle version MOODLE_' . $job['version'] . '_STABLE');

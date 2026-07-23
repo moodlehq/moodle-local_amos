@@ -35,6 +35,8 @@ use core_privacy\local\request\helper;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
 
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -273,8 +275,8 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
             $writer->export_data($subcontext, $contrib);
 
-            $stash = \mlang_stash::instance_from_id($contrib->stashid);
-            $stage = new \mlang_stage();
+            $stash = amos_stash::instance_from_id($contrib->stashid);
+            $stage = new amos_stage();
             $stash->apply($stage);
 
             $strings = [];
@@ -371,8 +373,8 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
             $writer->export_data($subcontext, $stashdata);
 
-            $stash = \mlang_stash::instance_from_id($stashdata->id);
-            $stage = new \mlang_stage();
+            $stash = amos_stash::instance_from_id($stashdata->id);
+            $stage = new amos_stage();
             $stash->apply($stage);
 
             $strings = [];

@@ -16,6 +16,11 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for external function {@see \local_amos\external\delete_translation}.
  *
@@ -81,21 +86,21 @@ final class delete_translation_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Group mode'));
+        $component = new amos_component('moodle', 'en', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Group mode'));
         $stage->add($component);
         $stage->commit('Introducing "Group mode" string', ['source' => 'unittest']);
 
-        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Skupinový režim'));
+        $component = new amos_component('moodle', 'cs', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Skupinový režim'));
         $stage->add($component);
         $stage->commit('Translating "Group mode" into Czech', ['source' => 'unittest']);
 
         // Simulate the buggy import: a duplicate translation manually committed at since=500.
-        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(500));
-        $component->add_string(new \mlang_string('groupmode', 'Špatný duplicitní překlad'));
+        $component = new amos_component('moodle', 'cs', amos_version::by_code(500));
+        $component->add_string(new amos_string('groupmode', 'Špatný duplicitní překlad'));
         $stage->add($component);
         $stage->commit('Backported bad import', ['source' => 'unittest']);
 

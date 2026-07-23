@@ -26,7 +26,7 @@
 namespace local_amos;
 
 use advanced_testcase;
-use mlang_version;
+use local_amos\local\amos_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -34,14 +34,14 @@ global $CFG;
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
 /**
- * Unit tests for the mlang_version class functionality.
+ * Unit tests for the amos_version class functionality.
  *
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class mlang_version_test extends advanced_testcase {
     /**
-     * Test mlang_version factory methods.
+     * Test amos_version factory methods.
      *
      * @dataProvider mlang_version_properties_provider
      *
@@ -52,27 +52,27 @@ final class mlang_version_test extends advanced_testcase {
      */
     public function test_factory_methods(int $code, string $label, string $dir, bool $translatable): void {
 
-        $v = mlang_version::by_code($code);
+        $v = amos_version::by_code($code);
         $this->assert_mlang_version_properties_match($v, $code, $label, $dir, $translatable);
 
-        $v = mlang_version::by_branch('MOODLE_' . $code . '_STABLE');
+        $v = amos_version::by_branch('MOODLE_' . $code . '_STABLE');
         $this->assert_mlang_version_properties_match($v, $code, $label, $dir, $translatable);
 
-        $v = mlang_version::by_dir($dir);
+        $v = amos_version::by_dir($dir);
         $this->assert_mlang_version_properties_match($v, $code, $label, $dir, $translatable);
     }
 
     /**
-     * Helper function to assert that the mlang_version properties match the given values.
+     * Helper function to assert that the amos_version properties match the given values.
      *
-     * @param mlang_version $v
+     * @param amos_version $v
      * @param int $code
      * @param string $label
      * @param string $dir
      * @param bool $translatable
      */
     protected function assert_mlang_version_properties_match(
-        mlang_version $v,
+        amos_version $v,
         int $code,
         string $label,
         string $dir,
@@ -182,7 +182,7 @@ final class mlang_version_test extends advanced_testcase {
 
         set_config('branchesall', '38,39,310,400', 'local_amos');
 
-        $list = mlang_version::list_all();
+        $list = amos_version::list_all();
 
         $this->assertEquals(4, count($list));
         $this->assertSame('3.9', $list[39]->dir);
@@ -198,7 +198,7 @@ final class mlang_version_test extends advanced_testcase {
 
         set_config('branchesall', '38,39,310', 'local_amos');
 
-        $latest = mlang_version::latest_version();
+        $latest = amos_version::latest_version();
 
         $this->assertSame('3.10', $latest->dir);
     }
@@ -212,7 +212,7 @@ final class mlang_version_test extends advanced_testcase {
 
         set_config('branchesall', '38,39,310', 'local_amos');
 
-        $latest = mlang_version::oldest_version();
+        $latest = amos_version::oldest_version();
 
         $this->assertSame('3.8', $latest->dir);
     }
@@ -226,24 +226,24 @@ final class mlang_version_test extends advanced_testcase {
 
         set_config('branchesall', '38,39,310,311,400,401', 'local_amos');
 
-        $range = mlang_version::list_range(400);
+        $range = amos_version::list_range(400);
 
         $this->assertEquals(2, count($range));
         $this->assertSame('4.0', $range[400]->dir);
         $this->assertSame('4.1', $range[401]->dir);
 
-        $range = mlang_version::list_range(39 + 1, 311 + 1);
+        $range = amos_version::list_range(39 + 1, 311 + 1);
 
         $this->assertEquals(2, count($range));
         $this->assertSame('3.10', $range[310]->dir);
         $this->assertSame('3.11', $range[311]->dir);
 
-        $range = mlang_version::list_range(401, 401);
+        $range = amos_version::list_range(401, 401);
 
         $this->assertEquals(1, count($range));
         $this->assertSame('4.1', $range[401]->dir);
 
-        $range = mlang_version::list_range(401, 400);
+        $range = amos_version::list_range(401, 400);
 
         $this->assertEquals(0, count($range));
     }
@@ -258,7 +258,7 @@ final class mlang_version_test extends advanced_testcase {
         set_config('branchesall', '34,35,36,37,38,39,310,400,401', 'local_amos');
         set_config('branchsupported', '39', 'local_amos');
 
-        $supported = mlang_version::list_supported();
+        $supported = amos_version::list_supported();
 
         $this->assertEquals(4, count($supported));
         $this->assertEquals('3.9', $supported[39]->dir);

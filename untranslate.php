@@ -22,6 +22,12 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
@@ -34,7 +40,7 @@ $confirm = optional_param('confirm', false, PARAM_BOOL);
 require_login(SITEID, false);
 require_capability('local/amos:commit', context_system::instance());
 
-$allowedlangs = mlang_tools::list_allowed_languages();
+$allowedlangs = amos_tools::list_allowed_languages();
 
 if (empty($allowedlangs['X']) && empty($allowedlangs[$language])) {
     throw new moodle_exception('err_unexpected_language', 'local_amos');
@@ -52,7 +58,7 @@ $PAGE->navbar->add(get_string('untranslating', 'local_amos'));
 
 navigation_node::override_active_url(new moodle_url('/local/amos/view.php'));
 
-$mversion = mlang_version::by_code($since);
+$mversion = amos_version::by_code($since);
 
 if (!$mversion->translatable) {
     throw new moodle_exception('err_nontranslatable_version', 'local_amos');
@@ -61,12 +67,12 @@ if (!$mversion->translatable) {
 if ($confirm) {
     require_sesskey();
 
-    $mstage = new mlang_stage();
-    $mcomponent = mlang_component::from_snapshot($component, $language, $mversion, null, false, false, [$stringid]);
+    $mstage = new amos_stage();
+    $mcomponent = amos_component::from_snapshot($component, $language, $mversion, null, false, false, [$stringid]);
     $cstring = $mcomponent->get_string($stringid);
 
     if ($cstring !== null) {
-        $mstring = new mlang_string($cstring->id, $cstring->text, null, true);
+        $mstring = new amos_string($cstring->id, $cstring->text, null, true);
         $mcomponent->add_string($mstring, true);
         $mstage->add($mcomponent);
 

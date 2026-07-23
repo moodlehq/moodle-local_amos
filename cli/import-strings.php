@@ -25,6 +25,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -83,12 +87,12 @@ if (!is_readable($filepath)) {
 }
 
 if ($options['versioncode']) {
-    $version = mlang_version::by_code($options['versioncode']);
+    $version = amos_version::by_code($options['versioncode']);
 } else {
-    $version = mlang_version::latest_version();
+    $version = amos_version::latest_version();
 }
 
-$component = mlang_component::from_phpfile(
+$component = amos_component::from_phpfile(
     $filepath,
     $options['lang'],
     $version,
@@ -99,7 +103,7 @@ $component = mlang_component::from_phpfile(
 
 fputs(STDOUT, "{$component->name} {$component->version->label} {$component->lang}" . PHP_EOL);
 
-$stage = new mlang_stage();
+$stage = new amos_stage();
 $stage->add($component);
 $stage->rebase(null, true, $options['timemodified']);
 

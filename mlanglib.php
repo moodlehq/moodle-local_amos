@@ -42,4 +42,3 @@ class_alias(\local_amos\local\amos_persistent_stage::class, 'mlang_persistent_st
 class_alias(\local_amos\local\amos_stash::class, 'mlang_stash');
 class_alias(\local_amos\local\amos_version::class, 'mlang_version');
 class_alias(\local_amos\local\amos_tools::class, 'mlang_tools');
-

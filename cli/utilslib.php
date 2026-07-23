@@ -23,6 +23,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir  . '/filelib.php');
@@ -246,7 +250,7 @@ class amos_export_zip {
                 continue;
             }
 
-            $version = mlang_version::by_dir($outputdir->getFilename());
+            $version = amos_version::by_dir($outputdir->getFilename());
 
             $this->rebuild_languages_md5($version);
             $this->rebuild_download_page($version);
@@ -256,14 +260,14 @@ class amos_export_zip {
     /**
      * Returns the list of mlang_versions that we should process
      *
-     * @return array of {@see mlang_version} objects indexed by the version code
+     * @return array of {@see amos_version} objects indexed by the version code
      */
     protected function get_versions() {
 
         $minver = max(20, $this->minver ?? 20);
         $maxver = $this->maxver;
 
-        $versions = mlang_version::list_range($minver, $maxver);
+        $versions = amos_version::list_range($minver, $maxver);
         krsort($versions);
 
         return $versions;
@@ -279,14 +283,14 @@ class amos_export_zip {
 
         if ($this->minver = $minver) {
             $this->log(
-                'Processing only versions starting from ' . mlang_version::by_code($minver)->label,
+                'Processing only versions starting from ' . amos_version::by_code($minver)->label,
                 amos_cli_logger::LEVEL_DEBUG
             );
         }
 
         if ($this->maxver = $maxver) {
             $this->log(
-                'Processing only versions up to ' . mlang_version::by_code($maxver)->label,
+                'Processing only versions up to ' . amos_version::by_code($maxver)->label,
                 amos_cli_logger::LEVEL_DEBUG
             );
         }
@@ -414,16 +418,16 @@ class amos_export_zip {
     /**
      * Dumps all component strings into PHP files and makes ZIP archive of them
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      * @param string $langcode
      */
-    protected function rebuild_zip_package(mlang_version $version, $langcode) {
+    protected function rebuild_zip_package(amos_version $version, $langcode) {
         $this->log('Rebuilding temp/' . $version->dir . '/' . $langcode . '.zip', amos_cli_logger::LEVEL_DEBUG);
 
-        foreach (mlang_tools::list_components() as $componentname => $ignored) {
-            $component = mlang_component::from_snapshot($componentname, $langcode, $version);
+        foreach (amos_tools::list_components() as $componentname => $ignored) {
+            $component = amos_component::from_snapshot($componentname, $langcode, $version);
             if ($langcode !== 'en') {
-                $english = mlang_component::from_snapshot($componentname, 'en', $version);
+                $english = amos_component::from_snapshot($componentname, 'en', $version);
                 $component->intersect($english);
                 $numberofenglishstrings = $english->get_number_of_strings(true);
                 $english->clear();
@@ -451,10 +455,10 @@ class amos_export_zip {
     /**
      * Moves the generated ZIP package to the output directory for resync
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      * @param string $langcode
      */
-    protected function push_zip_package(mlang_version $version, $langcode) {
+    protected function push_zip_package(amos_version $version, $langcode) {
 
         $source = $this->tempdirroot . '/' . $version->dir . '/' . $langcode . '.zip';
         $target = $this->outputdirroot . '/' . $version->dir . '/' . $langcode . '.zip';
@@ -495,9 +499,9 @@ class amos_export_zip {
     /**
      * Dumps the component into PHP file(s) in the temporary area
      *
-     * @param mlang_component $component
+     * @param amos_component $component
      */
-    protected function dump_component_into_temp(mlang_component $component) {
+    protected function dump_component_into_temp(amos_component $component) {
 
         if (!$component->has_string()) {
             return;
@@ -515,10 +519,10 @@ class amos_export_zip {
     /**
      * Makes a ZIP file of all string files in the temp area
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      * @param string $langcode
      */
-    protected function make_zip_package(mlang_version $version, $langcode) {
+    protected function make_zip_package(amos_version $version, $langcode) {
 
         $files = $this->list_string_files($version, $langcode);
 
@@ -532,11 +536,11 @@ class amos_export_zip {
     /**
      * Returns the list of full paths to generated string files
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      * @param string $langcode
      * @return array of (string)in-zip path => (string)full path
      */
-    protected function list_string_files(mlang_version $version, $langcode) {
+    protected function list_string_files(amos_version $version, $langcode) {
 
         $dirpath = $this->tempdirroot . '/' . $version->dir . '/' . $langcode;
 
@@ -562,11 +566,11 @@ class amos_export_zip {
     /**
      * Rebuilds languages.md5 file for the given version
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      */
-    protected function rebuild_languages_md5(mlang_version $version) {
+    protected function rebuild_languages_md5(amos_version $version) {
 
-        $langnames = mlang_tools::list_languages(true, true, false, true);
+        $langnames = amos_tools::list_languages(true, true, false, true);
         $languagesmd5lines = [];
 
         foreach (new DirectoryIterator($this->outputdirroot . '/' . $version->dir) as $zipfile) {
@@ -600,9 +604,9 @@ class amos_export_zip {
     /**
      * Rebuilds lang-table.html file for the given version
      *
-     * @param mlang_version $version
+     * @param amos_version $version
      */
-    protected function rebuild_download_page(mlang_version $version) {
+    protected function rebuild_download_page(amos_version $version) {
         global $OUTPUT;
 
         $langpacks = $this->statsman->get_language_pack_download_page_data($version->code);

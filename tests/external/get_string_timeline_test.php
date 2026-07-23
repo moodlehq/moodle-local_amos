@@ -16,6 +16,11 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for external function {@see \local_amos\external\get_string_timeline}.
  *
@@ -60,21 +65,21 @@ final class get_string_timeline_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
+        $stage = new amos_stage();
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Foo bar'));
         $stage->add($component);
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Fů bár'));
+        $stage = new amos_stage();
+        $component = new amos_component('foo_bar', 'cs', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Fů bár'));
         $stage->add($component);
         $stage->commit('První překlad', ['source' => 'unittest']);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(310));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar!'));
+        $stage = new amos_stage();
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(310));
+        $component->add_string(new amos_string('foobar', 'Foo bar!'));
         $stage->add($component);
         $stage->commit('Add exclamation mark in Moodle 3.10', ['source' => 'unittest']);
 
@@ -114,15 +119,15 @@ final class get_string_timeline_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
+        $stage = new amos_stage();
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Foo bar'));
         $stage->add($component);
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Fů bár'));
+        $stage = new amos_stage();
+        $component = new amos_component('foo_bar', 'cs', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Fů bár'));
         $stage->add($component);
         $stage->commit('První překlad', ['source' => 'unittest']);
 

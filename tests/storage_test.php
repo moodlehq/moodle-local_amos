@@ -26,10 +26,10 @@
 namespace local_amos;
 
 use advanced_testcase;
-use mlang_component;
-use mlang_stage;
-use mlang_string;
-use mlang_version;
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -53,9 +53,9 @@ final class storage_test extends advanced_testcase {
 
         // Committing a single string in 3.9.
         $now = time() - 5;
-        $component = new mlang_component('test', 'en', mlang_version::by_branch('MOODLE_39_STABLE'));
-        $component->add_string(new mlang_string('welcome', 'Welcome', $now));
-        $stage = new mlang_stage();
+        $component = new amos_component('test', 'en', amos_version::by_branch('MOODLE_39_STABLE'));
+        $component->add_string(new amos_string('welcome', 'Welcome', $now));
+        $stage = new amos_stage();
         $stage->add($component);
         $stage->commit('First string in AMOS', ['source' => 'unittest'], true);
         $component->clear();
@@ -72,10 +72,10 @@ final class storage_test extends advanced_testcase {
 
         // Adding more strings in 3.10.
         $now = time() - 4;
-        $stage = new mlang_stage();
-        $component = new mlang_component('test', 'en', mlang_version::by_branch('MOODLE_310_STABLE'));
-        $component->add_string(new mlang_string('hello', 'Hello', $now));
-        $component->add_string(new mlang_string('world', 'World', $now));
+        $stage = new amos_stage();
+        $component = new amos_component('test', 'en', amos_version::by_branch('MOODLE_310_STABLE'));
+        $component->add_string(new amos_string('hello', 'Hello', $now));
+        $component->add_string(new amos_string('world', 'World', $now));
         $stage->add($component);
         $stage->commit('Two other string into AMOS', ['source' => 'unittest'], true);
         $component->clear();
@@ -86,9 +86,9 @@ final class storage_test extends advanced_testcase {
 
         // Deleting the first string in 3.11.
         $now = time() - 3;
-        $stage = new mlang_stage();
-        $component = new mlang_component('test', 'en', mlang_version::by_branch('MOODLE_311_STABLE'));
-        $component->add_string(new mlang_string('welcome', '', $now, true));
+        $stage = new amos_stage();
+        $component = new amos_component('test', 'en', amos_version::by_branch('MOODLE_311_STABLE'));
+        $component->add_string(new amos_string('welcome', '', $now, true));
         $stage->add($component);
         $stage->commit('Marking string as deleted', ['source' => 'unittest'], true);
         $component->clear();
@@ -96,11 +96,11 @@ final class storage_test extends advanced_testcase {
         unset($stage);
 
         // Nothing on pre-3.9 versions here.
-        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_38_STABLE'));
+        $component = amos_component::from_snapshot('test', 'en', amos_version::by_branch('MOODLE_38_STABLE'));
         $this->assertFalse($component->has_string());
 
         // Load 3.9 snapshot.
-        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_39_STABLE'));
+        $component = amos_component::from_snapshot('test', 'en', amos_version::by_branch('MOODLE_39_STABLE'));
         $this->assertTrue($component->has_string());
         $this->assertTrue($component->has_string('welcome'));
         $this->assertEquals(1, $component->get_number_of_strings());
@@ -108,7 +108,7 @@ final class storage_test extends advanced_testcase {
         unset($component);
 
         // Load 3.10 snapshot - one 3.9 string inherited, two more added.
-        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_310_STABLE'));
+        $component = amos_component::from_snapshot('test', 'en', amos_version::by_branch('MOODLE_310_STABLE'));
         $this->assertTrue($component->has_string());
         $this->assertTrue($component->has_string('welcome'));
         $this->assertTrue($component->has_string('hello'));
@@ -118,7 +118,7 @@ final class storage_test extends advanced_testcase {
         unset($component);
 
         // Load 3.11 snapshot - only the two strings inherited from 3.10.
-        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_311_STABLE'));
+        $component = amos_component::from_snapshot('test', 'en', amos_version::by_branch('MOODLE_311_STABLE'));
         $this->assertTrue($component->has_string());
         $this->assertTrue($component->has_string('hello'));
         $this->assertTrue($component->has_string('world'));
@@ -127,7 +127,7 @@ final class storage_test extends advanced_testcase {
         unset($component);
 
         // Load 3.11 snapshot included the deleted strings.
-        $component = mlang_component::from_snapshot('test', 'en', mlang_version::by_branch('MOODLE_311_STABLE'), null, true);
+        $component = amos_component::from_snapshot('test', 'en', amos_version::by_branch('MOODLE_311_STABLE'), null, true);
         $this->assertTrue($component->has_string());
         $this->assertTrue($component->has_string('welcome'));
         $this->assertTrue($component->has_string('hello'));

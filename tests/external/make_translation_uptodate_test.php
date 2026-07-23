@@ -16,6 +16,11 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for external function {@see \local_amos\external\make_translation_uptodate}.
  *
@@ -61,20 +66,20 @@ final class make_translation_uptodate_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Group Mode', $now - 100));
+        $component = new amos_component('moodle', 'en', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Group Mode', $now - 100));
         $stage->add($component);
         $stage->commit('Introducing "Group Mode" string', ['source' => 'unittest']);
 
-        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Skupinový režim', $now - 90));
+        $component = new amos_component('moodle', 'cs', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Skupinový režim', $now - 90));
         $stage->add($component);
         $stage->commit('Translating "Group Mode" string into Czech', ['source' => 'unittest']);
 
-        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(21));
-        $component->add_string(new \mlang_string('groupmode', 'Group mode', $now - 80));
+        $component = new amos_component('moodle', 'en', amos_version::by_code(21));
+        $component->add_string(new amos_string('groupmode', 'Group mode', $now - 80));
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 
@@ -114,20 +119,20 @@ final class make_translation_uptodate_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Group Mode', $now - 100));
+        $component = new amos_component('moodle', 'en', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Group Mode', $now - 100));
         $stage->add($component);
         $stage->commit('Introducing "Group Mode" string', ['source' => 'unittest']);
 
-        $component = new \mlang_component('moodle', 'cs', \mlang_version::by_code(20));
-        $component->add_string(new \mlang_string('groupmode', 'Skupinový režim', $now - 90));
+        $component = new amos_component('moodle', 'cs', amos_version::by_code(20));
+        $component->add_string(new amos_string('groupmode', 'Skupinový režim', $now - 90));
         $stage->add($component);
         $stage->commit('Translating "Group Mode" string into Czech', ['source' => 'unittest']);
 
-        $component = new \mlang_component('moodle', 'en', \mlang_version::by_code(21));
-        $component->add_string(new \mlang_string('groupmode', 'Group mode', $now - 80));
+        $component = new amos_component('moodle', 'en', amos_version::by_code(21));
+        $component->add_string(new amos_string('groupmode', 'Group mode', $now - 80));
         $stage->add($component);
         $stage->commit('Correcting the letter case in the string', ['source' => 'unittest']);
 

@@ -26,13 +26,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/cli/config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 
-$versions = array_reverse(mlang_version::list_supported(), true);
+$versions = array_reverse(amos_version::list_supported(), true);
 
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');
@@ -49,7 +53,7 @@ foreach ($versions as $version) {
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
         $exportdir = $version->code . '_STABLE';
-    } else if ($version->code == mlang_version::latest_version()->code) {
+    } else if ($version->code == amos_version::latest_version()->code) {
         $gitbranch = 'origin/main';
         $exportdir = 'main';
     } else {
@@ -78,7 +82,7 @@ foreach ($versions as $version) {
     }
     unset($gitout);
 
-    $langs = array_keys(mlang_tools::list_languages());
+    $langs = array_keys(amos_tools::list_languages());
 
     $phpdoc = <<<EOF
 /**
@@ -102,7 +106,7 @@ EOF;
             if ($lang === 'en_fix') {
                 continue;
             }
-            $component = mlang_component::from_snapshot(
+            $component = amos_component::from_snapshot(
                 $componentname,
                 $lang,
                 $version,

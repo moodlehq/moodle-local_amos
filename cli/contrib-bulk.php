@@ -22,6 +22,9 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -79,13 +82,13 @@ $contributions = $DB->get_records_sql($sql, [
     'authorid' => $options['author'],
 ]);
 
-$stage = new mlang_stage();
+$stage = new amos_stage();
 
 foreach ($contributions as $contribution) {
     echo sprintf("#%d\t%s\t%s\t%d\n", $contribution->id, $contribution->subject, $contribution->components, $contribution->strings);
 
     if ($options['approve']) {
-        $stash = mlang_stash::instance_from_id($contribution->stashid);
+        $stash = amos_stash::instance_from_id($contribution->stashid);
         $stash->apply($stage);
 
         $stage->commit('Bulk approval - contribution #' . $contribution->id, [

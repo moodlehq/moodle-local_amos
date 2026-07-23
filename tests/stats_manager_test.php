@@ -26,12 +26,12 @@
 namespace local_amos;
 
 use advanced_testcase;
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
 use local_amos_stats_manager;
-use mlang_component;
-use mlang_stage;
-use mlang_string;
-use mlang_tools;
-use mlang_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -322,16 +322,16 @@ final class stats_manager_test extends advanced_testcase {
      */
     protected function helper_add_language(string $code, string $thislanguageint, string $thislanguage = '', string $parent = '') {
 
-        $stage = new mlang_stage();
-        $component = new mlang_component('langconfig', $code, mlang_version::oldest_version());
-        $component->add_string(new mlang_string('thislanguageint', $thislanguageint));
-        $component->add_string(new mlang_string('thislanguage', $thislanguage ?? $thislanguageint));
-        $component->add_string(new mlang_string('parentlanguage', $parent));
+        $stage = new amos_stage();
+        $component = new amos_component('langconfig', $code, amos_version::oldest_version());
+        $component->add_string(new amos_string('thislanguageint', $thislanguageint));
+        $component->add_string(new amos_string('thislanguage', $thislanguage ?? $thislanguageint));
+        $component->add_string(new amos_string('parentlanguage', $parent));
         $stage->add($component);
         $stage->commit('Registering language ' . $code, ['source' => 'unittest']);
         ;
 
         // Rebuild the cache.
-        mlang_tools::list_languages(true, false);
+        amos_tools::list_languages(true, false);
     }
 }

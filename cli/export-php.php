@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -60,5 +63,5 @@ if ($options['component'] === null || $options['language'] === null || $options[
     exit(3);
 }
 
-mlang_component::from_snapshot($options['component'], $options['language'], mlang_version::by_code($options['version']))
+amos_component::from_snapshot($options['component'], $options['language'], amos_version::by_code($options['version']))
     ->export_phpfile('php://stdout');

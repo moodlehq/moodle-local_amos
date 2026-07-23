@@ -22,6 +22,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_tools;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -446,7 +448,7 @@ class local_amos_renderer extends plugin_renderer_base {
         $table->data[] = $row;
 
         // Display the contribution language.
-        $listlanguages = mlang_tools::list_languages();
+        $listlanguages = amos_tools::list_languages();
 
         if (!empty($listlanguages[$contrib->language])) {
             $languagename = $listlanguages[$contrib->language];

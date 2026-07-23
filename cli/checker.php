@@ -26,6 +26,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -82,15 +88,15 @@ class amos_checker {
     protected function check_separators() {
 
         $details = [];
-        $langnames = mlang_tools::list_languages();
-        $versions = mlang_version::list_all();
+        $langnames = amos_tools::list_languages();
+        $versions = amos_version::list_all();
         foreach ($versions as $version) {
             foreach (array_keys($langnames) as $language) {
                 if ($language === 'en_fix') {
                     // Having empty values in en_fix is expected, do not check it.
                     continue;
                 }
-                $langconfig = mlang_component::from_snapshot('langconfig', $language, $version);
+                $langconfig = amos_component::from_snapshot('langconfig', $language, $version);
                 if ($decsep = $langconfig->get_string('decsep')) {
                     $decsep = $decsep->text;
                 }
@@ -170,11 +176,11 @@ class amos_checker {
 
         foreach ($rs as $contribution) {
             // Get the contributed components and rebase them to see what would happen.
-            $stash = mlang_stash::instance_from_id($contribution->stashid);
-            $stage = new mlang_stage();
+            $stash = amos_stash::instance_from_id($contribution->stashid);
+            $stage = new amos_stage();
             $stash->apply($stage);
             $stage->rebase();
-            [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = mlang_stage::analyze($stage);
+            [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = amos_stage::analyze($stage);
 
             if ($rebasedstrings == 0) {
                 $msg = sprintf(

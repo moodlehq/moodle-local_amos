@@ -22,6 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_tools;
+
 // phpcs:ignore moodle.Files.RequireLogin
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -52,7 +54,7 @@ if ($canedit && $editmode) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($PAGE->url, ['editmode' => 1]), get_string('turneditingon'), 'get'));
 }
 
-$languages = mlang_tools::list_languages(false, true, false);
+$languages = amos_tools::list_languages(false, true, false);
 
 // Get the list of known languages.
 

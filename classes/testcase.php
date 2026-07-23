@@ -14,6 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -37,11 +42,11 @@ abstract class local_amos_testcase extends advanced_testcase {
      */
     protected function register_language($langcode, $since) {
 
-        $stage = new mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new mlang_component('langconfig', $langcode, mlang_version::by_code($since));
-        $component->add_string(new mlang_string('thislanguage', $langcode));
-        $component->add_string(new mlang_string('thislanguageint', $langcode));
+        $component = new amos_component('langconfig', $langcode, amos_version::by_code($since));
+        $component->add_string(new amos_string('thislanguage', $langcode));
+        $component->add_string(new amos_string('thislanguageint', $langcode));
         $stage->add($component);
         $component->clear();
 

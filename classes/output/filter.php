@@ -25,6 +25,9 @@
 
 namespace local_amos\output;
 
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -135,7 +138,7 @@ class filter implements \renderable, \templatable {
         $data = (object) array_merge((array) $this->get_data_user_default(), (array) $this->get_data_session_default());
 
         if (empty($data->version)) {
-            $data->version = \mlang_version::latest_version()->code;
+            $data->version = amos_version::latest_version()->code;
         }
 
         if (empty($data->language)) {
@@ -197,7 +200,7 @@ class filter implements \renderable, \templatable {
         if (!$data->last) {
             $fver = optional_param('fver', null, PARAM_INT);
             if ($fver !== null) {
-                foreach (\mlang_version::list_all() as $version) {
+                foreach (amos_version::list_all() as $version) {
                     if ($version->code == $fver) {
                         $data->version = $version->code;
                     }
@@ -284,7 +287,7 @@ class filter implements \renderable, \templatable {
             $fver = clean_param_array($fver, PARAM_INT);
             if (!empty($fver) && is_array($fver)) {
                 $fver = max($fver);
-                foreach (\mlang_version::list_all() as $version) {
+                foreach (amos_version::list_all() as $version) {
                     if ($version->code == $fver) {
                         $data->version = $version->code;
                         $data->last = 0;
@@ -298,7 +301,7 @@ class filter implements \renderable, \templatable {
 
         if ($flng == '*') {
             // All languages.
-            foreach (\mlang_tools::list_languages(false) as $langcode => $langname) {
+            foreach (amos_tools::list_languages(false) as $langcode => $langname) {
                 $data->language[] = $langcode;
             }
         } else {
@@ -333,7 +336,7 @@ class filter implements \renderable, \templatable {
             $data->workplace = true;
         } else if ($fcmp == '*') {
             // All components.
-            $data->component = array_keys(\mlang_tools::list_components());
+            $data->component = array_keys(amos_tools::list_components());
         } else {
             $fcmp = explode(',', $fcmp);
             $fcmp = clean_param_array($fcmp, PARAM_FILE);
@@ -406,7 +409,7 @@ class filter implements \renderable, \templatable {
         }
 
         // List of languages or '*' if all are selected.
-        $all = \mlang_tools::list_languages(false);
+        $all = amos_tools::list_languages(false);
 
         foreach ($fdata->language as $selected) {
             unset($all[$selected]);
@@ -421,7 +424,7 @@ class filter implements \renderable, \templatable {
         unset($all);
 
         // List of components or '*' if all are selected.
-        $all = \mlang_tools::list_components();
+        $all = amos_tools::list_components();
         $app = array_keys(local_amos_app_plugins());
         $app = array_combine($app, $app);
         $workplace = local_amos_workplace_plugins();
@@ -534,7 +537,7 @@ class filter implements \renderable, \templatable {
             $flng['currentlanguage'] = 'en_fix';
         }
 
-        foreach (\mlang_tools::list_languages(false, true, true, true) as $langcode => $langname) {
+        foreach (amos_tools::list_languages(false, true, true, true) as $langcode => $langname) {
             $option = [
                 'value' => $langcode,
                 'text' => $langname,
@@ -580,7 +583,7 @@ class filter implements \renderable, \templatable {
         $stdversions = \local_amos\local\util::standard_components_range_versions();
 
         // Categorize components into Core, Standard or Add-ons.
-        foreach (\mlang_tools::list_components() as $componentname => $since) {
+        foreach (amos_tools::list_components() as $componentname => $since) {
             if (isset($standard[$componentname])) {
                 if ($standard[$componentname] === 'core' || substr($standard[$componentname], 0, 5) === 'core_') {
                     $options['core'][$componentname] = $standard[$componentname];
@@ -591,7 +594,7 @@ class filter implements \renderable, \templatable {
                 $options['contrib'][$componentname] = $componentname;
             }
 
-            $sinceversion[$componentname] = \mlang_version::by_code($since)->label . '+';
+            $sinceversion[$componentname] = amos_version::by_code($since)->label . '+';
         }
 
         asort($options['core']);
@@ -644,7 +647,7 @@ class filter implements \renderable, \templatable {
             'options' => [],
         ];
 
-        foreach (\mlang_version::list_all() as $version) {
+        foreach (amos_version::list_all() as $version) {
             $option = [
                 'value' => $version->code,
                 'text' => $version->label,
@@ -791,11 +794,11 @@ class filter implements \renderable, \templatable {
         $a = [];
 
         if ($min > PHP_INT_MIN) {
-            $a['from'] = \mlang_version::by_code($min)->label;
+            $a['from'] = amos_version::by_code($min)->label;
         }
 
         if ($max < PHP_INT_MAX) {
-            $a['to'] = \mlang_version::by_code($max)->label;
+            $a['to'] = amos_version::by_code($max)->label;
         }
 
         if ($min > PHP_INT_MIN && $max == PHP_INT_MAX) {

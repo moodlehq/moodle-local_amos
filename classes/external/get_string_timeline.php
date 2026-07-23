@@ -16,6 +16,8 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -137,7 +139,7 @@ class get_string_timeline extends \core_external\external_api {
             $cell = [
                 'hascontent' => true,
                 'langcode' => $record->lang,
-                'displaysince' => s(\mlang_version::by_code($record->since)->label . '+'),
+                'displaysince' => s(amos_version::by_code($record->since)->label . '+'),
                 'displaydate' => s(\local_amos_renderer::commit_datetime($record->timemodified)),
                 'userinfo' => $record->userinfo,
                 'commitmsg' => $record->commitmsg,

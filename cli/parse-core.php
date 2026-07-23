@@ -22,6 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -37,7 +42,7 @@ $starttime = microtime();
 /**
  * This is a hacky way how to populate a forum at lang.moodle.org with commits into the core
  *
- * @param mlang_stage $stage
+ * @param amos_stage $stage
  * @param string $commitmsg
  * @param string $committer
  * @param string $committeremail
@@ -45,7 +50,7 @@ $starttime = microtime();
  * @param string $fullcommitmsg
  * @return void
  */
-function amos_core_commit_notify(mlang_stage $stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg) {
+function amos_core_commit_notify(amos_stage $stage, $commitmsg, $committer, $committeremail, $commithash, $fullcommitmsg) {
     global $CFG;
     $DB;
     require_once($CFG->dirroot . '/mod/forum/lib.php');
@@ -169,12 +174,12 @@ function amos_parse_core_commit() {
 
     // Execute AMOS script if the commit message contains some.
     if ($version->code >= 20) {
-        $instructions = mlang_tools::extract_script_from_text($fullcommitmsg);
+        $instructions = amos_tools::extract_script_from_text($fullcommitmsg);
         if (!empty($instructions)) {
             foreach ($instructions as $instruction) {
                 fputs(STDOUT, "EXEC $instruction\n");
-                $changes = mlang_tools::execute($instruction, $version, $timemodified);
-                if ($changes instanceof mlang_stage) {
+                $changes = amos_tools::execute($instruction, $version, $timemodified);
+                if ($changes instanceof amos_stage) {
                     $changes->rebase($timemodified);
                     $changes->commit($commitmsg, [
                         'source' => 'commitscript',
@@ -271,9 +276,9 @@ $ignoredcommits = [
 $git = new \local_amos\local\git(AMOS_REPO_MOODLE);
 $git->exec('remote update --prune');
 
-$versions = mlang_version::list_supported();
+$versions = amos_version::list_supported();
 $standardplugins = \local_amos\local\util::standard_components_tree();
-$stage = new mlang_stage();
+$stage = new amos_stage();
 $prevstartat = '';
 
 fputs(STDOUT, "*****************************************\n");
@@ -285,7 +290,7 @@ foreach ($versions as $version) {
 
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
-    } else if ($version->code == mlang_version::latest_version()->code) {
+    } else if ($version->code == amos_version::latest_version()->code) {
         $gitbranch = 'origin/main';
     } else {
         fputs(STDERR, "GIT BRANCH NOT FOUND FOR MOODLE VERSION {$version->label}\n");
@@ -369,7 +374,7 @@ foreach ($versions as $version) {
             continue;
         }
 
-        $componentname = mlang_component::name_from_filename($file);
+        $componentname = amos_component::name_from_filename($file);
 
         // Series of checks that the file is proper language pack.
 
@@ -440,7 +445,7 @@ foreach ($versions as $version) {
         // Get the list of strings affected by the commit.
         $diff = $git->exec("log -1 -p --format=format: " . $commithash . ' -- ' . escapeshellarg($file));
 
-        foreach (mlang_tools::get_affected_strings($diff) as $stringid) {
+        foreach (amos_tools::get_affected_strings($diff) as $stringid) {
             $affected[$componentname][$stringid] = true;
         }
 
@@ -468,7 +473,7 @@ foreach ($versions as $version) {
             $checkoutformat = 1;
         }
 
-        $component = mlang_component::from_phpfile($checkout, 'en', $version, $timemodified, $componentname, $checkoutformat);
+        $component = amos_component::from_phpfile($checkout, 'en', $version, $timemodified, $componentname, $checkoutformat);
         $stage->add($component);
         $component->clear();
         unset($component);

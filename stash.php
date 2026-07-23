@@ -22,6 +22,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -48,8 +52,8 @@ $PAGE->set_heading('AMOS ' . get_string('stashes', 'local_amos'));
 if ($new) {
     // Pushing the current stage into a new stash.
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $stash = mlang_stash::instance_from_stage($stage, $stage->userid, $name);
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash = amos_stash::instance_from_stage($stage, $stage->userid, $name);
     $stash->push();
     redirect($PAGE->url);
 }
@@ -57,12 +61,12 @@ if ($new) {
 if ($apply) {
     require_sesskey();
     require_capability('local/amos:stage', context_system::instance());
-    $stash = mlang_stash::instance_from_id($apply);
+    $stash = amos_stash::instance_from_id($apply);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash->apply($stage);
     $stage->store();
     redirect(new moodle_url('/local/amos/stage.php'));
@@ -71,12 +75,12 @@ if ($apply) {
 if ($pop) {
     require_sesskey();
     require_capability('local/amos:stage', context_system::instance());
-    $stash = mlang_stash::instance_from_id($pop);
+    $stash = amos_stash::instance_from_id($pop);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash->apply($stage);
     $stage->store();
     $stash->drop();
@@ -85,7 +89,7 @@ if ($pop) {
 
 if ($drop) {
     require_sesskey();
-    $stash = mlang_stash::instance_from_id($drop);
+    $stash = amos_stash::instance_from_id($drop);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
@@ -122,7 +126,7 @@ if ($drop) {
 
 if ($download) {
     require_sesskey();
-    $stash = mlang_stash::instance_from_id($download);
+    $stash = amos_stash::instance_from_id($download);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
@@ -135,15 +139,15 @@ $submitform = new local_amos_submit_form();
 if ($submitform->is_cancelled()) {
     redirect($PAGE->url);
 } else if ($submitdata = $submitform->get_data()) {
-    $stash = mlang_stash::instance_from_id($submitdata->stashid);
+    $stash = amos_stash::instance_from_id($submitdata->stashid);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
 
     // Split the stashed components into separate packages by their language.
-    $stage = new mlang_stage();
-    // List of (string)langcode => (mlang_stage).
+    $stage = new amos_stage();
+    // List of (string)langcode => (amos_stage).
     $langstages = [];
     $stash->apply($stage);
     foreach ($stage as $component) {
@@ -152,7 +156,7 @@ if ($submitform->is_cancelled()) {
         }
         $lang = $component->lang;
         if (!isset($langstages[$lang])) {
-            $langstages[$lang] = new mlang_stage();
+            $langstages[$lang] = new amos_stage();
         }
         $langstages[$lang]->add($component);
     }
@@ -163,9 +167,9 @@ if ($submitform->is_cancelled()) {
 
     // Create new contribution record for every language and attach a new stash to it.
     foreach ($langstages as $lang => $stage) {
-        [$origstrings, $origlanguages, $origcomponents] = mlang_stage::analyze($stage);
+        [$origstrings, $origlanguages, $origcomponents] = amos_stage::analyze($stage);
 
-        $langstash = mlang_stash::instance_from_stage($stage, 0, $submitdata->name);
+        $langstash = amos_stash::instance_from_stage($stage, 0, $submitdata->name);
         $langstash->message = $submitdata->message;
         $langstash->push();
 
@@ -223,7 +227,7 @@ if ($submitform->is_cancelled()) {
     $stash->drop();
 
     // Drop the staged strings as they all have been sent to contributors now.
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->clear();
     $stage->store();
     unset($SESSION->local_amos->presetcommitmessage);
@@ -240,13 +244,13 @@ echo $output->header();
 
 if ($submit) {
     require_sesskey();
-    $stash = mlang_stash::instance_from_id($submit);
+    $stash = amos_stash::instance_from_id($submit);
     if ($stash->ownerid != $USER->id) {
         throw new \moodle_exception('stashaccessdenied', 'local_amos');
         die();
     }
     echo $output->heading_with_help(get_string('submitting', 'local_amos'), 'submitting', 'local_amos');
-    $stashinfo = local_amos_stash::instance_from_mlang_stash($stash, $USER);
+    $stashinfo = local_amos_stash::instance_from_amos_stash($stash, $USER);
     if (empty($stashinfo->strings)) {
         echo $output->heading(get_string('stagestringsnone', 'local_amos'));
         echo $output->footer();

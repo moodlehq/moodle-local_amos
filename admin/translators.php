@@ -22,6 +22,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_tools;
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
@@ -40,7 +42,7 @@ $status = required_param('status', PARAM_INT);
 $langcode = required_param('langcode', PARAM_SAFEDIR);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-$languages = mlang_tools::list_languages(false);
+$languages = amos_tools::list_languages(false);
 
 if (!isset($languages[$langcode])) {
     throw new \moodle_exception('error_unknown_language', 'local_amos', '', $langcode);

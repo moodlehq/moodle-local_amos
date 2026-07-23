@@ -24,6 +24,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', 1);
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
@@ -71,19 +76,19 @@ foreach ($tablenames as $tablename) {
 }
 
 // Register English language at 2.3 branch.
-$component = new mlang_component('langconfig', 'en', mlang_version::by_branch('MOODLE_23_STABLE'));
-$component->add_string(new mlang_string('thislanguage', 'English'));
-$component->add_string(new mlang_string('thislanguageint', 'English'));
-$stage = new mlang_stage();
+$component = new amos_component('langconfig', 'en', amos_version::by_branch('MOODLE_23_STABLE'));
+$component->add_string(new amos_string('thislanguage', 'English'));
+$component->add_string(new amos_string('thislanguageint', 'English'));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Registering the English language', ['source' => 'bot'], true);
 $component->clear();
 
 // Register Czech language at 2.3 branch.
-$component = new mlang_component('langconfig', 'cs', mlang_version::by_branch('MOODLE_23_STABLE'));
-$component->add_string(new mlang_string('thislanguage', 'Čeština'));
-$component->add_string(new mlang_string('thislanguageint', 'Czech'));
-$stage = new mlang_stage();
+$component = new amos_component('langconfig', 'cs', amos_version::by_branch('MOODLE_23_STABLE'));
+$component->add_string(new amos_string('thislanguage', 'Čeština'));
+$component->add_string(new amos_string('thislanguageint', 'Czech'));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Registering the Czech language', ['source' => 'bot'], true);
 $component->clear();
@@ -104,33 +109,33 @@ cli_exec('import-strings.php --version=MOODLE_24_STABLE --message="Book strings 
     $CFG->dirroot . '/mod/book/lang/en/book.php');
 
 // Register a contrib component into 2.3.
-$component = new mlang_component('stampcoll', 'en', mlang_version::by_branch('MOODLE_23_STABLE'));
-$component->add_string(new mlang_string('pluginname', 'Stamp colletion'));
-$component->add_string(new mlang_string('stamp', 'Stamp'));
-$stage = new mlang_stage();
+$component = new amos_component('stampcoll', 'en', amos_version::by_branch('MOODLE_23_STABLE'));
+$component->add_string(new amos_string('pluginname', 'Stamp colletion'));
+$component->add_string(new amos_string('stamp', 'Stamp'));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Registering the Stamp collection strings', ['source' => 'bot'], true);
 $component->clear();
 
 // Provide a translation of Stamp collection in 2.3.
-$component = new mlang_component('stampcoll', 'cs', mlang_version::by_branch('MOODLE_23_STABLE'));
-$component->add_string(new mlang_string('pluginname', 'Sbírka razítek'));
-$stage = new mlang_stage();
+$component = new amos_component('stampcoll', 'cs', amos_version::by_branch('MOODLE_23_STABLE'));
+$component->add_string(new amos_string('pluginname', 'Sbírka razítek'));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Translating the Stamp collection strings', ['source' => 'bot'], true);
 $component->clear();
 
 // Register a component at 2.4 and delete it.
-$component = new mlang_component('delete', 'en', mlang_version::by_branch('MOODLE_24_STABLE'));
-$component->add_string(new mlang_string('invalid', 'Just experimenting'));
-$stage = new mlang_stage();
+$component = new amos_component('delete', 'en', amos_version::by_branch('MOODLE_24_STABLE'));
+$component->add_string(new amos_string('invalid', 'Just experimenting'));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Registering a to-be-deleted component string', ['source' => 'bot'], true);
 $component->clear();
 sleep(2);
-$component = new mlang_component('delete', 'en', mlang_version::by_branch('MOODLE_24_STABLE'));
-$component->add_string(new mlang_string('invalid', 'Just experimenting', null, 1));
-$stage = new mlang_stage();
+$component = new amos_component('delete', 'en', amos_version::by_branch('MOODLE_24_STABLE'));
+$component->add_string(new amos_string('invalid', 'Just experimenting', null, 1));
+$stage = new amos_stage();
 $stage->add($component);
 $stage->commit('Deleting all strings from the component', ['source' => 'bot'], true);
 $component->clear();

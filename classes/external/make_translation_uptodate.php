@@ -16,6 +16,12 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -81,18 +87,18 @@ class make_translation_uptodate extends \core_external\external_api {
             throw new \invalid_parameter_exception('Invalid parameters: original timemodified lower than translation timemodified');
         }
 
-        $allowedlangs = \mlang_tools::list_allowed_languages($USER->id);
+        $allowedlangs = amos_tools::list_allowed_languages($USER->id);
 
         if (!isset($allowedlangs['X']) && !isset($allowedlangs[$translation->lang])) {
             throw new \invalid_parameter_exception('Invalid parameters: not a maintainer of ' . $translation->lang);
         }
 
-        $version = \mlang_version::by_code($original->since);
+        $version = amos_version::by_code($original->since);
 
-        $component = new \mlang_component($translation->component, $translation->lang, $version);
-        $component->add_string(new \mlang_string($translation->strname, $translation->strtext));
+        $component = new amos_component($translation->component, $translation->lang, $version);
+        $component->add_string(new amos_string($translation->strname, $translation->strtext));
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
         $stage->add($component);
 
         $commitid = $stage->commit(get_string('markuptodate', 'local_amos'), [

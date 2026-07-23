@@ -22,6 +22,11 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 require_once($CFG->dirroot . '/local/amos/admin/newlanguage_form.php');
@@ -41,12 +46,12 @@ $PAGE->set_heading('AMOS ' . get_string('newlanguage', 'local_amos'));
 $form = new local_amos_newlanguage_form();
 
 if ($data = $form->get_data()) {
-    $component = new mlang_component('langconfig', $data->langcode, mlang_version::oldest_version());
-    $data->langname = mlang_string::fix_syntax($data->langname);
-    $data->langnameint = mlang_string::fix_syntax($data->langnameint);
-    $component->add_string(new mlang_string('thislanguage', $data->langname));
-    $component->add_string(new mlang_string('thislanguageint', $data->langnameint));
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $component = new amos_component('langconfig', $data->langcode, amos_version::oldest_version());
+    $data->langname = amos_string::fix_syntax($data->langname);
+    $data->langnameint = amos_string::fix_syntax($data->langnameint);
+    $component->add_string(new amos_string('thislanguage', $data->langname));
+    $component->add_string(new amos_string('thislanguageint', $data->langnameint));
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->add($component);
     $stage->store();
     redirect(new moodle_url('/local/amos/stage.php'));

@@ -25,6 +25,12 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_parser_factory;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
@@ -98,8 +104,8 @@ class update_strings_file extends \core_external\external_api {
 
         // Reorder components to process low versions first.
         usort($components, function ($a, $b) {
-            $aver = \mlang_version::by_dir($a['moodlebranch']);
-            $bver = \mlang_version::by_dir($b['moodlebranch']);
+            $aver = amos_version::by_dir($a['moodlebranch']);
+            $bver = amos_version::by_dir($b['moodlebranch']);
 
             if ($aver->code == $bver->code) {
                 return 0;
@@ -118,20 +124,20 @@ class update_strings_file extends \core_external\external_api {
 
         // Iterate over all passed components and process them.
         foreach ($components as $component) {
-            $stage = new \mlang_stage();
+            $stage = new amos_stage();
 
             if (substr($component['stringfilename'], -4) !== '.php') {
                 throw new \invalid_parameter_exception('The strings file name does not have .php extension');
             }
 
-            $componentname = \mlang_component::name_from_filename($component['stringfilename']);
+            $componentname = amos_component::name_from_filename($component['stringfilename']);
 
             if (empty($component['language'])) {
                 throw new \invalid_parameter_exception('Invalid language code');
             }
             $componentlanguage = $component['language'];
 
-            $componentversion = \mlang_version::by_dir($component['moodlebranch']);
+            $componentversion = amos_version::by_dir($component['moodlebranch']);
             if (is_null($componentversion) || $componentversion->code <= 19) {
                 throw new \invalid_parameter_exception('Unsupported Moodle branch');
             }
@@ -167,21 +173,21 @@ class update_strings_file extends \core_external\external_api {
                 }
             }
 
-            // Create a new empty mlang_component instance.
-            $mlangcomponent = new \mlang_component($componentname, $componentlanguage, $componentversion);
+            // Create a new empty amos_component instance.
+            $mlangcomponent = new amos_component($componentname, $componentlanguage, $componentversion);
 
             // Parse the content of the PHP file and store all detected strings there.
-            $parser = \mlang_parser_factory::get_parser('php');
+            $parser = amos_parser_factory::get_parser('php');
             // The following will throw exception if the syntax is wrong.
             $parser->parse($component['stringfilecontent'], $mlangcomponent);
 
             // Gather some statistics about found strings.
-            $tmpstage = new \mlang_stage();
+            $tmpstage = new amos_stage();
             $tmpstage->add($mlangcomponent);
-            [$numofstrings, $listlanguages, $listcomponents] = \mlang_stage::analyze($tmpstage);
+            [$numofstrings, $listlanguages, $listcomponents] = amos_stage::analyze($tmpstage);
             $result['found'] = $numofstrings;
             $tmpstage->rebase(null, true);
-            [$numofstrings, $listlanguages, $listcomponents] = \mlang_stage::analyze($tmpstage);
+            [$numofstrings, $listlanguages, $listcomponents] = amos_stage::analyze($tmpstage);
             $result['changes'] = $numofstrings;
             $tmpstage->clear();
             unset($tmpstage);
@@ -209,7 +215,7 @@ class update_strings_file extends \core_external\external_api {
 
         // Auto-merge updated components.
         foreach (array_keys($componentnames) as $componentname) {
-            \mlang_tools::backport_translations($componentname);
+            amos_tools::backport_translations($componentname);
         }
 
         // Done! Thank you for calling this web service.

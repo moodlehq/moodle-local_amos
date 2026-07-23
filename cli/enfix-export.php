@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -36,7 +39,7 @@ if (!defined('AMOS_EXPORT_ENFIX_DIR')) {
 remove_dir(AMOS_EXPORT_ENFIX_DIR, true);
 
 $standardcomponents = \local_amos\local\util::standard_components_tree();
-$supportedversions = mlang_version::list_supported();
+$supportedversions = amos_version::list_supported();
 
 foreach ($supportedversions as $version) {
     foreach (array_keys($standardcomponents[$version->code]) as $componentname) {
@@ -44,8 +47,8 @@ foreach ($supportedversions as $version) {
             // Better not to mess up with langconfig via en_fix - make a proper MDL instead.
             continue;
         }
-        $component = mlang_component::from_snapshot($componentname, 'en_fix', $version);
-        $english = mlang_component::from_snapshot($componentname, 'en', $version);
+        $component = amos_component::from_snapshot($componentname, 'en_fix', $version);
+        $english = amos_component::from_snapshot($componentname, 'en', $version);
         $component->intersect($english);
         $english->clear();
 

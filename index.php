@@ -22,6 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_tools;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 
@@ -71,7 +73,7 @@ if (has_capability('local/amos:stage', context_system::instance())) {
 }
 
 if (has_capability('local/amos:commit', context_system::instance())) {
-    $allowed = mlang_tools::list_allowed_languages();
+    $allowed = amos_tools::list_allowed_languages();
 
     if (empty($allowed)) {
         $allowed = get_string('committablenone', 'local_amos');

@@ -16,6 +16,12 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -101,23 +107,23 @@ class stage_translated_string extends \core_external\external_api {
             }
         }
 
-        $version = \mlang_version::by_code($since);
+        $version = amos_version::by_code($since);
 
         if (!$version->translatable) {
             throw new \invalid_parameter_exception('Target version not translatable');
         }
 
-        $string = new \mlang_string($english->strname, $text);
+        $string = new amos_string($english->strname, $text);
         $string->nocleaning = $nocleaning;
         $string->clean_text();
 
-        $component = new \mlang_component($english->component, $lang, $version);
+        $component = new amos_component($english->component, $lang, $version);
         $component->add_string($string);
 
-        $stage = \mlang_persistent_stage::instance_for_user($USER->id, $stageid);
+        $stage = amos_persistent_stage::instance_for_user($USER->id, $stageid);
         $stage->add($component, true);
         $stage->store();
-        \mlang_stash::autosave($stage);
+        amos_stash::autosave($stage);
 
         $response = [
             'translation' => $text,

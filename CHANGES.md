@@ -1,3 +1,7 @@
+## 2026.07.23 ##
+
+* MDLSITE-8461 Fixed some legacy coding style violations.
+
 ## 2026.07.22 ##
 
 * MDLSITE-6394 Allow the version to be automatically detected when importing strings

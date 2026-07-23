@@ -100,7 +100,7 @@ class util {
 
         $tree = [];
 
-        foreach (\mlang_version::list_all() as $mlangversion) {
+        foreach (amos_version::list_all() as $mlangversion) {
             $tree[$mlangversion->code] = [];
         }
 
@@ -161,6 +161,6 @@ class util {
      * @return array (string)legacyname => (string)frankenstylename
      */
     public static function standard_components_in_latest_version(): array {
-        return static::standard_components_in_version(\mlang_version::latest_version()->code);
+        return static::standard_components_in_version(amos_version::latest_version()->code);
     }
 }

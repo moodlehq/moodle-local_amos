@@ -25,6 +25,11 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -66,9 +71,9 @@ final class plugin_translation_stats_test extends \externallib_advanced_testcase
         $user = self::getDataGenerator()->create_user();
         self::setUser($user);
 
-        $stage = new \mlang_stage();
-        $component = new \mlang_component('langconfig', 'en', \mlang_version::by_branch('MOODLE_36_STABLE'));
-        $component->add_string(new \mlang_string('thislanguageint', 'English'));
+        $stage = new amos_stage();
+        $component = new amos_component('langconfig', 'en', amos_version::by_branch('MOODLE_36_STABLE'));
+        $component->add_string(new amos_string('thislanguageint', 'English'));
         $stage->add($component);
         $component->clear();
         $stage->commit('Registering English language', ['source' => 'unittest']);

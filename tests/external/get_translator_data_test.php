@@ -16,6 +16,11 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for external function {@see \local_amos\external\get_translator_data}.
  *
@@ -60,10 +65,10 @@ final class get_translator_data_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Foo bar'));
         $stage->add($component);
         $component->clear();
 

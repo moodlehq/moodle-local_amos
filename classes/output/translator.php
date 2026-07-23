@@ -25,6 +25,10 @@
 
 namespace local_amos\output;
 
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -255,7 +259,7 @@ class translator implements \renderable, \templatable {
         }
 
         // Replace the loaded values with those already staged.
-        $stage = \mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
+        $stage = amos_persistent_stage::instance_for_user($user->id, $user->sesskey);
         foreach ($stage as $component) {
             foreach ($component as $staged) {
                 if ($staged->component->version->code > $compbranch) {
@@ -284,7 +288,7 @@ class translator implements \renderable, \templatable {
                             continue;
                         }
                         $string = (object) [];
-                        $versince = \mlang_version::by_code($english->since);
+                        $versince = amos_version::by_code($english->since);
                         $string->englishsincedir = $versince->dir;
                         $string->englishsincecode = $versince->code;
                         $string->englishsincelabel = $versince->label;
@@ -305,7 +309,7 @@ class translator implements \renderable, \templatable {
                             $string->translation = $s[$lang][$component][$stringid]->text;
                             $string->translationid = $s[$lang][$component][$stringid]->amosid;
                             $string->timemodified = $s[$lang][$component][$stringid]->timemodified;
-                            $versince = \mlang_version::by_code($s[$lang][$component][$stringid]->since);
+                            $versince = amos_version::by_code($s[$lang][$component][$stringid]->since);
                             $string->translationsincedir = $versince->dir;
                             $string->translationsincecode = $versince->code;
                             $string->translationsincelabel = $versince->label;
@@ -484,7 +488,7 @@ class translator implements \renderable, \templatable {
             }
         }
 
-        $allowedlangs = \mlang_tools::list_allowed_languages($user->id);
+        $allowedlangs = amos_tools::list_allowed_languages($user->id);
 
         foreach ($this->strings as $string) {
             if (!empty($allowedlangs['X']) || !empty($allowedlangs[$string->language])) {
@@ -525,7 +529,7 @@ class translator implements \renderable, \templatable {
             $maintainedlangscache->set('maintainedlangs', $maintainedlangs);
         }
 
-        $langnames = \mlang_tools::list_languages();
+        $langnames = amos_tools::list_languages();
 
         foreach ($this->strings as $string) {
             if (!isset($maintainedlangs[$string->language]) && !$string->committable) {
@@ -571,7 +575,7 @@ class translator implements \renderable, \templatable {
             ];
         }
 
-        $listlanguages = \mlang_tools::list_languages();
+        $listlanguages = amos_tools::list_languages();
         $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($result['strings'] as &$string) {

@@ -23,6 +23,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+
 define('CLI_SCRIPT', 1);
 
 require(__DIR__ . '/../../../config.php');
@@ -112,7 +114,7 @@ function load_language_pack(string $path): array {
             fputs(STDERR, 'Unexpected file ' . $file->getPathname());
             exit(1);
         }
-        $component = mlang_component::name_from_filename($file->getFilename());
+        $component = amos_component::name_from_filename($file->getFilename());
         $string = [];
         require($file->getPathname());
         $pack[$component] = $string;

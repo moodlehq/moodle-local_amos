@@ -22,6 +22,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_tools;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -106,8 +111,8 @@ if ($apply) {
         $author = $USER;
     }
 
-    $stash = mlang_stash::instance_from_id($contribution->stashid);
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash = amos_stash::instance_from_id($contribution->stashid);
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash->apply($stage);
     $stage->store();
 
@@ -152,8 +157,8 @@ if ($review) {
     $contribution->status = local_amos_contribution::STATE_REVIEW;
     $DB->update_record('amos_contributions', $contribution);
 
-    $stash = mlang_stash::instance_from_id($contribution->stashid);
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash = amos_stash::instance_from_id($contribution->stashid);
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stash->apply($stage);
     $stage->store();
 
@@ -282,7 +287,7 @@ if ($changelang) {
         redirect(new moodle_url($PAGE->url, ['id' => $contriborig->id]));
     }
 
-    $listlanguages = mlang_tools::list_languages();
+    $listlanguages = amos_tools::list_languages();
 
     if (empty($listlanguages[$newlang])) {
         throw new \moodle_exception(
@@ -295,15 +300,15 @@ if ($changelang) {
     }
 
     // Load the stash associated with the originial contribution.
-    $stashorig = mlang_stash::instance_from_id($contriborig->stashid);
-    $stage = new mlang_stage();
+    $stashorig = amos_stash::instance_from_id($contriborig->stashid);
+    $stage = new amos_stage();
     $stashorig->apply($stage);
 
     // Change the language of the stashed strings.
     $stage->change_lang($contriborig->lang, $newlang);
 
     // Store them as the new stash.
-    $stashnew = mlang_stash::instance_from_stage($stage, 0, $stashorig->name);
+    $stashnew = amos_stash::instance_from_stage($stage, 0, $stashorig->name);
     $stashnew->message = $stashorig->message;
     $stashnew->push();
 
@@ -399,12 +404,12 @@ if ($id) {
     }
 
     // Get the contributed components and rebase them to see what would happen.
-    $stash = mlang_stash::instance_from_id($contribution->stashid);
-    $stage = new mlang_stage();
+    $stash = amos_stash::instance_from_id($contribution->stashid);
+    $stage = new amos_stage();
     $stash->apply($stage);
-    [$origstrings, $origlanguages, $origcomponents] = mlang_stage::analyze($stage);
+    [$origstrings, $origlanguages, $origcomponents] = amos_stage::analyze($stage);
     $stage->rebase();
-    [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = mlang_stage::analyze($stage);
+    [$rebasedstrings, $rebasedlanguages, $rebasedcomponents] = amos_stage::analyze($stage);
 
     $contribinfo = new local_amos_contribution($contribution, $author);
     $contribinfo->language = implode(', ', array_filter(array_map('trim', explode('/', $origlanguages))));
@@ -486,7 +491,7 @@ if ($id) {
     echo html_writer::end_tag('div');
 
     if (has_capability('local/amos:changecontriblang', context_system::instance())) {
-        $listlanguages = mlang_tools::list_languages(false);
+        $listlanguages = amos_tools::list_languages(false);
         if (empty($contribution->lang) || isset($listlanguages[$contribution->lang])) {
             echo html_writer::start_tag('div', ['class' => 'contribactions']);
             unset($listlanguages[$contribution->lang]);

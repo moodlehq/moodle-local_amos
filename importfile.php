@@ -22,6 +22,13 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_parser_exception;
+use local_amos\local\amos_parser_factory;
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_version;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -76,19 +83,19 @@ if (($data = $importform->get_data()) && has_capability('local/amos:stage', cont
         if (empty($stringfiles)) {
             notice(get_string('nostringtoimport', 'local_amos'), new moodle_url('/local/amos/stage.php'));
         } else {
-            $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-            $parser = mlang_parser_factory::get_parser('php');
+            $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+            $parser = amos_parser_factory::get_parser('php');
 
             foreach ($stringfiles as $filenameorig => $pathname) {
-                $name = mlang_component::name_from_filename($filenameorig);
+                $name = amos_component::name_from_filename($filenameorig);
 
                 if ($data->version === 'auto') {
                     // Auto version: stage each string at the version of its most recent English source.
-                    $tempcomponent = new mlang_component($name, $data->language, mlang_version::latest_version());
+                    $tempcomponent = new amos_component($name, $data->language, amos_version::latest_version());
 
                     try {
                         $parser->parse(file_get_contents($pathname), $tempcomponent);
-                    } catch (mlang_parser_exception $e) {
+                    } catch (amos_parser_exception $e) {
                         notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
                     }
 
@@ -96,16 +103,16 @@ if (($data = $importform->get_data()) && has_capability('local/amos:stage', cont
                     $tempcomponent->clear();
                     $stage->store();
                 } else {
-                    $version = mlang_version::by_code($data->version);
-                    $component = new mlang_component($name, $data->language, $version);
+                    $version = amos_version::by_code($data->version);
+                    $component = new amos_component($name, $data->language, $version);
 
                     try {
                         $parser->parse(file_get_contents($pathname), $component);
-                    } catch (mlang_parser_exception $e) {
+                    } catch (amos_parser_exception $e) {
                         notice($e->getMessage(), new moodle_url('/local/amos/stage.php'));
                     }
 
-                    $encomponent = mlang_component::from_snapshot($component->name, 'en', $version);
+                    $encomponent = amos_component::from_snapshot($component->name, 'en', $version);
                     $component->intersect($encomponent);
 
                     if ($component->has_string()) {
@@ -115,7 +122,7 @@ if (($data = $importform->get_data()) && has_capability('local/amos:stage', cont
                     }
                 }
             }
-            mlang_stash::autosave($stage);
+            amos_stash::autosave($stage);
         }
 
         if (!empty($tmpzipdir)) {

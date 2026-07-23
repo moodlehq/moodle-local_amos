@@ -26,10 +26,12 @@
 namespace local_amos;
 
 use basic_testcase;
-use mlang_component;
-use mlang_parser_factory;
-use mlang_php_parser;
-use mlang_version;
+use local_amos\local\amos_component;
+use local_amos\local\amos_parser;
+use local_amos\local\amos_parser_exception;
+use local_amos\local\amos_parser_factory;
+use local_amos\local\amos_php_parser;
+use local_amos\local\amos_version;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -41,18 +43,18 @@ require_once($CFG->dirroot . '/local/amos/mlangparser.php');
  */
 final class mlangparser_test extends basic_testcase {
     public function test_singleton_instances(): void {
-        $parser = mlang_parser_factory::get_parser('php');
-        $this->assertTrue(in_array('mlang_parser', class_implements($parser)));
-        $this->assertTrue($parser instanceof mlang_php_parser);
-        $another = mlang_parser_factory::get_parser('php');
+        $parser = amos_parser_factory::get_parser('php');
+        $this->assertTrue(in_array(amos_parser::class, class_implements($parser)));
+        $this->assertTrue($parser instanceof amos_php_parser);
+        $another = amos_parser_factory::get_parser('php');
         $this->assertSame($another, $parser);
         $this->expectException('coding_exception');
         $clone = clone($parser);
     }
 
     public function test_php_parser(): void {
-        $parser = mlang_parser_factory::get_parser('php');
-        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
+        $parser = amos_parser_factory::get_parser('php');
+        $component = new amos_component('test', 'xx', amos_version::by_branch('MOODLE_20_STABLE'));
 
         // Empty string does nothing.
         $parser->parse('', $component);
@@ -111,27 +113,27 @@ final class mlangparser_test extends basic_testcase {
     }
 
     public function test_php_parser_failure_double_quotes(): void {
-        $parser = mlang_parser_factory::get_parser('php');
+        $parser = amos_parser_factory::get_parser('php');
         $data = '<?php $string["id"] = "This {$a} fails";';
-        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->expectException('mlang_parser_exception');
+        $component = new amos_component('test', 'xx', amos_version::by_branch('MOODLE_20_STABLE'));
+        $this->expectException(amos_parser_exception::class);
         $parser->parse($data, $component);
     }
 
     public function test_php_parser_usupported_string_concatenate(): void {
-        $parser = mlang_parser_factory::get_parser('php');
+        $parser = amos_parser_factory::get_parser('php');
         $data = '<?php $string[\'invalid\'] = \'Hello \' . \' world\';';
-        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->expectException('mlang_parser_exception');
+        $component = new amos_component('test', 'xx', amos_version::by_branch('MOODLE_20_STABLE'));
+        $this->expectException(amos_parser_exception::class);
         $parser->parse($data, $component);
     }
 
     public function test_php_parser_security_variable_expansion(): void {
         // Security issues.
-        $parser = mlang_parser_factory::get_parser('php');
+        $parser = amos_parser_factory::get_parser('php');
         $data = '<?php $string[\'dbpass\'] = $CFG->dbpass;';
-        $component = new mlang_component('test', 'xx', mlang_version::by_branch('MOODLE_20_STABLE'));
-        $this->expectException('mlang_parser_exception');
+        $component = new amos_component('test', 'xx', amos_version::by_branch('MOODLE_20_STABLE'));
+        $this->expectException(amos_parser_exception::class);
         $parser->parse($data, $component);
     }
 }

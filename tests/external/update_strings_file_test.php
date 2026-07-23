@@ -25,6 +25,9 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -114,19 +117,19 @@ final class update_strings_file_test extends \externallib_advanced_testcase {
             'changes' => 1,
         ], $clean);
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_36_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_36_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
         $component->clear();
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_35_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_35_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.5');
         $component->clear();
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_37_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_37_STABLE'));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar 3.6');
         $component->clear();
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_34_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_34_STABLE'));
         $this->assertFalse($component->has_string());
         $component->clear();
     }
@@ -232,20 +235,20 @@ final class update_strings_file_test extends \externallib_advanced_testcase {
             'changes' => 0,
         ], $clean);
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_39_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_39_STABLE'));
         $this->assertEquals(3, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');
         $this->assertEquals($component->get_string('in39only')->text, '3.9 only');
         $component->clear();
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_310_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_310_STABLE'));
         $this->assertEquals(2, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');
         $component->clear();
 
-        $component = \mlang_component::from_snapshot('tool_foobar', 'en', \mlang_version::by_branch('MOODLE_311_STABLE'));
+        $component = amos_component::from_snapshot('tool_foobar', 'en', amos_version::by_branch('MOODLE_311_STABLE'));
         $this->assertEquals(2, count($component));
         $this->assertEquals($component->get_string('pluginname')->text, 'Foo bar');
         $this->assertEquals($component->get_string('since39')->text, '3.9 and higher');

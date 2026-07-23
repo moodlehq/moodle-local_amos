@@ -22,6 +22,12 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -54,10 +60,10 @@ if (!empty($message)) {
     } else {
         $clear = false;
     }
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $allowed = mlang_tools::list_allowed_languages();
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $allowed = amos_tools::list_allowed_languages();
     $stage->prune($allowed);
-    [$numstrings, $listlanguages, $listcomponents] = mlang_stage::analyze($stage);
+    [$numstrings, $listlanguages, $listcomponents] = amos_stage::analyze($stage);
     $stage->commit(
         $message,
         ['source' => 'amos', 'userid' => $USER->id, 'userinfo' => fullname($USER) . ' <' . $USER->email . '>'],
@@ -74,7 +80,7 @@ if (!empty($message)) {
     $listlanguages = array_filter(explode('/', $listlanguages));
     $listcomponents = array_filter(explode('/', $listcomponents));
     foreach ($listcomponents as $componentname) {
-        mlang_tools::backport_translations($componentname, $listlanguages);
+        amos_tools::backport_translations($componentname, $listlanguages);
     }
     if ($clear) {
         if (empty($SESSION->local_amos->stagedcontribution)) {
@@ -124,8 +130,8 @@ if (!empty($unstage)) {
     }
 
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $component = $stage->get_component($name, $lang, mlang_version::by_code($branch));
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $component = $stage->get_component($name, $lang, amos_version::by_code($branch));
     if ($component) {
         $component->unlink_string($unstage);
     }
@@ -134,22 +140,22 @@ if (!empty($unstage)) {
 }
 if (!empty($prune)) {
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $allowed = mlang_tools::list_allowed_languages();
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $allowed = amos_tools::list_allowed_languages();
     $stage->prune($allowed);
     $stage->store();
     redirect($PAGE->url);
 }
 if (!empty($rebase)) {
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->rebase();
     $stage->store();
     redirect($PAGE->url);
 }
 if (!empty($unstageall)) {
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->clear();
     $stage->store();
     unset($SESSION->local_amos->presetcommitmessage);
@@ -158,13 +164,13 @@ if (!empty($unstageall)) {
 }
 if (!empty($download)) {
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
     $stage->send_zip("stage.zip");
 }
 if (!empty($submit)) {
     require_sesskey();
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $stash = mlang_stash::instance_from_stage($stage, $stage->userid);
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $stash = amos_stash::instance_from_stage($stage, $stage->userid);
     $stash->push();
     redirect(new moodle_url('/local/amos/stash.php', ['sesskey' => sesskey(), 'submit' => $stash->id]));
 }

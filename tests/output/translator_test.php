@@ -16,6 +16,11 @@
 
 namespace local_amos\output;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for {@see \local_amos\output\translator}.
  *
@@ -38,19 +43,19 @@ final class translator_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('s1', 'AAA'));
-        $component->add_string(new \mlang_string('s2', 'BBB'));
-        $component->add_string(new \mlang_string('s3', 'CCC'));
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(39));
+        $component->add_string(new amos_string('s1', 'AAA'));
+        $component->add_string(new amos_string('s2', 'BBB'));
+        $component->add_string(new amos_string('s3', 'CCC'));
         $stage->add($component);
         $component->clear();
 
-        $component = new \mlang_component('foo_bar', 'cs', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('s1', 'Ddd'));
-        $component->add_string(new \mlang_string('s2', 'Aaa'));
-        $component->add_string(new \mlang_string('s3', 'aaa'));
+        $component = new amos_component('foo_bar', 'cs', amos_version::by_code(39));
+        $component->add_string(new amos_string('s1', 'Ddd'));
+        $component->add_string(new amos_string('s2', 'Aaa'));
+        $component->add_string(new amos_string('s3', 'aaa'));
         $stage->add($component);
         $component->clear();
 

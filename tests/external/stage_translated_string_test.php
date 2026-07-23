@@ -16,6 +16,12 @@
 
 namespace local_amos\external;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_version;
+
 /**
  * Unit tests for external function {@see \local_amos\external\stage_translated_string}.
  *
@@ -60,16 +66,16 @@ final class stage_translated_string_test extends \local_amos_testcase {
         $this->register_language('en', 20);
         $this->register_language('cs', 20);
 
-        $stage = new \mlang_stage();
+        $stage = new amos_stage();
 
-        $component = new \mlang_component('foo_bar', 'en', \mlang_version::by_code(39));
-        $component->add_string(new \mlang_string('foobar', 'Foo bar'));
+        $component = new amos_component('foo_bar', 'en', amos_version::by_code(39));
+        $component->add_string(new amos_string('foobar', 'Foo bar'));
         $stage->add($component);
         $component->clear();
 
         $stage->commit('First string', ['source' => 'unittest']);
 
-        $foobarcomponent = \mlang_component::from_snapshot('foo_bar', 'en', \mlang_version::by_code(310), null, false, true);
+        $foobarcomponent = amos_component::from_snapshot('foo_bar', 'en', amos_version::by_code(310), null, false, true);
         $foobarstring = $foobarcomponent->get_string('foobar');
 
         $stageid = sesskey();
@@ -87,8 +93,8 @@ final class stage_translated_string_test extends \local_amos_testcase {
         $this->assertFalse($response['nocleaning']);
         $this->assertSame([], $response['warnings']);
 
-        $stage = \mlang_persistent_stage::instance_for_user($USER->id, $USER->sesskey);
+        $stage = amos_persistent_stage::instance_for_user($USER->id, $USER->sesskey);
 
-        $this->assertSame('Fů bár', $stage->get_component('foo_bar', 'cs', \mlang_version::by_code(39))->get_string('foobar')->text);
+        $this->assertSame('Fů bár', $stage->get_component('foo_bar', 'cs', amos_version::by_code(39))->get_string('foobar')->text);
     }
 }

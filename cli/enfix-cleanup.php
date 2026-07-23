@@ -22,6 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../..//config.php');
@@ -45,16 +49,16 @@ fputs(STDOUT, date('Y-m-d H:i', time()));
 fputs(STDOUT, " ENFIX CLEANUP JOB STARTED\n");
 
 $standardcomponents = \local_amos\local\util::standard_components_tree();
-$supportedversions = mlang_version::list_all();
-$stage = new mlang_stage();
+$supportedversions = amos_version::list_all();
+$stage = new amos_stage();
 
 foreach ($supportedversions as $version) {
     foreach (array_keys($standardcomponents[$version->code]) as $componentname) {
         if ($componentname === 'langconfig') {
             continue;
         }
-        $enfix = mlang_component::from_snapshot($componentname, 'en_fix', $version);
-        $en = mlang_component::from_snapshot($componentname, 'en', $version);
+        $enfix = amos_component::from_snapshot($componentname, 'en_fix', $version);
+        $en = amos_component::from_snapshot($componentname, 'en', $version);
         $enfix->intersect($en);
 
         if (!$enfix->has_string()) {

@@ -22,6 +22,11 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/amos/locallib.php');
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -40,13 +45,13 @@ $PAGE->set_heading('AMOS ' . get_string('scriptexecute', 'local_amos'));
 $executeform = new local_amos_execute_form(null, local_amos_execute_options());
 
 if ($data = $executeform->get_data()) {
-    $version = mlang_version::by_code($data->version);
-    $stage = mlang_persistent_stage::instance_for_user($USER->id, sesskey());
-    $instructions = mlang_tools::extract_script_from_text($data->script);
+    $version = amos_version::by_code($data->version);
+    $stage = amos_persistent_stage::instance_for_user($USER->id, sesskey());
+    $instructions = amos_tools::extract_script_from_text($data->script);
     if (!empty($instructions)) {
         foreach ($instructions as $instruction) {
-            $changes = mlang_tools::execute($instruction, $version);
-            if ($changes instanceof mlang_stage) {
+            $changes = amos_tools::execute($instruction, $version);
+            if ($changes instanceof amos_stage) {
                 foreach ($changes as $component) {
                     $stage->add($component, true);
                 }

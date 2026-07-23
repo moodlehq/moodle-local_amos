@@ -15,12 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides CLI access to {@see mlang_version} class features.
+ * Provides CLI access to {@see amos_version} class features.
  *
  * @package     local_amos
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+use local_amos\local\amos_version;
 
 define('CLI_SCRIPT', true);
 
@@ -67,4 +69,4 @@ if (!in_array($options['get'], ['code', 'dir', 'branch', 'label', 'translatable'
 $methodname = 'by_' . $options['type'];
 $propertyname = $options['get'];
 
-cli_writeln(mlang_version::$methodname($options['value'])->$propertyname);
+cli_writeln(amos_version::$methodname($options['value'])->$propertyname);

@@ -22,6 +22,13 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_stash;
+use local_amos\local\amos_string;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -56,13 +63,13 @@ class local_amos_stash implements renderable {
     protected $actions = [];
 
     /**
-     * Factory method using an instance if {@see mlang_stash} as a data source
+     * Factory method using an instance if {@see amos_stash} as a data source
      *
-     * @param mlang_stash $stash
+     * @param amos_stash $stash
      * @param stdClass $owner owner user data
      * @return local_amos_stash new instance
      */
-    public static function instance_from_mlang_stash(mlang_stash $stash, stdClass $owner) {
+    public static function instance_from_amos_stash(amos_stash $stash, stdClass $owner) {
 
         if ($stash->ownerid != $owner->id) {
             throw new coding_exception('Stash owner mismatch');
@@ -74,9 +81,9 @@ class local_amos_stash implements renderable {
         $new->timecreated   = $stash->timecreated;
         $new->timemodified  = $stash->timemodified;
 
-        $stage = new mlang_stage();
+        $stage = new amos_stage();
         $stash->apply($stage);
-        [$new->strings, $new->languages, $new->components] = mlang_stage::analyze($stage);
+        [$new->strings, $new->languages, $new->components] = amos_stage::analyze($stage);
         $stage->clear();
         unset($stage);
 
@@ -277,12 +284,12 @@ function local_amos_importfile_options() {
 
     $options['versions'] = ['auto' => get_string('versionauto', 'local_amos')];
     $options['versioncurrent'] = 'auto';
-    foreach (array_reverse(mlang_version::list_all(), true) as $version) {
+    foreach (array_reverse(amos_version::list_all(), true) as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
         }
     }
-    $options['languages'] = array_merge(['' => get_string('choosedots')], mlang_tools::list_languages(false));
+    $options['languages'] = array_merge(['' => get_string('choosedots')], amos_tools::list_languages(false));
     $currentlanguage = current_language();
     if ($currentlanguage === 'en') {
         $currentlanguage = 'en_fix';
@@ -296,22 +303,22 @@ function local_amos_importfile_options() {
  * Stage translated strings at the auto-detected version of their English source.
  *
  * For each string in $parsed, the most recent non-deleted English version is
- * looked up via {@see mlang_component::from_snapshot()}. Strings that have no
+ * looked up via {@see amos_component::from_snapshot()}. Strings that have no
  * English counterpart are silently skipped. The translated strings are added to
  * $stage grouped by their target version.
  *
- * @param mlang_stage $stage Stage to add the versioned components into.
- * @param mlang_component $parsed Component holding the parsed translated strings.
+ * @param amos_stage $stage Stage to add the versioned components into.
+ * @param amos_component $parsed Component holding the parsed translated strings.
  *     Its name and lang properties determine which component and language are staged.
  */
-function local_amos_importfile_stage_auto(mlang_stage $stage, mlang_component $parsed): void {
+function local_amos_importfile_stage_auto(amos_stage $stage, amos_component $parsed): void {
 
     // Load English strings with full info so that $extra->since is populated.
     // $deleted=false ensures strings currently deleted in English are excluded.
-    $encomponent = mlang_component::from_snapshot(
+    $encomponent = amos_component::from_snapshot(
         $parsed->name,
         'en',
-        mlang_version::latest_version(),
+        amos_version::latest_version(),
         null,
         false,
         true
@@ -328,16 +335,16 @@ function local_amos_importfile_stage_auto(mlang_stage $stage, mlang_component $p
         $byversion[$enstr->extra->since][] = $strname;
     }
 
-    // Add one mlang_component per version group to the stage.
+    // Add one amos_component per version group to the stage.
     foreach ($byversion as $vcode => $strnames) {
-        $mver = mlang_version::by_code($vcode);
+        $mver = amos_version::by_code($vcode);
         if (!$mver->translatable) {
             continue;
         }
-        $component = new mlang_component($parsed->name, $parsed->lang, $mver);
+        $component = new amos_component($parsed->name, $parsed->lang, $mver);
         foreach ($strnames as $strname) {
             $str = $parsed->get_string($strname);
-            $component->add_string(new mlang_string($str->id, $str->text, $str->timemodified, $str->deleted));
+            $component->add_string(new amos_string($str->id, $str->text, $str->timemodified, $str->deleted));
         }
         if ($component->has_string()) {
             $stage->add($component, true);
@@ -357,8 +364,8 @@ function local_amos_execute_options() {
 
     $options['versions'] = [];
     $options['versioncurrent'] = null;
-    $latestversioncode = mlang_version::latest_version()->code;
-    foreach (mlang_version::list_all() as $version) {
+    $latestversioncode = amos_version::latest_version()->code;
+    foreach (amos_version::list_all() as $version) {
         if ($version->translatable) {
             $options['versions'][$version->code] = $version->label;
             if ($version->code == $latestversioncode) {

@@ -22,6 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_string;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -66,7 +72,7 @@ $rs->close();
 $langs = [];
 $withparent = [];
 
-foreach (mlang_tools::list_languages() as $langcode => $langname) {
+foreach (amos_tools::list_languages() as $langcode => $langname) {
     $parts = explode('_', $langcode);
     $langs[$langcode] = implode('_', array_slice($parts, 0, -1));
 }
@@ -81,7 +87,7 @@ $langs = array_keys(array_diff_key($langs, $withparent, ['en' => '']));
 sort($langs);
 
 // Put all found strings to the primary language packs.
-$stage = new mlang_stage();
+$stage = new amos_stage();
 
 foreach ($english as $componentname => $vercodes) {
     foreach ($vercodes as $vercode => $stringnames) {
@@ -113,8 +119,8 @@ foreach ($english as $componentname => $vercodes) {
                     continue;
                 }
 
-                $component = new mlang_component($componentname, $langcode, mlang_version::by_code($vercode));
-                $component->add_string(new mlang_string($stringname, $origstring->strtext));
+                $component = new amos_component($componentname, $langcode, amos_version::by_code($vercode));
+                $component->add_string(new amos_string($stringname, $origstring->strtext));
                 $stage->add($component);
                 $component->clear();
             }

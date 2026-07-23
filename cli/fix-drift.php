@@ -25,6 +25,10 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_stage;
+use local_amos\local\amos_version;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -73,7 +77,7 @@ foreach (preg_split('|\R|', get_config('local_amos', 'plugintypelocations'), -1,
 cli_writeln('Seeking for differences between AMOS and Git');
 
 foreach ($plugins as $versioncode => $plugintypes) {
-    $version = mlang_version::by_code($versioncode);
+    $version = amos_version::by_code($versioncode);
 
     if ($git->has_remote_branch($version->branch)) {
         $gitbranch = 'origin/' . $version->branch;
@@ -92,10 +96,10 @@ foreach ($plugins as $versioncode => $plugintypes) {
         }
 
         // Prepare an empty component containing the fixes.
-        $fixcomponent = new mlang_component($legacyname, 'en', $version);
+        $fixcomponent = new amos_component($legacyname, 'en', $version);
 
         // Get the most recent snapshot from the AMOS repository.
-        $amoscomponent = mlang_component::from_snapshot($legacyname, 'en', $version);
+        $amoscomponent = amos_component::from_snapshot($legacyname, 'en', $version);
 
         // Get the location of the plugin.
         if ($frankenstylename == 'core') {
@@ -151,7 +155,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
         $dumpfile = $tmp . '/' . $legacyname . '.php';
         file_put_contents($dumpfile, implode("\n", $gitout));
 
-        $gitcomponent = mlang_component::from_phpfile($dumpfile, 'en', $version, time());
+        $gitcomponent = amos_component::from_phpfile($dumpfile, 'en', $version, time());
 
         foreach ($amoscomponent as $amosstring) {
             $gitstring = $gitcomponent->get_string($amosstring->id);
@@ -185,7 +189,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
         }
 
         if ($fixcomponent->has_string()) {
-            $stages[$version->code] = $stages[$version->code] ?? new mlang_stage();
+            $stages[$version->code] = $stages[$version->code] ?? new amos_stage();
             $stages[$version->code]->add($fixcomponent);
         }
 
@@ -196,7 +200,7 @@ foreach ($plugins as $versioncode => $plugintypes) {
 }
 
 foreach ($stages as $versioncode => $stage) {
-    [$x, $y, $z] = mlang_stage::analyze($stage);
+    [$x, $y, $z] = amos_stage::analyze($stage);
 
     if ($x > 0) {
         cli_writeln("There are {$x} string changes prepared for sync execution on branch {$versioncode}");

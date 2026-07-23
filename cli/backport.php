@@ -22,6 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_tools;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -65,7 +67,7 @@ $logger = new amos_cli_logger();
 
 $logger->log('backport', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
 
-$components = array_keys(mlang_tools::list_components());
+$components = array_keys(amos_tools::list_components());
 $languages = [];
 
 if ($options['component']) {
@@ -87,7 +89,7 @@ foreach ($components as $component) {
         $count,
         $component
     ));
-    mlang_tools::backport_translations($component, $languages);
+    amos_tools::backport_translations($component, $languages);
     $i++;
 }
 

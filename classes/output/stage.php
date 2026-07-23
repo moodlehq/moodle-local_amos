@@ -25,6 +25,11 @@
 
 namespace local_amos\output;
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_persistent_stage;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/local/amos/mlanglib.php');
@@ -110,7 +115,7 @@ class stage implements \renderable, \templatable {
         $needed = [];
 
         // The stage we are visualising.
-        $stage = \mlang_persistent_stage::instance_for_user($user->id, $user->sesskey);
+        $stage = amos_persistent_stage::instance_for_user($user->id, $user->sesskey);
 
         foreach ($stage as $component) {
             foreach ($component as $staged) {
@@ -166,10 +171,10 @@ class stage implements \renderable, \templatable {
                 $flng[$language] = true;
                 foreach ($components as $component => $stringnames) {
                     $fcmp[$component] = true;
-                    $needed[$branch][$language][$component] = \mlang_component::from_snapshot(
+                    $needed[$branch][$language][$component] = amos_component::from_snapshot(
                         $component,
                         $language,
-                        \mlang_version::by_code($branch),
+                        amos_version::by_code($branch),
                         null,
                         false,
                         false,
@@ -183,7 +188,7 @@ class stage implements \renderable, \templatable {
         $this->filterfields->flast = true;
         $this->filterfields->flng = array_keys($flng);
         $this->filterfields->fcmp = array_keys($fcmp);
-        $allowedlangs = \mlang_tools::list_allowed_languages($user->id);
+        $allowedlangs = amos_tools::list_allowed_languages($user->id);
 
         foreach ($this->strings as $string) {
             if (!empty($allowedlangs['X']) || !empty($allowedlangs[$string->language])) {
@@ -198,13 +203,13 @@ class stage implements \renderable, \templatable {
 
             $translation = $needed[$string->sincecode][$string->language][$string->component] ?: null;
 
-            if ($translation instanceof \mlang_component) {
+            if ($translation instanceof amos_component) {
                 if ($translation->has_string($string->stringid)) {
                     $string->current = $translation->get_string($string->stringid)->text;
                 }
             }
 
-            if (empty(\mlang_version::by_code($string->sincecode)->translatable)) {
+            if (empty(amos_version::by_code($string->sincecode)->translatable)) {
                 $string->committable = false;
             }
 
@@ -226,7 +231,7 @@ class stage implements \renderable, \templatable {
             'strings' => [],
         ];
 
-        $listlanguages = \mlang_tools::list_languages();
+        $listlanguages = amos_tools::list_languages();
         $standard = \local_amos\local\util::standard_components_list();
 
         foreach ($this->strings as $string) {

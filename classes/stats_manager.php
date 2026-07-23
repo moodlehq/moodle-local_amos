@@ -22,6 +22,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\amos_component;
+use local_amos\local\amos_tools;
+use local_amos\local\amos_version;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -214,11 +218,11 @@ class local_amos_stats_manager {
             'branches' => [],
         ];
 
-        $langnames = mlang_tools::list_languages();
+        $langnames = amos_tools::list_languages();
         $langused = [];
 
         foreach ($data as $branch => $langs) {
-            $mlangversion = mlang_version::by_code($branch);
+            $mlangversion = amos_version::by_code($branch);
 
             if (empty($mlangversion)) {
                 debugging('Unknown branch code: ' . $branch);
@@ -302,9 +306,9 @@ class local_amos_stats_manager {
         global $DB;
 
         if ($vercode) {
-            $version = mlang_version::by_code($vercode);
+            $version = amos_version::by_code($vercode);
         } else {
-            $version = mlang_version::latest_version();
+            $version = amos_version::latest_version();
         }
 
         $cache = cache::make('local_amos', 'stats');
@@ -314,7 +318,7 @@ class local_amos_stats_manager {
             return $cached;
         }
 
-        $langnames = mlang_tools::list_languages(true, true, false, true);
+        $langnames = amos_tools::list_languages(true, true, false, true);
         $standardcomponents = \local_amos\local\util::standard_components_in_version($version->code);
 
         [$standardsql, $standardparams] = $DB->get_in_or_equal(array_keys($standardcomponents), SQL_PARAMS_NAMED);
@@ -360,7 +364,7 @@ class local_amos_stats_manager {
             if ($langpack->langcode === 'en') {
                 $parent = '';
             } else {
-                $langconfig = mlang_component::from_snapshot('langconfig', $langpack->langcode, $version);
+                $langconfig = amos_component::from_snapshot('langconfig', $langpack->langcode, $version);
 
                 if ($mlangstringparentlanguage = $langconfig->get_string('parentlanguage')) {
                     $parent = $mlangstringparentlanguage->text;
