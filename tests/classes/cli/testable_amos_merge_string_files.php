@@ -25,7 +25,7 @@
 
 namespace local_amos;
 
-use amos_merge_string_files;
+use local_amos\local\cli_merge_files;
 
 /**
  * Provides access to protected methods we want to explicitly test
@@ -33,5 +33,5 @@ use amos_merge_string_files;
  * @copyright 2013 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testable_amos_merge_string_files extends amos_merge_string_files {
+class testable_amos_merge_string_files extends cli_merge_files {
 }

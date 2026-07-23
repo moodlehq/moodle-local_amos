@@ -25,7 +25,7 @@
 
 namespace local_amos;
 
-use amos_cli_logger;
+use local_amos\local\cli_logger;
 
 /**
  * Dummy implementation of the AMOS logger suitable for unit testing
@@ -33,7 +33,7 @@ use amos_cli_logger;
  * @copyright 2013 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class testable_amos_cli_logger extends amos_cli_logger {
+class testable_amos_cli_logger extends cli_logger {
     /**
      * Logs a message
      *

@@ -23,6 +23,7 @@
  */
 
 use local_amos\local\amos_tools;
+use local_amos\local\cli_logger;
 
 define('CLI_SCRIPT', true);
 
@@ -63,9 +64,9 @@ if ($options['help'] || !empty($unrecognised)) {
     exit(2);
 }
 
-$logger = new amos_cli_logger();
+$logger = new cli_logger();
 
-$logger->log('backport', 'Loading list of components ...', amos_cli_logger::LEVEL_DEBUG);
+$logger->log('backport', 'Loading list of components ...', cli_logger::LEVEL_DEBUG);
 
 $components = array_keys(amos_tools::list_components());
 $languages = [];

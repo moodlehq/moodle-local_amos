@@ -23,6 +23,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\cli_export_zip;
+use local_amos\local\cli_logger;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -63,13 +66,13 @@ if ($options['help']) {
     exit(2);
 }
 
-$logger = new amos_cli_logger();
+$logger = new cli_logger();
 
 if ($options['langs'] !== null) {
     $options['langs'] = array_map('trim', explode(',', $options['langs']));
 }
 
-$exporter = new amos_export_zip($logger);
+$exporter = new cli_export_zip($logger);
 $exporter->init($options['minver'], $options['maxver'], $options['langs']);
 $exporter->rebuild_zip_packages();
 $exporter->rebuild_output_folders();

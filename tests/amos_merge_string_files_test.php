@@ -36,7 +36,7 @@ require_once(__DIR__ . '/classes/cli/testable_amos_cli_logger.php');
 require_once(__DIR__ . '/classes/cli/testable_amos_merge_string_files.php');
 
 /**
- * Unit tests for the {@see \amos_merge_string_files} class
+ * Unit tests for the {@see \local_amos\local\cli_merge_files} class
  *
  * @copyright 2013 David Mudrak <david.mudrak@gmail.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

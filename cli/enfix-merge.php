@@ -22,6 +22,9 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_amos\local\cli_logger;
+use local_amos\local\cli_merge_files;
+
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
@@ -74,8 +77,8 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
 
 // Let's rock!
 
-$logger = new amos_cli_logger();
-$helper = new amos_merge_string_files($logger);
+$logger = new cli_logger();
+$helper = new cli_merge_files($logger);
 $total = 0;
 
 foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
@@ -87,7 +90,7 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     $logger->log('enfix-merge', 'Processing file ' . $filename . ' ...');
 
     if ($filename === 'langconfig.php') {
-        $logger->log('enfix-merge', 'Skipping file ' . $filename, amos_cli_logger::LEVEL_DEBUG);
+        $logger->log('enfix-merge', 'Skipping file ' . $filename, cli_logger::LEVEL_DEBUG);
         continue;
     }
 
@@ -97,14 +100,14 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     $logger->log(
         'enfix-merge',
         count($fromstrings) . ' string(s) found in ' . $options['symlinksdir'] . '/' . $filename,
-        amos_cli_logger::LEVEL_DEBUG
+        cli_logger::LEVEL_DEBUG
     );
 
     $tostrings = $helper->load_strings_from_file($options['enfixdir'] . '/' . $filename);
     $logger->log(
         'enfix-merge',
         count($tostrings) . ' string(s) found in ' . $options['enfixdir'] . '/' . $filename,
-        amos_cli_logger::LEVEL_DEBUG
+        cli_logger::LEVEL_DEBUG
     );
 
     $changes = $helper->replace_strings_in_file($filecontents, $fromstrings, $tostrings);
@@ -116,7 +119,7 @@ foreach (new DirectoryIterator($options['enfixdir']) as $enfixfileinfo) {
     } else if ($changes === 0) {
         $logger->log('enfix-merge', 'No changes in ' . $filename);
     } else {
-        $logger->log('enfix-merge', 'Error while processing file ' . $filename, amos_cli_logger::LEVEL_ERROR);
+        $logger->log('enfix-merge', 'Error while processing file ' . $filename, cli_logger::LEVEL_ERROR);
     }
 }
 
