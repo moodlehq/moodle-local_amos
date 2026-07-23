@@ -32,8 +32,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 class_alias(\local_amos\local\amos_exception::class, 'mlang_exception');
 class_alias(\local_amos\local\amos_component::class, 'mlang_component');
 class_alias(\local_amos\local\amos_string::class, 'mlang_string');

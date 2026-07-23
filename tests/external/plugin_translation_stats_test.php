@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides class {@see \local_amos\external\plugin_translation_stats_test}.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2019 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\external;
 
 use local_amos\local\amos_component;
@@ -42,6 +33,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(plugin_translation_stats::class)]
 final class plugin_translation_stats_test extends \externallib_advanced_testcase {
     /**
      * Test the behaviour of the plugin_translation_stats external function when unknown component is requested.

@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\local\amos_tools_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\local;
 
 defined('MOODLE_INTERNAL') || die();
@@ -35,6 +26,7 @@ require_once(__DIR__ . '/../classes/local/testable_amos_tools.php');
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_tools::class)]
 final class amos_tools_test extends \local_amos_testcase {
     public function test_extract_script_from_text(): void {
         $noscript = 'This is text with no AMOS script';

@@ -212,7 +212,7 @@ class get_string_timeline extends \core_external\external_api {
             'hascontent' => new \core_external\external_value(PARAM_BOOL, 'Does this item have data to display.'),
             'langcode' => new \core_external\external_value(PARAM_ALPHANUMEXT, 'Language code', VALUE_OPTIONAL),
             'displaysince' => new \core_external\external_value(PARAM_RAW, 'Formatted version since this applies', VALUE_OPTIONAL),
-            'displaydate' => new \core_external\external_value(PARAM_RAW, 'Formatted date and time of string change', VALUE_OPTIONAL),
+            'displaydate' => new \core_external\external_value(PARAM_RAW, 'Formatted date and time of the change', VALUE_OPTIONAL),
             'userinfo' => new \core_external\external_value(PARAM_RAW, 'Author name and email', VALUE_OPTIONAL),
             'commitmsg' => new \core_external\external_value(PARAM_RAW, 'Commit message', VALUE_OPTIONAL),
             'hascommithash' => new \core_external\external_value(PARAM_BOOL, 'Is commit hash info present?', VALUE_OPTIONAL),

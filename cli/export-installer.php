@@ -116,7 +116,8 @@ EOF;
                 array_keys($stringids)
             );
             if ($component->has_string()) {
-                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/' . $installroot . '/lang/' . $lang . '/' . $component->name . '.php';
+                $file = AMOS_EXPORT_INSTALLER_DIR . '/' . $exportdir . '/' . $installroot . '/lang/' . $lang . '/' .
+                    $component->name . '.php';
                 if (!file_exists(dirname($file))) {
                     mkdir(dirname($file), 0755, true);
                 }

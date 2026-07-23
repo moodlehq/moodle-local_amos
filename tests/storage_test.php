@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\storage_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2020 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos;
 
 use advanced_testcase;
@@ -31,17 +22,16 @@ use local_amos\local\amos_stage;
 use local_amos\local\amos_string;
 use local_amos\local\amos_version;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/amos/mlanglib.php');
-
 /**
  * Unit tests for the mlanglib.php functionality after the storage DB layout update.
  *
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_component::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_stage::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_string::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_version::class)]
 final class storage_test extends advanced_testcase {
     /**
      * Test essential operations with the strings storage.

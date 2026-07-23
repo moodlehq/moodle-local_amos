@@ -30,8 +30,6 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 class_alias(\local_amos\local\amos_parser::class, 'mlang_parser');
 class_alias(\local_amos\local\amos_parser_factory::class, 'mlang_parser_factory');
 class_alias(\local_amos\local\amos_parser_exception::class, 'mlang_parser_exception');

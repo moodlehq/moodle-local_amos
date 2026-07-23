@@ -14,20 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\local\source_code_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2019 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\local;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
 
 /**
  * Test the implementation of {@see \local_amos\local\source_code} class.
@@ -35,6 +22,7 @@ global $CFG;
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(source_code::class)]
 final class source_code_test extends \advanced_testcase {
     /**
      * Test {@see \local_amos\local\source_code::parse_version_php()}.

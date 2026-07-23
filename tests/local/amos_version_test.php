@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\local\amos_version_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2020 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\local;
 
 /**
@@ -31,6 +22,7 @@ namespace local_amos\local;
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_version::class)]
 final class amos_version_test extends \advanced_testcase {
     /**
      * Test amos_version factory methods.

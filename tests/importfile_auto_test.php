@@ -40,6 +40,7 @@ require_once($CFG->dirroot . '/local/amos/locallib.php');
 /**
  * Tests for the auto-version import staging function.
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(local_amos_importfile_stage_auto::class)]
 final class importfile_auto_test extends local_amos_testcase {
     /**
      * Set up English strings used across all test methods.
@@ -84,13 +85,13 @@ final class importfile_auto_test extends local_amos_testcase {
         local_amos_importfile_stage_auto($stage, $parsed);
         $parsed->clear();
 
-        // 'alpha' was introduced at branch 39; its translation must be there.
+        // String 'alpha' was introduced at branch 39; its translation must be there.
         $component39 = $stage->get_component('foo_test', 'cs', amos_version::by_code(39));
         $this->assertNotNull($component39, 'Expected component at version 39');
         $this->assertSame('Alfa', $component39->get_string('alpha')->text);
         $this->assertNull($component39->get_string('beta'), 'beta must not be at version 39');
 
-        // 'beta' was introduced at branch 400; its translation must be there.
+        // String 'beta' was introduced at branch 400; its translation must be there.
         $component400 = $stage->get_component('foo_test', 'cs', amos_version::by_code(400));
         $this->assertNotNull($component400, 'Expected component at version 400');
         $this->assertSame('Béta', $component400->get_string('beta')->text);
@@ -113,12 +114,12 @@ final class importfile_auto_test extends local_amos_testcase {
         local_amos_importfile_stage_auto($stage, $parsed);
         $parsed->clear();
 
-        // 'alpha' is staged normally.
+        // String 'alpha' is staged normally.
         $component39 = $stage->get_component('foo_test', 'cs', amos_version::by_code(39));
         $this->assertNotNull($component39);
         $this->assertNotNull($component39->get_string('alpha'));
 
-        // 'nonexistent' must not be in the stage at any version.
+        // String 'nonexistent' must not be in the stage at any version.
         foreach (['39', '310', '400'] as $code) {
             $comp = $stage->get_component('foo_test', 'cs', amos_version::by_code((int) $code));
             if ($comp !== null) {
@@ -178,14 +179,14 @@ final class importfile_auto_test extends local_amos_testcase {
 
         $stage = new amos_stage();
 
-        // 'delta' introduced at branch 39 with original text.
+        // String 'delta' introduced at branch 39 with original text.
         $component = new amos_component('foo_test', 'en', amos_version::by_code(39));
         $component->add_string(new amos_string('delta', 'Delta'));
         $stage->add($component);
         $component->clear();
         $stage->commit('Add delta', ['source' => 'unittest']);
 
-        // 'delta' updated at branch 400 with new text.
+        // String 'delta' updated at branch 400 with new text.
         $component = new amos_component('foo_test', 'en', amos_version::by_code(400));
         $component->add_string(new amos_string('delta', 'Delta (revised)'));
         $stage->add($component);

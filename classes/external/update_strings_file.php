@@ -51,16 +51,37 @@ class update_strings_file extends \core_external\external_api {
 
         return new \core_external\external_function_parameters(
             [
-                'userinfo' => new \core_external\external_value(PARAM_RAW, 'Name and email of the author to record into AMOS commit'),
-                'message' => new \core_external\external_value(PARAM_RAW, 'Message describing the change to be committed into AMOS repository'),
+                'userinfo' => new \core_external\external_value(
+                    PARAM_RAW,
+                    'Name and email of the author to record into AMOS commit'
+                ),
+                'message' => new \core_external\external_value(
+                    PARAM_RAW,
+                    'Message describing the change to be committed into AMOS repository'
+                ),
                 'components' => new \core_external\external_multiple_structure(
                     new \core_external\external_single_structure(
                         [
-                            'componentname' => new \core_external\external_value(PARAM_COMPONENT, 'The full component name (eg. mod_stampcoll)'),
-                            'moodlebranch' => new \core_external\external_value(PARAM_FILE, 'The Moodle branch for this component (eg. 2.3)'),
-                            'language' => new \core_external\external_value(PARAM_SAFEDIR, 'The code of the language (eg. en)'),
-                            'stringfilename' => new \core_external\external_value(PARAM_FILE, 'The name of the strings file (eg. stampcoll.php)'),
-                            'stringfilecontent' => new \core_external\external_value(PARAM_RAW, 'The content of the strings file.'),
+                            'componentname' => new \core_external\external_value(
+                                PARAM_COMPONENT,
+                                'The full component name (eg. mod_stampcoll)'
+                            ),
+                            'moodlebranch' => new \core_external\external_value(
+                                PARAM_FILE,
+                                'The Moodle branch for this component (eg. 2.3)'
+                            ),
+                            'language' => new \core_external\external_value(
+                                PARAM_SAFEDIR,
+                                'The code of the language (eg. en)'
+                            ),
+                            'stringfilename' => new \core_external\external_value(
+                                PARAM_FILE,
+                                'The name of the strings file (eg. stampcoll.php)'
+                            ),
+                            'stringfilecontent' => new \core_external\external_value(
+                                PARAM_RAW,
+                                'The content of the strings file.'
+                            ),
                         ]
                     )
                 ),
@@ -232,13 +253,37 @@ class update_strings_file extends \core_external\external_api {
         return new \core_external\external_multiple_structure(
             new \core_external\external_single_structure(
                 [
-                    'componentname' => new \core_external\external_value(PARAM_COMPONENT, 'Component name as registered in AMOS (eg. stampcoll)'),
-                    'moodlebranch' => new \core_external\external_value(PARAM_FILE, 'Moodle branch for this component (eg. 2.3)'),
-                    'language' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code (e.g. en)'),
-                    'status' => new \core_external\external_value(PARAM_ALPHA, 'ok|error'),
-                    'message' => new \core_external\external_value(PARAM_RAW, 'Additional status information', VALUE_OPTIONAL),
-                    'found' => new \core_external\external_value(PARAM_INT, 'Number of detected strings in the given file', VALUE_OPTIONAL),
-                    'changes' => new \core_external\external_value(PARAM_INT, 'Number of committed changes including removals', VALUE_OPTIONAL),
+                    'componentname' => new \core_external\external_value(
+                        PARAM_COMPONENT,
+                        'Component name as registered in AMOS (eg. stampcoll)'
+                    ),
+                    'moodlebranch' => new \core_external\external_value(
+                        PARAM_FILE,
+                        'Moodle branch for this component (eg. 2.3)'
+                    ),
+                    'language' => new \core_external\external_value(
+                        PARAM_SAFEDIR,
+                        'Language code (e.g. en)'
+                    ),
+                    'status' => new \core_external\external_value(
+                        PARAM_ALPHA,
+                        'ok|error'
+                    ),
+                    'message' => new \core_external\external_value(
+                        PARAM_RAW,
+                        'Additional status information',
+                        VALUE_OPTIONAL
+                    ),
+                    'found' => new \core_external\external_value(
+                        PARAM_INT,
+                        'Number of detected strings in the given file',
+                        VALUE_OPTIONAL
+                    ),
+                    'changes' => new \core_external\external_value(
+                        PARAM_INT,
+                        'Number of committed changes including removals',
+                        VALUE_OPTIONAL
+                    ),
                 ]
             )
         );

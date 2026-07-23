@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\local\amos_string_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\local;
 
 /**
@@ -31,6 +22,7 @@ namespace local_amos\local;
  * @copyright 2010 David Mudrak <david.mudrak@gmail.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_string::class)]
 final class amos_string_test extends \advanced_testcase {
     /**
      * Sanity 1.x string

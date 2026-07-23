@@ -95,14 +95,15 @@ class import_workplace_plugins extends \core\task\scheduled_task {
 
             $results = \local_amos\external\update_strings_file::execute(
                 'Moodle Workplace <workplace@moodle.com>',
-                'Strings for ' . $componentname . ' ' . $info['version'],
+                'Strings for ' . $job['plugin'] . ' ' . $info['version'],
                 $components
             );
 
             $results = \external_api::clean_returnvalue(\local_amos\external\update_strings_file::execute_returns(), $results);
 
             foreach ($results as $result) {
-                mtrace('  ' . $result['status'] . ' ' . $result['componentname'] . ' ' . $result['changes'] . '/' . $result['found'] . ' changes');
+                mtrace('  ' . $result['status'] . ' ' . $result['componentname'] . ' ' . $result['changes'] . '/' .
+                    $result['found'] . ' changes');
                 if (!in_array($result['componentname'], $componentnames)) {
                     $componentnames[] = $result['componentname'];
                 }

@@ -44,12 +44,34 @@ class stage_translated_string extends \core_external\external_api {
     public static function execute_parameters(): \core_external\external_function_parameters {
 
         return new \core_external\external_function_parameters([
-            'stageid' => new \core_external\external_value(PARAM_RAW, 'Identifier of persistent AMOS stage to add the translation to'),
-            'originalid' => new \core_external\external_value(PARAM_INT, 'Identifier of English string used as a source for translation'),
-            'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Code of the language'),
-            'text' => new \core_external\external_value(PARAM_RAW, 'Raw text of the translation'),
-            'translationid' => new \core_external\external_value(PARAM_INT, 'Identifier of translation being updated', VALUE_DEFAULT, null),
-            'nocleaning' => new \core_external\external_value(PARAM_BOOL, 'Skip implicit cleaning of the input string', VALUE_DEFAULT, false),
+            'stageid' => new \core_external\external_value(
+                PARAM_RAW,
+                'Identifier of persistent AMOS stage to add the translation to'
+            ),
+            'originalid' => new \core_external\external_value(
+                PARAM_INT,
+                'Identifier of English string used as a source for translation'
+            ),
+            'lang' => new \core_external\external_value(
+                PARAM_SAFEDIR,
+                'Code of the language'
+            ),
+            'text' => new \core_external\external_value(
+                PARAM_RAW,
+                'Raw text of the translation'
+            ),
+            'translationid' => new \core_external\external_value(
+                PARAM_INT,
+                'Identifier of translation being updated',
+                VALUE_DEFAULT,
+                null
+            ),
+            'nocleaning' => new \core_external\external_value(
+                PARAM_BOOL,
+                'Skip implicit cleaning of the input string',
+                VALUE_DEFAULT,
+                false
+            ),
         ]);
     }
 
@@ -144,10 +166,22 @@ class stage_translated_string extends \core_external\external_api {
     public static function execute_returns(): \core_external\external_description {
 
         return new \core_external\external_single_structure([
-            'translation' => new \core_external\external_value(PARAM_RAW, 'Raw text of the staged translation'),
-            'displaytranslation' => new \core_external\external_value(PARAM_RAW, 'HTML text of the staged translation to display'),
-            'displaytranslationsince' => new \core_external\external_value(PARAM_RAW, 'Label indicating version since the translation applies'),
-            'nocleaning' => new \core_external\external_value(PARAM_BOOL, 'Whether the implicit cleaning was skipped'),
+            'translation' => new \core_external\external_value(
+                PARAM_RAW,
+                'Raw text of the staged translation'
+            ),
+            'displaytranslation' => new \core_external\external_value(
+                PARAM_RAW,
+                'HTML text of the staged translation to display'
+            ),
+            'displaytranslationsince' => new \core_external\external_value(
+                PARAM_RAW,
+                'Label indicating version since the translation applies'
+            ),
+            'nocleaning' => new \core_external\external_value(
+                PARAM_BOOL,
+                'Whether the implicit cleaning was skipped'
+            ),
             'warnings' => new \core_external\external_warnings(),
         ]);
     }

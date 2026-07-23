@@ -24,8 +24,6 @@
 
 use local_amos\local\amos_tools;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * AMOS renderer class
  */

@@ -29,6 +29,7 @@ use local_amos\local\amos_version;
  * @copyright   2026 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(delete_translation::class)]
 final class delete_translation_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.

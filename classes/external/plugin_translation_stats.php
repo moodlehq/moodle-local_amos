@@ -25,8 +25,6 @@
 
 namespace local_amos\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Implements external function plugin_translation_stats used e.g. by plugins directory.
  *
@@ -79,21 +77,42 @@ class plugin_translation_stats extends \core_external\external_api {
      */
     public static function execute_returns() {
         return new \core_external\external_single_structure([
-            'lastmodified' => new \core_external\external_value(PARAM_INT, 'Timestamp of when the data was last modified'),
+            'lastmodified' => new \core_external\external_value(
+                PARAM_INT,
+                'Timestamp of when the data was last modified'
+            ),
             'langnames' => new \core_external\external_multiple_structure(
                 new \core_external\external_single_structure([
-                    'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code'),
-                    'name' => new \core_external\external_value(PARAM_TEXT, 'International name of the language followed by its code'),
+                    'lang' => new \core_external\external_value(
+                        PARAM_SAFEDIR,
+                        'Language code'
+                    ),
+                    'name' => new \core_external\external_value(
+                        PARAM_TEXT,
+                        'International name of the language followed by its code'
+                    ),
                 ])
             ),
             'branches' => new \core_external\external_multiple_structure(
                 new \core_external\external_single_structure([
-                    'branch' => new \core_external\external_value(PARAM_FILE, 'Moodle branch (eg. 3.6)'),
+                    'branch' => new \core_external\external_value(
+                        PARAM_FILE,
+                        'Moodle branch (eg. 3.6)'
+                    ),
                     'languages' => new \core_external\external_multiple_structure(
                         new \core_external\external_single_structure([
-                            'lang' => new \core_external\external_value(PARAM_SAFEDIR, 'Language code'),
-                            'numofstrings' => new \core_external\external_value(PARAM_INT, 'Number of strings in the language pack'),
-                            'ratio' => new \core_external\external_value(PARAM_INT, 'Completeness of the translation'),
+                            'lang' => new \core_external\external_value(
+                                PARAM_SAFEDIR,
+                                'Language code'
+                            ),
+                            'numofstrings' => new \core_external\external_value(
+                                PARAM_INT,
+                                'Number of strings in the language pack'
+                            ),
+                            'ratio' => new \core_external\external_value(
+                                PARAM_INT,
+                                'Completeness of the translation'
+                            ),
                         ])
                     ),
                 ])

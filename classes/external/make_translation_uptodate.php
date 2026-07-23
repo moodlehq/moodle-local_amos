@@ -45,8 +45,14 @@ class make_translation_uptodate extends \core_external\external_api {
     public static function execute_parameters(): \core_external\external_function_parameters {
 
         return new \core_external\external_function_parameters([
-            'originalid' => new \core_external\external_value(PARAM_INT, 'ID of the English original used as reference'),
-            'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the translation to be re-committed as up-to-date'),
+            'originalid' => new \core_external\external_value(
+                PARAM_INT,
+                'ID of the English original used as reference'
+            ),
+            'translationid' => new \core_external\external_value(
+                PARAM_INT,
+                'ID of the translation to be re-committed as up-to-date'
+            ),
         ]);
     }
 
@@ -129,8 +135,14 @@ class make_translation_uptodate extends \core_external\external_api {
     public static function execute_returns(): \core_external\external_description {
 
         return new \core_external\external_single_structure([
-            'translationid' => new \core_external\external_value(PARAM_INT, 'ID of the new translation'),
-            'displaytranslationsince' => new \core_external\external_value(PARAM_RAW, 'Label indicating version since the translation applies'),
+            'translationid' => new \core_external\external_value(
+                PARAM_INT,
+                'ID of the new translation'
+            ),
+            'displaytranslationsince' => new \core_external\external_value(
+                PARAM_RAW,
+                'Label indicating version since the translation applies'
+            ),
         ]);
     }
 }

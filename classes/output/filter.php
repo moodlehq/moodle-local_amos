@@ -347,6 +347,8 @@ class filter implements \renderable, \templatable {
             }
         }
 
+        // Meaning of the filter parameters:
+        //
         // a - app
         // d - stringid
         // e - substringeng
@@ -359,8 +361,11 @@ class filter implements \renderable, \templatable {
         // r - substringregex
         // s - substring
         // u - outdated
+        // v - version
         // w - workplace
         // x - has
+        //
+        // The parameters are intentionally short to make the permalink shorter.
 
         $data->missing = optional_param('m', false, PARAM_BOOL);
         $data->outdated = optional_param('u', false, PARAM_BOOL);
@@ -500,7 +505,7 @@ class filter implements \renderable, \templatable {
      * Export the filter form data for template.
      *
      * @param \renderer_base $output
-     * @return object
+     * @return \stdClass|array
      */
     public function export_for_template(\renderer_base $output) {
 
@@ -581,6 +586,7 @@ class filter implements \renderable, \templatable {
 
         $standard = \local_amos\local\util::standard_components_in_latest_version();
         $stdversions = \local_amos\local\util::standard_components_range_versions();
+        $sinceversion = [];
 
         // Categorize components into Core, Standard or Add-ons.
         foreach (amos_tools::list_components() as $componentname => $since) {

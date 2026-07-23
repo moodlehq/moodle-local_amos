@@ -26,8 +26,6 @@ use local_amos\local\amos_component;
 use local_amos\local\amos_tools;
 use local_amos\local\amos_version;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Manager class for accessing and updating the translation stats.
  *

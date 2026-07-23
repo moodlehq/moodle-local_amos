@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Provides {@see \local_amos\amos_merge_string_files_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2013 David Mudrak <david.mudrak@gmail.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos;
 
 use basic_testcase;
@@ -41,6 +32,7 @@ require_once(__DIR__ . '/classes/cli/testable_amos_merge_string_files.php');
  * @copyright 2013 David Mudrak <david.mudrak@gmail.com>
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(local_amos\local\cli_merge_files::class)]
 final class amos_merge_string_files_test extends basic_testcase {
     public function test_load_strings_from_file(): void {
         $logger = new testable_amos_cli_logger();

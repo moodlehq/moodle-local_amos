@@ -33,7 +33,7 @@ class amos_component implements \Countable, \IteratorAggregate {
     /** @var amos_version we are part of */
     public $version;
 
-    /** @var holds instances of amos_string in an associative array */
+    /** @var amos_string[] holds instances of amos_string in an associative array */
     protected $strings = [];
 
     /**
@@ -73,7 +73,14 @@ class amos_component implements \Countable, \IteratorAggregate {
      * @throws Exception
      * @return amos_component
      */
-    public static function from_phpfile($filepath, $lang, amos_version $version, $timemodified = null, $name = null, $format = null) {
+    public static function from_phpfile(
+        $filepath,
+        $lang,
+        amos_version $version,
+        $timemodified = null,
+        $name = null,
+        $format = null
+    ) {
         if (empty($name)) {
             $name = self::name_from_filename($filepath);
         }

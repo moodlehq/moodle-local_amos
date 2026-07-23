@@ -29,6 +29,7 @@ use local_amos\local\amos_version;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(get_string_timeline::class)]
 final class get_string_timeline_test extends \local_amos_testcase {
     /**
      * Test that permission check is performed.

@@ -42,6 +42,7 @@ require_once($CFG->dirroot . '/local/amos/mlanglib.php');
 /**
  * Tests for the {@see \local_amos_stats_manager} class.
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(local_amos_stats_manager::class)]
 final class stats_manager_test extends advanced_testcase {
     /**
      * Test the workflow for updating the stats.
@@ -192,6 +193,8 @@ final class stats_manager_test extends advanced_testcase {
         $this->assertContains(['lang' => 'cs', 'name' => 'Czech [cs]'], $raw['langnames']);
         $this->assertContains(['lang' => 'de', 'name' => 'German [de]'], $raw['langnames']);
         $this->assertNotEmpty($raw['branches']);
+
+        $data = [];
 
         foreach ($raw['branches'] as $branchinfo) {
             $this->assertTrue(isset($branchinfo['branch']));

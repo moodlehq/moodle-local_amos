@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Unit tests for Moodle string file parsers defined in mlangparser.php
- *
- * @package     local_amos
- * @category    test
- * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos;
 
 use basic_testcase;
@@ -40,7 +31,14 @@ require_once($CFG->dirroot . '/local/amos/mlangparser.php');
 
 /**
  * Test cases for the parsers api
+
+ * @copyright   2010 David Mudrak <david.mudrak@gmail.com>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_parser::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_parser_factory::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_parser_exception::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(amos_php_parser::class)]
 final class mlangparser_test extends basic_testcase {
     public function test_singleton_instances(): void {
         $parser = amos_parser_factory::get_parser('php');

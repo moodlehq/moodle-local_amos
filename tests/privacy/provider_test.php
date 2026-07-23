@@ -14,20 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides the {@see \local_amos\privacy\provider_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2018 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\privacy;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
 
 /**
  * Unit tests for the {@see \local_amos\privacy\provider} class.
@@ -35,6 +22,7 @@ global $CFG;
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(provider::class)]
 final class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * Test {@see \local_amos\privacy\provider::get_contexts_for_userid()} implementation.

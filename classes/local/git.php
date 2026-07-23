@@ -24,8 +24,6 @@
 
 namespace local_amos\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Implements a thin wrapper for executing git commands against a given repository.
  *

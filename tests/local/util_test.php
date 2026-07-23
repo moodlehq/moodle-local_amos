@@ -24,6 +24,7 @@ namespace local_amos\local;
  * @copyright   2020 David Mudrák <david@moodle.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(util::class)]
 final class util_test extends \advanced_testcase {
     /**
      * Test functionality of {@see local_amos\local\util::add_breaks()}.

@@ -14,15 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Provides the {@see \local_amos\external\update_strings_file_test} class.
- *
- * @package     local_amos
- * @category    test
- * @copyright   2020 David Mudrák <david@moodle.com>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_amos\external;
 
 use local_amos\local\amos_component;
@@ -40,6 +31,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(update_strings_file::class)]
 final class update_strings_file_test extends \externallib_advanced_testcase {
     /**
      * Test the permission check for the update_strings_file external function.
