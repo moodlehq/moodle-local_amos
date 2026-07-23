@@ -319,5 +319,7 @@ const markUpToDate = (item) => {
         item.querySelector('[data-region="displaytranslationsince"]').innerHTML = response.displaytranslationsince + ' | ';
         item.querySelector('[data-region="markuptodatelink"]').remove();
 
+        return true;
+
     }).catch(Notification.exception);
 };
