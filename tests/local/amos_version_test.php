@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provides {@see \local_amos\mlang_version_test} class.
+ * Provides {@see \local_amos\local\amos_version_test} class.
  *
  * @package     local_amos
  * @category    test
@@ -23,23 +23,15 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_amos;
-
-use advanced_testcase;
-use local_amos\local\amos_version;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/amos/mlanglib.php');
+namespace local_amos\local;
 
 /**
- * Unit tests for the amos_version class functionality.
+ * Unit tests for the {@see \local_amos\local\amos_version} class functionality.
  *
  * @copyright 2020 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class mlang_version_test extends advanced_testcase {
+final class amos_version_test extends \advanced_testcase {
     /**
      * Test amos_version factory methods.
      *
@@ -265,5 +257,20 @@ final class mlang_version_test extends advanced_testcase {
         $this->assertEquals('3.10', $supported[310]->dir);
         $this->assertEquals('4.0', $supported[400]->dir);
         $this->assertEquals('4.1', $supported[401]->dir);
+    }
+
+    /**
+     * Test that amos_version instances are re-used.
+     */
+    public function test_instance_reuse(): void {
+
+        $v20b = amos_version::by_branch('MOODLE_20_STABLE');
+        $v20c = amos_version::by_code(20);
+        $v20d = amos_version::by_dir('2.0');
+        $v21c = amos_version::by_code(21);
+
+        $this->assertSame($v20b, $v20c);
+        $this->assertSame($v20c, $v20d);
+        $this->assertNotSame($v20c, $v21c);
     }
 }
