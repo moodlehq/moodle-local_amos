@@ -589,12 +589,12 @@ if (has_capability('local/amos:commit', context_system::instance())) {
             get_string('contribstatus', 'local_amos'),
             get_string('contribauthor', 'local_amos'),
             get_string('contribsubject', 'local_amos'),
-            get_string('contribtimemodified', 'local_amos'),
+            get_string('contribtimecreated', 'local_amos'),
             get_string('contribassignee', 'local_amos'),
             get_string('language', 'local_amos'),
             get_string('strings', 'local_amos'),
         ];
-        $table->colclasses = ['id', 'status', 'author', 'subject', 'timemodified', 'assignee', 'language', 'strings'];
+        $table->colclasses = ['id', 'status', 'author', 'subject', 'timecreated', 'assignee', 'language', 'strings'];
 
         foreach ($contributions as $contribution) {
             $url = new moodle_url($PAGE->url, ['id' => $contribution->id]);
@@ -606,8 +606,7 @@ if (has_capability('local/amos:commit', context_system::instance())) {
             $author->size = 16;
             $cells[] = new html_table_cell($output->render($author) . s(fullname($author->user)));
             $cells[] = new html_table_cell(html_writer::link($url, s($contribution->subject)));
-            $time    = is_null($contribution->timemodified) ? $contribution->timecreated : $contribution->timemodified;
-            $cells[] = new html_table_cell(userdate($time, get_string('strftimedaydatetime', 'langconfig')));
+            $cells[] = new html_table_cell(userdate($contribution->timecreated, get_string('strftimedate', 'langconfig')));
             if (is_null($contribution->assigneeid)) {
                 $assignee = get_string('contribassigneenone', 'local_amos');
             } else {
@@ -659,12 +658,12 @@ if (empty($contributions)) {
         get_string('contribid', 'local_amos'),
         get_string('contribstatus', 'local_amos'),
         get_string('contribsubject', 'local_amos'),
-        get_string('contribtimemodified', 'local_amos'),
+        get_string('contribtimecreated', 'local_amos'),
         get_string('contribassignee', 'local_amos'),
         get_string('language', 'local_amos'),
         get_string('strings', 'local_amos'),
     ];
-    $table->colclasses = ['id', 'status', 'subject', 'timemodified', 'assignee', 'language', 'strings'];
+    $table->colclasses = ['id', 'status', 'subject', 'timecreated', 'assignee', 'language', 'strings'];
 
     foreach ($contributions as $contribution) {
         $url = new moodle_url($PAGE->url, ['id' => $contribution->id]);
@@ -673,8 +672,7 @@ if (empty($contributions)) {
         $status  = get_string('contribstatus' . $contribution->status, 'local_amos');
         $cells[] = new html_table_cell(html_writer::link($url, $status));
         $cells[] = new html_table_cell(html_writer::link($url, s($contribution->subject)));
-        $time    = is_null($contribution->timemodified) ? $contribution->timecreated : $contribution->timemodified;
-        $cells[] = new html_table_cell(userdate($time, get_string('strftimedaydatetime', 'langconfig')));
+        $cells[] = new html_table_cell(userdate($contribution->timecreated, get_string('strftimedate', 'langconfig')));
         if (is_null($contribution->assigneeid)) {
             $assignee = get_string('contribassigneenone', 'local_amos');
         } else {
