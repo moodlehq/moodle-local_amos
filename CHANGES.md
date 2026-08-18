@@ -1,3 +1,7 @@
+## 2026.08.18 ##
+
+* MDLSITE-8478 Display creation timestamp on translation contribution pages.
+
 ## 2026.07.23 ##
 
 * MDLSITE-8461 Fixed some legacy coding style violations.
