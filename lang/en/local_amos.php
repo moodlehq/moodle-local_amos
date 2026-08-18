@@ -173,6 +173,7 @@ $string['contribstringssome'] = '{$a->orig} ({$a->same} of them already have mor
 $string['contribsubject'] = 'Subject';
 $string['contribsubmittednone'] = 'No submitted contributions';
 $string['contribsubmittedsome'] = 'Your contributions ({$a})';
+$string['contribtimecreated'] = 'Submitted';
 $string['contribtimemodified'] = 'Modified';
 $string['contribute'] = 'Contribute';
 $string['contributenow'] = 'Contribute now!';
