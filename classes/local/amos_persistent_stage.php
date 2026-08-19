@@ -24,7 +24,7 @@ namespace local_amos\local;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class amos_persistent_stage extends amos_stage {
-    /** @var the owner of the stage */
+    /** @var int the owner of the stage */
     public $userid;
 
     /** @var string name of the stage */
