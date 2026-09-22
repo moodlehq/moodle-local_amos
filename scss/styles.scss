@@ -61,11 +61,22 @@
 .path-local-amos .contributionwrapper .source {
     padding-left: 60px;
     position: relative;
-}
-
-.path-local-amos .contributionwrapper .source {
     margin-left: auto;
     margin-right: auto;
+
+    h3, div {
+      margin: 0px 0px 0.3em;
+    }
+
+    .timecreated, .timemodified {
+      font-style: italic;
+    }
+
+    .userpicture {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
 }
 
 .path-local-amos .contributionwrapper .details {
@@ -74,21 +85,6 @@
     margin-top: 1em;
     margin-left: auto;
     margin-right: auto;
-}
-
-.path-local-amos .contributionwrapper .source h3,
-.path-local-amos .contributionwrapper .source div {
-    margin: 0px 0px 0.3em;
-}
-
-.path-local-amos .contributionwrapper .source .timecreated {
-    font-style: italic;
-}
-
-.path-local-amos .contributionwrapper .source .userpicture {
-    position: absolute;
-    top: 10px;
-    left: 10px;
 }
 
 .path-local-amos .contributionwrapper .details .userpicture {

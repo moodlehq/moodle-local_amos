@@ -402,16 +402,18 @@ class local_amos_renderer extends plugin_renderer_base {
         $output .= $this->output->heading('#' . $contrib->info->id . ' ' . s($contrib->info->subject), 3, 'subject');
         $output .= $this->output->container($this->output->user_picture($contrib->author) . fullname($contrib->author), 'author');
 
+        $output .= $this->output->container(
+            get_string('contribtimecreated', 'local_amos') . ': ' .
+                userdate($contrib->info->timecreated, get_string('strftimedaydatetime', 'langconfig')),
+            'timecreated'
+        );
+
         if ($contrib->info->timemodified) {
-            $output .= $this->output->container(userdate(
-                $contrib->info->timemodified,
-                get_string('strftimedaydatetime', 'langconfig')
-            ), 'timemodified');
-        } else {
-            $output .= $this->output->container(userdate(
-                $contrib->info->timecreated,
-                get_string('strftimedaydatetime', 'langconfig')
-            ), 'timecreated');
+            $output .= $this->output->container(
+                get_string('contribtimemodified', 'local_amos') . ': ' .
+                    userdate($contrib->info->timemodified, get_string('strftimedaydatetime', 'langconfig')),
+                'timemodified'
+            );
         }
 
         $output .= $this->output->container(format_text($contrib->info->message), 'message');
