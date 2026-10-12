@@ -471,7 +471,7 @@ class local_amos_stats_manager {
         global $CFG, $DB;
 
         $cache = cache::make('local_amos', 'stats');
-        $cachekey = 'contributionstats';
+        $cachekey = 'contributionstats_' . current_language();
 
         if ($cached = $cache->get($cachekey)) {
             if (($cached['timecached'] ?? 0) > time() - 600) {
