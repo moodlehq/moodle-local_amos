@@ -1,3 +1,7 @@
+## 2026.10.12 ##
+
+* MDLSITE-8589 Fix the cross-language cache leak in the Contribute frontpage block.
+
 ## 2026.08.18 ##
 
 * MDLSITE-8478 Display creation timestamp on translation contribution pages.
