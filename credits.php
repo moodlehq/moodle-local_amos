@@ -58,6 +58,7 @@ if ($canedit && $editmode) {
 $languages = amos_tools::list_languages(false, true, false);
 
 // Get the list of known languages.
+$list = [];
 
 foreach ($languages as $langcode => $langname) {
     $list[$langcode] = (object)['langname' => $langname, 'maintainers' => [], 'contributors' => []];
